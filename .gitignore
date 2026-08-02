@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Environment and local data
+.env
+*.db
+.DS_Store
+Thumbs.db
+
+# ML artifacts and private/raw datasets
+ml/datasets/*
+!ml/datasets/.gitkeep
+ml/artifacts/
+ml/runs/
