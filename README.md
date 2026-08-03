@@ -11,6 +11,8 @@ AffectLab is a text-first research prototype for emotion-aware coaching and adap
 - Workload, personal-boundary, and relationship-need role-plays at three difficulty levels
 - Pause, resume, manual completion, automatic success, and safety interruption
 - Evidence-backed feedback with optional structured LLM wording
+- Auditable text-intelligence baselines for emotion, cognitive patterns, intent, readiness, and resistance
+- Scored strategy decisions with machine-readable reasons and model-version metadata
 - Consent disclosure, responsive authenticated frontend, and account/session controls
 
 ## Run with Docker
@@ -64,9 +66,16 @@ docker compose config
 
 Tests use an in-memory repository adapter and never require live MongoDB or OpenAI access. Docker and normal configured deployments use the async PyMongo repository.
 
+Run the bundled evaluation smoke dataset with:
+
+```powershell
+.venv\Scripts\python.exe ml\evaluation\evaluate_text.py ml\evaluation\sample_text_eval.jsonl
+```
+
+The evaluator reports accuracy, macro F1, per-class precision/recall/F1, mean confidence error, distortion accuracy, and individual predictions. The bundled rows are pipeline fixtures—not a scientific benchmark. Replace them with appropriately licensed, independently reviewed evaluation data before reporting results.
+
 ## Privacy and safety
 
 Users must accept disclosure that text is stored locally for up to 30 days and that the full session may be sent to OpenAI when configured. Raw prompts and responses are not written to application logs. Crisis phrase checks run before response generation; provider moderation is secondary. The safety layer is a conservative prototype and requires independent evaluation before any study or public deployment.
 
 See [docs/architecture.md](docs/architecture.md) for data flow and extension boundaries.
-

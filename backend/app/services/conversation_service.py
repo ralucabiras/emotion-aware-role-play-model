@@ -13,19 +13,25 @@ from app.models.domain import (
 )
 from app.repositories.base import Repository
 from app.safety.crisis import CRISIS_RESPONSE, contains_crisis_language
-from app.services.affect_service import RuleBasedEmotionAnalyzer, assess_cognition, smooth_state
-from app.services.interfaces import EmotionAnalyzer, ResponseGenerator, StrategySelector
+from app.services.affect_service import (
+    ExponentialStateTracker,
+    RuleBasedCognitiveAnalyzer,
+    RuleBasedEmotionAnalyzer,
+)
+from app.services.interfaces import CognitiveAnalyzer, EmotionAnalyzer, ResponseGenerator, StrategySelector
 from app.services.llm_service import OpenAIResponseGenerator
 from app.services.roleplay_service import RolePlayService
-from app.services.strategy_service import RuleBasedStrategySelector
+from app.services.strategy_service import RuleBasedStrategySelector, ScoredStrategySelector
 
 
 class SessionNotFoundError(KeyError): pass
 
 
 class ConversationService:
-    def __init__(self, repository: Repository, analyzer: EmotionAnalyzer | None = None, selector: StrategySelector | None = None, generator: ResponseGenerator | None = None) -> None:
+    def __init__(self, repository: Repository, analyzer: EmotionAnalyzer | None = None, cognitive_analyzer: CognitiveAnalyzer | None = None, selector: StrategySelector | None = None, generator: ResponseGenerator | None = None) -> None:
         self.repository, self.analyzer = repository, analyzer or RuleBasedEmotionAnalyzer()
+        self.cognitive_analyzer = cognitive_analyzer or RuleBasedCognitiveAnalyzer()
+        self.state_tracker = ExponentialStateTracker()
         self.selector, self.generator = selector or RuleBasedStrategySelector(), generator or OpenAIResponseGenerator()
         self.roleplays = RolePlayService()
     async def create_session(self, user_id: UUID) -> Session:
@@ -44,9 +50,14 @@ class ConversationService:
         session = await self.get_session(session_id, user_id)
         crisis = contains_crisis_language(message)
         if not crisis and isinstance(self.generator, OpenAIResponseGenerator): crisis = await self.generator.moderate(message)
-        state = smooth_state(session.emotion_state, self.analyzer.analyze(message))
-        assessment, session.emotion_state = assess_cognition(message, crisis), state
-        strategy = self.selector.select(state, assessment)
+        state = self.state_tracker.update(session.emotion_state, self.analyzer.analyze(message))
+        assessment, session.emotion_state = self.cognitive_analyzer.analyze(message, crisis), state
+        state.resistance = assessment.resistance
+        if isinstance(self.selector, ScoredStrategySelector):
+            strategy_decision = self.selector.decide(state, assessment)
+            strategy, strategy_scores, reasons = strategy_decision.strategy, strategy_decision.scores, strategy_decision.reasons
+        else:
+            strategy, strategy_scores, reasons = self.selector.select(state, assessment), {}, []
         session.turns.append(ConversationTurn(role=Role.USER, content=message, emotion_state=state))
         if crisis:
             content, metadata = CRISIS_RESPONSE, None
@@ -58,7 +69,7 @@ class ConversationService:
         turn = ConversationTurn(role=Role.ASSISTANT, content=content, strategy=strategy, generation=metadata)
         session.turns.append(turn)
         await self.save(session)
-        return turn, AgentDecision(emotion_state=state, cognitive_assessment=assessment, strategy=strategy), session
+        return turn, AgentDecision(emotion_state=state, cognitive_assessment=assessment, strategy=strategy, strategy_scores=strategy_scores, decision_reasons=reasons, analyzer_version=getattr(self.analyzer, "version", "unknown")), session
     async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty):
         session = await self.get_session(session_id, user_id)
         state, scenario = self.roleplays.start(scenario_id, level)
@@ -79,4 +90,3 @@ class ConversationService:
         feedback = self.roleplays.feedback(session.roleplay)
         if isinstance(self.generator, OpenAIResponseGenerator): feedback = await self.generator.phrase_feedback(feedback)
         session.feedback = feedback
-

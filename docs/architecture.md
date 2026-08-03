@@ -27,7 +27,14 @@ Interfaces isolate persistence, affect analysis, strategy selection, and generat
 
 Each scenario defines difficulty behavior, expected skills, success conditions, and a maximum turn count. Per-turn evidence captures observable language features and affect values. Deterministic metrics are the source of truth; the LLM may rephrase strengths and suggestions but cannot create new evidence.
 
+## Text-intelligence baseline
+
+The `lexical-v2` analyzer returns a normalized eight-label distribution plus valence, arousal, intensity, and confidence. It handles weighted terms, nearby negation, intensifiers, and punctuation. `cognitive-rules-v2` independently estimates ten tentative cognitive-pattern categories, user intent, advice readiness, resistance, and a possible stated cause. The state tracker applies an exponential moving average across turns.
+
+The strategy policy scores every available strategy and returns the chosen strategy with human-readable reasons. Crisis escalation has absolute precedence. These transparent components establish evaluation and ablation baselines; they are not trained models and must not be described as clinically validated.
+
+Experiment configuration lives in `configs/text_baseline.json`. The JSONL evaluator under `ml/evaluation` accepts records containing `text`, `emotion`, and optional `distortion`, and can write a reproducible JSON result with `--output`.
+
 ## Deferred work
 
-Trained emotion/cognitive models, experiment tracking, audio, video, password reset, email verification, OAuth, and production deployment hardening remain outside this milestone.
-
+Trained transformer models, external experiment tracking, audio, video, password reset, email verification, OAuth, and production deployment hardening remain outside this milestone.

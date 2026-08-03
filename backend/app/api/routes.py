@@ -43,6 +43,11 @@ async def health(repository=Depends(get_repository)):
     return {"status": "ok", "persistence": type(repository).__name__}
 
 
+@router.get("/models/info")
+async def model_info(user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
+    return {"emotion_analyzer": getattr(service.analyzer, "version", "unknown"), "cognitive_analyzer": getattr(service.cognitive_analyzer, "version", "unknown"), "strategy_selector": "scored-rules-v2", "trained_model": False, "disclaimer": "Transparent development baselines; predictions are uncertain and are not diagnoses."}
+
+
 async def auth_response(user: User, response: Response, auth: AuthService) -> AuthResponse:
     set_refresh_cookie(response, await auth.refresh_token(user.id))
     return AuthResponse(access_token=auth.access_token(user.id), user=UserResponse(id=user.id, email=user.email))
@@ -146,4 +151,3 @@ async def get_feedback(session_id: UUID, user: User = Depends(current_user), ser
     session = await service.get_session(session_id, user.id)
     if not session.feedback: raise HTTPException(404, "Feedback not available")
     return session.feedback
-

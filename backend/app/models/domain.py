@@ -31,6 +31,14 @@ class SupportStrategy(StrEnum):
     SAFETY_ESCALATION = "safety_escalation"
 
 
+class UserIntent(StrEnum):
+    EMOTIONAL_SUPPORT = "emotional_support"
+    PRACTICAL_HELP = "practical_help"
+    REHEARSAL = "rehearsal"
+    INFORMATION = "information"
+    UNCLEAR = "unclear"
+
+
 class Role(StrEnum):
     USER = "user"
     ASSISTANT = "assistant"
@@ -63,7 +71,11 @@ class EmotionState(BaseModel):
 
 class CognitiveAssessment(BaseModel):
     possible_distortion: str | None = None
+    distortion_scores: dict[str, float] = Field(default_factory=dict)
     possible_cause: str | None = None
+    intent: UserIntent = UserIntent.UNCLEAR
+    readiness_for_advice: float = Field(0.5, ge=0, le=1)
+    resistance: float = Field(0, ge=0, le=1)
     wants_validation: bool = False
     wants_practical_help: bool = False
     wants_roleplay: bool = False
@@ -130,6 +142,9 @@ class AgentDecision(BaseModel):
     emotion_state: EmotionState
     cognitive_assessment: CognitiveAssessment
     strategy: SupportStrategy
+    strategy_scores: dict[SupportStrategy, float] = Field(default_factory=dict)
+    decision_reasons: list[str] = Field(default_factory=list)
+    analyzer_version: str = "lexical-v2"
 
 
 class FeedbackMetric(BaseModel):
@@ -166,4 +181,3 @@ class Session(BaseModel):
     emotion_state: EmotionState = Field(default_factory=EmotionState)
     roleplay: RolePlayState | None = None
     feedback: SessionFeedback | None = None
-
