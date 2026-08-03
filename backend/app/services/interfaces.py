@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from app.models.domain import CognitiveAssessment, EmotionState, Session, SupportStrategy
+from app.models.domain import CognitiveAssessment, EmotionState, GenerationMetadata, Session, SupportStrategy
 
 
 class EmotionAnalyzer(ABC):
@@ -15,5 +15,5 @@ class StrategySelector(ABC):
 
 class ResponseGenerator(ABC):
     @abstractmethod
-    async def generate(self, session: Session, message: str, strategy: SupportStrategy) -> str: ...
+    async def generate(self, session: Session, message: str, strategy: SupportStrategy) -> tuple[str, GenerationMetadata]: ...
 

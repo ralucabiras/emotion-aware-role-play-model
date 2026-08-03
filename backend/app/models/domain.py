@@ -1,8 +1,12 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
+
+
+def utcnow() -> datetime:
+    return datetime.now(UTC)
 
 
 class EmotionLabel(StrEnum):
@@ -32,6 +36,19 @@ class Role(StrEnum):
     ASSISTANT = "assistant"
 
 
+class RolePlayStatus(StrEnum):
+    ACTIVE = "active"
+    PAUSED = "paused"
+    COMPLETED = "completed"
+    INTERRUPTED = "interrupted"
+
+
+class Difficulty(StrEnum):
+    BEGINNER = "beginner"
+    INTERMEDIATE = "intermediate"
+    DIFFICULT = "difficult"
+
+
 class EmotionState(BaseModel):
     dominant_emotion: EmotionLabel = EmotionLabel.NEUTRAL
     distribution: dict[EmotionLabel, float] = Field(default_factory=lambda: {EmotionLabel.NEUTRAL: 1.0})
@@ -54,13 +71,33 @@ class CognitiveAssessment(BaseModel):
     crisis_detected: bool = False
 
 
+class GenerationMetadata(BaseModel):
+    source: str = "template"
+    model: str | None = None
+    latency_ms: int | None = None
+    fallback_reason: str | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+
+
 class ConversationTurn(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     role: Role
     content: str
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    created_at: datetime = Field(default_factory=utcnow)
     emotion_state: EmotionState | None = None
     strategy: SupportStrategy | None = None
+    generation: GenerationMetadata | None = None
+
+
+class TurnEvidence(BaseModel):
+    turn: int
+    concrete_request: bool = False
+    excessive_apology: bool = False
+    maintained_boundary: bool = False
+    blame_language: bool = False
+    specific_detail: bool = False
+    arousal: float = 0
 
 
 class RolePlayScenario(BaseModel):
@@ -70,14 +107,23 @@ class RolePlayScenario(BaseModel):
     user_objective: str
     opening_line: str
     expected_skills: list[str]
+    difficulty_behaviors: dict[Difficulty, str]
+    success_conditions: list[str]
+    max_turns: int = 8
 
 
 class RolePlayState(BaseModel):
     scenario_id: str
-    active: bool = True
+    status: RolePlayStatus = RolePlayStatus.ACTIVE
+    difficulty_level: Difficulty = Difficulty.BEGINNER
     difficulty: float = Field(0.3, ge=0, le=1)
     cooperation: float = Field(0.7, ge=0, le=1)
     turn: int = 0
+    evidence: list[TurnEvidence] = Field(default_factory=list)
+    success_progress: float = Field(0, ge=0, le=1)
+    completion_reason: str | None = None
+    started_at: datetime = Field(default_factory=utcnow)
+    completed_at: datetime | None = None
 
 
 class AgentDecision(BaseModel):
@@ -86,15 +132,38 @@ class AgentDecision(BaseModel):
     strategy: SupportStrategy
 
 
+class FeedbackMetric(BaseModel):
+    name: str
+    score: float = Field(ge=0, le=1)
+    evidence_turns: list[int] = Field(default_factory=list)
+
+
 class SessionFeedback(BaseModel):
+    scenario_id: str
+    metrics: list[FeedbackMetric]
+    observed: list[str]
     strengths: list[str]
     suggestions: list[str]
-    observed: list[str]
+    generation_source: str = "deterministic"
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class User(BaseModel):
+    id: UUID = Field(default_factory=uuid4)
+    email: str
+    password_hash: str
+    consented_at: datetime
+    created_at: datetime = Field(default_factory=utcnow)
 
 
 class Session(BaseModel):
     id: UUID = Field(default_factory=uuid4)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    user_id: UUID
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)
+    expires_at: datetime = Field(default_factory=lambda: utcnow() + timedelta(days=30))
     turns: list[ConversationTurn] = Field(default_factory=list)
     emotion_state: EmotionState = Field(default_factory=EmotionState)
     roleplay: RolePlayState | None = None
+    feedback: SessionFeedback | None = None
+

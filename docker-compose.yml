@@ -1,11 +1,32 @@
 services:
+  mongodb:
+    image: mongo:8.0
+    restart: unless-stopped
+    ports: ["27017:27017"]
+    volumes: ["mongodb_data:/data/db"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
   backend:
     build: ./backend
     ports: ["8000:8000"]
     environment:
       FRONTEND_ORIGIN: http://localhost:5173
+      PERSISTENCE_BACKEND: mongo
+      MONGODB_URI: mongodb://mongodb:27017
+      MONGODB_DATABASE: affectlab
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.6}
+    depends_on:
+      mongodb:
+        condition: service_healthy
   frontend:
     build: ./frontend
     ports: ["5173:80"]
     depends_on: [backend]
+volumes:
+  mongodb_data:
 

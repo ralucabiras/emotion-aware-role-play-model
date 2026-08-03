@@ -1,34 +1,41 @@
 # AffectLab
 
-AffectLab is a research prototype for emotion-aware coaching and adaptive social rehearsal. It is designed to help people reflect on difficult social situations and practise conversations; it is **not** a therapist, medical service, or diagnostic tool.
+AffectLab is a text-first research prototype for emotion-aware coaching and adaptive social rehearsal. It is not a therapist, medical service, or diagnostic system.
 
-The current milestone is a text-first full-stack baseline:
+## Complete MVP
 
-- React + TypeScript chat interface
-- FastAPI API with typed domain models
-- In-memory sessions and conversation history
-- Replaceable rule-based emotion analyser and strategy selector
-- Smoothed emotional state across turns
-- One adaptive workload-conversation role-play
-- Crisis-language interruption and delete-session endpoint
+- Email/password accounts with Argon2 hashing, access JWTs, and rotating refresh cookies
+- Ownership-protected MongoDB sessions with 30-day inactivity expiry and explicit deletion
+- Rule-based affect tracking and strategy selection behind replaceable interfaces
+- Optional OpenAI Responses API generation with moderation and transparent offline fallback
+- Workload, personal-boundary, and relationship-need role-plays at three difficulty levels
+- Pause, resume, manual completion, automatic success, and safety interruption
+- Evidence-backed feedback with optional structured LLM wording
+- Consent disclosure, responsive authenticated frontend, and account/session controls
 
-## Quick start
+## Run with Docker
 
-Requirements: Python 3.11+ and Node.js 20+.
+Requirements: Docker Desktop with Compose.
 
-### Backend
+```powershell
+Copy-Item .env.example .env
+# Set a long random JWT_SECRET and optionally OPENAI_API_KEY in .env
+docker compose up --build
+```
+
+Open `http://localhost:5173`. MongoDB data is kept in the `mongodb_data` volume. The API and interactive documentation are available at `http://localhost:8000` and `http://localhost:8000/docs`.
+
+## Run services locally
+
+Start MongoDB on `localhost:27017`, then:
 
 ```powershell
 cd backend
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r requirements-dev.txt
-uvicorn app.main:app --reload
+..\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+$env:PERSISTENCE_BACKEND = "mongo"
+$env:JWT_SECRET = "replace-this-with-at-least-32-random-bytes"
+..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
 ```
-
-The API runs at `http://localhost:8000`; interactive documentation is at `http://localhost:8000/docs`.
-
-### Frontend
 
 In a second terminal:
 
@@ -38,29 +45,28 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`.
-
-Alternatively, run `docker compose up --build` from the repository root.
+When `OPENAI_API_KEY` is absent or an API call fails, the backend uses its deterministic template generator. `OPENAI_MODEL` defaults to `gpt-5.6` and is configurable.
 
 ## Verify
 
 ```powershell
 cd backend
-pytest
-ruff check .
+..\.venv\Scripts\python.exe -m pytest
+..\.venv\Scripts\python.exe -m ruff check .
 
 cd ..\frontend
 npm run lint
 npm run build
+
+cd ..
+docker compose config
 ```
 
-## Architecture
+Tests use an in-memory repository adapter and never require live MongoDB or OpenAI access. Docker and normal configured deployments use the async PyMongo repository.
 
-The browser calls a small typed API. A conversation passes through emotion analysis, state smoothing, cognitive assessment, strategy selection, and response generation. Each intelligent component is behind a service boundary so a trained model or external LLM can replace the offline baseline without changing API routes.
+## Privacy and safety
 
-Session storage is intentionally in memory for this milestone; restarting the backend clears it. Raw audio and video are not accepted or stored. See [docs/architecture.md](docs/architecture.md) for the module map and next steps.
+Users must accept disclosure that text is stored locally for up to 30 days and that the full session may be sent to OpenAI when configured. Raw prompts and responses are not written to application logs. Crisis phrase checks run before response generation; provider moderation is secondary. The safety layer is a conservative prototype and requires independent evaluation before any study or public deployment.
 
-## Safety scope
-
-The prototype expresses affect estimates as uncertain signals, never diagnoses, and interrupts ordinary coaching when its conservative phrase matcher detects crisis-related language. The matcher is only a baseline and must be independently evaluated before any user study or public deployment.
+See [docs/architecture.md](docs/architecture.md) for data flow and extension boundaries.
 

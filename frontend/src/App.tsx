@@ -1,78 +1,26 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { EmotionPanel } from './components/EmotionPanel'
 import { api } from './services/api'
-import type { ConversationTurn, EmotionState } from './types/api'
+import type { ConversationTurn, EmotionState, Feedback, RolePlayState, Scenario } from './types/api'
 import './styles.css'
 
+function AuthScreen({ onAuth }: { onAuth: (email: string) => void }) {
+  const [register, setRegister] = useState(true), [email, setEmail] = useState(''), [password, setPassword] = useState(''), [consent, setConsent] = useState(false), [error, setError] = useState(''), [busy, setBusy] = useState(false)
+  async function submit(e: FormEvent) { e.preventDefault(); setBusy(true); setError(''); try { const result = register ? await api.register(email, password, consent) : await api.login(email, password); onAuth(result.user.email) } catch (err) { setError(err instanceof Error ? err.message : 'Authentication failed') } finally { setBusy(false) } }
+  return <main className="auth-shell"><section className="auth-card"><span className="brand-mark">A</span><p className="eyebrow">Reflect · Reframe · Rehearse</p><h1>Welcome to AffectLab.</h1><p>A private research prototype for practising difficult conversations.</p><form className="auth-form" onSubmit={submit}><label>Email<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required /></label><label>Password<input type="password" minLength={10} value={password} onChange={e=>setPassword(e.target.value)} required /></label>{register && <label className="consent"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} required /><span>I understand that conversation text is stored in local MongoDB for up to 30 days and, when configured, the full session may be sent to OpenAI. AffectLab is not therapy or medical care.</span></label>}{error && <p className="error">{error}</p>}<button className="primary" disabled={busy}>{busy ? 'Please wait…' : register ? 'Create account' : 'Sign in'}</button></form><button className="text-button" onClick={()=>{setRegister(!register);setError('')}}>{register ? 'Already registered? Sign in' : 'Need an account? Register'}</button></section></main>
+}
+
 export default function App() {
-  const [sessionId, setSessionId] = useState<string>()
-  const [turns, setTurns] = useState<ConversationTurn[]>([])
-  const [emotion, setEmotion] = useState<EmotionState | null>(null)
-  const [message, setMessage] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
+  const [user, setUser] = useState<string>(), [sessionId, setSessionId] = useState<string>(), [sessions, setSessions] = useState<{session_id:string;turn_count:number}[]>([]), [turns, setTurns] = useState<ConversationTurn[]>([]), [emotion, setEmotion] = useState<EmotionState|null>(null), [message, setMessage] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState(''), [scenarios, setScenarios] = useState<Scenario[]>([]), [selected, setSelected] = useState('workload'), [difficulty, setDifficulty] = useState('beginner'), [roleplay, setRoleplay] = useState<RolePlayState|null>(null), [feedback, setFeedback] = useState<Feedback|null>(null)
   const endRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    api.createSession().then(({ session_id, emotion_state }) => {
-      setSessionId(session_id); setEmotion(emotion_state)
-    }).catch(() => setError('Could not connect to the AffectLab API.'))
-  }, [])
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), [turns])
-
-  async function submit(event: FormEvent) {
-    event.preventDefault()
-    if (!sessionId || !message.trim() || busy) return
-    const content = message.trim()
-    setMessage(''); setBusy(true); setError('')
-    setTurns((current) => [...current, { id: crypto.randomUUID(), role: 'user', content, created_at: new Date().toISOString() }])
-    try {
-      const result = await api.sendMessage(sessionId, content)
-      setTurns((current) => [...current, result.turn]); setEmotion(result.decision.emotion_state)
-    } catch { setError('The message could not be sent. Please try again.') }
-    finally { setBusy(false) }
-  }
-
-  async function startRoleplay() {
-    if (!sessionId || busy) return
-    setBusy(true)
-    try {
-      const result = await api.startRoleplay(sessionId)
-      setTurns((current) => [...current, result.opening_turn])
-    } catch { setError('Could not start the role-play.') }
-    finally { setBusy(false) }
-  }
-
-  async function clearSession() {
-    if (sessionId) await api.deleteSession(sessionId)
-    const next = await api.createSession()
-    setSessionId(next.session_id); setEmotion(next.emotion_state); setTurns([]); setError('')
-  }
-
-  return (
-    <main className="shell">
-      <header><div><span className="brand-mark">A</span><span className="brand">AffectLab</span></div><button className="text-button" onClick={clearSession}>Delete session</button></header>
-      <section className="intro">
-        <p className="eyebrow">Reflect · Reframe · Rehearse</p>
-        <h1>A calmer place to practise<br />difficult conversations.</h1>
-        <p>Share what’s happening. AffectLab will reflect what it notices and help you prepare—at your pace.</p>
-      </section>
-      <div className="workspace">
-        <section className="chat-card">
-          <div className="notice"><strong>Research prototype</strong><span>AffectLab is not a therapist or medical service. In an emergency, contact local emergency services.</span></div>
-          <div className="messages" aria-live="polite">
-            {turns.length === 0 && <div className="empty"><span>✦</span><h2>What conversation is on your mind?</h2><p>For example: “I need to tell my manager I’m overloaded, but I’m worried how they’ll react.”</p></div>}
-            {turns.map((turn) => <div key={turn.id} className={`message ${turn.role}`}><span>{turn.content}</span></div>)}
-            {busy && <div className="message assistant"><span>Thinking…</span></div>}
-            <div ref={endRef} />
-          </div>
-          {error && <p className="error">{error}</p>}
-          <div className="actions"><button onClick={startRoleplay} disabled={!sessionId || busy}>Practise workload conversation</button></div>
-          <form onSubmit={submit}><textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Describe the situation or how you’re feeling…" rows={2} /><button className="send" disabled={!sessionId || busy || !message.trim()} aria-label="Send message">↑</button></form>
-          <p className="privacy">Text is held only in this running server session. Raw audio and video are not collected.</p>
-        </section>
-        <EmotionPanel state={emotion} />
-      </div>
-    </main>
-  )
+  useEffect(()=>{ api.me().then(u=>setUser(u.email)).catch(()=>api.refresh().then(r=>setUser(r.user.email)).catch(()=>{})) },[])
+  useEffect(()=>{ if(!user)return; Promise.all([api.listSessions(),api.scenarios()]).then(async ([history, choices])=>{setScenarios(choices);setSessions(history); if(history[0]){const s=await api.getSession(history[0].session_id); load(s)}else{const s=await api.createSession();setSessionId(s.session_id);setEmotion(s.emotion_state);setSessions([{session_id:s.session_id,turn_count:0}])}}).catch(()=>setError('Could not load your sessions.')) },[user])
+  useEffect(()=>endRef.current?.scrollIntoView({behavior:'smooth'}),[turns])
+  function load(s:{session_id:string;turns:ConversationTurn[];emotion_state:EmotionState;roleplay:RolePlayState|null;feedback:Feedback|null}){setSessionId(s.session_id);setTurns(s.turns);setEmotion(s.emotion_state);setRoleplay(s.roleplay);setFeedback(s.feedback)}
+  async function submit(e:FormEvent){e.preventDefault();if(!sessionId||!message.trim()||busy)return;const content=message.trim();setMessage('');setBusy(true);setTurns(t=>[...t,{id:crypto.randomUUID(),role:'user',content,created_at:new Date().toISOString()}]);try{const r=await api.sendMessage(sessionId,content);setTurns(t=>[...t,r.turn]);setEmotion(r.decision.emotion_state);setRoleplay(r.roleplay);setFeedback(r.feedback)}catch(err){setError(err instanceof Error?err.message:'Message failed')}finally{setBusy(false)}}
+  async function start(){if(!sessionId)return;setBusy(true);try{const r=await api.startRoleplay(sessionId,selected,difficulty);setTurns(t=>[...t,r.opening_turn]);setRoleplay(r.state);setFeedback(null)}finally{setBusy(false)}}
+  async function action(name:string){if(!sessionId)return;const r=await api.roleplayAction(sessionId,name);load(r)}
+  async function fresh(){if(sessionId)await api.deleteSession(sessionId);const s=await api.createSession();setSessionId(s.session_id);setTurns([]);setEmotion(s.emotion_state);setRoleplay(null);setFeedback(null);setSessions(await api.listSessions())}
+  if(!user)return <AuthScreen onAuth={setUser}/>
+  return <main className="shell"><header><div><span className="brand-mark">A</span><span className="brand">AffectLab</span></div><div className="header-actions"><select value={sessionId} aria-label="Saved session" onChange={async e=>load(await api.getSession(e.target.value))}>{sessions.map((s,i)=><option key={s.session_id} value={s.session_id}>Session {sessions.length-i} · {s.turn_count} turns</option>)}</select><span>{user}</span><button className="text-button" onClick={async()=>{await api.logout();setUser(undefined)}}>Sign out</button><button className="text-button danger" onClick={async()=>{if(confirm('Delete your account and all sessions?')){await api.deleteAccount();setUser(undefined)}}}>Delete account</button></div></header><section className="intro"><p className="eyebrow">Reflect · Reframe · Rehearse</p><h1>A calmer place to practise<br/>difficult conversations.</h1><p>Share what is happening. AffectLab will reflect what it notices and help you prepare—at your pace.</p></section><div className="workspace"><section className="chat-card"><div className="notice"><strong>Research prototype</strong><span>Not a therapist or medical service. In an emergency, contact local emergency services.</span></div><div className="messages" aria-live="polite">{turns.length===0&&<div className="empty"><span>✦</span><h2>What conversation is on your mind?</h2><p>Your affect estimate is uncertain and is never a diagnosis.</p></div>}{turns.map(t=><div key={t.id} className={`message ${t.role}`}><span>{t.content}</span></div>)}{busy&&<div className="message assistant"><span>Thinking…</span></div>}<div ref={endRef}/></div>{error&&<p className="error">{error}</p>} {!roleplay||['completed','interrupted'].includes(roleplay.status)?<div className="scenario-picker"><select value={selected} onChange={e=>setSelected(e.target.value)} aria-label="Scenario">{scenarios.map(s=><option key={s.id} value={s.id}>{s.title}</option>)}</select><select value={difficulty} onChange={e=>setDifficulty(e.target.value)} aria-label="Difficulty"><option>beginner</option><option>intermediate</option><option>difficult</option></select><button onClick={start}>Start role-play</button></div>:<div className="role-controls"><span>{roleplay.status} · turn {roleplay.turn} · {Math.round(roleplay.success_progress*100)}%</span>{roleplay.status==='active'?<button onClick={()=>action('pause')}>Pause</button>:<button onClick={()=>action('resume')}>Resume</button>}<button onClick={()=>action('finish')}>Finish</button></div>}<form onSubmit={submit}><textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Describe the situation or respond in the role-play…" rows={2}/><button className="send" disabled={!message.trim()||busy} aria-label="Send message">↑</button></form><p className="privacy">Session text is retained locally for up to 30 days and may be sent to OpenAI when configured.</p></section><aside><EmotionPanel state={emotion}/>{feedback&&<section className="feedback"><p className="eyebrow">Session feedback</p><h2>What you practised</h2>{feedback.observed.map(x=><p key={x}>{x}</p>)}<h3>Strengths</h3><ul>{feedback.strengths.map(x=><li key={x}>{x}</li>)}</ul><h3>Try next</h3><ul>{feedback.suggestions.map(x=><li key={x}>{x}</li>)}</ul></section>}<button className="new-session" onClick={fresh}>Delete & start fresh</button></aside></div></main>
 }

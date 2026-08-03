@@ -1,24 +1,34 @@
-import type { ChatResponse, ConversationTurn, EmotionState } from '../types/api'
+import type { ChatResponse, EmotionState, Scenario, SessionResponse } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
+let accessToken = sessionStorage.getItem('access_token')
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-  })
-  if (!response.ok) throw new Error((await response.json()).detail ?? 'Request failed')
-  return response.json() as Promise<T>
+async function request<T>(path: string, init?: RequestInit, retry = true): Promise<T> {
+  const response = await fetch(`${API_URL}${path}`, { ...init, credentials: 'include', headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}), ...init?.headers } })
+  if (response.status === 401 && retry && path !== '/auth/refresh') {
+    try { await api.refresh(); return request<T>(path, init, false) } catch { api.clearToken() }
+  }
+  if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(body.detail ?? 'Request failed') }
+  return response.status === 204 ? undefined as T : response.json() as Promise<T>
 }
+
+type AuthResponse = { access_token: string; user: { id: string; email: string } }
+function acceptAuth(result: AuthResponse) { accessToken = result.access_token; sessionStorage.setItem('access_token', accessToken); return result }
 
 export const api = {
+  register: (email: string, password: string, consent: boolean) => request<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify({ email, password, consent }) }, false).then(acceptAuth),
+  login: (email: string, password: string) => request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }, false).then(acceptAuth),
+  refresh: () => request<AuthResponse>('/auth/refresh', { method: 'POST' }, false).then(acceptAuth),
+  me: () => request<{ id: string; email: string }>('/auth/me'),
+  logout: async () => { await request('/auth/logout', { method: 'POST' }); api.clearToken() },
+  deleteAccount: async () => { await request('/auth/me', { method: 'DELETE' }); api.clearToken() },
+  clearToken: () => { accessToken = null; sessionStorage.removeItem('access_token') },
   createSession: () => request<{ session_id: string; emotion_state: EmotionState }>('/sessions', { method: 'POST' }),
-  sendMessage: (sessionId: string, message: string) =>
-    request<ChatResponse>('/chat', { method: 'POST', body: JSON.stringify({ session_id: sessionId, message }) }),
-  startRoleplay: (sessionId: string) =>
-    request<{ opening_turn: ConversationTurn }>(`/sessions/${sessionId}/roleplay`, {
-      method: 'POST', body: JSON.stringify({ scenario_id: 'workload' }),
-    }),
-  deleteSession: (sessionId: string) => fetch(`${API_URL}/sessions/${sessionId}`, { method: 'DELETE' }),
+  getSession: (id: string) => request<SessionResponse>(`/sessions/${id}`),
+  listSessions: () => request<{ session_id: string; updated_at: string; turn_count: number }[]>('/sessions'),
+  sendMessage: (sessionId: string, message: string) => request<ChatResponse>('/chat', { method: 'POST', body: JSON.stringify({ session_id: sessionId, message }) }),
+  scenarios: () => request<Scenario[]>('/roleplay/scenarios'),
+  startRoleplay: (sessionId: string, scenarioId: string, difficulty: string) => request<{ opening_turn: ChatResponse['turn']; state: ChatResponse['roleplay'] }>(`/sessions/${sessionId}/roleplay`, { method: 'POST', body: JSON.stringify({ scenario_id: scenarioId, difficulty }) }),
+  roleplayAction: (sessionId: string, action: string) => request<SessionResponse>(`/sessions/${sessionId}/roleplay/action`, { method: 'POST', body: JSON.stringify({ action }) }),
+  deleteSession: (id: string) => request<void>(`/sessions/${id}`, { method: 'DELETE' }),
 }
-
