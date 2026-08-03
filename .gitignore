@@ -21,3 +21,6 @@ ml/datasets/*
 !ml/datasets/.gitkeep
 ml/artifacts/
 ml/runs/
+ml/checkpoints/
+*.arrow
+.huggingface/

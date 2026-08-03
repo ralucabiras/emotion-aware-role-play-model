@@ -1,0 +1,29 @@
+{
+  "experiment_name": "meld_deberta_v3_small",
+  "model_name": "microsoft/deberta-v3-small",
+  "dataset_name": "MELD",
+  "dataset_revision": "official_csv_master",
+  "max_length": 128,
+  "learning_rate": 0.00002,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.1,
+  "epochs": 5,
+  "train_batch_size": 16,
+  "eval_batch_size": 32,
+  "gradient_accumulation_steps": 1,
+  "early_stopping_patience": 2,
+  "seeds": [13, 42, 73],
+  "metric_for_best_model": "macro_f1",
+  "greater_is_better": true,
+  "fp16": true,
+  "labels": ["anger", "disgust", "fear", "joy", "neutral", "sadness", "surprise"],
+  "affectlab_mapping": {
+    "anger": "anger",
+    "disgust": "anger",
+    "fear": "anxiety",
+    "joy": "joy",
+    "neutral": "neutral",
+    "sadness": "sadness",
+    "surprise": "neutral"
+  }
+}

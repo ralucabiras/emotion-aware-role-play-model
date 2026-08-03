@@ -15,9 +15,13 @@ AffectLab is a text-first research prototype for emotion-aware coaching and adap
 - Scored strategy decisions with machine-readable reasons and model-version metadata
 - Consent disclosure, responsive authenticated frontend, and account/session controls
 
-## Run with Docker
+## Run with an existing local MongoDB installation
 
-Requirements: Docker Desktop with Compose.
+Set `PERSISTENCE_BACKEND=mongo`, `MONGODB_URI=mongodb://localhost:27017`, `MONGODB_DATABASE=affectlab`, and a long random `JWT_SECRET` in `.env`. MongoDB Compass is optional administration software; the backend connects directly to the MongoDB service. Then use the local service commands below. Docker is not required.
+
+## Run with Docker instead
+
+Requirements: Docker Desktop with Compose. Use this option only when a local MongoDB service is not already available.
 
 ```powershell
 Copy-Item .env.example .env
@@ -79,3 +83,9 @@ The evaluator reports accuracy, macro F1, per-class precision/recall/F1, mean co
 Users must accept disclosure that text is stored locally for up to 30 days and that the full session may be sent to OpenAI when configured. Raw prompts and responses are not written to application logs. Crisis phrase checks run before response generation; provider moderation is secondary. The safety layer is a conservative prototype and requires independent evaluation before any study or public deployment.
 
 See [docs/architecture.md](docs/architecture.md) for data flow and extension boundaries.
+
+## Colab model training
+
+The first transformer experiment uses MELD text with `microsoft/deberta-v3-small`. Open [the Colab notebook](ml/notebooks/affectlab_meld_training_colab.ipynb) in Google Colab, select a GPU runtime, add `HF_TOKEN` to Colab Secrets, and run the cells in order. Data, checkpoints, metrics, predictions, and confusion matrices are written to `MyDrive/AffectLab`, not the repository.
+
+Run seed `42` first as a pipeline check. After it succeeds, set `RUN_ALL_SEEDS = True` and run the predeclared seeds `13`, `42`, and `73`. Report the aggregate rather than choosing the best test seed. Dataset provenance and restrictions are recorded in [docs/dataset-registry.md](docs/dataset-registry.md).
