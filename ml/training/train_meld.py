@@ -69,8 +69,19 @@ def run(config_path: Path, data_dir: Path, output_root: Path, seed: int) -> dict
     run_dir = output_root / f"seed-{seed}"
     run_dir.mkdir(parents=True, exist_ok=True)
     model = AutoModelForSequenceClassification.from_pretrained(
-        config["model_name"], num_labels=len(labels), id2label=id2label, label2id=label2id
+        config["model_name"],
+        num_labels=len(labels),
+        id2label=id2label,
+        label2id=label2id,
+        dtype=torch.float32,
     )
+
+    trainable_dtypes = {parameter.dtype for parameter in model.parameters() if parameter.requires_grad}
+    if trainable_dtypes != {torch.float32}:
+        raise RuntimeError(
+            "Mixed-precision training requires FP32 trainable weights; "
+            f"found {sorted(str(dtype) for dtype in trainable_dtypes)}"
+        )
 
     def compute_metrics(prediction):
         return classification_metrics(prediction.predictions, prediction.label_ids)
@@ -131,6 +142,7 @@ def run(config_path: Path, data_dir: Path, output_root: Path, seed: int) -> dict
             "python": platform.python_version(),
             "torch": torch.__version__,
             "transformers": transformers.__version__,
+            "precision": "fp16-mixed" if use_fp16 else "fp32",
             "cuda_available": torch.cuda.is_available(),
             "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
         },
