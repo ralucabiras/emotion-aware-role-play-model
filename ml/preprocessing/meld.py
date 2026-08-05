@@ -35,6 +35,23 @@ def normalize_example(example: dict, split: str) -> dict:
     }
 
 
+def find_dialogue_overlaps(dialogue_signatures: dict[str, dict[str, int]]) -> list[dict]:
+    """Describe exact cross-split duplicates without changing official MELD splits."""
+    overlaps = []
+    for left, right in (("train", "validation"), ("train", "test"), ("validation", "test")):
+        for signature in sorted(dialogue_signatures[left].keys() & dialogue_signatures[right].keys()):
+            overlaps.append(
+                {
+                    "left_split": left,
+                    "left_dialogue_id": dialogue_signatures[left][signature],
+                    "right_split": right,
+                    "right_dialogue_id": dialogue_signatures[right][signature],
+                    "sha256": signature,
+                }
+            )
+    return overlaps
+
+
 def prepare(output_dir: Path):
     from datasets import Dataset, DatasetDict, load_dataset
 
@@ -45,7 +62,7 @@ def prepare(output_dir: Path):
         raise ValueError(f"MELD schema changed; missing columns: {missing}")
     cleaned = DatasetDict()
     split_dialogues: dict[str, set[int]] = {}
-    dialogue_signatures: dict[str, set[str]] = {}
+    dialogue_signatures: dict[str, dict[str, int]] = {}
     for split, dataset in raw.items():
         normalized = [normalize_example(row, split) for row in dataset]
         cleaned[split] = Dataset.from_list(normalized)
@@ -54,19 +71,26 @@ def prepare(output_dir: Path):
         for row in normalized:
             grouped.setdefault(row["dialogue_id"], []).append((row["utterance_id"], row["text"].lower()))
         dialogue_signatures[split] = {
-            hashlib.sha256("\n".join(text for _, text in sorted(turns)).encode()).hexdigest()
-            for turns in grouped.values()
+            hashlib.sha256("\n".join(text for _, text in sorted(turns)).encode()).hexdigest(): dialogue_id
+            for dialogue_id, turns in grouped.items()
         }
-    for left, right in (("train", "validation"), ("train", "test"), ("validation", "test")):
-        overlap = dialogue_signatures[left] & dialogue_signatures[right]
-        if overlap:
-            raise ValueError(f"Exact dialogue leakage between {left} and {right}: {len(overlap)} matches")
+    overlaps = find_dialogue_overlaps(dialogue_signatures)
     output_dir.mkdir(parents=True, exist_ok=True)
     cleaned.save_to_disk(str(output_dir / "dataset"))
     manifest = {
         "dataset": "MELD",
         "source_files": FILES,
         "labels": LABELS,
+        "integrity": {
+            "official_splits_preserved": True,
+            "exact_cross_split_dialogue_overlaps": overlaps,
+            "warning": (
+                "MELD's official splits contain exact duplicate dialogue content. "
+                "The duplicates are retained for benchmark comparability and disclosed here."
+                if overlaps
+                else None
+            ),
+        },
         "splits": {
             split: {
                 "examples": len(dataset),
