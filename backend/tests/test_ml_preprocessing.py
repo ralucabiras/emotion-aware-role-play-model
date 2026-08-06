@@ -1,5 +1,6 @@
 from ml.preprocessing.iemocap import fold_sessions, parse_annotation_line, parse_transcript_line
 from ml.preprocessing.meld import LABELS, find_dialogue_overlaps, normalize_example
+from ml.training.train_iemocap_text import calculate_class_weights
 
 
 def test_meld_normalization_preserves_dialogue_identity() -> None:
@@ -60,3 +61,8 @@ def test_iemocap_transcript_and_session_folds() -> None:
     )
     assert fold_sessions(5) == {"train": [1, 2, 3], "validation": [4], "test": [5]}
     assert fold_sessions(1) == {"train": [2, 3, 4], "validation": [5], "test": [1]}
+
+
+def test_iemocap_class_weights_are_balanced_and_clipped() -> None:
+    assert calculate_class_weights([0, 0, 0, 1], 2, "none", 10.0) == [1.0, 1.0]
+    assert calculate_class_weights([0] * 99 + [1], 2, "balanced_clipped", 10.0) == [100 / 198, 10.0]
