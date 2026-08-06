@@ -9,7 +9,10 @@ from pathlib import Path
 BACKEND = Path(__file__).resolve().parents[2] / "backend"
 sys.path.insert(0, str(BACKEND))
 
-from app.services.affect_service import LexicalEmotionAnalyzer, RuleBasedCognitiveAnalyzer  # noqa: E402
+from app.services.affect_service import (
+    LexicalEmotionAnalyzer,
+    RuleBasedCognitiveAnalyzer,
+)
 
 
 def safe_div(numerator: float, denominator: float) -> float:

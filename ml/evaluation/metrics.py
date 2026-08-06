@@ -1,5 +1,7 @@
 """Metrics shared by training and standalone evaluation."""
 
+from itertools import pairwise
+
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, precision_recall_fscore_support
 
@@ -14,7 +16,7 @@ def expected_calibration_error(probabilities: np.ndarray, labels: np.ndarray, bi
     confidences, predictions = probabilities.max(axis=1), probabilities.argmax(axis=1)
     boundaries = np.linspace(0, 1, bins + 1)
     error = 0.0
-    for lower, upper in zip(boundaries[:-1], boundaries[1:], strict=True):
+    for lower, upper in pairwise(boundaries):
         mask = (confidences > lower) & (confidences <= upper)
         if mask.any():
             error += mask.mean() * abs((predictions[mask] == labels[mask]).mean() - confidences[mask].mean())

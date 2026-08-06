@@ -23,4 +23,7 @@ ml/artifacts/
 ml/runs/
 ml/checkpoints/
 *.arrow
+*.tar
+*.tar.gz
+*.tgz
 .huggingface/
