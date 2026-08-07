@@ -1,4 +1,11 @@
-from ml.preprocessing.iemocap import fold_sessions, parse_annotation_line, parse_transcript_line
+import numpy as np
+from ml.evaluation.metrics import fit_temperature, negative_log_likelihood
+from ml.preprocessing.iemocap import (
+    add_context_fields,
+    fold_sessions,
+    parse_annotation_line,
+    parse_transcript_line,
+)
 from ml.preprocessing.meld import LABELS, find_dialogue_overlaps, normalize_example
 from ml.training.train_iemocap_text import calculate_class_weights
 
@@ -66,3 +73,27 @@ def test_iemocap_transcript_and_session_folds() -> None:
 def test_iemocap_class_weights_are_balanced_and_clipped() -> None:
     assert calculate_class_weights([0, 0, 0, 1], 2, "none", 10.0) == [1.0, 1.0]
     assert calculate_class_weights([0] * 99 + [1], 2, "balanced_clipped", 10.0) == [100 / 198, 10.0]
+
+
+def test_iemocap_context_is_causal_and_speaker_aware() -> None:
+    records = [
+        {"id": "u3", "dialogue_id": "d", "speaker": "A", "start_seconds": 3.0, "text": "target"},
+        {"id": "u1", "dialogue_id": "d", "speaker": "A", "start_seconds": 1.0, "text": "first"},
+        {"id": "u2", "dialogue_id": "d", "speaker": "B", "start_seconds": 2.0, "text": "second"},
+    ]
+
+    result = {row["id"]: row for row in add_context_fields(records, context_turns=2)}
+
+    assert result["u1"]["context_text"] == "[target] first"
+    assert result["u3"]["context_text"] == "[same speaker] first\n[other speaker] second\n[target] target"
+    assert result["u3"]["context_turn_count"] == 2
+
+
+def test_temperature_scaling_reduces_validation_nll() -> None:
+    logits = np.array([[8.0, 0.0], [8.0, 0.0], [0.0, 8.0], [0.0, 8.0]])
+    labels = np.array([0, 1, 1, 0])
+
+    temperature = fit_temperature(logits, labels)
+
+    assert temperature > 1.0
+    assert negative_log_likelihood(logits, labels, temperature) < negative_log_likelihood(logits, labels)

@@ -28,6 +28,7 @@ This registry records access and redistribution constraints separately from impl
 - Five folds are speaker-independent. Each fold holds out one complete session for testing and the preceding session (cyclically) for validation.
 - `benchmark_4` provides anger, happiness (including excitement), neutral, and sadness.
 - `affectlab_6` provides anger, anxiety (IEMOCAP fear), frustration, joy (happiness and excitement), neutral, and sadness.
+- Processed `iemocap-text-v2-context3` adds only the previous three turns, ordered by start time, with same/other-speaker markers. It never includes future turns or labels in model input.
 
 ## Handling rules
 

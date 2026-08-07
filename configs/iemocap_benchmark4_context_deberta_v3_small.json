@@ -1,0 +1,20 @@
+{
+  "experiment_name": "iemocap_benchmark4_context3_deberta_v3_small",
+  "model_name": "microsoft/deberta-v3-small",
+  "task": "benchmark_4",
+  "input_field": "context_text",
+  "context_previous_turns": 3,
+  "max_length": 256,
+  "learning_rate": 0.00002,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.1,
+  "epochs": 8,
+  "train_batch_size": 16,
+  "eval_batch_size": 32,
+  "gradient_accumulation_steps": 1,
+  "early_stopping_patience": 2,
+  "metric_for_best_model": "macro_f1",
+  "greater_is_better": true,
+  "class_weighting": "none",
+  "labels": ["anger", "happiness", "neutral", "sadness"]
+}

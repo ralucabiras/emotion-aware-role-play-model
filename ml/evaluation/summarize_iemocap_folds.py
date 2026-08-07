@@ -11,13 +11,16 @@ from sklearn.metrics import (
     precision_recall_fscore_support,
 )
 
-METRICS = ("test_accuracy", "test_macro_f1", "test_weighted_f1", "test_ece")
+from ml.evaluation.metrics import expected_calibration_error
+
+METRICS = ("test_accuracy", "test_macro_f1", "test_weighted_f1", "test_ece", "test_calibrated_ece")
 
 
 def summarize(experiment_dir: Path) -> dict:
     runs = []
     expected_all = []
     predicted_all = []
+    calibrated_probabilities_all = []
     labels = None
     seen_ids = set()
     for fold in range(1, 6):
@@ -36,6 +39,9 @@ def summarize(experiment_dir: Path) -> dict:
         seen_ids.update(row["id"] for row in rows)
         expected_all.extend(row["expected"] for row in rows)
         predicted_all.extend(row["predicted"] for row in rows)
+        calibrated_probabilities_all.extend(
+            [row["probabilities_calibrated"][label] for label in labels] for row in rows
+        )
         runs.append(metrics)
     fold_metrics = {
         metric: {
@@ -69,6 +75,10 @@ def summarize(experiment_dir: Path) -> dict:
             "accuracy": float(accuracy_score(expected_all, predicted_all)),
             "macro_f1": float(f1_score(expected_all, predicted_all, average="macro", zero_division=0)),
             "weighted_f1": float(f1_score(expected_all, predicted_all, average="weighted", zero_division=0)),
+            "calibrated_ece": expected_calibration_error(
+                np.asarray(calibrated_probabilities_all),
+                np.asarray([labels.index(label) for label in expected_all]),
+            ),
             "per_class": pooled_per_class,
         },
     }

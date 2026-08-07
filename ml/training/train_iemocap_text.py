@@ -54,7 +54,14 @@ def run(config_path: Path, data_root: Path, output_root: Path, fold: int, seed: 
         TrainingArguments,
     )
 
-    from ml.evaluation.metrics import classification_metrics, per_class_metrics, softmax
+    from ml.evaluation.metrics import (
+        classification_metrics,
+        expected_calibration_error,
+        fit_temperature,
+        negative_log_likelihood,
+        per_class_metrics,
+        softmax,
+    )
     from ml.training.train_meld import plot_confusion
 
     config = load_config(config_path)
@@ -68,8 +75,12 @@ def run(config_path: Path, data_root: Path, output_root: Path, fold: int, seed: 
     dataset = load_from_disk(str(dataset_path))
     tokenizer = AutoTokenizer.from_pretrained(config["model_name"])
 
+    input_field = config.get("input_field", "text")
+    if input_field not in dataset["train"].column_names:
+        raise ValueError(f"Input field {input_field!r} is not present in the processed dataset")
+
     def tokenize(batch):
-        return tokenizer(batch["text"], truncation=True, max_length=config["max_length"])
+        return tokenizer(batch[input_field], truncation=True, max_length=config["max_length"])
 
     tokenized = dataset.map(tokenize, batched=True, desc=f"Tokenizing IEMOCAP fold {fold}")
     run_dir = output_root / config["experiment_name"] / f"fold-{fold}"
@@ -141,10 +152,19 @@ def run(config_path: Path, data_root: Path, output_root: Path, fold: int, seed: 
     )
     train_result = trainer.train()
     trainer.remove_callback(EarlyStoppingCallback)
-    validation = trainer.evaluate(tokenized["validation"], metric_key_prefix="validation")
+    validation_output = trainer.predict(tokenized["validation"], metric_key_prefix="validation")
     test_output = trainer.predict(tokenized["test"], metric_key_prefix="test")
-    probabilities = softmax(test_output.predictions)
-    predictions = probabilities.argmax(axis=1)
+    temperature = fit_temperature(validation_output.predictions, validation_output.label_ids)
+    raw_probabilities = softmax(test_output.predictions)
+    calibrated_probabilities = softmax(test_output.predictions / temperature)
+    predictions = raw_probabilities.argmax(axis=1)
+    test_metrics = dict(test_output.metrics)
+    test_metrics["test_calibrated_ece"] = expected_calibration_error(
+        calibrated_probabilities, test_output.label_ids
+    )
+    test_metrics["test_calibrated_nll"] = negative_log_likelihood(
+        test_output.predictions, test_output.label_ids, temperature
+    )
     model_dir = run_dir / "model"
     trainer.save_model(model_dir)
     tokenizer.save_pretrained(model_dir)
@@ -155,6 +175,7 @@ def run(config_path: Path, data_root: Path, output_root: Path, fold: int, seed: 
         "seed": seed,
         "created_at": datetime.now(UTC).isoformat(),
         "base_model": config["model_name"],
+        "input_field": input_field,
         "labels": labels,
         "class_weighting": config["class_weighting"],
         "class_weights": dict(zip(labels, class_weights, strict=True)),
@@ -162,8 +183,19 @@ def run(config_path: Path, data_root: Path, output_root: Path, fold: int, seed: 
             split: sorted(set(dataset[split]["session"])) for split in ("train", "validation", "test")
         },
         "train_metrics": train_result.metrics,
-        "validation_metrics": validation,
-        "test_metrics": test_output.metrics,
+        "validation_metrics": validation_output.metrics,
+        "test_metrics": test_metrics,
+        "calibration": {
+            "method": "validation_temperature_scaling",
+            "temperature": temperature,
+            "validation_examples": len(validation_output.label_ids),
+            "validation_nll_before": negative_log_likelihood(
+                validation_output.predictions, validation_output.label_ids
+            ),
+            "validation_nll_after": negative_log_likelihood(
+                validation_output.predictions, validation_output.label_ids, temperature
+            ),
+        },
         "test_per_class": per_class_metrics(test_output.label_ids, predictions, labels),
         "log_history": trainer.state.log_history,
         "environment": {
@@ -181,8 +213,13 @@ def run(config_path: Path, data_root: Path, output_root: Path, fold: int, seed: 
         encoding="utf-8",
     )
     with (run_dir / "test_predictions.jsonl").open("w", encoding="utf-8") as handle:
-        for item_id, expected, predicted, probability in zip(
-            dataset["test"]["id"], test_output.label_ids, predictions, probabilities, strict=True
+        for item_id, expected, predicted, raw_probability, calibrated_probability in zip(
+            dataset["test"]["id"],
+            test_output.label_ids,
+            predictions,
+            raw_probabilities,
+            calibrated_probabilities,
+            strict=True,
         ):
             handle.write(
                 json.dumps(
@@ -190,8 +227,11 @@ def run(config_path: Path, data_root: Path, output_root: Path, fold: int, seed: 
                         "id": item_id,
                         "expected": labels[int(expected)],
                         "predicted": labels[int(predicted)],
-                        "confidence": float(probability.max()),
-                        "probabilities": {label: float(probability[index]) for index, label in enumerate(labels)},
+                        "confidence_raw": float(raw_probability.max()),
+                        "confidence_calibrated": float(calibrated_probability.max()),
+                        "probabilities_calibrated": {
+                            label: float(calibrated_probability[index]) for index, label in enumerate(labels)
+                        },
                     }
                 )
                 + "\n"

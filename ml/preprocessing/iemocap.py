@@ -153,6 +153,33 @@ def load_records(release_root: Path) -> list[dict]:
     return records
 
 
+def add_context_fields(records: list[dict], context_turns: int = 3) -> list[dict]:
+    """Add causal dialogue context without using future utterances or labels."""
+    if context_turns < 0:
+        raise ValueError("context_turns must be non-negative")
+    grouped: dict[str, list[dict]] = {}
+    for record in records:
+        grouped.setdefault(record["dialogue_id"], []).append(record)
+    enriched = []
+    for dialogue in grouped.values():
+        ordered = sorted(dialogue, key=lambda row: (row["start_seconds"], row["id"]))
+        for index, record in enumerate(ordered):
+            previous = ordered[max(0, index - context_turns) : index]
+            segments = [
+                f"[{'same speaker' if turn['speaker'] == record['speaker'] else 'other speaker'}] {turn['text']}"
+                for turn in previous
+            ]
+            segments.append(f"[target] {record['text']}")
+            enriched.append(
+                {
+                    **record,
+                    "context_text": "\n".join(segments),
+                    "context_turn_count": len(previous),
+                }
+            )
+    return sorted(enriched, key=lambda row: row["id"])
+
+
 def fold_sessions(test_session: int) -> dict[str, list[int]]:
     if test_session not in range(1, 6):
         raise ValueError("test_session must be between 1 and 5")
@@ -164,13 +191,19 @@ def fold_sessions(test_session: int) -> dict[str, list[int]]:
 def prepare(release_root: Path, output_dir: Path, archive_metadata: dict | None = None) -> dict:
     from datasets import Dataset, DatasetDict
 
-    records = load_records(locate_release_root(release_root))
+    records = add_context_fields(load_records(locate_release_root(release_root)))
     output_dir.mkdir(parents=True, exist_ok=True)
     manifest = {
         "dataset": "IEMOCAP",
         "release": "IEMOCAP_full_release",
         "license": "Access-controlled; no redistribution of raw or derived row-level data.",
         "archive": archive_metadata or {},
+        "context": {
+            "field": "context_text",
+            "previous_turns": 3,
+            "causal": True,
+            "speaker_markers": ["same speaker", "other speaker", "target"],
+        },
         "source_label_counts": dict(sorted(Counter(row["source_label"] for row in records).items())),
         "tasks": {},
     }
