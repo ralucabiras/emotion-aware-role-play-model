@@ -98,4 +98,6 @@ The next frozen comparison is the speaker-independent audio-only baseline. Open 
 
 Once all five audio folds are frozen, run [the calibrated late-fusion notebook](ml/notebooks/affectlab_iemocap_late_fusion_colab.ipynb) on a CPU runtime. It uses a predeclared equal-weight average of context-text and audio calibrated posteriors, verifies exact utterance pairing, and reports a paired dialogue-cluster bootstrap against context text. Do not tune the fusion weight on the held-out test predictions.
 
+For deployable confidence estimates, use [the validation-fitted fusion calibration notebook](ml/notebooks/affectlab_iemocap_fusion_calibration_colab.ipynb). It reloads frozen checkpoints for validation inference only—without retraining—fits a modality weight and final temperature independently inside each fold, and then applies those parameters to the untouched test session.
+
 The completed text results and dialogue-clustered paired bootstrap intervals are recorded in [docs/iemocap-text-results.md](docs/iemocap-text-results.md). Audio and calibrated fusion results are recorded in [docs/iemocap-multimodal-results.md](docs/iemocap-multimodal-results.md). Row-level reports remain in the private Cloud Storage experiment directories.

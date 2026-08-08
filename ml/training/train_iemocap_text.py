@@ -54,6 +54,7 @@ def run(config_path: Path, data_root: Path, output_root: Path, fold: int, seed: 
         TrainingArguments,
     )
 
+    from ml.evaluation.export_iemocap_validation import _write_rows
     from ml.evaluation.metrics import (
         classification_metrics,
         expected_calibration_error,
@@ -211,6 +212,14 @@ def run(config_path: Path, data_root: Path, output_root: Path, fold: int, seed: 
     (model_dir / "affectlab_metadata.json").write_text(
         json.dumps({"labels": labels, "task": config["task"], "fold": fold, "seed": seed}, indent=2) + "\n",
         encoding="utf-8",
+    )
+    _write_rows(
+        run_dir / "validation_predictions.jsonl",
+        dataset["validation"]["id"],
+        validation_output.label_ids,
+        validation_output.predictions,
+        labels,
+        temperature,
     )
     with (run_dir / "test_predictions.jsonl").open("w", encoding="utf-8") as handle:
         for item_id, expected, predicted, raw_probability, calibrated_probability in zip(

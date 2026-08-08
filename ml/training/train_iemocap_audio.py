@@ -109,6 +109,7 @@ def run(config_path: Path, data_root: Path, audio_root: Path, output_root: Path,
         TrainingArguments,
     )
 
+    from ml.evaluation.export_iemocap_validation import _write_rows
     from ml.evaluation.metrics import (
         classification_metrics,
         expected_calibration_error,
@@ -246,6 +247,14 @@ def run(config_path: Path, data_root: Path, audio_root: Path, output_root: Path,
         },
     }
     (run_dir / "metrics.json").write_text(json.dumps(export, indent=2) + "\n", encoding="utf-8")
+    _write_rows(
+        run_dir / "validation_predictions.jsonl",
+        dataset["validation"]["id"],
+        validation_output.label_ids,
+        validation_output.predictions,
+        labels,
+        temperature,
+    )
     with (run_dir / "test_predictions.jsonl").open("w", encoding="utf-8") as handle:
         for item_id, expected, predicted, raw_probability, calibrated_probability in zip(
             dataset["test"]["id"],
