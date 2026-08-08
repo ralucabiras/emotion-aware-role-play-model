@@ -29,6 +29,11 @@ This registry records access and redistribution constraints separately from impl
 - `benchmark_4` provides anger, happiness (including excitement), neutral, and sadness.
 - `affectlab_6` provides anger, anxiety (IEMOCAP fear), frustration, joy (happiness and excitement), neutral, and sadness.
 - Processed `iemocap-text-v2-context3` adds only the previous three turns, ordered by start time, with same/other-speaker markers. It never includes future turns or labels in model input.
+- Private audio bundle: `gs://affectlab-research-raluca-biras/data/processed/iemocap-audio-benchmark4-v1/iemocap-benchmark4-audio-v1.tar.gz`.
+- Audio bundle scope: the same 5,531 utterances used by the complete five-fold `benchmark_4` text experiment; no labels are embedded in audio paths.
+- Audio bundle size: 595,571,808 bytes; SHA-256: `A4AD53F8190DB62C839608F592D950CC3F7DC9D4FB495F315DCE03405C28BE83`.
+- Audio audit: all 5,531 files are mono, 16 kHz, 16-bit PCM; total duration is 25,160.435375 seconds (about 6.99 hours), with durations from 0.5849375 to 34.13875 seconds.
+- The adjacent `.manifest.json` is required for integrity verification. Both the bundle and any trained audio checkpoints inherit IEMOCAP's private handling restrictions.
 
 ## Handling rules
 

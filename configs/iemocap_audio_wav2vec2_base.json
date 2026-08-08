@@ -1,0 +1,20 @@
+{
+  "experiment_name": "iemocap_benchmark4_audio_wav2vec2_base",
+  "model_name": "facebook/wav2vec2-base",
+  "task": "benchmark_4",
+  "sampling_rate": 16000,
+  "maximum_duration_seconds": 20.0,
+  "learning_rate": 0.00001,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.1,
+  "epochs": 10,
+  "train_batch_size": 4,
+  "eval_batch_size": 8,
+  "gradient_accumulation_steps": 4,
+  "early_stopping_patience": 2,
+  "metric_for_best_model": "macro_f1",
+  "greater_is_better": true,
+  "freeze_feature_encoder": true,
+  "gradient_checkpointing": true,
+  "labels": ["anger", "happiness", "neutral", "sadness"]
+}
