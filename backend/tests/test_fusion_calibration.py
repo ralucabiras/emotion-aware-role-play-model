@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from ml.evaluation.calibrate_iemocap_fusion import fit_parameters, probability_metrics
+from ml.evaluation.calibrate_iemocap_fusion import fit_parameters, probability_metrics, run_global_oof
 from ml.evaluation.export_iemocap_validation import _write_rows
 
 
@@ -37,3 +37,34 @@ def test_probability_metrics_report_proper_scores_and_reliability() -> None:
     assert result["nll"] > 0
     assert result["multiclass_brier"] == pytest.approx(0.1025)
     assert sum(item["count"] for item in result["reliability_bins"]) == 2
+
+
+def test_global_oof_fit_produces_one_deployment_parameter_set(tmp_path: Path) -> None:
+    labels = ["negative", "positive"]
+    for modality, probabilities in (
+        ("text", {"negative": 0.8, "positive": 0.2}),
+        ("audio", {"negative": 0.6, "positive": 0.4}),
+    ):
+        for fold in range(1, 6):
+            fold_dir = tmp_path / modality / f"fold-{fold}"
+            fold_dir.mkdir(parents=True)
+            (fold_dir / "metrics.json").write_text(
+                json.dumps({"labels": labels, "fold": fold}), encoding="utf-8"
+            )
+            for split in ("validation", "test"):
+                row = {
+                    "id": f"Ses0{fold}F_impro01_F000",
+                    "expected": "negative",
+                    "predicted": "negative",
+                    "probabilities_calibrated": probabilities,
+                }
+                (fold_dir / f"{split}_predictions.jsonl").write_text(
+                    json.dumps(row) + "\n", encoding="utf-8"
+                )
+
+    result = run_global_oof(tmp_path / "text", tmp_path / "audio", tmp_path / "output")
+
+    assert result["validation_examples"] == 5
+    assert result["text_weight"] >= 0.5
+    assert result["pooled"]["accuracy"] == 1.0
+    assert (tmp_path / "output" / "fold-5" / "test_predictions.jsonl").exists()

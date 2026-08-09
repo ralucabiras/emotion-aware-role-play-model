@@ -144,10 +144,106 @@ def run(text_dir: Path, audio_dir: Path, output_dir: Path) -> dict:
     return result
 
 
+def run_global_oof(text_dir: Path, audio_dir: Path, output_dir: Path) -> dict:
+    """Fit one deployable calibrator on pooled out-of-fold validation predictions."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    validation_text, validation_audio, validation_expected = [], [], []
+    validation_ids_seen: set[str] = set()
+    labels = None
+    for fold in range(1, 6):
+        text_metrics = json.loads((text_dir / f"fold-{fold}" / "metrics.json").read_text())
+        audio_metrics = json.loads((audio_dir / f"fold-{fold}" / "metrics.json").read_text())
+        if text_metrics["labels"] != audio_metrics["labels"]:
+            raise ValueError(f"Label order differs in fold {fold}")
+        labels = labels or text_metrics["labels"]
+        if labels != text_metrics["labels"]:
+            raise ValueError("Label order differs across folds")
+        text_rows = _rows(text_dir / f"fold-{fold}" / "validation_predictions.jsonl")
+        audio_rows = _rows(audio_dir / f"fold-{fold}" / "validation_predictions.jsonl")
+        if text_rows.keys() != audio_rows.keys():
+            raise ValueError(f"Validation ids differ in fold {fold}")
+        if duplicate := validation_ids_seen & text_rows.keys():
+            raise ValueError(f"Validation ids occur in multiple folds: {sorted(duplicate)[:3]}")
+        validation_ids_seen.update(text_rows)
+        ids = list(text_rows)
+        validation_text.extend(_matrix(text_rows, ids, labels).tolist())
+        validation_audio.extend(_matrix(audio_rows, ids, labels).tolist())
+        validation_expected.extend(labels.index(text_rows[item]["expected"]) for item in ids)
+    if labels is None:
+        raise ValueError("No validation predictions found")
+    weight, temperature, validation_nll = fit_parameters(
+        np.asarray(validation_text), np.asarray(validation_audio), np.asarray(validation_expected)
+    )
+    all_expected, all_predicted, all_probabilities = [], [], []
+    fold_results = []
+    for fold in range(1, 6):
+        text_rows = _rows(text_dir / f"fold-{fold}" / "test_predictions.jsonl")
+        audio_rows = _rows(audio_dir / f"fold-{fold}" / "test_predictions.jsonl")
+        if text_rows.keys() != audio_rows.keys():
+            raise ValueError(f"Test ids differ in fold {fold}")
+        ids = list(text_rows)
+        expected_names = [text_rows[item]["expected"] for item in ids]
+        if expected_names != [audio_rows[item]["expected"] for item in ids]:
+            raise ValueError(f"Test labels differ in fold {fold}")
+        fused = weight * _matrix(text_rows, ids, labels) + (1.0 - weight) * _matrix(audio_rows, ids, labels)
+        calibrated = softmax(np.log(np.clip(fused, 1e-12, 1.0)) / temperature)
+        predicted_names = [labels[index] for index in calibrated.argmax(axis=1)]
+        expected_ids = np.asarray([labels.index(value) for value in expected_names])
+        metrics = _classification_summary(expected_names, predicted_names, labels)
+        metrics["ece"] = expected_calibration_error(calibrated, expected_ids)
+        metrics.update(probability_metrics(calibrated, expected_ids))
+        metrics["fold"] = fold
+        fold_results.append(metrics)
+        fold_dir = output_dir / f"fold-{fold}"
+        fold_dir.mkdir(exist_ok=True)
+        with (fold_dir / "test_predictions.jsonl").open("w", encoding="utf-8") as handle:
+            for item_id, expected, predicted, probability in zip(
+                ids, expected_names, predicted_names, calibrated, strict=True
+            ):
+                handle.write(
+                    json.dumps(
+                        {
+                            "id": item_id,
+                            "expected": expected,
+                            "predicted": predicted,
+                            "confidence": float(probability.max()),
+                            "probabilities": {
+                                label: float(probability[index]) for index, label in enumerate(labels)
+                            },
+                        }
+                    )
+                    + "\n"
+                )
+        all_expected.extend(expected_names)
+        all_predicted.extend(predicted_names)
+        all_probabilities.extend(calibrated.tolist())
+    expected_ids = np.asarray([labels.index(value) for value in all_expected])
+    probabilities = np.asarray(all_probabilities)
+    pooled = _classification_summary(all_expected, all_predicted, labels)
+    pooled["ece"] = expected_calibration_error(probabilities, expected_ids)
+    pooled.update(probability_metrics(probabilities, expected_ids))
+    result = {
+        "experiment": "iemocap_benchmark4_global_oof_calibrated_fusion",
+        "method": "global_weight_and_temperature_fitted_on_pooled_oof_validation_predictions",
+        "validation_examples": len(validation_expected),
+        "text_weight": weight,
+        "audio_weight": 1.0 - weight,
+        "temperature": temperature,
+        "validation_nll": validation_nll,
+        "weight_grid": {"minimum": 0.0, "maximum": 1.0, "step": 0.01},
+        "folds": fold_results,
+        "pooled": pooled,
+    }
+    (output_dir / "summary.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    return result
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--text-dir", type=Path, required=True)
     parser.add_argument("--audio-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--scope", choices=("per-fold", "global-oof"), default="per-fold")
     args = parser.parse_args()
-    print(json.dumps(run(args.text_dir, args.audio_dir, args.output_dir), indent=2))
+    function = run_global_oof if args.scope == "global-oof" else run
+    print(json.dumps(function(args.text_dir, args.audio_dir, args.output_dir), indent=2))
