@@ -23,6 +23,18 @@ def _matrix(rows: dict[str, dict], ids: list[str], labels: list[str]) -> np.ndar
     return np.asarray([[rows[item]["probabilities_calibrated"][label] for label in labels] for item in ids])
 
 
+def _logits(rows: dict[str, dict], ids: list[str]) -> np.ndarray:
+    try:
+        return np.asarray([rows[item]["logits"] for item in ids], dtype=float)
+    except KeyError as error:
+        raise ValueError("Validation rows must contain raw logits for global calibration") from error
+
+
+def _recover_logits(rows: dict[str, dict], ids: list[str], labels: list[str], fold_temperature: float) -> np.ndarray:
+    probabilities = np.clip(_matrix(rows, ids, labels), 1e-12, 1.0)
+    return np.log(probabilities) * fold_temperature
+
+
 def probability_metrics(probabilities: np.ndarray, expected: np.ndarray, bins: int = 10) -> dict:
     selected = np.clip(probabilities[np.arange(len(expected)), expected], 1e-12, 1.0)
     one_hot = np.eye(probabilities.shape[1])[expected]
@@ -147,7 +159,7 @@ def run(text_dir: Path, audio_dir: Path, output_dir: Path) -> dict:
 def run_global_oof(text_dir: Path, audio_dir: Path, output_dir: Path) -> dict:
     """Fit one deployable calibrator on pooled out-of-fold validation predictions."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    validation_text, validation_audio, validation_expected = [], [], []
+    validation_text_logits, validation_audio_logits, validation_expected = [], [], []
     validation_ids_seen: set[str] = set()
     labels = None
     for fold in range(1, 6):
@@ -166,17 +178,26 @@ def run_global_oof(text_dir: Path, audio_dir: Path, output_dir: Path) -> dict:
             raise ValueError(f"Validation ids occur in multiple folds: {sorted(duplicate)[:3]}")
         validation_ids_seen.update(text_rows)
         ids = list(text_rows)
-        validation_text.extend(_matrix(text_rows, ids, labels).tolist())
-        validation_audio.extend(_matrix(audio_rows, ids, labels).tolist())
+        validation_text_logits.extend(_logits(text_rows, ids).tolist())
+        validation_audio_logits.extend(_logits(audio_rows, ids).tolist())
         validation_expected.extend(labels.index(text_rows[item]["expected"]) for item in ids)
     if labels is None:
         raise ValueError("No validation predictions found")
+    validation_expected_array = np.asarray(validation_expected)
+    validation_text_logits_array = np.asarray(validation_text_logits)
+    validation_audio_logits_array = np.asarray(validation_audio_logits)
+    text_temperature = fit_temperature(validation_text_logits_array, validation_expected_array)
+    audio_temperature = fit_temperature(validation_audio_logits_array, validation_expected_array)
+    validation_text = softmax(validation_text_logits_array / text_temperature)
+    validation_audio = softmax(validation_audio_logits_array / audio_temperature)
     weight, temperature, validation_nll = fit_parameters(
-        np.asarray(validation_text), np.asarray(validation_audio), np.asarray(validation_expected)
+        validation_text, validation_audio, validation_expected_array
     )
     all_expected, all_predicted, all_probabilities = [], [], []
     fold_results = []
     for fold in range(1, 6):
+        text_metrics = json.loads((text_dir / f"fold-{fold}" / "metrics.json").read_text())
+        audio_metrics = json.loads((audio_dir / f"fold-{fold}" / "metrics.json").read_text())
         text_rows = _rows(text_dir / f"fold-{fold}" / "test_predictions.jsonl")
         audio_rows = _rows(audio_dir / f"fold-{fold}" / "test_predictions.jsonl")
         if text_rows.keys() != audio_rows.keys():
@@ -185,7 +206,19 @@ def run_global_oof(text_dir: Path, audio_dir: Path, output_dir: Path) -> dict:
         expected_names = [text_rows[item]["expected"] for item in ids]
         if expected_names != [audio_rows[item]["expected"] for item in ids]:
             raise ValueError(f"Test labels differ in fold {fold}")
-        fused = weight * _matrix(text_rows, ids, labels) + (1.0 - weight) * _matrix(audio_rows, ids, labels)
+        text_probabilities = softmax(
+            _recover_logits(
+                text_rows, ids, labels, text_metrics["calibration"]["temperature"]
+            )
+            / text_temperature
+        )
+        audio_probabilities = softmax(
+            _recover_logits(
+                audio_rows, ids, labels, audio_metrics["calibration"]["temperature"]
+            )
+            / audio_temperature
+        )
+        fused = weight * text_probabilities + (1.0 - weight) * audio_probabilities
         calibrated = softmax(np.log(np.clip(fused, 1e-12, 1.0)) / temperature)
         predicted_names = [labels[index] for index in calibrated.argmax(axis=1)]
         expected_ids = np.asarray([labels.index(value) for value in expected_names])
@@ -226,6 +259,8 @@ def run_global_oof(text_dir: Path, audio_dir: Path, output_dir: Path) -> dict:
         "experiment": "iemocap_benchmark4_global_oof_calibrated_fusion",
         "method": "global_weight_and_temperature_fitted_on_pooled_oof_validation_predictions",
         "validation_examples": len(validation_expected),
+        "text_temperature": text_temperature,
+        "audio_temperature": audio_temperature,
         "text_weight": weight,
         "audio_weight": 1.0 - weight,
         "temperature": temperature,

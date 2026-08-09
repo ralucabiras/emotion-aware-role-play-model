@@ -49,15 +49,19 @@ def test_global_oof_fit_produces_one_deployment_parameter_set(tmp_path: Path) ->
             fold_dir = tmp_path / modality / f"fold-{fold}"
             fold_dir.mkdir(parents=True)
             (fold_dir / "metrics.json").write_text(
-                json.dumps({"labels": labels, "fold": fold}), encoding="utf-8"
+                json.dumps({"labels": labels, "fold": fold, "calibration": {"temperature": 1.0}}),
+                encoding="utf-8",
             )
             for split in ("validation", "test"):
                 row = {
                     "id": f"Ses0{fold}F_impro01_F000",
                     "expected": "negative",
-                    "predicted": "negative",
                     "probabilities_calibrated": probabilities,
                 }
+                if split == "test":
+                    row["predicted"] = "negative"
+                else:
+                    row["logits"] = [float(np.log(probabilities[label])) for label in labels]
                 (fold_dir / f"{split}_predictions.jsonl").write_text(
                     json.dumps(row) + "\n", encoding="utf-8"
                 )

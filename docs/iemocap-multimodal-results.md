@@ -58,6 +58,21 @@ Validation-fitted per-class F1 was 0.7951 for anger, 0.8221 for happiness, 0.689
 
 The equal-weight result remains the predeclared confirmatory comparison for the hypothesis that audio adds information beyond contextual text. The validation-fitted result is the preferred operational configuration whenever confidence is exposed or used for thresholding. This distinction avoids selecting a scientific headline or deployment configuration from test-set performance after the fact.
 
+## Global out-of-fold deployment calibrator
+
+An initial pooled analysis of the 5,531 unique out-of-fold validation predictions yielded text weight 0.59, audio weight 0.41, and fusion temperature 0.6009347778. Its metrics are retained below as an intermediate result. It still consumed modality probabilities produced with fold-specific temperatures, so it is not by itself the final deployment recipe. The final global pass additionally fits one text temperature and one audio temperature from pooled raw validation logits before fitting fusion.
+
+| Metric | Global OOF calibrator |
+| --- | ---: |
+| Accuracy | 0.7742 |
+| Macro F1 | 0.7783 |
+| Weighted F1 | 0.7732 |
+| ECE | 0.0319 |
+| NLL | 0.6059 |
+| Multiclass Brier | 0.3269 |
+
+The intermediate global calibrator slightly improves accuracy and macro F1 over fold-specific calibration while retaining low ECE. Its per-class F1 is 0.7984 for anger, 0.8228 for happiness, 0.6927 for neutral, and 0.7995 for sadness. Selection for the final full-data inference package requires the complete global modality-plus-fusion calibration chain; neither deployment analysis replaces the equal-weight confirmatory research comparison.
+
 The paired context values above are reconstructed from the exact row-level artifacts used in fusion. They can differ slightly from an earlier run summary if nondeterministic GPU reruns overwrote the private fold artifacts; the paired analysis verifies every prediction file against its adjacent recorded fold metrics.
 
 ## Private artifacts
@@ -65,3 +80,4 @@ The paired context values above are reconstructed from the exact row-level artif
 - Audio runs: `gs://affectlab-research-raluca-biras/runs/iemocap-audio/iemocap_benchmark4_audio_wav2vec2_base/`
 - Fusion report: `gs://affectlab-research-raluca-biras/runs/iemocap-fusion/iemocap_benchmark4_context3_audio_equal_fusion/`
 - Validation-fitted fusion: `gs://affectlab-research-raluca-biras/runs/iemocap-fusion/iemocap_benchmark4_validation_fitted_fusion/`
+- Global OOF calibrator: `gs://affectlab-research-raluca-biras/runs/iemocap-fusion/iemocap_benchmark4_global_oof_calibrated_fusion/`
