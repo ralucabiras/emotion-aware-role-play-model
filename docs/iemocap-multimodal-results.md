@@ -73,6 +73,19 @@ An initial pooled analysis of the 5,531 unique out-of-fold validation prediction
 
 The intermediate global calibrator slightly improves accuracy and macro F1 over fold-specific calibration while retaining low ECE. Its per-class F1 is 0.7984 for anger, 0.8228 for happiness, 0.6927 for neutral, and 0.7995 for sadness. Selection for the final full-data inference package requires the complete global modality-plus-fusion calibration chain; neither deployment analysis replaces the equal-weight confirmatory research comparison.
 
+### Final global calibration chain
+
+Fitting modality temperatures from pooled raw out-of-fold validation logits, followed by fusion fitting, produced the final deployment recipe:
+
+- Text temperature: 1.8268186503
+- Audio temperature: 1.3357223831
+- Text weight: 0.59
+- Audio weight: 0.41
+- Fusion temperature: 0.5989429433
+- Calibration examples: 5,531 unique out-of-fold validation predictions
+
+Applied to the held-out fold predictions, the complete chain gives accuracy 0.7736, macro F1 0.7776, weighted F1 0.7728, ECE 0.0242, NLL 0.6075, and multiclass Brier score 0.3280. Per-class F1 is 0.7993 for anger, 0.8235 for happiness, 0.6936 for neutral, and 0.7942 for sadness. These are the parameters selected for full-data model packaging.
+
 The paired context values above are reconstructed from the exact row-level artifacts used in fusion. They can differ slightly from an earlier run summary if nondeterministic GPU reruns overwrote the private fold artifacts; the paired analysis verifies every prediction file against its adjacent recorded fold metrics.
 
 ## Private artifacts

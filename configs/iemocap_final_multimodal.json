@@ -1,0 +1,37 @@
+{
+  "experiment_name": "iemocap_benchmark4_final_multimodal",
+  "task": "benchmark_4",
+  "seed": 42,
+  "labels": ["anger", "happiness", "neutral", "sadness"],
+  "text": {
+    "model_name": "microsoft/deberta-v3-small",
+    "input_field": "context_text",
+    "max_length": 256,
+    "learning_rate": 0.00002,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "train_batch_size": 16,
+    "gradient_accumulation_steps": 1
+  },
+  "audio": {
+    "model_name": "facebook/wav2vec2-base",
+    "sampling_rate": 16000,
+    "maximum_duration_seconds": 20.0,
+    "learning_rate": 0.00001,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "train_batch_size": 4,
+    "gradient_accumulation_steps": 4,
+    "freeze_feature_encoder": true,
+    "gradient_checkpointing": true
+  },
+  "calibration": {
+    "source": "pooled_unique_out_of_fold_validation_predictions",
+    "examples": 5531,
+    "text_temperature": 1.826818650307318,
+    "audio_temperature": 1.3357223830600773,
+    "text_weight": 0.59,
+    "audio_weight": 0.41000000000000003,
+    "fusion_temperature": 0.5989429432640037
+  }
+}

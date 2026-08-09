@@ -102,4 +102,6 @@ For deployable confidence estimates, use [the validation-fitted fusion calibrati
 
 After validation predictions exist, [the CPU-only calibration report notebook](ml/notebooks/affectlab_iemocap_calibration_report_colab.ipynb) reproduces the fit without checkpoints and stores calibrated row-level outputs, NLL, multiclass Brier score, ECE, and reliability bins. It also fits one global calibrator on pooled out-of-fold validation predictions, yielding the single modality weight and temperature required by a final full-data deployment model.
 
+With the complete global modality-plus-fusion calibration chain frozen, [the final-model notebook](ml/notebooks/affectlab_iemocap_final_models_colab.ipynb) trains one context-text and one audio artifact on all 5,531 unique rows. It derives fixed epoch counts from the median completed cross-validation epochs and uploads the private artifacts under `models/iemocap-benchmark4-final-v1`. Training metrics from these full-data artifacts are not evaluation results.
+
 The completed text results and dialogue-clustered paired bootstrap intervals are recorded in [docs/iemocap-text-results.md](docs/iemocap-text-results.md). Audio and calibrated fusion results are recorded in [docs/iemocap-multimodal-results.md](docs/iemocap-multimodal-results.md). Row-level reports remain in the private Cloud Storage experiment directories.
