@@ -94,3 +94,4 @@ The paired context values above are reconstructed from the exact row-level artif
 - Fusion report: `gs://affectlab-research-raluca-biras/runs/iemocap-fusion/iemocap_benchmark4_context3_audio_equal_fusion/`
 - Validation-fitted fusion: `gs://affectlab-research-raluca-biras/runs/iemocap-fusion/iemocap_benchmark4_validation_fitted_fusion/`
 - Global OOF calibrator: `gs://affectlab-research-raluca-biras/runs/iemocap-fusion/iemocap_benchmark4_global_oof_calibrated_fusion/`
+- Final full-data inference artifacts: `gs://affectlab-research-raluca-biras/models/iemocap-benchmark4-final-v1/` (text: 7 epochs; audio: 10 epochs; 5,531 unique examples each). These artifacts have no held-out score of their own; use the cross-validation results above for performance claims.
