@@ -23,6 +23,31 @@ def _matrix(rows: dict[str, dict], ids: list[str], labels: list[str]) -> np.ndar
     return np.asarray([[rows[item]["probabilities_calibrated"][label] for label in labels] for item in ids])
 
 
+def probability_metrics(probabilities: np.ndarray, expected: np.ndarray, bins: int = 10) -> dict:
+    selected = np.clip(probabilities[np.arange(len(expected)), expected], 1e-12, 1.0)
+    one_hot = np.eye(probabilities.shape[1])[expected]
+    confidence = probabilities.max(axis=1)
+    predicted = probabilities.argmax(axis=1)
+    reliability = []
+    for index in range(bins):
+        lower, upper = index / bins, (index + 1) / bins
+        mask = (confidence >= lower) & (confidence < upper if index < bins - 1 else confidence <= upper)
+        reliability.append(
+            {
+                "lower": lower,
+                "upper": upper,
+                "count": int(mask.sum()),
+                "mean_confidence": float(confidence[mask].mean()) if mask.any() else None,
+                "accuracy": float((predicted[mask] == expected[mask]).mean()) if mask.any() else None,
+            }
+        )
+    return {
+        "nll": float(-np.log(selected).mean()),
+        "multiclass_brier": float(np.square(probabilities - one_hot).sum(axis=1).mean()),
+        "reliability_bins": reliability,
+    }
+
+
 def fit_parameters(text: np.ndarray, audio: np.ndarray, expected: np.ndarray) -> tuple[float, float, float]:
     """Grid-search weight and fit temperature using validation NLL only."""
     best = None
@@ -72,14 +97,41 @@ def run(text_dir: Path, audio_dir: Path, output_dir: Path) -> dict:
         expected_ids = np.asarray([labels.index(value) for value in expected_names])
         metrics = _classification_summary(expected_names, predicted_names, labels)
         metrics["ece"] = expected_calibration_error(calibrated, expected_ids)
+        metrics.update(probability_metrics(calibrated, expected_ids))
         metrics.update({"fold": fold, "text_weight": weight, "temperature": temperature, "validation_nll": validation_nll})
         fold_results.append(metrics)
+        fold_dir = output_dir / f"fold-{fold}"
+        fold_dir.mkdir(exist_ok=True)
+        with (fold_dir / "test_predictions.jsonl").open("w", encoding="utf-8") as handle:
+            for item_id, expected, predicted, probability in zip(
+                test_ids, expected_names, predicted_names, calibrated, strict=True
+            ):
+                handle.write(
+                    json.dumps(
+                        {
+                            "id": item_id,
+                            "expected": expected,
+                            "predicted": predicted,
+                            "confidence": float(probability.max()),
+                            "probabilities": {
+                                label: float(probability[index]) for index, label in enumerate(labels)
+                            },
+                        }
+                    )
+                    + "\n"
+                )
         all_expected.extend(expected_names)
         all_predicted.extend(predicted_names)
         all_probabilities.extend(calibrated.tolist())
     pooled = _classification_summary(all_expected, all_predicted, labels)
     pooled["ece"] = expected_calibration_error(
         np.asarray(all_probabilities), np.asarray([labels.index(value) for value in all_expected])
+    )
+    pooled.update(
+        probability_metrics(
+            np.asarray(all_probabilities),
+            np.asarray([labels.index(value) for value in all_expected]),
+        )
     )
     result = {
         "experiment": "iemocap_benchmark4_validation_fitted_fusion",

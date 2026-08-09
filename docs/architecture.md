@@ -37,4 +37,4 @@ Experiment configuration lives in `configs/text_baseline.json`. The JSONL evalua
 
 ## Deferred work
 
-Trained transformer models, external experiment tracking, audio, video, password reset, email verification, OAuth, and production deployment hardening remain outside this milestone.
+The current application runtime still uses the transparent text baseline. Private IEMOCAP research now includes frozen context-text, audio-only, and validation-calibrated late-fusion experiments, documented separately from the deployed service. Integrating those checkpoints requires an explicit model-serving and microphone-consent phase. Video, external experiment tracking, password reset, email verification, OAuth, and production deployment hardening remain outside this milestone.

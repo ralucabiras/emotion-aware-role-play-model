@@ -100,4 +100,6 @@ Once all five audio folds are frozen, run [the calibrated late-fusion notebook](
 
 For deployable confidence estimates, use [the validation-fitted fusion calibration notebook](ml/notebooks/affectlab_iemocap_fusion_calibration_colab.ipynb). It reloads frozen checkpoints for validation inference only—without retraining—fits a modality weight and final temperature independently inside each fold, and then applies those parameters to the untouched test session.
 
+After validation predictions exist, [the CPU-only calibration report notebook](ml/notebooks/affectlab_iemocap_calibration_report_colab.ipynb) reproduces the fit without checkpoints and stores calibrated row-level outputs, NLL, multiclass Brier score, ECE, and reliability bins.
+
 The completed text results and dialogue-clustered paired bootstrap intervals are recorded in [docs/iemocap-text-results.md](docs/iemocap-text-results.md). Audio and calibrated fusion results are recorded in [docs/iemocap-multimodal-results.md](docs/iemocap-multimodal-results.md). Row-level reports remain in the private Cloud Storage experiment directories.

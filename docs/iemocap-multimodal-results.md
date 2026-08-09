@@ -35,9 +35,33 @@ All 10,000 dialogue-bootstrap replicates favored fusion for each aggregate metri
 
 The fusion ECE is 0.1619. Classification improves strongly, but averaging two separately calibrated posterior vectors does not preserve calibration. Treat the fused scores as ranking/classification outputs until a fusion calibrator is fitted on paired validation predictions; do not present them as reliable probabilities.
 
+## Validation-fitted deployment calibration
+
+For each fold, the frozen models were run on that fold's validation session. A text weight was selected on a fixed 0.00–1.00 grid in increments of 0.01, then a final temperature was fitted by validation negative log-likelihood. Both parameters were frozen before evaluation on the held-out test session.
+
+| Fold | Text weight | Audio weight | Temperature |
+| --- | ---: | ---: | ---: |
+| 1 | 0.62 | 0.38 | 0.6380 |
+| 2 | 0.54 | 0.46 | 0.5959 |
+| 3 | 0.63 | 0.37 | 0.6542 |
+| 4 | 0.58 | 0.42 | 0.5738 |
+| 5 | 0.57 | 0.43 | 0.5442 |
+
+| Metric | Equal fusion | Validation-fitted fusion | Change |
+| --- | ---: | ---: | ---: |
+| Accuracy | 0.7832 | 0.7717 | -0.0116 |
+| Macro F1 | 0.7883 | 0.7758 | -0.0126 |
+| Weighted F1 | 0.7815 | 0.7707 | -0.0107 |
+| ECE | 0.1619 | 0.0283 | -0.1336 |
+
+Validation-fitted per-class F1 was 0.7951 for anger, 0.8221 for happiness, 0.6897 for neutral, and 0.7961 for sadness. The consistent text weights (0.54–0.63) support a text-dominant but genuinely multimodal combination. Calibration error fell by 82.5% relative to equal fusion, at a 0.0126 absolute macro-F1 cost.
+
+The equal-weight result remains the predeclared confirmatory comparison for the hypothesis that audio adds information beyond contextual text. The validation-fitted result is the preferred operational configuration whenever confidence is exposed or used for thresholding. This distinction avoids selecting a scientific headline or deployment configuration from test-set performance after the fact.
+
 The paired context values above are reconstructed from the exact row-level artifacts used in fusion. They can differ slightly from an earlier run summary if nondeterministic GPU reruns overwrote the private fold artifacts; the paired analysis verifies every prediction file against its adjacent recorded fold metrics.
 
 ## Private artifacts
 
 - Audio runs: `gs://affectlab-research-raluca-biras/runs/iemocap-audio/iemocap_benchmark4_audio_wav2vec2_base/`
 - Fusion report: `gs://affectlab-research-raluca-biras/runs/iemocap-fusion/iemocap_benchmark4_context3_audio_equal_fusion/`
+- Validation-fitted fusion: `gs://affectlab-research-raluca-biras/runs/iemocap-fusion/iemocap_benchmark4_validation_fitted_fusion/`
