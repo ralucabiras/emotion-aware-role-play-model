@@ -1,8 +1,18 @@
-import { Component, FormEvent, ReactNode, useEffect, useRef, useState } from 'react'
+import { Component, FormEvent, ReactNode, useEffect as useReactEffect, useRef, useState } from 'react'
+import type { DependencyList } from 'react'
 import { EmotionPanel } from './components/EmotionPanel'
 import { api } from './services/api'
 import type { ConversationTurn, EmotionState, Feedback, RolePlayState, Scenario, UserProfile } from './types/api'
 import './styles.css'
+
+// React effects may only return cleanup functions. Keep compact component
+// effects safe even when a browser API happens to return a non-void value.
+function useEffect(effect: () => unknown, dependencies: DependencyList) {
+  useReactEffect(() => {
+    const cleanup = effect()
+    return typeof cleanup === 'function' ? cleanup as () => void : undefined
+  }, dependencies)
+}
 
 export class AppErrorBoundary extends Component<{children:ReactNode},{error:string}> {
   state = { error: '' }
