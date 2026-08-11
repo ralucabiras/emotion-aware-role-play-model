@@ -9,7 +9,7 @@ from app.repositories.base import Repository
 
 class MongoRepository(Repository):
     def __init__(self, uri: str, database: str) -> None:
-        self.client = AsyncMongoClient(uri)
+        self.client = AsyncMongoClient(uri, uuidRepresentation="standard")
         self.db = self.client[database]
 
     async def initialize(self) -> None:
@@ -49,4 +49,3 @@ class MongoRepository(Repository):
         return doc["user_id"] if doc else None
     async def revoke_user_tokens(self, user_id: UUID) -> None:
         await self.db.refresh_tokens.delete_many({"user_id": user_id})
-
