@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 
 class Settings(BaseSettings):
@@ -21,7 +25,10 @@ class Settings(BaseSettings):
     multimodal_config_path: str = "../configs/iemocap_final_multimodal.json"
     multimodal_device: str = "auto"
     multimodal_max_audio_bytes: int = 5_000_000
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=(REPOSITORY_ROOT / ".env", REPOSITORY_ROOT / "backend" / ".env"),
+        extra="ignore",
+    )
 
 
 settings = Settings()

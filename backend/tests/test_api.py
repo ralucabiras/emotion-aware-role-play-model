@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
 
+from app.core.container import get_multimodal_service
 from app.main import app
+from app.services.multimodal_service import MultimodalAffectService
 
 
 def auth(client: TestClient, email: str = "user@example.com") -> dict[str, str]:
@@ -43,14 +45,20 @@ def test_refresh_rotation_logout_and_delete() -> None:
 
 
 def test_multimodal_endpoint_is_authenticated_and_explicitly_unavailable_by_default() -> None:
-    with TestClient(app) as client:
-        assert client.post("/api/affect/multimodal", json={}).status_code == 401
-        headers = auth(client, "multimodal@example.com")
-        session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
-        response = client.post(
-            "/api/affect/multimodal",
-            headers=headers,
-            json={"session_id": session_id, "message": "I feel tense", "audio_wav_base64": "d2F2"},
-        )
-        assert response.status_code == 503
-        assert response.json()["detail"] == "Multimodal inference is not configured"
+    app.dependency_overrides[get_multimodal_service] = lambda: MultimodalAffectService(
+        False, "", "", "missing.json"
+    )
+    try:
+        with TestClient(app) as client:
+            assert client.post("/api/affect/multimodal", json={}).status_code == 401
+            headers = auth(client, "multimodal@example.com")
+            session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+            response = client.post(
+                "/api/affect/multimodal",
+                headers=headers,
+                json={"session_id": session_id, "message": "I feel tense", "audio_wav_base64": "d2F2"},
+            )
+            assert response.status_code == 503
+            assert response.json()["detail"] == "Multimodal inference is not configured"
+    finally:
+        app.dependency_overrides.pop(get_multimodal_service, None)

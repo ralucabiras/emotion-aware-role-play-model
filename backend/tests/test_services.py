@@ -55,9 +55,9 @@ def test_scenarios_difficulty_observations_and_completion() -> None:
 
 
 @pytest.mark.asyncio
-async def test_openai_generator_offline_fallback_records_reason() -> None:
+async def test_openai_generator_offline_fallback_records_reason(monkeypatch) -> None:
+    monkeypatch.setattr("app.services.llm_service.settings.openai_api_key", None)
     generator = OpenAIResponseGenerator()
     session = Session(user_id=User(email="x@example.com", password_hash="x", consented_at=utcnow()).id)
     text, metadata = await generator.generate(session, "Help me", "validation")
     assert text and metadata.source == "template" and metadata.fallback_reason == "missing_api_key"
-
