@@ -3,10 +3,12 @@ from app.repositories.memory import MemoryRepository
 from app.repositories.mongo import MongoRepository
 from app.services.auth_service import AuthService
 from app.services.conversation_service import ConversationService
+from app.services.email_service import EmailService
 from app.services.multimodal_service import MultimodalAffectService
 
 repository = MongoRepository(settings.mongodb_uri, settings.mongodb_database) if settings.persistence_backend == "mongo" else MemoryRepository()
-auth_service = AuthService(repository)
+email_service = EmailService()
+auth_service = AuthService(repository, email_service)
 conversation_service = ConversationService(repository)
 multimodal_service = MultimodalAffectService(
     settings.multimodal_inference_enabled,

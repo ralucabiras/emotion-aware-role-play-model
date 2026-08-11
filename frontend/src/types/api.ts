@@ -6,3 +6,4 @@ export interface Feedback { scenario_id: string; observed: string[]; strengths: 
 export interface ChatResponse { turn: ConversationTurn; decision: { emotion_state: EmotionState; strategy: string; cognitive_assessment: { possible_distortion: string|null; possible_cause: string|null; intent: string }; decision_reasons: string[]; analyzer_version: string }; roleplay: RolePlayState | null; feedback: Feedback | null }
 export interface Scenario { id: string; title: string; character: string; user_objective: string; expected_skills: string[] }
 export interface SessionResponse { session_id: string; turns: ConversationTurn[]; emotion_state: EmotionState; roleplay: RolePlayState | null; feedback: Feedback | null }
+export interface UserProfile { id: string; email: string; first_name: string; last_name: string; preferred_name: string; country: string; timezone: string; email_verified: boolean }

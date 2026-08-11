@@ -1,14 +1,33 @@
 from fastapi.testclient import TestClient
 
-from app.core.container import get_multimodal_service
+from app.core.container import auth_service, get_multimodal_service
 from app.main import app
 from app.services.multimodal_service import MultimodalAffectService
 
 
+class CapturingEmailService:
+    def __init__(self) -> None:
+        self.tokens: dict[str, str] = {}
+
+    async def send_verification(self, recipient: str, preferred_name: str, token: str) -> None:
+        self.tokens[recipient] = token
+
+
+capturing_email = CapturingEmailService()
+auth_service.email_service = capturing_email
+
+
 def auth(client: TestClient, email: str = "user@example.com") -> dict[str, str]:
     result = client.post("/api/auth/register", json={"email": email, "password": "long-test-password", "consent": True})
-    assert result.status_code == 201
-    return {"Authorization": f"Bearer {result.json()['access_token']}"}
+    assert result.status_code == 202
+    verification = client.post(
+        "/api/auth/verify-email", json={"token": capturing_email.tokens[email]}
+    )
+    assert verification.status_code == 200
+    login = client.post(
+        "/api/auth/login", json={"email": email, "password": "long-test-password"}
+    )
+    return {"Authorization": f"Bearer {login.json()['access_token']}"}
 
 
 def test_auth_session_chat_and_feedback() -> None:

@@ -17,12 +17,36 @@ class AuthRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=10, max_length=128)
     consent: bool = False
+    first_name: str = Field(default="", max_length=80)
+    last_name: str = Field(default="", max_length=80)
+    preferred_name: str = Field(default="", max_length=80)
+    country: str = Field(default="", max_length=80)
+    timezone: str = Field(default="UTC", max_length=80)
 class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: "UserResponse"
 class UserResponse(BaseModel):
     id: UUID
+    email: EmailStr
+    first_name: str = ""
+    last_name: str = ""
+    preferred_name: str = ""
+    country: str = ""
+    timezone: str = "UTC"
+    email_verified: bool = False
+
+
+class RegistrationResponse(BaseModel):
+    message: str
+    email: EmailStr
+
+
+class EmailVerificationRequest(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+
+
+class ResendVerificationRequest(BaseModel):
     email: EmailStr
 class CreateSessionResponse(BaseModel):
     session_id: UUID

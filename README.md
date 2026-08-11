@@ -4,7 +4,7 @@ AffectLab is a text-first research prototype for emotion-aware coaching and adap
 
 ## Complete MVP
 
-- Email/password accounts with Argon2 hashing, access JWTs, and rotating refresh cookies
+- Email/password accounts with email confirmation, Argon2 hashing, access JWTs, and rotating refresh cookies
 - Ownership-protected MongoDB sessions with 30-day inactivity expiry and explicit deletion
 - Rule-based affect tracking and strategy selection behind replaceable interfaces
 - Optional OpenAI Responses API generation with moderation and transparent offline fallback
@@ -30,6 +30,14 @@ docker compose up --build
 ```
 
 Open `http://localhost:5173`. MongoDB data is kept in the `mongodb_data` volume. The API and interactive documentation are available at `http://localhost:8000` and `http://localhost:8000/docs`.
+
+## Email confirmation
+
+New accounts must confirm their email address before signing in. Configure the SMTP settings in the repository `.env`; for Gmail on port 587, `SMTP_USE_TLS=true` and `SMTP_PASSWORD` must be a Google App Password, not the account's normal password. Google App Passwords require 2-Step Verification on the sender account. Keep the password only in `.env` and restart the backend after changing it.
+
+Confirmation links use `FRONTEND_ORIGIN` (normally `http://localhost:5173`) and expire after `EMAIL_VERIFICATION_HOURS` (24 by default). Resending a confirmation invalidates the previous link. Responses from the resend endpoint are deliberately generic so they do not reveal whether an email is registered. Existing MongoDB accounts created before this feature can use the resend-confirmation action to become verified.
+
+The frontend provides public routes for the landing page (`/`), About (`/about`), sign in (`/login`), sign up (`/signup`), and email confirmation. The authenticated workspace remains at `/app`.
 
 ## Run services locally
 

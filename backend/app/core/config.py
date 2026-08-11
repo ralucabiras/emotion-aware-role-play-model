@@ -25,6 +25,14 @@ class Settings(BaseSettings):
     multimodal_config_path: str = "../configs/iemocap_final_multimodal.json"
     multimodal_device: str = "auto"
     multimodal_max_audio_bytes: int = 5_000_000
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_use_tls: bool = True
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_sender: str = ""
+    smtp_timeout_seconds: float = 20
+    email_verification_hours: int = 24
     model_config = SettingsConfigDict(
         env_file=(REPOSITORY_ROOT / ".env", REPOSITORY_ROOT / "backend" / ".env"),
         extra="ignore",

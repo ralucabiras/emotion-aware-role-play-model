@@ -168,6 +168,12 @@ class User(BaseModel):
     email: str
     password_hash: str
     consented_at: datetime
+    first_name: str = ""
+    last_name: str = ""
+    preferred_name: str = ""
+    country: str = ""
+    timezone: str = "UTC"
+    email_verified_at: datetime | None = None
     created_at: datetime = Field(default_factory=utcnow)
 
 

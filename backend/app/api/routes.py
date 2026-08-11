@@ -18,8 +18,11 @@ from app.schemas.chat import (
     ChatRequest,
     ChatResponse,
     CreateSessionResponse,
+    EmailVerificationRequest,
     MultimodalAffectRequest,
     MultimodalAffectResponse,
+    RegistrationResponse,
+    ResendVerificationRequest,
     RolePlayActionRequest,
     SessionResponse,
     SessionSummary,
@@ -27,8 +30,13 @@ from app.schemas.chat import (
     StartRolePlayResponse,
     UserResponse,
 )
-from app.services.auth_service import AuthenticationError, AuthService
+from app.services.auth_service import (
+    AuthenticationError,
+    AuthService,
+    EmailNotVerifiedError,
+)
 from app.services.conversation_service import ConversationService, SessionNotFoundError
+from app.services.email_service import EmailDeliveryError
 from app.services.multimodal_service import (
     MultimodalAffectService,
     MultimodalInferenceUnavailable,
@@ -48,6 +56,7 @@ async def current_user(credentials: HTTPAuthorizationCredentials | None = Depend
     except AuthenticationError: raise HTTPException(401, "Invalid or expired credentials") from None
     user = await repository.get_user(user_id)
     if not user: raise HTTPException(401, "Invalid or expired credentials")
+    if not user.email_verified_at: raise HTTPException(403, "Email confirmation required")
     return user
 
 
@@ -83,23 +92,59 @@ async def multimodal_affect(
 
 async def auth_response(user: User, response: Response, auth: AuthService) -> AuthResponse:
     set_refresh_cookie(response, await auth.refresh_token(user.id))
-    return AuthResponse(access_token=auth.access_token(user.id), user=UserResponse(id=user.id, email=user.email))
+    return AuthResponse(access_token=auth.access_token(user.id), user=user_response(user))
 
 
-@router.post("/auth/register", response_model=AuthResponse, status_code=201)
+def user_response(user: User) -> UserResponse:
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        preferred_name=user.preferred_name,
+        country=user.country,
+        timezone=user.timezone,
+        email_verified=bool(user.email_verified_at),
+    )
+
+
+@router.post("/auth/register", response_model=RegistrationResponse, status_code=202)
 async def register(request: AuthRequest, response: Response, auth: AuthService = Depends(get_auth_service)):
-    try: user = await auth.register(str(request.email), request.password, request.consent)
+    profile = request.model_dump(
+        include={"first_name", "last_name", "preferred_name", "country", "timezone"}
+    )
+    try: user = await auth.register(str(request.email), request.password, request.consent, profile)
     except ValueError as exc:
         detail = "An account with this email already exists" if "duplicate" in str(exc) else str(exc)
         raise HTTPException(409 if "duplicate" in str(exc) else 400, detail) from None
-    return await auth_response(user, response, auth)
+    except EmailDeliveryError:
+        return RegistrationResponse(
+            message="Account created, but email delivery is temporarily unavailable. Use resend shortly.",
+            email=request.email,
+        )
+    return RegistrationResponse(message="Check your email to confirm your account", email=user.email)
 
 
 @router.post("/auth/login", response_model=AuthResponse)
 async def login(request: AuthRequest, response: Response, auth: AuthService = Depends(get_auth_service)):
     try: user = await auth.authenticate(str(request.email), request.password)
+    except EmailNotVerifiedError: raise HTTPException(403, "Email confirmation required") from None
     except AuthenticationError: raise HTTPException(401, "Invalid email or password") from None
     return await auth_response(user, response, auth)
+
+
+@router.post("/auth/verify-email")
+async def verify_email(request: EmailVerificationRequest, auth: AuthService = Depends(get_auth_service)):
+    try: await auth.verify_email(request.token)
+    except AuthenticationError as exc: raise HTTPException(400, str(exc)) from None
+    return {"message": "Email confirmed. You can now sign in."}
+
+
+@router.post("/auth/resend-verification", status_code=202)
+async def resend_verification(request: ResendVerificationRequest, auth: AuthService = Depends(get_auth_service)):
+    try: await auth.resend_verification(str(request.email))
+    except EmailDeliveryError: pass
+    return {"message": "If the account exists and is unverified, a confirmation email has been sent."}
 
 
 @router.post("/auth/refresh", response_model=AuthResponse)
@@ -110,7 +155,8 @@ async def refresh(response: Response, refresh_token: str | None = Cookie(None), 
     user = await repository.get_user(user_id)
     if not user: raise HTTPException(401, "Invalid or expired credentials")
     set_refresh_cookie(response, replacement)
-    return AuthResponse(access_token=auth.access_token(user.id), user=UserResponse(id=user.id, email=user.email))
+    if not user.email_verified_at: raise HTTPException(403, "Email confirmation required")
+    return AuthResponse(access_token=auth.access_token(user.id), user=user_response(user))
 
 
 @router.post("/auth/logout", status_code=204)
@@ -119,7 +165,7 @@ async def logout(response: Response, user: User = Depends(current_user), reposit
 
 
 @router.get("/auth/me", response_model=UserResponse)
-async def me(user: User = Depends(current_user)): return UserResponse(id=user.id, email=user.email)
+async def me(user: User = Depends(current_user)): return user_response(user)
 
 
 @router.delete("/auth/me", status_code=204)

@@ -1,4 +1,4 @@
-import type { ChatResponse, EmotionState, Scenario, SessionResponse } from '../types/api'
+import type { ChatResponse, EmotionState, Scenario, SessionResponse, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -12,14 +12,16 @@ async function request<T>(path: string, init?: RequestInit, retry = true): Promi
   return response.status === 204 ? undefined as T : response.json() as Promise<T>
 }
 
-type AuthResponse = { access_token: string; user: { id: string; email: string } }
+type AuthResponse = { access_token: string; user: UserProfile }
 function acceptAuth(result: AuthResponse) { accessToken = result.access_token; sessionStorage.setItem('access_token', accessToken); return result }
 
 export const api = {
-  register: (email: string, password: string, consent: boolean) => request<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify({ email, password, consent }) }, false).then(acceptAuth),
+  register: (data: { email:string; password:string; consent:boolean; first_name:string; last_name:string; preferred_name:string; country:string; timezone:string }) => request<{message:string;email:string}>('/auth/register', { method: 'POST', body: JSON.stringify(data) }, false),
   login: (email: string, password: string) => request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }, false).then(acceptAuth),
+  verifyEmail: (token: string) => request<{message:string}>('/auth/verify-email', { method: 'POST', body: JSON.stringify({ token }) }, false),
+  resendVerification: (email: string) => request<{message:string}>('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }, false),
   refresh: () => request<AuthResponse>('/auth/refresh', { method: 'POST' }, false).then(acceptAuth),
-  me: () => request<{ id: string; email: string }>('/auth/me'),
+  me: () => request<UserProfile>('/auth/me'),
   logout: async () => { await request('/auth/logout', { method: 'POST' }); api.clearToken() },
   deleteAccount: async () => { await request('/auth/me', { method: 'DELETE' }); api.clearToken() },
   clearToken: () => { accessToken = null; sessionStorage.removeItem('access_token') },

@@ -10,6 +10,7 @@ class MemoryRepository(Repository):
         self.users: dict[UUID, User] = {}
         self.sessions: dict[UUID, Session] = {}
         self.tokens: dict[str, tuple[UUID, str, datetime]] = {}
+        self.email_verification_tokens: dict[str, tuple[UUID, datetime]] = {}
 
     async def initialize(self) -> None: pass
     async def create_user(self, user: User) -> User:
@@ -24,6 +25,11 @@ class MemoryRepository(Repository):
         self.users.pop(user_id, None)
         self.sessions = {key: val for key, val in self.sessions.items() if val.user_id != user_id}
         await self.revoke_user_tokens(user_id)
+        self.email_verification_tokens = {
+            digest: record
+            for digest, record in self.email_verification_tokens.items()
+            if record[0] != user_id
+        }
     async def save_session(self, session: Session) -> Session:
         self.sessions[session.id] = session
         return session
@@ -45,4 +51,17 @@ class MemoryRepository(Repository):
         return record[0]
     async def revoke_user_tokens(self, user_id: UUID) -> None:
         self.tokens = {key: val for key, val in self.tokens.items() if val[0] != user_id}
-
+    async def store_email_verification_token(self, user_id: UUID, digest: str, expires_at) -> None:
+        self.email_verification_tokens = {
+            key: record for key, record in self.email_verification_tokens.items() if record[0] != user_id
+        }
+        self.email_verification_tokens[digest] = (user_id, expires_at)
+    async def consume_email_verification_token(self, digest: str) -> UUID | None:
+        record = self.email_verification_tokens.pop(digest, None)
+        if not record or record[1] <= utcnow(): return None
+        return record[0]
+    async def mark_email_verified(self, user_id: UUID) -> User | None:
+        user = self.users.get(user_id)
+        if not user: return None
+        user.email_verified_at = utcnow()
+        return user

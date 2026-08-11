@@ -9,13 +9,28 @@ from app.services.llm_service import OpenAIResponseGenerator
 from app.services.roleplay_service import RolePlayService, observe
 
 
+class CapturingEmailService:
+    def __init__(self) -> None:
+        self.token = ""
+
+    async def send_verification(self, recipient: str, preferred_name: str, token: str) -> None:
+        self.token = token
+
+
 @pytest.mark.asyncio
 async def test_passwords_tokens_rotation_and_expiry() -> None:
     repository = MemoryRepository()
-    auth = AuthService(repository)
+    email = CapturingEmailService()
+    auth = AuthService(repository, email)
     user = await auth.register(" Mixed@Example.com ", "a-secure-password", True)
     assert user.email == "mixed@example.com"
     assert user.password_hash != "a-secure-password"
+    with pytest.raises(AuthenticationError):
+        await auth.authenticate("mixed@example.com", "a-secure-password")
+    await auth.verify_email(email.token)
+    with pytest.raises(AuthenticationError):
+        await auth.verify_email(email.token)
+    assert (await auth.authenticate("mixed@example.com", "a-secure-password")).id == user.id
     assert auth.decode_access(auth.access_token(user.id)) == user.id
     token = await auth.refresh_token(user.id)
     rotated_user, replacement = await auth.rotate(token)
