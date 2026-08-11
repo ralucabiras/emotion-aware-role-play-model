@@ -1,8 +1,19 @@
-import { FormEvent, ReactNode, useEffect, useRef, useState } from 'react'
+import { Component, FormEvent, ReactNode, useEffect, useRef, useState } from 'react'
 import { EmotionPanel } from './components/EmotionPanel'
 import { api } from './services/api'
 import type { ConversationTurn, EmotionState, Feedback, RolePlayState, Scenario, UserProfile } from './types/api'
 import './styles.css'
+
+export class AppErrorBoundary extends Component<{children:ReactNode},{error:string}> {
+  state = { error: '' }
+  static getDerivedStateFromError(error: unknown) {
+    return { error: error instanceof Error ? error.message : 'Unexpected application error' }
+  }
+  render() {
+    if (this.state.error) return <main className="error-page"><section><p className="eyebrow">AffectLab</p><h1>The workspace could not be displayed.</h1><p role="alert">{this.state.error}</p><button className="primary" onClick={()=>{sessionStorage.removeItem('access_token');location.assign('/login')}}>Return to sign in</button></section></main>
+    return this.props.children
+  }
+}
 
 function navigate(path:string){history.pushState({},'',path);window.dispatchEvent(new PopStateEvent('popstate'))}
 function usePath(){const [path,setPath]=useState(location.pathname+location.search);useEffect(()=>{const update=()=>setPath(location.pathname+location.search);addEventListener('popstate',update);return()=>removeEventListener('popstate',update)},[]);return path}

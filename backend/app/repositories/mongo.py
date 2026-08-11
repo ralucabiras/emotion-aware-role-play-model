@@ -59,7 +59,10 @@ class MongoRepository(Repository):
             upsert=True,
         )
     async def consume_email_verification_token(self, digest: str) -> UUID | None:
-        doc = await self.db.email_verification_tokens.find_one_and_delete(
+        # Keep the record until its TTL expires so repeated browser requests are
+        # idempotent. React StrictMode and mail scanners may open the same link
+        # more than once; repeating verification grants no additional access.
+        doc = await self.db.email_verification_tokens.find_one(
             {"digest": digest, "expires_at": {"$gt": utcnow()}}
         )
         return doc["user_id"] if doc else None

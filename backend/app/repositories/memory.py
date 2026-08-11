@@ -57,7 +57,7 @@ class MemoryRepository(Repository):
         }
         self.email_verification_tokens[digest] = (user_id, expires_at)
     async def consume_email_verification_token(self, digest: str) -> UUID | None:
-        record = self.email_verification_tokens.pop(digest, None)
+        record = self.email_verification_tokens.get(digest)
         if not record or record[1] <= utcnow(): return None
         return record[0]
     async def mark_email_verified(self, user_id: UUID) -> User | None:

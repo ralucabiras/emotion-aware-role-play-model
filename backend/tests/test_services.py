@@ -28,8 +28,7 @@ async def test_passwords_tokens_rotation_and_expiry() -> None:
     with pytest.raises(AuthenticationError):
         await auth.authenticate("mixed@example.com", "a-secure-password")
     await auth.verify_email(email.token)
-    with pytest.raises(AuthenticationError):
-        await auth.verify_email(email.token)
+    assert (await auth.verify_email(email.token)).id == user.id
     assert (await auth.authenticate("mixed@example.com", "a-secure-password")).id == user.id
     assert auth.decode_access(auth.access_token(user.id)) == user.id
     token = await auth.refresh_token(user.id)
