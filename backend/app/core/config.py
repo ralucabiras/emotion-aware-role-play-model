@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     openai_model: str = "gpt-5.6"
     openai_timeout_seconds: float = 20
+    multimodal_inference_enabled: bool = False
+    multimodal_text_model_dir: str = ""
+    multimodal_audio_model_dir: str = ""
+    multimodal_config_path: str = "../configs/iemocap_final_multimodal.json"
+    multimodal_device: str = "auto"
+    multimodal_max_audio_bytes: int = 5_000_000
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

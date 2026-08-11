@@ -38,3 +38,5 @@ Experiment configuration lives in `configs/text_baseline.json`. The JSONL evalua
 ## Deferred work
 
 The current application runtime still uses the transparent text baseline. Private IEMOCAP research now includes frozen context-text, audio-only, and validation-calibrated late-fusion experiments, documented separately from the deployed service. Integrating those checkpoints requires an explicit model-serving and microphone-consent phase. Video, external experiment tracking, password reset, email verification, OAuth, and production deployment hardening remain outside this milestone.
+
+An optional multimodal inference boundary is available but disabled by default. It lazy-loads private local text/audio artifacts, constructs the previous-three-turn causal text format from an authenticated user's owned session, validates an in-memory WAV payload, and discards audio after inference. It returns the four-class research distribution separately from the persisted conversational affect state. The trained estimate never overrides crisis detection or safety escalation.

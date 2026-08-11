@@ -1,0 +1,8 @@
+-r requirements.txt
+torch>=2.7,<3.0
+transformers>=5.0,<6.0
+sentencepiece>=0.2,<1.0
+protobuf>=5.29,<7.0
+numpy>=2.2,<3.0
+soundfile>=0.13,<1.0
+scipy>=1.15,<2.0

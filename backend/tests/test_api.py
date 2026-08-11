@@ -41,3 +41,16 @@ def test_refresh_rotation_logout_and_delete() -> None:
         headers = {"Authorization": f"Bearer {client.post('/api/auth/login', json={'email':'refresh@example.com','password':'long-test-password'}).json()['access_token']}"}
         assert client.delete("/api/auth/me", headers=headers).status_code == 204
 
+
+def test_multimodal_endpoint_is_authenticated_and_explicitly_unavailable_by_default() -> None:
+    with TestClient(app) as client:
+        assert client.post("/api/affect/multimodal", json={}).status_code == 401
+        headers = auth(client, "multimodal@example.com")
+        session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+        response = client.post(
+            "/api/affect/multimodal",
+            headers=headers,
+            json={"session_id": session_id, "message": "I feel tense", "audio_wav_base64": "d2F2"},
+        )
+        assert response.status_code == 503
+        assert response.json()["detail"] == "Multimodal inference is not configured"

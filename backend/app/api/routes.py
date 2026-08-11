@@ -1,9 +1,16 @@
+import base64
+import binascii
 from uuid import UUID
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.core.container import get_auth_service, get_conversation_service, get_repository
+from app.core.container import (
+    get_auth_service,
+    get_conversation_service,
+    get_multimodal_service,
+    get_repository,
+)
 from app.models.domain import User
 from app.schemas.chat import (
     AuthRequest,
@@ -11,6 +18,8 @@ from app.schemas.chat import (
     ChatRequest,
     ChatResponse,
     CreateSessionResponse,
+    MultimodalAffectRequest,
+    MultimodalAffectResponse,
     RolePlayActionRequest,
     SessionResponse,
     SessionSummary,
@@ -20,6 +29,10 @@ from app.schemas.chat import (
 )
 from app.services.auth_service import AuthenticationError, AuthService
 from app.services.conversation_service import ConversationService, SessionNotFoundError
+from app.services.multimodal_service import (
+    MultimodalAffectService,
+    MultimodalInferenceUnavailable,
+)
 from app.services.roleplay_service import SCENARIOS
 
 router, bearer = APIRouter(prefix="/api"), HTTPBearer(auto_error=False)
@@ -45,7 +58,27 @@ async def health(repository=Depends(get_repository)):
 
 @router.get("/models/info")
 async def model_info(user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
-    return {"emotion_analyzer": getattr(service.analyzer, "version", "unknown"), "cognitive_analyzer": getattr(service.cognitive_analyzer, "version", "unknown"), "strategy_selector": "scored-rules-v2", "trained_model": False, "disclaimer": "Transparent development baselines; predictions are uncertain and are not diagnoses."}
+    multimodal = get_multimodal_service()
+    return {"emotion_analyzer": getattr(service.analyzer, "version", "unknown"), "cognitive_analyzer": getattr(service.cognitive_analyzer, "version", "unknown"), "strategy_selector": "scored-rules-v2", "trained_model": multimodal.available, "multimodal_model": multimodal.version if multimodal.available else None, "disclaimer": "Predictions are uncertain and are not diagnoses."}
+
+
+@router.post("/affect/multimodal", response_model=MultimodalAffectResponse)
+async def multimodal_affect(
+    request: MultimodalAffectRequest,
+    user: User = Depends(current_user),
+    conversations: ConversationService = Depends(get_conversation_service),
+    multimodal: MultimodalAffectService = Depends(get_multimodal_service),
+):
+    try:
+        session = await conversations.get_session(request.session_id, user.id)
+        audio = base64.b64decode(request.audio_wav_base64, validate=True)
+        return await multimodal.analyze(session, request.message, audio)
+    except SessionNotFoundError:
+        raise HTTPException(404, "Session not found") from None
+    except (binascii.Error, ValueError) as exc:
+        raise HTTPException(400, str(exc)) from None
+    except MultimodalInferenceUnavailable as exc:
+        raise HTTPException(503, str(exc)) from None
 
 
 async def auth_response(user: User, response: Response, auth: AuthService) -> AuthResponse:

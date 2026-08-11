@@ -56,3 +56,17 @@ class StartRolePlayResponse(BaseModel):
 class RolePlayActionRequest(BaseModel):
     action: str
 
+
+class MultimodalAffectRequest(BaseModel):
+    session_id: UUID
+    message: str = Field(min_length=1, max_length=5000)
+    audio_wav_base64: str = Field(min_length=1, max_length=7_000_000)
+
+
+class MultimodalAffectResponse(BaseModel):
+    label: str
+    confidence: float = Field(ge=0, le=1)
+    distribution: dict[str, float]
+    model_version: str
+    audio_persisted: bool = False
+    disclaimer: str = "Research estimate; uncertain and not a diagnosis."
