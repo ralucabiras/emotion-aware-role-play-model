@@ -68,6 +68,32 @@ def test_refresh_rotation_logout_and_delete() -> None:
         assert client.delete("/api/auth/me", headers=headers).status_code == 204
 
 
+def test_profile_update_and_password_change() -> None:
+    with TestClient(app) as client:
+        headers = auth(client, "settings@example.com")
+        profile = client.patch(
+            "/api/auth/me",
+            headers=headers,
+            json={"first_name": "Ralu", "last_name": "B", "preferred_name": "Ral", "country": "Romania", "timezone": "Europe/Bucharest"},
+        )
+        assert profile.status_code == 200
+        assert profile.json()["preferred_name"] == "Ral"
+        wrong = client.post(
+            "/api/auth/change-password",
+            headers=headers,
+            json={"current_password": "incorrect-password", "new_password": "new-long-password"},
+        )
+        assert wrong.status_code == 400
+        changed = client.post(
+            "/api/auth/change-password",
+            headers=headers,
+            json={"current_password": "long-test-password", "new_password": "new-long-password"},
+        )
+        assert changed.status_code == 204
+        assert client.post("/api/auth/login", json={"email": "settings@example.com", "password": "long-test-password"}).status_code == 401
+        assert client.post("/api/auth/login", json={"email": "settings@example.com", "password": "new-long-password"}).status_code == 200
+
+
 def test_multimodal_endpoint_is_authenticated_and_explicitly_unavailable_by_default() -> None:
     app.dependency_overrides[get_multimodal_service] = lambda: MultimodalAffectService(
         False, "", "", "missing.json"

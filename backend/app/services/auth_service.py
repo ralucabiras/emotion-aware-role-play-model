@@ -63,6 +63,21 @@ class AuthService:
         if not user.email_verified_at:
             raise EmailNotVerifiedError("Email confirmation required")
         return user
+    async def update_profile(self, user: User, profile: dict[str, str]) -> User:
+        for field in ("first_name", "last_name", "preferred_name", "country", "timezone"):
+            if field in profile:
+                setattr(user, field, profile[field].strip())
+        if not user.first_name or not user.last_name or not user.timezone:
+            raise ValueError("First name, last name, and timezone are required")
+        return await self.repository.save_user(user)
+    async def change_password(self, user: User, current_password: str, new_password: str) -> None:
+        if not password_hash.verify(current_password, user.password_hash):
+            raise AuthenticationError("Current password is incorrect")
+        if password_hash.verify(new_password, user.password_hash):
+            raise ValueError("New password must be different")
+        user.password_hash = password_hash.hash(new_password)
+        await self.repository.save_user(user)
+        await self.repository.revoke_user_tokens(user.id)
     def access_token(self, user_id: UUID) -> str:
         now = utcnow()
         return jwt.encode({"sub": str(user_id), "type": "access", "iat": now, "exp": now + timedelta(minutes=settings.access_token_minutes)}, settings.jwt_secret, algorithm="HS256")

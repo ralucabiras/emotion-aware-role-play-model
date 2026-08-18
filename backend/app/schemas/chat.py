@@ -37,6 +37,19 @@ class UserResponse(BaseModel):
     email_verified: bool = False
 
 
+class ProfileUpdateRequest(BaseModel):
+    first_name: str = Field(min_length=1, max_length=80)
+    last_name: str = Field(min_length=1, max_length=80)
+    preferred_name: str = Field(default="", max_length=80)
+    country: str = Field(default="", max_length=80)
+    timezone: str = Field(min_length=1, max_length=80)
+
+
+class PasswordChangeRequest(BaseModel):
+    current_password: str = Field(min_length=10, max_length=128)
+    new_password: str = Field(min_length=10, max_length=128)
+
+
 class RegistrationResponse(BaseModel):
     message: str
     email: EmailStr

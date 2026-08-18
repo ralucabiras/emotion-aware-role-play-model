@@ -24,6 +24,8 @@ from app.schemas.chat import (
     EmailVerificationRequest,
     MultimodalAffectRequest,
     MultimodalAffectResponse,
+    PasswordChangeRequest,
+    ProfileUpdateRequest,
     RegistrationResponse,
     ResendVerificationRequest,
     RolePlayActionRequest,
@@ -189,6 +191,35 @@ async def logout(response: Response, user: User = Depends(current_user), reposit
 
 @router.get("/auth/me", response_model=UserResponse)
 async def me(user: User = Depends(current_user)): return user_response(user)
+
+
+@router.patch("/auth/me", response_model=UserResponse)
+async def update_me(
+    request: ProfileUpdateRequest,
+    user: User = Depends(current_user),
+    auth: AuthService = Depends(get_auth_service),
+):
+    try:
+        updated = await auth.update_profile(user, request.model_dump())
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    return user_response(updated)
+
+
+@router.post("/auth/change-password", status_code=204)
+async def change_password(
+    request: PasswordChangeRequest,
+    response: Response,
+    user: User = Depends(current_user),
+    auth: AuthService = Depends(get_auth_service),
+):
+    try:
+        await auth.change_password(user, request.current_password, request.new_password)
+    except AuthenticationError:
+        raise HTTPException(400, "Current password is incorrect") from None
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    response.delete_cookie("refresh_token", path="/api/auth")
 
 
 @router.delete("/auth/me", status_code=204)

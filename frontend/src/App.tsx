@@ -1,10 +1,9 @@
-import { Component, useEffect, useRef, useState } from 'react'
+import { Component, useEffect, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
-import { EmotionPanel } from './components/EmotionPanel'
-import { VoiceCapture } from './components/VoiceCapture'
-import type { VoiceSample } from './components/VoiceCapture'
+import { Dashboard } from './components/Dashboard'
+import { SettingsPage } from './components/SettingsPage'
 import { api } from './services/api'
-import type { ConversationTurn, EmotionState, Feedback, MultimodalAffect, RolePlayState, Scenario, SessionResponse, UserProfile } from './types/api'
+import type { UserProfile } from './types/api'
 import './styles.css'
 
 function navigate(path: string) { history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')) }
@@ -62,38 +61,6 @@ function VerifyEmail() {
   return <AuthLayout title={state === 'success' ? 'Email confirmed.' : state === 'error' ? 'Link not accepted.' : 'One moment.'} subtitle={message}><div className={`verification-state ${state}`}>{state === 'working' ? '…' : state === 'success' ? '✓' : '!'}</div><button className="primary wide" disabled={state === 'working'} onClick={() => navigate('/login')}>Continue to sign in</button></AuthLayout>
 }
 
-function MultimodalPanel({result}: {result: MultimodalAffect}) {
-  const sorted = Object.entries(result.distribution).sort((left, right) => right[1] - left[1])
-  return <section className="multimodal-panel" aria-label="Voice and text affect estimate"><p className="eyebrow">Voice + text estimate</p><h2>{result.label}</h2><strong>{Math.round(result.confidence * 100)}% confidence</strong><div className="distribution">{sorted.map(([label, probability]) => <div key={label}><span>{label}</span><div><i style={{width:`${probability * 100}%`}}/></div><small>{Math.round(probability * 100)}%</small></div>)}</div><p>{result.disclaimer} Audio was not stored.</p></section>
-}
-
-function Dashboard({user, onLogout}: {user: UserProfile; onLogout: () => void}) {
-  const [sessionId, setSessionId] = useState<string>(), [sessions, setSessions] = useState<{session_id:string;turn_count:number}[]>([]), [turns, setTurns] = useState<ConversationTurn[]>([]), [emotion, setEmotion] = useState<EmotionState|null>(null), [message, setMessage] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState(''), [scenarios, setScenarios] = useState<Scenario[]>([]), [selected, setSelected] = useState('workload'), [difficulty, setDifficulty] = useState('beginner'), [roleplay, setRoleplay] = useState<RolePlayState|null>(null), [feedback, setFeedback] = useState<Feedback|null>(null), [multimodalEnabled, setMultimodalEnabled] = useState(false), [transcriptionAvailable, setTranscriptionAvailable] = useState(false), [transcriptionStatus, setTranscriptionStatus] = useState<'idle'|'transcribing'|'review'|'error'>('idle'), [voiceSample, storeVoiceSample] = useState<VoiceSample|null>(null), [multimodal, setMultimodal] = useState<MultimodalAffect|null>(null), [voiceNotice, setVoiceNotice] = useState('')
-  const endRef = useRef<HTMLDivElement>(null)
-  useEffect(() => { let active = true; void Promise.all([api.listSessions(), api.scenarios(), api.modelInfo()]).then(async ([history, choices, models]) => { if (!active) return; setMultimodalEnabled(models.trained_model); setTranscriptionAvailable(models.transcription_available); setScenarios(choices); setSessions(history); if (history[0]) load(await api.getSession(history[0].session_id)); else { const session = await api.createSession(); if (!active) return; setSessionId(session.session_id); setEmotion(session.emotion_state); setSessions([{session_id:session.session_id, turn_count:0}]) } }).catch(() => active && setError('Could not load your sessions.')); return () => { active = false } }, [])
-  useEffect(() => { endRef.current?.scrollIntoView({behavior:'smooth'}) }, [turns])
-  function load(session: SessionResponse) { setSessionId(session.session_id); setTurns(session.turns); setEmotion(session.emotion_state); setRoleplay(session.roleplay); setFeedback(session.feedback); storeVoiceSample(null); setTranscriptionStatus('idle'); setMultimodal(null); setVoiceNotice('') }
-  async function setVoiceSample(sample: VoiceSample | null) {
-    storeVoiceSample(sample); setVoiceNotice('')
-    if (!sample) { setTranscriptionStatus('idle'); return }
-    if (!transcriptionAvailable) { setTranscriptionStatus('error'); setVoiceNotice('Automatic transcription is unavailable. Type what you said before sending.'); return }
-    setTranscriptionStatus('transcribing'); setVoiceNotice('Transcribing your recording…')
-    try { const result = await api.transcribe(sample.wavBase64); setMessage(result.text); setTranscriptionStatus('review'); setVoiceNotice('Transcript ready—review or edit it before sending.') }
-    catch (caught) { setTranscriptionStatus('error'); setVoiceNotice(caught instanceof Error ? `${caught.message} You can type the transcript manually.` : 'Transcription failed. You can type the transcript manually.') }
-  }
-  async function submit(event: FormEvent) {
-    event.preventDefault(); if (!sessionId || !message.trim() || busy || transcriptionStatus === 'transcribing') return
-    const content = message.trim(), audio = voiceSample
-    setMessage(''); storeVoiceSample(null); setTranscriptionStatus('idle'); setBusy(true); setError(''); setVoiceNotice(''); setTurns(current => [...current, {id:crypto.randomUUID(), role:'user', content, created_at:new Date().toISOString()}])
-    if (audio) try { setMultimodal(await api.multimodalAffect(sessionId, content, audio.wavBase64)); setVoiceNotice('Voice and text were analysed together. The recording was not stored.') } catch { setMultimodal(null); setVoiceNotice('Voice analysis was unavailable; your message continued with text analysis only.') }
-    try { const response = await api.sendMessage(sessionId, content); setTurns(current => [...current, response.turn]); setEmotion(response.decision.emotion_state); setRoleplay(response.roleplay); setFeedback(response.feedback) } catch (caught) { setError(caught instanceof Error ? caught.message : 'Message failed') } finally { setBusy(false) }
-  }
-  async function start() { if (!sessionId) return; setBusy(true); try { const response = await api.startRoleplay(sessionId, selected, difficulty); setTurns(current => [...current, response.opening_turn]); setRoleplay(response.state); setFeedback(null) } finally { setBusy(false) } }
-  async function action(name: string) { if (sessionId) load(await api.roleplayAction(sessionId, name)) }
-  async function fresh() { if (sessionId) await api.deleteSession(sessionId); const session = await api.createSession(); setSessionId(session.session_id); setTurns([]); setEmotion(session.emotion_state); setRoleplay(null); setFeedback(null); storeVoiceSample(null); setTranscriptionStatus('idle'); setMultimodal(null); setSessions(await api.listSessions()) }
-  return <main className="shell"><header><button className="brand-link" onClick={() => navigate('/')}><span className="brand-mark">A</span><span className="brand">AffectLab</span></button><div className="header-actions"><select value={sessionId} aria-label="Saved session" onChange={async event => load(await api.getSession(event.target.value))}>{sessions.map((session, index) => <option key={session.session_id} value={session.session_id}>Session {sessions.length-index} · {session.turn_count} turns</option>)}</select><span>{user.preferred_name || user.first_name || user.email}</span><button className="text-button" onClick={async () => { await api.logout(); onLogout(); navigate('/') }}>Sign out</button><button className="text-button danger" onClick={async () => { if (confirm('Delete your account and all sessions?')) { await api.deleteAccount(); onLogout(); navigate('/') } }}>Delete account</button></div></header><section className="intro"><p className="eyebrow">Reflect · Reframe · Rehearse</p><h1>A calmer place to practise<br/>difficult conversations.</h1><p>Share what is happening. AffectLab will reflect what it notices and help you prepare—at your pace.</p></section><div className="workspace"><section className="chat-card"><div className="notice"><strong>Research prototype</strong><span>Not a therapist or medical service. In an emergency, contact local emergency services.</span></div><div className="messages" aria-live="polite">{turns.length === 0 && <div className="empty"><span>✦</span><h2>What conversation is on your mind?</h2><p>Your affect estimate is uncertain and is never a diagnosis.</p></div>}{turns.map(turn => <div key={turn.id} className={`message ${turn.role}`}><span>{turn.content}</span></div>)}{busy && <div className="message assistant"><span>Thinking…</span></div>}<div ref={endRef}/></div>{error && <p className="error" role="alert">{error}</p>}{voiceNotice && <p className="voice-notice" role="status">{voiceNotice}</p>}{!roleplay || ['completed','interrupted'].includes(roleplay.status) ? <div className="scenario-picker"><select value={selected} onChange={event => setSelected(event.target.value)} aria-label="Scenario">{scenarios.map(scenario => <option key={scenario.id} value={scenario.id}>{scenario.title}</option>)}</select><select value={difficulty} onChange={event => setDifficulty(event.target.value)} aria-label="Difficulty"><option>beginner</option><option>intermediate</option><option>difficult</option></select><button onClick={start}>Start role-play</button></div> : <div className="role-controls"><span>{roleplay.status} · turn {roleplay.turn} · {Math.round(roleplay.success_progress*100)}%</span>{roleplay.status === 'active' ? <button onClick={() => action('pause')}>Pause</button> : <button onClick={() => action('resume')}>Resume</button>}<button onClick={() => action('finish')}>Finish</button></div>}<VoiceCapture enabled={multimodalEnabled} disabled={busy || transcriptionStatus === 'transcribing'} sample={voiceSample} onChange={setVoiceSample}/><form onSubmit={submit}><textarea value={message} onChange={event => setMessage(event.target.value)} placeholder={transcriptionStatus === 'transcribing' ? 'Transcribing your recording…' : transcriptionStatus === 'review' ? 'Review or edit the transcript before sending…' : 'Type a message or add your voice…'} rows={2}/><button className="send" disabled={!message.trim() || busy || transcriptionStatus === 'transcribing'} aria-label="Send message">↑</button></form><p className="privacy">Session text is retained locally for up to 30 days. Optional audio may be sent to OpenAI for transcription, is processed in memory for affect inference, and is not stored by AffectLab.</p></section><aside><EmotionPanel state={emotion}/>{multimodal && <MultimodalPanel result={multimodal}/>} {feedback && <section className="feedback"><p className="eyebrow">Session feedback</p><h2>What you practised</h2>{feedback.observed.map(item => <p key={item}>{item}</p>)}<h3>Strengths</h3><ul>{feedback.strengths.map(item => <li key={item}>{item}</li>)}</ul><h3>Try next</h3><ul>{feedback.suggestions.map(item => <li key={item}>{item}</li>)}</ul></section>}<button className="new-session" onClick={fresh}>Delete & start fresh</button></aside></div></main>
-}
-
 export default function App() {
   const path = usePath(), [user, setUser] = useState<UserProfile>(), [checked, setChecked] = useState(false)
   useEffect(() => { let active = true; void api.me().then(profile => active && setUser(profile)).catch(() => api.refresh().then(result => active && setUser(result.user)).catch(() => undefined)).finally(() => active && setChecked(true)); return () => { active = false } }, [])
@@ -103,6 +70,7 @@ export default function App() {
   if (path === '/signup') return <Signup/>
   if (path === '/login') return <Login onAuth={setUser}/>
   if (path === '/about') return <About user={user}/>
-  if (path === '/app') return user ? <Dashboard user={user} onLogout={() => setUser(undefined)}/> : <Login onAuth={setUser}/>
+  if (path === '/settings') return user ? <SettingsPage user={user} onUser={setUser} onBack={() => navigate('/app')} onSignedOut={() => { setUser(undefined); navigate('/login') }}/> : <Login onAuth={setUser}/>
+  if (path === '/app') return user ? <Dashboard user={user} onLogout={() => { setUser(undefined); navigate('/') }} onHome={() => navigate('/')} onSettings={() => navigate('/settings')}/> : <Login onAuth={setUser}/>
   return <Landing user={user}/>
 }

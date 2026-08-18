@@ -29,6 +29,11 @@ class MongoRepository(Repository):
     async def get_user(self, user_id: UUID) -> User | None:
         doc = await self.db.users.find_one({"id": user_id})
         return User.model_validate(doc) if doc else None
+    async def save_user(self, user: User) -> User:
+        await self.db.users.replace_one(
+            {"id": user.id}, user.model_dump(mode="python"), upsert=False
+        )
+        return user
     async def delete_user(self, user_id: UUID) -> None:
         await self.db.users.delete_one({"id": user_id})
         await self.db.sessions.delete_many({"user_id": user_id})

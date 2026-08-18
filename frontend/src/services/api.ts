@@ -1,4 +1,4 @@
-import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, Scenario, SessionResponse, UserProfile } from '../types/api'
+import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, Scenario, SessionResponse, SessionSummary, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -27,6 +27,8 @@ export const api = {
   resendVerification: (email: string) => request<{message:string}>('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }, false),
   refresh: refreshAccess,
   me: () => request<UserProfile>('/auth/me'),
+  updateProfile: (profile: Pick<UserProfile,'first_name'|'last_name'|'preferred_name'|'country'|'timezone'>) => request<UserProfile>('/auth/me', { method: 'PATCH', body: JSON.stringify(profile) }),
+  changePassword: (currentPassword: string, newPassword: string) => request<void>('/auth/change-password', { method: 'POST', body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }) }),
   logout: async () => { await request('/auth/logout', { method: 'POST' }); api.clearToken() },
   deleteAccount: async () => { await request('/auth/me', { method: 'DELETE' }); api.clearToken() },
   clearToken: () => { accessToken = null; sessionStorage.removeItem('access_token') },
@@ -35,7 +37,7 @@ export const api = {
   multimodalAffect: (sessionId: string, message: string, audioWavBase64: string) => request<MultimodalAffect>('/affect/multimodal', { method: 'POST', body: JSON.stringify({ session_id: sessionId, message, audio_wav_base64: audioWavBase64 }) }),
   createSession: () => request<{ session_id: string; emotion_state: EmotionState }>('/sessions', { method: 'POST' }),
   getSession: (id: string) => request<SessionResponse>(`/sessions/${id}`),
-  listSessions: () => request<{ session_id: string; updated_at: string; turn_count: number }[]>('/sessions'),
+  listSessions: () => request<SessionSummary[]>('/sessions'),
   sendMessage: (sessionId: string, message: string) => request<ChatResponse>('/chat', { method: 'POST', body: JSON.stringify({ session_id: sessionId, message }) }),
   scenarios: () => request<Scenario[]>('/roleplay/scenarios'),
   startRoleplay: (sessionId: string, scenarioId: string, difficulty: string) => request<{ opening_turn: ChatResponse['turn']; state: ChatResponse['roleplay'] }>(`/sessions/${sessionId}/roleplay`, { method: 'POST', body: JSON.stringify({ scenario_id: scenarioId, difficulty }) }),

@@ -14,6 +14,7 @@ AffectLab is a text-first research prototype for emotion-aware coaching and adap
 - Auditable text-intelligence baselines for emotion, cognitive patterns, intent, readiness, and resistance
 - Scored strategy decisions with machine-readable reasons and model-version metadata
 - Consent disclosure, responsive authenticated frontend, and account/session controls
+- Profile and privacy settings with current-password-verified password changes
 
 ## Run with an existing local MongoDB installation
 
@@ -38,6 +39,8 @@ New accounts must confirm their email address before signing in. Configure the S
 Confirmation links use `FRONTEND_ORIGIN` (normally `http://localhost:5173`) and expire after `EMAIL_VERIFICATION_HOURS` (24 by default). Resending a confirmation invalidates the previous link. Responses from the resend endpoint are deliberately generic so they do not reveal whether an email is registered. Existing MongoDB accounts created before this feature can use the resend-confirmation action to become verified.
 
 The frontend provides public routes for the landing page (`/`), About (`/about`), sign in (`/login`), sign up (`/signup`), and email confirmation. The authenticated workspace remains at `/app`.
+
+Authenticated users can open `/settings` to update their name, country, and timezone; control the local microphone preference; review or delete individual sessions; change their password; or delete the account. Password changes require the current password, revoke every refresh token, clear the refresh cookie, and sign the current browser out. Email changes remain deferred because they require a dedicated reconfirmation flow.
 
 ## Run services locally
 
