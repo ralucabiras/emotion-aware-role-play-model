@@ -28,6 +28,7 @@ class AuthService:
             email=email.strip().lower(),
             password_hash=password_hash.hash(password),
             consented_at=utcnow(),
+            consent_version=settings.research_consent_version,
             **(profile or {}),
         )
         user = await self.repository.create_user(user)

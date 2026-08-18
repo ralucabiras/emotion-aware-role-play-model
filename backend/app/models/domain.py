@@ -154,6 +154,7 @@ class FeedbackMetric(BaseModel):
 
 
 class SessionFeedback(BaseModel):
+    session_id: UUID | None = None
     scenario_id: str
     metrics: list[FeedbackMetric]
     observed: list[str]
@@ -163,11 +164,28 @@ class SessionFeedback(BaseModel):
     created_at: datetime = Field(default_factory=utcnow)
 
 
+class StudyQuestionnaire(BaseModel):
+    phase: str
+    confidence: int | None = Field(default=None, ge=1, le=7)
+    anxiety: int | None = Field(default=None, ge=1, le=7)
+    realism: int | None = Field(default=None, ge=1, le=7)
+    usefulness: int | None = Field(default=None, ge=1, le=7)
+    submitted_at: datetime = Field(default_factory=utcnow)
+
+
+class ResearchEvent(BaseModel):
+    name: str
+    created_at: datetime = Field(default_factory=utcnow)
+    properties: dict[str, str | int | float | bool] = Field(default_factory=dict)
+
+
 class User(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     email: str
     password_hash: str
     consented_at: datetime
+    participant_id: UUID = Field(default_factory=uuid4)
+    consent_version: str = "legacy-privacy-v1"
     first_name: str = ""
     last_name: str = ""
     preferred_name: str = ""
@@ -187,3 +205,5 @@ class Session(BaseModel):
     emotion_state: EmotionState = Field(default_factory=EmotionState)
     roleplay: RolePlayState | None = None
     feedback: SessionFeedback | None = None
+    questionnaires: dict[str, StudyQuestionnaire] = Field(default_factory=dict)
+    research_events: list[ResearchEvent] = Field(default_factory=list)

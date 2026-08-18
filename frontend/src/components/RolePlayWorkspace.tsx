@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { api } from '../services/api'
 import type { Feedback, RolePlayState, Scenario } from '../types/api'
 
 export type WorkspaceMode = 'reflect' | 'roleplay' | 'feedback'
@@ -17,7 +19,8 @@ export function ModeTabs({mode, roleplay, onChange}: {mode: WorkspaceMode; rolep
   </nav>
 }
 
-export function ScenarioSetup({scenarios, selected, difficulty, busy, onScenario, onDifficulty, onStart}: {scenarios: Scenario[]; selected: string; difficulty: string; busy: boolean; onScenario: (id: string) => void; onDifficulty: (level: string) => void; onStart: () => void}) {
+export function ScenarioSetup({scenarios, selected, difficulty, busy, onScenario, onDifficulty, onStart}: {scenarios: Scenario[]; selected: string; difficulty: string; busy: boolean; onScenario: (id: string) => void; onDifficulty: (level: string) => void; onStart: (ratings: {confidence:number;anxiety:number}) => void}) {
+  const [confidence, setConfidence] = useState(4), [anxiety, setAnxiety] = useState(4)
   const scenario = scenarios.find(item => item.id === selected) ?? scenarios[0]
   if (!scenario) return <section className="scenario-setup"><p>Loading scenarios…</p></section>
   return <section className="scenario-setup">
@@ -25,7 +28,8 @@ export function ScenarioSetup({scenarios, selected, difficulty, busy, onScenario
     <div className="scenario-cards">{scenarios.map(item => <button key={item.id} className={selected === item.id ? 'selected' : ''} onClick={() => onScenario(item.id)} aria-pressed={selected === item.id}><span className="scenario-icon">{item.id === 'workload' ? 'W' : item.id === 'boundary' ? 'B' : 'R'}</span><strong>{item.title}</strong><small>Practise with a {item.character}</small></button>)}</div>
     <div className="scenario-brief"><div><span>Your objective</span><p>{scenario.user_objective}</p></div><div><span>Skills to practise</span><ul>{scenario.expected_skills.map(skill => <li key={skill}>{skill}</li>)}</ul></div></div>
     <fieldset className="difficulty-options"><legend>Difficulty</legend>{Object.entries(difficultyCopy).map(([level, copy]) => <label key={level} className={difficulty === level ? 'selected' : ''}><input type="radio" name="difficulty" value={level} checked={difficulty === level} onChange={() => onDifficulty(level)}/><strong>{level}</strong><small>{copy}</small></label>)}</fieldset>
-    <button className="primary start-rehearsal" disabled={busy} onClick={onStart}>{busy ? 'Preparing…' : `Begin with the ${scenario.character}`}</button>
+    <fieldset className="study-ratings"><legend>Before you begin <small>Optional research measure</small></legend><label>How confident do you feel about this conversation?<input type="range" min="1" max="7" value={confidence} onChange={event => setConfidence(Number(event.target.value))}/><span>{confidence} / 7</span></label><label>How anxious do you feel about this conversation?<input type="range" min="1" max="7" value={anxiety} onChange={event => setAnxiety(Number(event.target.value))}/><span>{anxiety} / 7</span></label></fieldset>
+    <button className="primary start-rehearsal" disabled={busy} onClick={() => onStart({confidence, anxiety})}>{busy ? 'Preparing…' : `Begin with the ${scenario.character}`}</button>
   </section>
 }
 
@@ -41,11 +45,14 @@ export function ActiveRolePlayHeader({scenario, state, busy, onAction}: {scenari
 }
 
 export function FeedbackScreen({scenario, feedback, state, onRetry, onConversation}: {scenario?: Scenario; feedback: Feedback; state: RolePlayState | null; onRetry: () => void; onConversation: () => void}) {
+  const [confidence, setConfidence] = useState(4), [realism, setRealism] = useState(4), [usefulness, setUsefulness] = useState(4), [submitted, setSubmitted] = useState(false), [submitting, setSubmitting] = useState(false)
+  async function submitPost() { if (!feedback.session_id) return; setSubmitting(true); try { await api.submitQuestionnaire(feedback.session_id, 'post', {confidence, realism, usefulness}); setSubmitted(true) } finally { setSubmitting(false) } }
   return <section className="feedback-screen">
     <div className="feedback-hero"><span className="completion-mark">✓</span><p className="eyebrow">Rehearsal complete</p><h2>{scenario?.title ?? 'Role-play feedback'}</h2><p>{state?.completion_reason === 'success' ? 'You demonstrated the scenario’s target skills.' : state?.completion_reason === 'maximum_turns' ? 'You reached the final turn. Review what appeared and what to try next.' : 'You chose to finish the rehearsal. Here is the evidence collected so far.'}</p></div>
     <div className="feedback-metrics">{feedback.metrics.map(metric => <article key={metric.name}><div><strong>{metric.name}</strong><span>{Math.round(metric.score * 100)}%</span></div><div className="metric-track"><i style={{width:`${metric.score * 100}%`}}/></div><small>{metric.evidence_turns?.length ? `Observed in turn${metric.evidence_turns.length > 1 ? 's' : ''} ${metric.evidence_turns.join(', ')}` : 'Not yet observed'}</small></article>)}</div>
     <div className="feedback-columns"><article><p className="eyebrow">Strengths</p><ul>{feedback.strengths.map(item => <li key={item}>{item}</li>)}</ul></article><article><p className="eyebrow">Try next</p><ul>{feedback.suggestions.map(item => <li key={item}>{item}</li>)}</ul></article></div>
     <section className="feedback-evidence"><p className="eyebrow">Evidence from this attempt</p>{feedback.observed.map(item => <p key={item}>{item}</p>)}<small>Generated from deterministic communication features. Source: {feedback.generation_source.replaceAll('_', ' ')}.</small></section>
+    <section className="post-study"><p className="eyebrow">Optional research measure</p><h3>How was this rehearsal?</h3>{submitted ? <p className="settings-message" role="status">Thank you. Your ratings were saved with this session.</p> : <><div className="study-ratings"><label>Confidence now<input type="range" min="1" max="7" value={confidence} onChange={event => setConfidence(Number(event.target.value))}/><span>{confidence} / 7</span></label><label>Scenario realism<input type="range" min="1" max="7" value={realism} onChange={event => setRealism(Number(event.target.value))}/><span>{realism} / 7</span></label><label>Feedback usefulness<input type="range" min="1" max="7" value={usefulness} onChange={event => setUsefulness(Number(event.target.value))}/><span>{usefulness} / 7</span></label></div><button className="secondary" disabled={submitting || !feedback.session_id} onClick={() => void submitPost()}>{submitting ? 'Saving…' : 'Save research ratings'}</button></>}</section>
     <div className="feedback-actions"><button className="secondary" onClick={onConversation}>Return to conversation</button><button className="primary" onClick={onRetry}>Practise again</button></div>
   </section>
 }

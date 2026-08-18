@@ -10,6 +10,7 @@ from app.models.domain import (
     RolePlayScenario,
     RolePlayState,
     SessionFeedback,
+    StudyQuestionnaire,
 )
 
 
@@ -92,6 +93,17 @@ class SessionSummary(BaseModel):
     updated_at: str
     turn_count: int
     roleplay: RolePlayState | None = None
+
+
+class StudyQuestionnaireRequest(BaseModel):
+    confidence: int | None = Field(default=None, ge=1, le=7)
+    anxiety: int | None = Field(default=None, ge=1, le=7)
+    realism: int | None = Field(default=None, ge=1, le=7)
+    usefulness: int | None = Field(default=None, ge=1, le=7)
+
+
+class StudyQuestionnaireResponse(BaseModel):
+    questionnaire: StudyQuestionnaire
 class StartRolePlayRequest(BaseModel):
     scenario_id: str
     difficulty: Difficulty = Difficulty.BEGINNER

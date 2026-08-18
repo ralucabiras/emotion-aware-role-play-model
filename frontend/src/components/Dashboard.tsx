@@ -75,9 +75,9 @@ export function Dashboard({user, onLogout, onHome, onSettings}: {user: UserProfi
     try { const response = await api.sendMessage(sessionId, content); setTurns(current => [...current, response.turn]); setEmotion(response.decision.emotion_state); setRoleplay(response.roleplay); setFeedback(response.feedback); if (response.feedback) setMode('feedback') }
     catch (caught) { setError(caught instanceof Error ? caught.message : 'Message failed') } finally { setBusy(false) }
   }
-  async function start() {
+  async function start(ratings: {confidence:number;anxiety:number}) {
     if (!sessionId) return; setBusy(true)
-    try { const response = await api.startRoleplay(sessionId, selected, difficulty); setTurns(current => [...current, response.opening_turn]); setRoleplay(response.state); setFeedback(null); setMode('roleplay') } finally { setBusy(false) }
+    try { await api.submitQuestionnaire(sessionId, 'pre', ratings); const response = await api.startRoleplay(sessionId, selected, difficulty); setTurns(current => [...current, response.opening_turn]); setRoleplay(response.state); setFeedback(null); setMode('roleplay') } finally { setBusy(false) }
   }
   async function action(name: string, nextMode: WorkspaceMode = 'roleplay') { if (!sessionId) return; const session = await api.roleplayAction(sessionId, name); load(session); setMode(session.feedback ? 'feedback' : nextMode) }
   async function fresh() { if (sessionId) await api.deleteSession(sessionId); const session = await api.createSession(); setSessionId(session.session_id); setTurns([]); setEmotion(session.emotion_state); setRoleplay(null); setFeedback(null); setMode('reflect'); storeVoiceSample(null); setTranscriptionStatus('idle'); setMultimodal(null); setSessions(await api.listSessions()) }

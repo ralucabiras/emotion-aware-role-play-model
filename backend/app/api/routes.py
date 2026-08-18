@@ -35,6 +35,8 @@ from app.schemas.chat import (
     SessionSummary,
     StartRolePlayRequest,
     StartRolePlayResponse,
+    StudyQuestionnaireRequest,
+    StudyQuestionnaireResponse,
     UserResponse,
 )
 from app.services.auth_service import (
@@ -221,6 +223,37 @@ async def logout(response: Response, user: User = Depends(current_user), reposit
 async def me(user: User = Depends(current_user)): return user_response(user)
 
 
+@router.get("/auth/research-export")
+async def research_export(
+    user: User = Depends(current_user), repository=Depends(get_repository)
+):
+    sessions = await repository.list_sessions(user.id)
+    return {
+        "schema_version": "affectlab-research-export-v1",
+        "participant_id": str(user.participant_id),
+        "consent": {"version": user.consent_version, "accepted_at": user.consented_at},
+        "contains_conversation_text": False,
+        "sessions": [
+            {
+                "session_id": str(session.id),
+                "created_at": session.created_at,
+                "updated_at": session.updated_at,
+                "turn_count": len(session.turns),
+                "roleplay": session.roleplay.model_dump(mode="json") if session.roleplay else None,
+                "feedback_metrics": [
+                    metric.model_dump(mode="json") for metric in session.feedback.metrics
+                ] if session.feedback else [],
+                "questionnaires": {
+                    phase: answer.model_dump(mode="json")
+                    for phase, answer in session.questionnaires.items()
+                },
+                "events": [event.model_dump(mode="json") for event in session.research_events],
+            }
+            for session in sessions
+        ],
+    }
+
+
 @router.patch("/auth/me", response_model=UserResponse)
 async def update_me(
     request: ProfileUpdateRequest,
@@ -312,3 +345,25 @@ async def get_feedback(session_id: UUID, user: User = Depends(current_user), ser
     session = await service.get_session(session_id, user.id)
     if not session.feedback: raise HTTPException(404, "Feedback not available")
     return session.feedback
+
+
+@router.put(
+    "/sessions/{session_id}/questionnaires/{phase}",
+    response_model=StudyQuestionnaireResponse,
+)
+async def submit_questionnaire(
+    session_id: UUID,
+    phase: str,
+    request: StudyQuestionnaireRequest,
+    user: User = Depends(current_user),
+    service: ConversationService = Depends(get_conversation_service),
+):
+    try:
+        questionnaire = await service.submit_questionnaire(
+            session_id, user.id, phase, request.model_dump()
+        )
+    except SessionNotFoundError:
+        raise HTTPException(404, "Session not found") from None
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    return StudyQuestionnaireResponse(questionnaire=questionnaire)

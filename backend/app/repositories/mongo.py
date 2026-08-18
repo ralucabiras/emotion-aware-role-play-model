@@ -27,10 +27,18 @@ class MongoRepository(Repository):
         return user
     async def get_user_by_email(self, email: str) -> User | None:
         doc = await self.db.users.find_one({"email": email})
-        return User.model_validate(doc) if doc else None
+        if not doc: return None
+        user = User.model_validate(doc)
+        if "participant_id" not in doc:
+            await self.save_user(user)
+        return user
     async def get_user(self, user_id: UUID) -> User | None:
         doc = await self.db.users.find_one({"id": user_id})
-        return User.model_validate(doc) if doc else None
+        if not doc: return None
+        user = User.model_validate(doc)
+        if "participant_id" not in doc:
+            await self.save_user(user)
+        return user
     async def save_user(self, user: User) -> User:
         await self.db.users.replace_one(
             {"id": user.id}, user.model_dump(mode="python"), upsert=False

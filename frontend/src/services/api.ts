@@ -1,4 +1,4 @@
-import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, Scenario, SessionResponse, SessionSummary, UserProfile } from '../types/api'
+import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyQuestionnaire, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -31,6 +31,7 @@ export const api = {
   me: () => request<UserProfile>('/auth/me'),
   updateProfile: (profile: Pick<UserProfile,'first_name'|'last_name'|'preferred_name'|'country'|'timezone'>) => request<UserProfile>('/auth/me', { method: 'PATCH', body: JSON.stringify(profile) }),
   changePassword: (currentPassword: string, newPassword: string) => request<void>('/auth/change-password', { method: 'POST', body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }) }),
+  researchExport: () => request<ResearchExport>('/auth/research-export'),
   logout: async () => { await request('/auth/logout', { method: 'POST' }); api.clearToken() },
   deleteAccount: async () => { await request('/auth/me', { method: 'DELETE' }); api.clearToken() },
   clearToken: () => { accessToken = null; sessionStorage.removeItem('access_token') },
@@ -44,5 +45,6 @@ export const api = {
   scenarios: () => request<Scenario[]>('/roleplay/scenarios'),
   startRoleplay: (sessionId: string, scenarioId: string, difficulty: string) => request<{ opening_turn: ChatResponse['turn']; state: ChatResponse['roleplay'] }>(`/sessions/${sessionId}/roleplay`, { method: 'POST', body: JSON.stringify({ scenario_id: scenarioId, difficulty }) }),
   roleplayAction: (sessionId: string, action: string) => request<SessionResponse>(`/sessions/${sessionId}/roleplay/action`, { method: 'POST', body: JSON.stringify({ action }) }),
+  submitQuestionnaire: (sessionId: string, phase: 'pre'|'post', values: {confidence?:number;anxiety?:number;realism?:number;usefulness?:number}) => request<{questionnaire:StudyQuestionnaire}>(`/sessions/${sessionId}/questionnaires/${phase}`, { method: 'PUT', body: JSON.stringify(values) }),
   deleteSession: (id: string) => request<void>(`/sessions/${id}`, { method: 'DELETE' }),
 }

@@ -129,6 +129,31 @@ def test_password_reset_is_generic_single_use_and_changes_credentials() -> None:
         ).status_code == 400
 
 
+def test_research_questionnaires_and_export_exclude_identity_and_conversation_text() -> None:
+    with TestClient(app) as client:
+        headers = auth(client, "research@example.com")
+        session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+        pre = client.put(
+            f"/api/sessions/{session_id}/questionnaires/pre",
+            headers=headers,
+            json={"confidence": 3, "anxiety": 6},
+        )
+        assert pre.status_code == 200
+        client.post(
+            "/api/chat",
+            headers=headers,
+            json={"session_id": session_id, "message": "private conversation wording"},
+        )
+        export = client.get("/api/auth/research-export", headers=headers)
+        assert export.status_code == 200
+        body = export.json()
+        assert body["contains_conversation_text"] is False
+        assert body["sessions"][0]["questionnaires"]["pre"]["anxiety"] == 6
+        serialized = export.text
+        assert "private conversation wording" not in serialized
+        assert "research@example.com" not in serialized
+
+
 def test_multimodal_endpoint_is_authenticated_and_explicitly_unavailable_by_default() -> None:
     app.dependency_overrides[get_multimodal_service] = lambda: MultimodalAffectService(
         False, "", "", "missing.json"
