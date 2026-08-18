@@ -1,8 +1,13 @@
+import base64
+import io
+import wave
+
 from fastapi.testclient import TestClient
 
-from app.core.container import auth_service, get_multimodal_service
+from app.core.container import auth_service, get_multimodal_service, get_transcription_service
 from app.main import app
 from app.services.multimodal_service import MultimodalAffectService
+from app.services.transcription_service import TranscriptionResult
 
 
 class CapturingEmailService:
@@ -81,3 +86,29 @@ def test_multimodal_endpoint_is_authenticated_and_explicitly_unavailable_by_defa
             assert response.json()["detail"] == "Multimodal inference is not configured"
     finally:
         app.dependency_overrides.pop(get_multimodal_service, None)
+
+
+def test_audio_transcription_is_authenticated_and_returns_transient_result() -> None:
+    class FakeTranscription:
+        available = True
+        model = "test-transcriber"
+
+        async def transcribe(self, audio: bytes):
+            assert audio.startswith(b"RIFF")
+            return TranscriptionResult("I need more time for this task.", self.model, 12)
+
+    output = io.BytesIO()
+    with wave.open(output, "wb") as recording:
+        recording.setnchannels(1); recording.setsampwidth(2); recording.setframerate(16_000)
+        recording.writeframes(b"\x00\x00" * 8_000)
+    payload = base64.b64encode(output.getvalue()).decode()
+    app.dependency_overrides[get_transcription_service] = lambda: FakeTranscription()
+    try:
+        with TestClient(app) as client:
+            assert client.post("/api/audio/transcriptions", json={"audio_wav_base64": payload}).status_code == 401
+            headers = auth(client, "voice@example.com")
+            response = client.post("/api/audio/transcriptions", headers=headers, json={"audio_wav_base64": payload})
+            assert response.status_code == 200
+            assert response.json() == {"text": "I need more time for this task.", "model": "test-transcriber", "latency_ms": 12, "audio_persisted": False}
+    finally:
+        app.dependency_overrides.pop(get_transcription_service, None)

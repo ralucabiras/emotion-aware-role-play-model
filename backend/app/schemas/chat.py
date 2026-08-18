@@ -94,3 +94,14 @@ class MultimodalAffectResponse(BaseModel):
     model_version: str
     audio_persisted: bool = False
     disclaimer: str = "Research estimate; uncertain and not a diagnosis."
+
+
+class AudioTranscriptionRequest(BaseModel):
+    audio_wav_base64: str = Field(min_length=1, max_length=7_000_000)
+
+
+class AudioTranscriptionResponse(BaseModel):
+    text: str
+    model: str
+    latency_ms: int
+    audio_persisted: bool = False

@@ -93,7 +93,7 @@ export function VoiceCapture({ enabled, disabled, sample, onChange }: { enabled:
   if (!enabled) return <div className="voice-capture unavailable"><span>Voice analysis unavailable</span><small>The message will use text analysis.</small></div>
   return <div className={`voice-capture ${displayStatus}`}>
     {displayStatus === 'recording' ? <button type="button" onClick={()=>stop(true)} disabled={disabled} aria-label="Stop voice recording">■ Stop</button> : <button type="button" onClick={start} disabled={disabled} aria-label={displayStatus === 'ready' ? 'Replace voice recording' : 'Record voice sample'}>● {displayStatus === 'ready' ? 'Record again' : 'Add voice'}</button>}
-    <span aria-live="polite">{displayStatus === 'recording' ? `Recording ${seconds.toFixed(1)} / ${MAX_SECONDS}s` : displayStatus === 'ready' ? `${seconds.toFixed(1)}s voice sample attached` : 'Optional · not stored'}</span>
+    <span aria-live="polite">{displayStatus === 'recording' ? `Recording ${seconds.toFixed(1)} / ${MAX_SECONDS}s` : displayStatus === 'ready' ? `${seconds.toFixed(1)}s voice sample attached` : 'Optional · sent to OpenAI for transcription · not stored'}</span>
     {displayStatus === 'ready' && <button type="button" className="remove-audio" onClick={()=>{onChange(null);setStatus('idle');setSeconds(0)}}>Remove</button>}
     {error && <small role="status">{error}</small>}
   </div>

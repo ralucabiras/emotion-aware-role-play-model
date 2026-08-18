@@ -7,5 +7,6 @@ export interface ChatResponse { turn: ConversationTurn; decision: { emotion_stat
 export interface Scenario { id: string; title: string; character: string; user_objective: string; expected_skills: string[] }
 export interface SessionResponse { session_id: string; turns: ConversationTurn[]; emotion_state: EmotionState; roleplay: RolePlayState | null; feedback: Feedback | null }
 export interface UserProfile { id: string; email: string; first_name: string; last_name: string; preferred_name: string; country: string; timezone: string; email_verified: boolean }
-export interface ModelInfo { trained_model: boolean; multimodal_model: string | null; disclaimer: string }
+export interface ModelInfo { trained_model: boolean; multimodal_model: string | null; transcription_available: boolean; transcription_model: string | null; disclaimer: string }
 export interface MultimodalAffect { label: string; confidence: number; distribution: Record<string,number>; model_version: string; audio_persisted: false; disclaimer: string }
+export interface AudioTranscription { text: string; model: string; latency_ms: number; audio_persisted: false }

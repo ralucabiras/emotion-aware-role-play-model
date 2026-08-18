@@ -10,9 +10,12 @@ from app.core.container import (
     get_conversation_service,
     get_multimodal_service,
     get_repository,
+    get_transcription_service,
 )
 from app.models.domain import User
 from app.schemas.chat import (
+    AudioTranscriptionRequest,
+    AudioTranscriptionResponse,
     AuthRequest,
     AuthResponse,
     ChatRequest,
@@ -42,6 +45,7 @@ from app.services.multimodal_service import (
     MultimodalInferenceUnavailable,
 )
 from app.services.roleplay_service import SCENARIOS
+from app.services.transcription_service import InvalidAudio, TranscriptionService, TranscriptionUnavailable
 
 router, bearer = APIRouter(prefix="/api"), HTTPBearer(auto_error=False)
 
@@ -68,7 +72,26 @@ async def health(repository=Depends(get_repository)):
 @router.get("/models/info")
 async def model_info(user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     multimodal = get_multimodal_service()
-    return {"emotion_analyzer": getattr(service.analyzer, "version", "unknown"), "cognitive_analyzer": getattr(service.cognitive_analyzer, "version", "unknown"), "strategy_selector": "scored-rules-v2", "trained_model": multimodal.available, "multimodal_model": multimodal.version if multimodal.available else None, "disclaimer": "Predictions are uncertain and are not diagnoses."}
+    transcription = get_transcription_service()
+    return {"emotion_analyzer": getattr(service.analyzer, "version", "unknown"), "cognitive_analyzer": getattr(service.cognitive_analyzer, "version", "unknown"), "strategy_selector": "scored-rules-v2", "trained_model": multimodal.available, "multimodal_model": multimodal.version if multimodal.available else None, "transcription_available": transcription.available, "transcription_model": transcription.model if transcription.available else None, "disclaimer": "Predictions are uncertain and are not diagnoses."}
+
+
+@router.post("/audio/transcriptions", response_model=AudioTranscriptionResponse)
+async def transcribe_audio(
+    request: AudioTranscriptionRequest,
+    user: User = Depends(current_user),
+    transcription: TranscriptionService = Depends(get_transcription_service),
+):
+    del user
+    try:
+        audio = base64.b64decode(request.audio_wav_base64, validate=True)
+        return await transcription.transcribe(audio)
+    except binascii.Error:
+        raise HTTPException(400, "Audio payload is not valid base64") from None
+    except InvalidAudio as exc:
+        raise HTTPException(400, str(exc)) from None
+    except TranscriptionUnavailable as exc:
+        raise HTTPException(503, str(exc)) from None
 
 
 @router.post("/affect/multimodal", response_model=MultimodalAffectResponse)

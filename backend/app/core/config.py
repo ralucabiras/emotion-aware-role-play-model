@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     openai_model: str = "gpt-5.6"
     openai_timeout_seconds: float = 20
+    transcription_enabled: bool = True
+    openai_transcription_model: str = "gpt-transcribe"
+    transcription_timeout_seconds: float = 30
     multimodal_inference_enabled: bool = False
     multimodal_text_model_dir: str = ""
     multimodal_audio_model_dir: str = ""
