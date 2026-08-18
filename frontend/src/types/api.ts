@@ -8,6 +8,6 @@ export interface Scenario { id: string; title: string; character: string; user_o
 export interface SessionResponse { session_id: string; turns: ConversationTurn[]; emotion_state: EmotionState; roleplay: RolePlayState | null; feedback: Feedback | null }
 export interface SessionSummary { session_id: string; updated_at: string; turn_count: number; roleplay?: RolePlayState | null }
 export interface UserProfile { id: string; email: string; first_name: string; last_name: string; preferred_name: string; country: string; timezone: string; email_verified: boolean }
-export interface ModelInfo { trained_model: boolean; multimodal_model: string | null; transcription_available: boolean; transcription_model: string | null; disclaimer: string }
-export interface MultimodalAffect { label: string; confidence: number; distribution: Record<string,number>; model_version: string; audio_persisted: false; disclaimer: string }
+export interface ModelInfo { trained_model: boolean; multimodal_model: string | null; multimodal_status: string; transcription_available: boolean; transcription_model: string | null; disclaimer: string }
+export interface MultimodalAffect { label: string; confidence: number; distribution: Record<string,number>; text_label: string; text_confidence: number; text_distribution: Record<string,number>; audio_label: string; audio_confidence: number; audio_distribution: Record<string,number>; modalities_agree: boolean; confidence_level: 'low'|'moderate'|'high'; low_confidence_threshold: number; model_version: string; latency_ms: number; queue_ms: number; audio_persisted: false; disclaimer: string }
 export interface AudioTranscription { text: string; model: string; latency_ms: number; audio_persisted: false }

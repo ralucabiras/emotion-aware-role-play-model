@@ -75,7 +75,7 @@ async def health(repository=Depends(get_repository)):
 async def model_info(user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     multimodal = get_multimodal_service()
     transcription = get_transcription_service()
-    return {"emotion_analyzer": getattr(service.analyzer, "version", "unknown"), "cognitive_analyzer": getattr(service.cognitive_analyzer, "version", "unknown"), "strategy_selector": "scored-rules-v2", "trained_model": multimodal.available, "multimodal_model": multimodal.version if multimodal.available else None, "transcription_available": transcription.available, "transcription_model": transcription.model if transcription.available else None, "disclaimer": "Predictions are uncertain and are not diagnoses."}
+    return {"emotion_analyzer": getattr(service.analyzer, "version", "unknown"), "cognitive_analyzer": getattr(service.cognitive_analyzer, "version", "unknown"), "strategy_selector": "scored-rules-v2", "trained_model": multimodal.available, "multimodal_model": multimodal.version if multimodal.available else None, "multimodal_status": multimodal.status, "transcription_available": transcription.available, "transcription_model": transcription.model if transcription.available else None, "disclaimer": "Predictions are uncertain and are not diagnoses."}
 
 
 @router.post("/audio/transcriptions", response_model=AudioTranscriptionResponse)

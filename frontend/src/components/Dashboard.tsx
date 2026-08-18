@@ -10,7 +10,8 @@ import type { VoiceSample } from './VoiceCapture'
 
 function MultimodalPanel({result}: {result: MultimodalAffect}) {
   const sorted = Object.entries(result.distribution).sort((left, right) => right[1] - left[1])
-  return <section className="multimodal-panel" aria-label="Voice and text affect estimate"><p className="eyebrow">Voice + text estimate</p><h2>{result.label}</h2><strong>{Math.round(result.confidence * 100)}% confidence</strong><div className="distribution">{sorted.map(([label, probability]) => <div key={label}><span>{label}</span><div><i style={{width:`${probability * 100}%`}}/></div><small>{Math.round(probability * 100)}%</small></div>)}</div><p>{result.disclaimer} Audio was not stored.</p></section>
+  const low = result.confidence_level === 'low'
+  return <section className={`multimodal-panel confidence-${result.confidence_level}`} aria-label="Voice and text affect estimate"><p className="eyebrow">Voice + text estimate</p><h2>{low ? 'Uncertain estimate' : result.label}</h2><strong>{Math.round(result.confidence * 100)}% confidence · {result.confidence_level}</strong>{low && <p className="confidence-warning">No single label reached the display threshold. Treat the leading possibilities as tentative.</p>}<div className="modality-comparison"><article><span>Text signal</span><strong>{result.text_label}</strong><small>{Math.round(result.text_confidence * 100)}%</small></article><article><span>Voice signal</span><strong>{result.audio_label}</strong><small>{Math.round(result.audio_confidence * 100)}%</small></article></div><p className={`agreement ${result.modalities_agree ? 'agree' : 'disagree'}`}>{result.modalities_agree ? 'Text and voice point to the same leading label.' : 'Text and voice point to different leading labels; the fused result is less straightforward.'}</p><div className="distribution">{sorted.map(([label, probability]) => <div key={label}><span>{label}</span><div><i style={{width:`${probability * 100}%`}}/></div><small>{Math.round(probability * 100)}%</small></div>)}</div><p>{result.disclaimer} Audio was not stored. Inference took {(result.latency_ms / 1000).toFixed(1)}s{result.queue_ms > 50 ? ` after ${(result.queue_ms / 1000).toFixed(1)}s queued` : ''}.</p></section>
 }
 
 export function Dashboard({user, onLogout, onHome, onSettings}: {user: UserProfile; onLogout: () => void; onHome: () => void; onSettings: () => void}) {
@@ -28,6 +29,7 @@ export function Dashboard({user, onLogout, onHome, onSettings}: {user: UserProfi
   const [feedback, setFeedback] = useState<Feedback|null>(null)
   const [mode, setMode] = useState<WorkspaceMode>('reflect')
   const [multimodalEnabled, setMultimodalEnabled] = useState(false)
+  const [modelStatus, setModelStatus] = useState('unavailable')
   const microphoneEnabled = localStorage.getItem('affectlab_microphone_enabled') !== 'false'
   const [transcriptionAvailable, setTranscriptionAvailable] = useState(false)
   const [transcriptionStatus, setTranscriptionStatus] = useState<'idle'|'transcribing'|'review'|'error'>('idle')
@@ -40,7 +42,7 @@ export function Dashboard({user, onLogout, onHome, onSettings}: {user: UserProfi
     let active = true
     void Promise.all([api.listSessions(), api.scenarios(), api.modelInfo()]).then(async ([history, choices, models]) => {
       if (!active) return
-      setMultimodalEnabled(models.trained_model); setTranscriptionAvailable(models.transcription_available); setScenarios(choices); setSessions(history)
+      setMultimodalEnabled(models.trained_model); setModelStatus(models.multimodal_status); setTranscriptionAvailable(models.transcription_available); setScenarios(choices); setSessions(history)
       if (history[0]) load(await api.getSession(history[0].session_id))
       else { const session = await api.createSession(); if (!active) return; setSessionId(session.session_id); setEmotion(session.emotion_state); setSessions([{session_id:session.session_id, turn_count:0}]) }
     }).catch(() => active && setError('Could not load your sessions.'))
@@ -69,7 +71,7 @@ export function Dashboard({user, onLogout, onHome, onSettings}: {user: UserProfi
     const content = message.trim(), audio = voiceSample
     setMessage(''); storeVoiceSample(null); setTranscriptionStatus('idle'); setBusy(true); setError(''); setVoiceNotice('')
     setTurns(current => [...current, {id:crypto.randomUUID(), role:'user', content, created_at:new Date().toISOString()}])
-    if (audio) try { setMultimodal(await api.multimodalAffect(sessionId, content, audio.wavBase64)); setVoiceNotice('Voice and text were analysed together. The recording was not stored.') } catch { setMultimodal(null); setVoiceNotice('Voice analysis was unavailable; your message continued with text analysis only.') }
+    if (audio) try { if (modelStatus !== 'ready') setVoiceNotice('Loading the trained models for the first voice analysis…'); setMultimodal(await api.multimodalAffect(sessionId, content, audio.wavBase64)); setModelStatus('ready'); setVoiceNotice('Voice and text were analysed together. The recording was not stored.') } catch { setMultimodal(null); setVoiceNotice('Voice analysis was unavailable; your message continued with text analysis only.') }
     try { const response = await api.sendMessage(sessionId, content); setTurns(current => [...current, response.turn]); setEmotion(response.decision.emotion_state); setRoleplay(response.roleplay); setFeedback(response.feedback); if (response.feedback) setMode('feedback') }
     catch (caught) { setError(caught instanceof Error ? caught.message : 'Message failed') } finally { setBusy(false) }
   }

@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     multimodal_config_path: str = "../configs/iemocap_final_multimodal.json"
     multimodal_device: str = "auto"
     multimodal_max_audio_bytes: int = 5_000_000
+    multimodal_low_confidence_threshold: float = 0.55
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_use_tls: bool = True

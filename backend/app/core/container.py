@@ -18,6 +18,7 @@ multimodal_service = MultimodalAffectService(
     settings.multimodal_config_path,
     settings.multimodal_device,
     settings.multimodal_max_audio_bytes,
+    settings.multimodal_low_confidence_threshold,
 )
 transcription_service = TranscriptionService(
     settings.transcription_enabled,

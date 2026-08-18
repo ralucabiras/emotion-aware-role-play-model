@@ -104,7 +104,18 @@ class MultimodalAffectResponse(BaseModel):
     label: str
     confidence: float = Field(ge=0, le=1)
     distribution: dict[str, float]
+    text_label: str
+    text_confidence: float = Field(ge=0, le=1)
+    text_distribution: dict[str, float]
+    audio_label: str
+    audio_confidence: float = Field(ge=0, le=1)
+    audio_distribution: dict[str, float]
+    modalities_agree: bool
+    confidence_level: str
+    low_confidence_threshold: float = Field(ge=0, le=1)
     model_version: str
+    latency_ms: int
+    queue_ms: int = 0
     audio_persisted: bool = False
     disclaimer: str = "Research estimate; uncertain and not a diagnosis."
 
