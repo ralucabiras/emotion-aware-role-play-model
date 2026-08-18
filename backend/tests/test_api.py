@@ -13,9 +13,13 @@ from app.services.transcription_service import TranscriptionResult
 class CapturingEmailService:
     def __init__(self) -> None:
         self.tokens: dict[str, str] = {}
+        self.reset_tokens: dict[str, str] = {}
 
     async def send_verification(self, recipient: str, preferred_name: str, token: str) -> None:
         self.tokens[recipient] = token
+
+    async def send_password_reset(self, recipient: str, preferred_name: str, token: str) -> None:
+        self.reset_tokens[recipient] = token
 
 
 capturing_email = CapturingEmailService()
@@ -92,6 +96,37 @@ def test_profile_update_and_password_change() -> None:
         assert changed.status_code == 204
         assert client.post("/api/auth/login", json={"email": "settings@example.com", "password": "long-test-password"}).status_code == 401
         assert client.post("/api/auth/login", json={"email": "settings@example.com", "password": "new-long-password"}).status_code == 200
+
+
+def test_password_reset_is_generic_single_use_and_changes_credentials() -> None:
+    with TestClient(app) as client:
+        auth(client, "reset@example.com")
+        unknown = client.post(
+            "/api/auth/forgot-password", json={"email": "unknown@example.com"}
+        )
+        requested = client.post(
+            "/api/auth/forgot-password", json={"email": "reset@example.com"}
+        )
+        assert unknown.status_code == requested.status_code == 202
+        assert unknown.json() == requested.json()
+        token = capturing_email.reset_tokens["reset@example.com"]
+        reset = client.post(
+            "/api/auth/reset-password",
+            json={"token": token, "new_password": "replacement-password"},
+        )
+        assert reset.status_code == 204
+        assert client.post(
+            "/api/auth/login",
+            json={"email": "reset@example.com", "password": "long-test-password"},
+        ).status_code == 401
+        assert client.post(
+            "/api/auth/login",
+            json={"email": "reset@example.com", "password": "replacement-password"},
+        ).status_code == 200
+        assert client.post(
+            "/api/auth/reset-password",
+            json={"token": token, "new_password": "another-password"},
+        ).status_code == 400
 
 
 def test_multimodal_endpoint_is_authenticated_and_explicitly_unavailable_by_default() -> None:

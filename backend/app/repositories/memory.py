@@ -11,6 +11,7 @@ class MemoryRepository(Repository):
         self.sessions: dict[UUID, Session] = {}
         self.tokens: dict[str, tuple[UUID, str, datetime]] = {}
         self.email_verification_tokens: dict[str, tuple[UUID, datetime]] = {}
+        self.password_reset_tokens: dict[str, tuple[UUID, datetime]] = {}
 
     async def initialize(self) -> None: pass
     async def create_user(self, user: User) -> User:
@@ -31,6 +32,11 @@ class MemoryRepository(Repository):
         self.email_verification_tokens = {
             digest: record
             for digest, record in self.email_verification_tokens.items()
+            if record[0] != user_id
+        }
+        self.password_reset_tokens = {
+            digest: record
+            for digest, record in self.password_reset_tokens.items()
             if record[0] != user_id
         }
     async def save_session(self, session: Session) -> Session:
@@ -61,6 +67,15 @@ class MemoryRepository(Repository):
         self.email_verification_tokens[digest] = (user_id, expires_at)
     async def consume_email_verification_token(self, digest: str) -> UUID | None:
         record = self.email_verification_tokens.get(digest)
+        if not record or record[1] <= utcnow(): return None
+        return record[0]
+    async def store_password_reset_token(self, user_id: UUID, digest: str, expires_at) -> None:
+        self.password_reset_tokens = {
+            key: record for key, record in self.password_reset_tokens.items() if record[0] != user_id
+        }
+        self.password_reset_tokens[digest] = (user_id, expires_at)
+    async def consume_password_reset_token(self, digest: str) -> UUID | None:
+        record = self.password_reset_tokens.pop(digest, None)
         if not record or record[1] <= utcnow(): return None
         return record[0]
     async def mark_email_verified(self, user_id: UUID) -> User | None:

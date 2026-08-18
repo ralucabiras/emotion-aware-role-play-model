@@ -19,6 +19,8 @@ class MongoRepository(Repository):
         await self.db.refresh_tokens.create_index("expires_at", expireAfterSeconds=0)
         await self.db.email_verification_tokens.create_index("expires_at", expireAfterSeconds=0)
         await self.db.email_verification_tokens.create_index("user_id", unique=True)
+        await self.db.password_reset_tokens.create_index("expires_at", expireAfterSeconds=0)
+        await self.db.password_reset_tokens.create_index("user_id", unique=True)
     async def create_user(self, user: User) -> User:
         try: await self.db.users.insert_one(user.model_dump(mode="python"))
         except DuplicateKeyError as exc: raise ValueError("duplicate email") from exc
@@ -39,6 +41,7 @@ class MongoRepository(Repository):
         await self.db.sessions.delete_many({"user_id": user_id})
         await self.db.refresh_tokens.delete_many({"user_id": user_id})
         await self.db.email_verification_tokens.delete_many({"user_id": user_id})
+        await self.db.password_reset_tokens.delete_many({"user_id": user_id})
     async def save_session(self, session: Session) -> Session:
         await self.db.sessions.replace_one({"id": session.id}, session.model_dump(mode="python"), upsert=True)
         return session
@@ -76,3 +79,14 @@ class MongoRepository(Repository):
             {"id": user_id}, {"$set": {"email_verified_at": utcnow()}}
         )
         return await self.get_user(user_id)
+    async def store_password_reset_token(self, user_id: UUID, digest: str, expires_at) -> None:
+        await self.db.password_reset_tokens.replace_one(
+            {"user_id": user_id},
+            {"user_id": user_id, "digest": digest, "expires_at": expires_at},
+            upsert=True,
+        )
+    async def consume_password_reset_token(self, digest: str) -> UUID | None:
+        doc = await self.db.password_reset_tokens.find_one_and_delete(
+            {"digest": digest, "expires_at": {"$gt": utcnow()}}
+        )
+        return doc["user_id"] if doc else None

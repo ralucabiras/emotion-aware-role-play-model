@@ -12,9 +12,13 @@ from app.services.roleplay_service import RolePlayService, observe
 class CapturingEmailService:
     def __init__(self) -> None:
         self.token = ""
+        self.reset_token = ""
 
     async def send_verification(self, recipient: str, preferred_name: str, token: str) -> None:
         self.token = token
+
+    async def send_password_reset(self, recipient: str, preferred_name: str, token: str) -> None:
+        self.reset_token = token
 
 
 @pytest.mark.asyncio

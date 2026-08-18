@@ -39,7 +39,21 @@ function AuthLayout({title, subtitle, children}: {title: string; subtitle: strin
 function Login({onAuth}: {onAuth: (user: UserProfile) => void}) {
   const [email, setEmail] = useState(''), [password, setPassword] = useState(''), [error, setError] = useState(''), [busy, setBusy] = useState(false)
   async function submit(event: FormEvent) { event.preventDefault(); setBusy(true); setError(''); try { const result = await api.login(email, password); onAuth(result.user); navigate('/app') } catch (caught) { setError(caught instanceof Error ? caught.message : 'Sign in failed') } finally { setBusy(false) } }
-  return <AuthLayout title="Welcome back." subtitle="Sign in to continue your private practice sessions."><form className="auth-form" onSubmit={submit}><label>Email<input type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required/></label><label>Password<input type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} required/></label>{error && <p className="error" role="alert">{error}</p>}<button className="primary" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button></form><button className="text-button" onClick={() => navigate('/signup')}>Need an account? Create one</button></AuthLayout>
+  return <AuthLayout title="Welcome back." subtitle="Sign in to continue your private practice sessions."><form className="auth-form" onSubmit={submit}><label>Email<input type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required/></label><label>Password<input type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} required/></label><button type="button" className="forgot-link" onClick={() => navigate('/forgot-password')}>Forgot your password?</button>{error && <p className="error" role="alert">{error}</p>}<button className="primary" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button></form><button className="text-button" onClick={() => navigate('/signup')}>Need an account? Create one</button></AuthLayout>
+}
+
+function ForgotPassword() {
+  const [email, setEmail] = useState(''), [message, setMessage] = useState(''), [error, setError] = useState(''), [busy, setBusy] = useState(false)
+  async function submit(event: FormEvent) { event.preventDefault(); setBusy(true); setError(''); try { setMessage((await api.forgotPassword(email)).message) } catch (caught) { setError(caught instanceof Error ? caught.message : 'Request failed') } finally { setBusy(false) } }
+  return <AuthLayout title="Reset your password." subtitle="Enter the email used for your AffectLab account.">{message ? <div className="auth-result" role="status"><div className="email-icon">✉</div><p>{message}</p><small>For privacy, this message is the same whether or not an account was found.</small></div> : <form className="auth-form" onSubmit={submit}><label>Email<input type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required autoFocus/></label>{error && <p className="error" role="alert">{error}</p>}<button className="primary" disabled={busy}>{busy ? 'Sending…' : 'Send reset link'}</button></form>}<button className="text-button" onClick={() => navigate('/login')}>Return to sign in</button></AuthLayout>
+}
+
+function ResetPassword() {
+  const token = new URLSearchParams(location.search).get('token') || '', [password, setPassword] = useState(''), [confirmation, setConfirmation] = useState(''), [error, setError] = useState(''), [done, setDone] = useState(false), [busy, setBusy] = useState(false)
+  async function submit(event: FormEvent) { event.preventDefault(); setError(''); if (password !== confirmation) { setError('Passwords do not match'); return } setBusy(true); try { await api.resetPassword(token, password); api.clearToken(); setDone(true) } catch (caught) { setError(caught instanceof Error ? caught.message : 'Password reset failed') } finally { setBusy(false) } }
+  if (!token) return <AuthLayout title="Link not accepted." subtitle="This password reset link is incomplete."><button className="primary wide" onClick={() => navigate('/forgot-password')}>Request a new link</button></AuthLayout>
+  if (done) return <AuthLayout title="Password updated." subtitle="Your existing signed-in sessions have been revoked. You can now sign in with your new password."><div className="verification-state success">✓</div><button className="primary wide" onClick={() => navigate('/login')}>Continue to sign in</button></AuthLayout>
+  return <AuthLayout title="Choose a new password." subtitle="This link is single-use and expires after 30 minutes."><form className="auth-form" onSubmit={submit}><label>New password<input type="password" autoComplete="new-password" minLength={10} maxLength={128} value={password} onChange={event => setPassword(event.target.value)} required autoFocus/><small>At least 10 characters.</small></label><label>Confirm new password<input type="password" autoComplete="new-password" minLength={10} maxLength={128} value={confirmation} onChange={event => setConfirmation(event.target.value)} required/></label>{error && <p className="error" role="alert">{error}</p>}<button className="primary" disabled={busy}>{busy ? 'Updating…' : 'Update password'}</button></form><button className="text-button" onClick={() => navigate('/forgot-password')}>Request a new link</button></AuthLayout>
 }
 
 function Signup() {
@@ -66,6 +80,8 @@ export default function App() {
   useEffect(() => { let active = true; void api.me().then(profile => active && setUser(profile)).catch(() => api.refresh().then(result => active && setUser(result.user)).catch(() => undefined)).finally(() => active && setChecked(true)); return () => { active = false } }, [])
   if (!checked) return <main className="loading-page">Loading AffectLab…</main>
   if (path.startsWith('/verify-email')) return <VerifyEmail/>
+  if (path.startsWith('/reset-password')) return <ResetPassword/>
+  if (path === '/forgot-password') return <ForgotPassword/>
   if (path.startsWith('/check-email')) return <CheckEmail/>
   if (path === '/signup') return <Signup/>
   if (path === '/login') return <Login onAuth={setUser}/>

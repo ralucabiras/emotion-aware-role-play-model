@@ -25,6 +25,8 @@ export const api = {
   login: (email: string, password: string) => request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }, false).then(acceptAuth),
   verifyEmail: (token: string) => request<{message:string}>('/auth/verify-email', { method: 'POST', body: JSON.stringify({ token }) }, false),
   resendVerification: (email: string) => request<{message:string}>('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }, false),
+  forgotPassword: (email: string) => request<{message:string}>('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }, false),
+  resetPassword: (token: string, newPassword: string) => request<void>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, new_password: newPassword }) }, false),
   refresh: refreshAccess,
   me: () => request<UserProfile>('/auth/me'),
   updateProfile: (profile: Pick<UserProfile,'first_name'|'last_name'|'preferred_name'|'country'|'timezone'>) => request<UserProfile>('/auth/me', { method: 'PATCH', body: JSON.stringify(profile) }),

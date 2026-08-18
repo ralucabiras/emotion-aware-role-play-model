@@ -50,6 +50,15 @@ class PasswordChangeRequest(BaseModel):
     new_password: str = Field(min_length=10, max_length=128)
 
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+
+class PasswordResetConfirmRequest(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+    new_password: str = Field(min_length=10, max_length=128)
+
+
 class RegistrationResponse(BaseModel):
     message: str
     email: EmailStr

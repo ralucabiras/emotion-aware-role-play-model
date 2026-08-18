@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     smtp_sender: str = ""
     smtp_timeout_seconds: float = 20
     email_verification_hours: int = 24
+    password_reset_minutes: int = 30
     model_config = SettingsConfigDict(
         env_file=(REPOSITORY_ROOT / ".env", REPOSITORY_ROOT / "backend" / ".env"),
         extra="ignore",

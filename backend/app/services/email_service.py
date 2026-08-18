@@ -26,6 +26,22 @@ class EmailService:
         )
         await asyncio.to_thread(self._send, message)
 
+    async def send_password_reset(self, recipient: str, preferred_name: str, token: str) -> None:
+        if not all((settings.smtp_host, settings.smtp_username, settings.smtp_password, settings.smtp_sender)):
+            raise EmailDeliveryError("Email delivery is not configured")
+        link = f"{settings.frontend_origin.rstrip('/')}/reset-password?token={token}"
+        message = EmailMessage()
+        message["Subject"] = "Reset your AffectLab password"
+        message["From"] = settings.smtp_sender
+        message["To"] = recipient
+        greeting = f"Hi {preferred_name}," if preferred_name else "Hello,"
+        message.set_content(
+            f"{greeting}\n\nReset your AffectLab password by opening this link:\n{link}\n\n"
+            f"This single-use link expires in {settings.password_reset_minutes} minutes. If you did "
+            "not request a password reset, you can ignore this email."
+        )
+        await asyncio.to_thread(self._send, message)
+
     def _send(self, message: EmailMessage) -> None:
         try:
             with smtplib.SMTP(

@@ -78,6 +78,33 @@ class AuthService:
         user.password_hash = password_hash.hash(new_password)
         await self.repository.save_user(user)
         await self.repository.revoke_user_tokens(user.id)
+    async def request_password_reset(self, email: str) -> None:
+        user = await self.repository.get_user_by_email(email.strip().lower())
+        if not user or not user.email_verified_at:
+            return
+        raw_token = secrets.token_urlsafe(32)
+        digest = hashlib.sha256(raw_token.encode()).hexdigest()
+        await self.repository.store_password_reset_token(
+            user.id,
+            digest,
+            utcnow() + timedelta(minutes=settings.password_reset_minutes),
+        )
+        await self.email_service.send_password_reset(
+            user.email, user.preferred_name or user.first_name, raw_token
+        )
+    async def reset_password(self, raw_token: str, new_password: str) -> None:
+        digest = hashlib.sha256(raw_token.encode()).hexdigest()
+        user_id = await self.repository.consume_password_reset_token(digest)
+        if not user_id:
+            raise AuthenticationError("Invalid or expired password reset link")
+        user = await self.repository.get_user(user_id)
+        if not user:
+            raise AuthenticationError("Invalid or expired password reset link")
+        if password_hash.verify(new_password, user.password_hash):
+            raise ValueError("New password must be different")
+        user.password_hash = password_hash.hash(new_password)
+        await self.repository.save_user(user)
+        await self.repository.revoke_user_tokens(user.id)
     def access_token(self, user_id: UUID) -> str:
         now = utcnow()
         return jwt.encode({"sub": str(user_id), "type": "access", "iat": now, "exp": now + timedelta(minutes=settings.access_token_minutes)}, settings.jwt_secret, algorithm="HS256")

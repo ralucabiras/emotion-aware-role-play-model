@@ -25,6 +25,8 @@ from app.schemas.chat import (
     MultimodalAffectRequest,
     MultimodalAffectResponse,
     PasswordChangeRequest,
+    PasswordResetConfirmRequest,
+    PasswordResetRequest,
     ProfileUpdateRequest,
     RegistrationResponse,
     ResendVerificationRequest,
@@ -170,6 +172,32 @@ async def resend_verification(request: ResendVerificationRequest, auth: AuthServ
     try: await auth.resend_verification(str(request.email))
     except EmailDeliveryError: pass
     return {"message": "If the account exists and is unverified, a confirmation email has been sent."}
+
+
+@router.post("/auth/forgot-password", status_code=202)
+async def forgot_password(
+    request: PasswordResetRequest, auth: AuthService = Depends(get_auth_service)
+):
+    try:
+        await auth.request_password_reset(str(request.email))
+    except EmailDeliveryError:
+        pass
+    return {"message": "If an eligible account exists, a password reset link has been sent."}
+
+
+@router.post("/auth/reset-password", status_code=204)
+async def reset_password(
+    request: PasswordResetConfirmRequest,
+    response: Response,
+    auth: AuthService = Depends(get_auth_service),
+):
+    try:
+        await auth.reset_password(request.token, request.new_password)
+    except AuthenticationError as exc:
+        raise HTTPException(400, str(exc)) from None
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    response.delete_cookie("refresh_token", path="/api/auth")
 
 
 @router.post("/auth/refresh", response_model=AuthResponse)
