@@ -61,7 +61,7 @@ async def test_repository_ownership_expiry_and_cascade() -> None:
 
 def test_scenarios_difficulty_observations_and_completion() -> None:
     service = RolePlayService()
-    for scenario_id in ("workload", "boundary", "relationship"):
+    for scenario_id in ("workload", "boundary", "relationship", "colleague_feedback", "deadline", "household"):
         for difficulty in Difficulty:
             state, scenario = service.start(scenario_id, difficulty)
             assert scenario.id == scenario_id and state.difficulty_level == difficulty
@@ -94,6 +94,18 @@ def test_relationship_roleplay_progresses_and_feedback_is_scenario_specific() ->
     metric_names = {metric.name for metric in feedback.metrics}
     assert metric_names == {"I-statements", "specific need", "non-blaming language"}
     assert "boundary maintenance" not in " ".join(feedback.suggestions).lower()
+
+
+def test_difficult_boundary_requires_maintaining_refusal_and_feedback_does_not_escalate() -> None:
+    service = RolePlayService()
+    state, _ = service.start("boundary", Difficulty.DIFFICULT)
+    prompt = service.respond(state, "I am busy and I can't this week.", EmotionState())
+    assert state.status == RolePlayStatus.ACTIVE
+    assert "answer still no" in prompt
+    service.respond(state, "Yes, my answer is still no. I cannot take this on.", EmotionState())
+    assert state.status == RolePlayStatus.COMPLETED
+    feedback = service.feedback(state)
+    assert all("higher difficulty" not in item for item in feedback.suggestions)
 
 
 @pytest.mark.asyncio
