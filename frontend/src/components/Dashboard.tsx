@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { api } from '../services/api'
-import type { ConversationTurn, EmotionState, Feedback, MultimodalAffect, RolePlayState, Scenario, SessionResponse, UserProfile } from '../types/api'
+import type { ConversationTurn, EmotionState, Feedback, MultimodalAffect, RolePlayState, Scenario, SessionResponse, SessionSummary, UserProfile } from '../types/api'
 import { EmotionPanel } from './EmotionPanel'
 import { ActiveRolePlayHeader, FeedbackScreen, ModeTabs, ScenarioSetup } from './RolePlayWorkspace'
 import type { WorkspaceMode } from './RolePlayWorkspace'
@@ -15,9 +15,10 @@ function MultimodalPanel({result}: {result: MultimodalAffect}) {
   return <section className={`multimodal-panel confidence-${result.confidence_level}`} aria-label="Voice and text affect estimate"><p className="eyebrow">Voice + text estimate</p><h2>{low ? 'Uncertain estimate' : result.label}</h2><strong>{Math.round(result.confidence * 100)}% confidence · {result.confidence_level}</strong>{low && <p className="confidence-warning">No single label reached the display threshold. Treat the leading possibilities as tentative.</p>}<div className="modality-comparison"><article><span>Text signal</span><strong>{result.text_label}</strong><small>{Math.round(result.text_confidence * 100)}%</small></article><article><span>Voice signal</span><strong>{result.audio_label}</strong><small>{Math.round(result.audio_confidence * 100)}%</small></article></div><p className={`agreement ${result.modalities_agree ? 'agree' : 'disagree'}`}>{result.modalities_agree ? 'Text and voice point to the same leading label.' : 'Text and voice point to different leading labels; the fused result is less straightforward.'}</p><div className="distribution">{sorted.map(([label, probability]) => <div key={label}><span>{label}</span><div><i style={{width:`${probability * 100}%`}}/></div><small>{Math.round(probability * 100)}%</small></div>)}</div><p>{result.disclaimer} Audio was not stored. Inference took {(result.latency_ms / 1000).toFixed(1)}s{result.queue_ms > 50 ? ` after ${(result.queue_ms / 1000).toFixed(1)}s queued` : ''}.</p></section>
 }
 
-export function Dashboard({user, onLogout, onHome, onSettings}: {user: UserProfile; onLogout: () => void; onHome: () => void; onSettings: () => void}) {
+export function Dashboard({user, initialSessionId, initialRoleplay=false, onLogout, onDashboard, onSettings}: {user: UserProfile; initialSessionId?:string; initialRoleplay?:boolean; onLogout: () => void; onDashboard:()=>void; onSettings: () => void}) {
   const [sessionId, setSessionId] = useState<string>()
-  const [sessions, setSessions] = useState<{session_id:string;turn_count:number}[]>([])
+  const [sessions, setSessions] = useState<SessionSummary[]>([])
+  const [sessionTitle, setSessionTitle] = useState('New reflection')
   const [turns, setTurns] = useState<ConversationTurn[]>([])
   const [emotion, setEmotion] = useState<EmotionState|null>(null)
   const [message, setMessage] = useState('')
@@ -28,7 +29,7 @@ export function Dashboard({user, onLogout, onHome, onSettings}: {user: UserProfi
   const [difficulty, setDifficulty] = useState('beginner')
   const [roleplay, setRoleplay] = useState<RolePlayState|null>(null)
   const [feedback, setFeedback] = useState<Feedback|null>(null)
-  const [mode, setMode] = useState<WorkspaceMode>('reflect')
+  const [mode, setMode] = useState<WorkspaceMode>(initialRoleplay ? 'roleplay' : 'reflect')
   const [multimodalEnabled, setMultimodalEnabled] = useState(false)
   const [modelStatus, setModelStatus] = useState('unavailable')
   const microphoneEnabled = localStorage.getItem('affectlab_microphone_enabled') !== 'false'
@@ -44,18 +45,18 @@ export function Dashboard({user, onLogout, onHome, onSettings}: {user: UserProfi
     void Promise.all([api.listSessions(), api.scenarios(), api.modelInfo()]).then(async ([history, choices, models]) => {
       if (!active) return
       setMultimodalEnabled(models.trained_model); setModelStatus(models.multimodal_status); setTranscriptionAvailable(models.transcription_available); setScenarios(choices); setSessions(history)
-      if (history[0]) load(await api.getSession(history[0].session_id))
-      else { const session = await api.createSession(); if (!active) return; setSessionId(session.session_id); setEmotion(session.emotion_state); setSessions([{session_id:session.session_id, turn_count:0}]) }
+      if (initialSessionId) load(await api.getSession(initialSessionId))
+      else { const session = await api.createSession(); if (!active) return; setSessionId(session.session_id); setEmotion(session.emotion_state); setSessions(await api.listSessions()) }
     }).catch(() => active && setError('Could not load your sessions.'))
     return () => { active = false }
-  }, [])
+  }, [initialSessionId])
   useEffect(() => { endRef.current?.scrollIntoView({behavior:'smooth'}) }, [turns])
 
   const activeScenario = scenarios.find(item => item.id === (roleplay?.scenario_id ?? selected))
   const roleplayActive = Boolean(roleplay && ['active','paused'].includes(roleplay.status))
 
   function load(session: SessionResponse) {
-    setSessionId(session.session_id); setTurns(session.turns); setEmotion(session.emotion_state); setRoleplay(session.roleplay); setFeedback(session.feedback)
+    setSessionId(session.session_id); setSessionTitle(session.title); setTurns(session.turns); setEmotion(session.emotion_state); setRoleplay(session.roleplay); setFeedback(session.feedback)
     setMode(session.feedback ? 'feedback' : session.roleplay && ['active','paused'].includes(session.roleplay.status) ? 'roleplay' : 'reflect')
     storeVoiceSample(null); setTranscriptionStatus('idle'); setMultimodal(null); setVoiceNotice('')
   }
@@ -73,21 +74,22 @@ export function Dashboard({user, onLogout, onHome, onSettings}: {user: UserProfi
     setMessage(''); storeVoiceSample(null); setTranscriptionStatus('idle'); setBusy(true); setError(''); setVoiceNotice('')
     setTurns(current => [...current, {id:crypto.randomUUID(), role:'user', content, created_at:new Date().toISOString()}])
     if (audio) try { if (modelStatus !== 'ready') setVoiceNotice('Loading the trained models for the first voice analysis…'); setMultimodal(await api.multimodalAffect(sessionId, content, audio.wavBase64)); setModelStatus('ready'); setVoiceNotice('Voice and text were analysed together. The recording was not stored.') } catch { setMultimodal(null); setVoiceNotice('Voice analysis was unavailable; your message continued with text analysis only.') }
-    try { const response = await api.sendMessage(sessionId, content); setTurns(current => [...current, response.turn]); setEmotion(response.decision.emotion_state); setRoleplay(response.roleplay); setFeedback(response.feedback); if (response.feedback) setMode('feedback') }
+    try { const response = await api.sendMessage(sessionId, content); setTurns(current => [...current, response.turn]); setEmotion(response.decision.emotion_state); setRoleplay(response.roleplay); setFeedback(response.feedback); if (sessionTitle === 'New reflection') setSessionTitle(content.length > 57 ? `${content.slice(0,57).trim()}…` : content); if (response.feedback) setMode('feedback') }
     catch (caught) { setError(caught instanceof Error ? caught.message : 'Message failed') } finally { setBusy(false) }
   }
   async function start(ratings: {confidence:number;anxiety:number}) {
     if (!sessionId) return; setBusy(true)
-    try { await api.submitQuestionnaire(sessionId, 'pre', ratings); const response = await api.startRoleplay(sessionId, selected, difficulty); setTurns([response.opening_turn]); setRoleplay(response.state); setFeedback(null); setMultimodal(null); storeVoiceSample(null); setMessage(''); setMode('roleplay') } finally { setBusy(false) }
+    try { await api.submitQuestionnaire(sessionId, 'pre', ratings); const response = await api.startRoleplay(sessionId, selected, difficulty); setSessionTitle(activeScenario?.title ?? 'Role-play'); setTurns([response.opening_turn]); setRoleplay(response.state); setFeedback(null); setMultimodal(null); storeVoiceSample(null); setMessage(''); setMode('roleplay') } finally { setBusy(false) }
   }
   async function action(name: string, nextMode: WorkspaceMode = 'roleplay') { if (!sessionId) return; const session = await api.roleplayAction(sessionId, name); load(session); setMode(session.feedback ? 'feedback' : nextMode) }
-  async function fresh() { if (sessionId) await api.deleteSession(sessionId); const session = await api.createSession(); setSessionId(session.session_id); setTurns([]); setEmotion(session.emotion_state); setRoleplay(null); setFeedback(null); setMode('reflect'); storeVoiceSample(null); setTranscriptionStatus('idle'); setMultimodal(null); setSessions(await api.listSessions()) }
+  async function fresh() { if (sessionId) await api.deleteSession(sessionId); const session = await api.createSession(); setSessionId(session.session_id); setSessionTitle('New reflection'); setTurns([]); setEmotion(session.emotion_state); setRoleplay(null); setFeedback(null); setMode('reflect'); storeVoiceSample(null); setTranscriptionStatus('idle'); setMultimodal(null); setSessions(await api.listSessions()) }
   function retry() { setSelected(roleplay?.scenario_id ?? selected); setDifficulty(roleplay?.difficulty_level ?? difficulty); setFeedback(null); setRoleplay(null); setMode('roleplay') }
 
   const composer = <><VoiceCapture enabled={multimodalEnabled && microphoneEnabled} disabled={busy || transcriptionStatus === 'transcribing'} sample={voiceSample} onChange={setVoiceSample}/><form onSubmit={submit}><textarea value={message} onChange={event => setMessage(event.target.value)} placeholder={transcriptionStatus === 'transcribing' ? 'Transcribing your recording…' : transcriptionStatus === 'review' ? 'Review or edit the transcript before sending…' : roleplayActive ? `Respond to your ${activeScenario?.character ?? 'practice partner'}…` : 'Type a message or add your voice…'} rows={2}/><button className="send" disabled={!message.trim() || busy || transcriptionStatus === 'transcribing' || roleplay?.status === 'paused'} aria-label="Send message">↑</button></form><p className="privacy">Session text is retained locally for up to 30 days. Optional audio may be sent to OpenAI for transcription, processed in memory, and is not stored by AffectLab.</p></>
 
   return <main className="shell">
-    <header><button className="brand-link" onClick={onHome}><span className="brand-mark">A</span><span className="brand">AffectLab</span></button><div className="header-actions"><select value={sessionId} aria-label="Saved session" onChange={async event => load(await api.getSession(event.target.value))}>{sessions.map((session, index) => <option key={session.session_id} value={session.session_id}>Session {sessions.length-index} · {session.turn_count} turns</option>)}</select><span>{user.preferred_name || user.first_name || user.email}</span><button className="text-button" onClick={onSettings}>Settings</button><button className="text-button" onClick={async () => { await api.logout(); onLogout() }}>Sign out</button></div></header>
+    <header><button className="brand-link" onClick={onDashboard}><span className="brand-mark">A</span><span className="brand">AffectLab</span></button><div className="header-actions"><button className="text-button" onClick={onDashboard}>Dashboard</button><select value={sessionId} aria-label="Saved session" onChange={async event => load(await api.getSession(event.target.value))}>{sessions.map(session => <option key={session.session_id} value={session.session_id}>{session.title} · {session.turn_count} turns</option>)}</select><span>{user.preferred_name || user.first_name || user.email}</span><button className="text-button" onClick={onSettings}>Settings</button><button className="text-button" onClick={async () => { await api.logout(); onLogout() }}>Sign out</button></div></header>
+    <div className="workspace-title"><span>{sessionTitle}</span><button onClick={async()=>{const next=prompt('Rename this session',sessionTitle)?.trim();if(!next||!sessionId)return;const updated=await api.renameSession(sessionId,next);setSessionTitle(updated.title);setSessions(await api.listSessions())}}>Rename</button></div>
     <section className="intro"><p className="eyebrow">Reflect · Reframe · Rehearse</p><h1>{mode === 'roleplay' ? 'Practise the conversation.' : mode === 'feedback' ? 'Review your rehearsal.' : 'A calmer place to prepare.'}</h1><p>{mode === 'roleplay' ? 'Try the words, adjust your approach, and finish whenever you are ready.' : mode === 'feedback' ? 'Use observable evidence to decide what to keep and what to try next.' : 'Share what is happening and explore the conversation at your pace.'}</p></section>
     {mode === 'reflect' && user.practice_goals.length > 0 && <section className="practice-focus"><div><p className="eyebrow">Your practice focus</p><strong>{user.practice_goals.map(goalLabel).join(' · ')}</strong></div><button onClick={() => { setSelected(recommendedScenario(user.practice_goals)); setMode('roleplay') }}>Try a recommended rehearsal</button></section>}
     <ModeTabs mode={mode} roleplay={roleplay} onChange={next => { if (roleplayActive && next === 'reflect' && !confirm('Pause the active role-play and return to reflection?')) return; if (roleplayActive && next === 'reflect' && roleplay?.status === 'active') { void action('pause', 'reflect'); return } setMode(next) }}/>

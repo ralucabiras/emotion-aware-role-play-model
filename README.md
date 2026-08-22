@@ -13,6 +13,7 @@ AffectLab is a text-first research prototype for emotion-aware coaching and adap
 - Evidence-backed feedback with optional structured LLM wording
 - Adaptive OpenAI role-play wording constrained by deterministic dialogue actions, safety rules, and local fallback
 - Guided first-run onboarding with explicit model/privacy boundaries and one-to-three persistent personal practice goals
+- Authenticated home dashboard with automatic/editable session titles, resumable activity, and evidence-based rehearsal history
 - Pseudonymous research events, versioned consent, pre/post ratings, and text-free personal data export
 - Auditable text-intelligence baselines for emotion, cognitive patterns, intent, readiness, and resistance
 - Scored strategy decisions with machine-readable reasons and model-version metadata

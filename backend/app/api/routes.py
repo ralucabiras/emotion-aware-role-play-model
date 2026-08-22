@@ -34,6 +34,7 @@ from app.schemas.chat import (
     RolePlayActionRequest,
     SessionResponse,
     SessionSummary,
+    SessionTitleRequest,
     StartRolePlayRequest,
     StartRolePlayResponse,
     StudyQuestionnaireRequest,
@@ -314,14 +315,21 @@ async def create_session(user: User = Depends(current_user), service: Conversati
 
 @router.get("/sessions", response_model=list[SessionSummary])
 async def list_sessions(user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
-    return [SessionSummary(session_id=s.id, updated_at=s.updated_at.isoformat(), turn_count=len(s.turns), roleplay=s.roleplay) for s in await service.list_sessions(user.id)]
+    return [SessionSummary(session_id=s.id, title=s.title, created_at=s.created_at.isoformat(), updated_at=s.updated_at.isoformat(), turn_count=len(s.turns), roleplay=s.roleplay, feedback=s.feedback) for s in await service.list_sessions(user.id)]
 
 
 @router.get("/sessions/{session_id}", response_model=SessionResponse)
 async def get_session(session_id: UUID, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     try: session = await service.get_session(session_id, user.id)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
-    return SessionResponse(session_id=session.id, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback)
+    return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback)
+
+
+@router.patch("/sessions/{session_id}/title", response_model=SessionSummary)
+async def rename_session(session_id: UUID, request: SessionTitleRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
+    try: session = await service.rename_session(session_id, user.id, request.title)
+    except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
+    return SessionSummary(session_id=session.id, title=session.title, created_at=session.created_at.isoformat(), updated_at=session.updated_at.isoformat(), turn_count=len(session.turns), roleplay=session.roleplay, feedback=session.feedback)
 
 
 @router.delete("/sessions/{session_id}", status_code=204)
@@ -355,7 +363,7 @@ async def roleplay_action(session_id: UUID, request: RolePlayActionRequest, user
     try: session = await service.set_roleplay_status(session_id, user.id, request.action)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return SessionResponse(session_id=session.id, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback)
+    return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback)
 
 
 @router.get("/sessions/{session_id}/feedback")

@@ -92,15 +92,23 @@ class ChatResponse(BaseModel):
     feedback: SessionFeedback | None = None
 class SessionResponse(BaseModel):
     session_id: UUID
+    title: str
     turns: list[ConversationTurn]
     emotion_state: EmotionState
     roleplay: RolePlayState | None = None
     feedback: SessionFeedback | None = None
 class SessionSummary(BaseModel):
     session_id: UUID
+    title: str
+    created_at: str
     updated_at: str
     turn_count: int
     roleplay: RolePlayState | None = None
+    feedback: SessionFeedback | None = None
+
+
+class SessionTitleRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=80)
 
 
 class StudyQuestionnaireRequest(BaseModel):

@@ -44,6 +44,9 @@ def test_auth_session_chat_and_feedback() -> None:
         headers = auth(client)
         assert client.get("/api/auth/me", headers=headers).status_code == 200
         session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+        renamed = client.patch(f"/api/sessions/{session_id}/title", headers=headers, json={"title": "  Manager preparation  "})
+        assert renamed.status_code == 200
+        assert renamed.json()["title"] == "Manager preparation"
         response = client.post("/api/chat", headers=headers, json={"session_id": session_id, "message": "I'm scared they will think I'm incompetent"})
         assert response.status_code == 200
         assert response.json()["decision"]["strategy"] == "validate_then_reframe"
@@ -55,6 +58,9 @@ def test_auth_session_chat_and_feedback() -> None:
         reply = client.post("/api/chat", headers=headers, json={"session_id": session_id, "message": "I need you to prioritise the deadline because it is this week"}).json()
         assert reply["roleplay"]["status"] == "completed"
         assert reply["feedback"]["metrics"]
+        history = client.get("/api/sessions", headers=headers).json()
+        assert history[0]["title"] == "Workload conversation"
+        assert history[0]["feedback"]["metrics"]
 
 
 def test_ownership_and_crisis_precedence() -> None:

@@ -47,11 +47,19 @@ class ConversationService:
     async def list_sessions(self, user_id: UUID) -> list[Session]: return await self.repository.list_sessions(user_id)
     async def delete_session(self, session_id: UUID, user_id: UUID) -> None:
         if not await self.repository.delete_session(session_id, user_id): raise SessionNotFoundError
+    async def rename_session(self, session_id: UUID, user_id: UUID, title: str) -> Session:
+        session = await self.get_session(session_id, user_id)
+        session.title = " ".join(title.split())
+        await self.save(session)
+        return session
     async def save(self, session: Session) -> None:
         session.updated_at, session.expires_at = utcnow(), utcnow() + timedelta(days=settings.session_retention_days)
         await self.repository.save_session(session)
     async def chat(self, session_id: UUID, user_id: UUID, message: str) -> tuple[ConversationTurn, AgentDecision, Session]:
         session = await self.get_session(session_id, user_id)
+        if session.title == "New reflection":
+            clean = " ".join(message.split())
+            session.title = clean[:57].rstrip(" ,.;:-") + ("…" if len(clean) > 57 else "")
         crisis = contains_crisis_language(message)
         if not crisis and isinstance(self.generator, OpenAIResponseGenerator): crisis = await self.generator.moderate(message)
         state = self.state_tracker.update(session.emotion_state, self.analyzer.analyze(message))
@@ -101,6 +109,7 @@ class ConversationService:
         session = await self.get_session(session_id, user_id)
         state, scenario = self.roleplays.start(scenario_id, level)
         session.roleplay, session.feedback = state, None
+        session.title = scenario.title
         session.turns = []
         session.emotion_state = self.analyzer.analyze("")
         turn = ConversationTurn(role=Role.ASSISTANT, content=scenario.opening_line)

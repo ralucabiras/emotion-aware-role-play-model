@@ -211,6 +211,7 @@ class User(BaseModel):
 class Session(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     user_id: UUID
+    title: str = "New reflection"
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
     expires_at: datetime = Field(default_factory=lambda: utcnow() + timedelta(days=30))
