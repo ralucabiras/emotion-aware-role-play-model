@@ -6,8 +6,8 @@ from app.models.domain import Difficulty, EmotionState, RolePlayStatus, Session,
 from app.repositories.memory import MemoryRepository
 from app.services.affect_service import RuleBasedCognitiveAnalyzer, RuleBasedEmotionAnalyzer
 from app.services.auth_service import AuthenticationError, AuthService
-from app.services.llm_service import OpenAIResponseGenerator, TemplateResponseGenerator
-from app.services.roleplay_service import RolePlayService, observe
+from app.services.llm_service import OpenAIResponseGenerator, RolePlayWording, TemplateResponseGenerator
+from app.services.roleplay_service import SCENARIOS, RolePlayService, observe
 from app.services.strategy_service import ScoredStrategySelector
 
 
@@ -135,3 +135,45 @@ async def test_emotional_statements_receive_specific_offline_support() -> None:
         )
         assert "Tell me a little more" not in text
         assert state.dominant_emotion.value in text.lower()
+
+
+@pytest.mark.asyncio
+async def test_roleplay_generation_accepts_only_the_deterministic_action() -> None:
+    generator = OpenAIResponseGenerator()
+
+    class Response:
+        output_parsed = RolePlayWording(
+            dialogue="I hear that this week is full. Is your answer still no?",
+            character_action="apply_pressure",
+        )
+        usage = None
+
+    class Responses:
+        async def parse(self, **kwargs):
+            assert kwargs["store"] is False
+            assert kwargs["text_format"] is RolePlayWording
+            return Response()
+
+    class Client:
+        responses = Responses()
+
+    generator.client = Client()
+    roleplay, _ = RolePlayService().start("boundary", Difficulty.DIFFICULT)
+    session = Session(
+        user_id=User(email="x@example.com", password_hash="x", consented_at=utcnow()).id,
+        roleplay=roleplay,
+    )
+    text, metadata = await generator.generate_roleplay(
+        session, SCENARIOS["boundary"], "apply_pressure", "fallback"
+    )
+    assert "answer still no" in text
+    assert metadata.source == "openai_roleplay"
+
+    Response.output_parsed = RolePlayWording(
+        dialogue="Here is some coaching.", character_action="accept_and_close"
+    )
+    text, metadata = await generator.generate_roleplay(
+        session, SCENARIOS["boundary"], "apply_pressure", "fallback"
+    )
+    assert text == "fallback"
+    assert metadata.fallback_reason == "invalid_roleplay_output"

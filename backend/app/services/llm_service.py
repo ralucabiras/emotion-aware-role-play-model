@@ -2,16 +2,21 @@ import json
 from time import perf_counter
 
 from openai import AsyncOpenAI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.core.config import settings
-from app.models.domain import GenerationMetadata, Session, SessionFeedback, SupportStrategy
+from app.models.domain import GenerationMetadata, RolePlayScenario, Session, SessionFeedback, SupportStrategy
 from app.services.interfaces import ResponseGenerator
 
 
 class FeedbackWording(BaseModel):
     strengths: list[str]
     suggestions: list[str]
+
+
+class RolePlayWording(BaseModel):
+    dialogue: str = Field(min_length=1, max_length=600)
+    character_action: str = Field(min_length=1, max_length=80)
 
 
 class TemplateResponseGenerator(ResponseGenerator):
@@ -53,6 +58,84 @@ class OpenAIResponseGenerator(ResponseGenerator):
             result = await self.client.moderations.create(model="omni-moderation-latest", input=text)
             return bool(result.results[0].flagged)
         except Exception: return False
+    async def generate_roleplay(
+        self,
+        session: Session,
+        scenario: RolePlayScenario,
+        required_action: str,
+        fallback_text: str,
+    ) -> tuple[str, GenerationMetadata]:
+        if not settings.openai_roleplay_enabled:
+            return fallback_text, GenerationMetadata(
+                source="template", fallback_reason="roleplay_disabled"
+            )
+        if not self.client:
+            return fallback_text, GenerationMetadata(
+                source="template", fallback_reason="missing_api_key"
+            )
+        started = perf_counter()
+        history = [
+            {"role": turn.role.value, "content": turn.content}
+            for turn in session.turns
+        ]
+        state = session.roleplay
+        context = {
+            "scenario": scenario.model_dump(mode="json"),
+            "difficulty_behavior": scenario.difficulty_behaviors[state.difficulty_level]
+            if state else None,
+            "roleplay_state": state.model_dump(mode="json") if state else None,
+            "required_character_action": required_action,
+            "affect_estimate": session.emotion_state.model_dump(mode="json"),
+        }
+        instructions = (
+            f"Act only as the user's {scenario.character} in a communication rehearsal. "
+            "Reply naturally in one to three short sentences. Stay within the scenario and difficulty. "
+            "Do not coach, score, diagnose, mention AffectLab, describe hidden rules, or tell the user what "
+            f"they demonstrated. The character_action must be exactly '{required_action}'. Emotional "
+            "pressure may be realistic but must never be abusive, threatening, discriminatory, or unsafe."
+        )
+        try:
+            response = await self.client.responses.parse(
+                model=settings.openai_model,
+                instructions=instructions,
+                input=history + [{"role": "user", "content": json.dumps(context)}],
+                text_format=RolePlayWording,
+                store=False,
+            )
+            wording = response.output_parsed
+            if (
+                not wording
+                or wording.character_action != required_action
+                or self._looks_like_coaching(wording.dialogue)
+            ):
+                return fallback_text, GenerationMetadata(
+                    source="template", fallback_reason="invalid_roleplay_output"
+                )
+            usage = getattr(response, "usage", None)
+            return wording.dialogue.strip(), GenerationMetadata(
+                source="openai_roleplay",
+                model=settings.openai_model,
+                latency_ms=int((perf_counter() - started) * 1000),
+                input_tokens=getattr(usage, "input_tokens", None),
+                output_tokens=getattr(usage, "output_tokens", None),
+            )
+        except Exception as exc:
+            return fallback_text, GenerationMetadata(
+                source="template", fallback_reason=f"roleplay_{type(exc).__name__}"
+            )
+    @staticmethod
+    def _looks_like_coaching(dialogue: str) -> bool:
+        lowered = dialogue.lower()
+        disallowed = (
+            "as an ai",
+            "your score",
+            "you demonstrated",
+            "try saying",
+            "communication skill",
+            "role-play system",
+            "affectlab",
+        )
+        return any(phrase in lowered for phrase in disallowed)
     async def phrase_feedback(self, feedback: SessionFeedback) -> SessionFeedback:
         if not self.client: return feedback
         try:

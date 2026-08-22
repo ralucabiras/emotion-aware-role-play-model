@@ -1,4 +1,5 @@
 import re
+from dataclasses import dataclass
 
 from app.models.domain import (
     Difficulty,
@@ -23,6 +24,13 @@ SCENARIOS = {
 }
 
 
+@dataclass(frozen=True)
+class RolePlayReplyPlan:
+    action: str
+    fallback_text: str
+    completed: bool = False
+
+
 def observe(turn: int, text: str, arousal: float) -> TurnEvidence:
     lower = text.lower()
     return TurnEvidence(
@@ -43,6 +51,8 @@ class RolePlayService:
         difficulty, cooperation = LEVELS[level]
         return RolePlayState(scenario_id=scenario_id, difficulty_level=level, difficulty=difficulty, cooperation=cooperation), scenario
     def respond(self, state: RolePlayState, message: str, emotion: EmotionState) -> str:
+        return self.plan_response(state, message, emotion).fallback_text
+    def plan_response(self, state: RolePlayState, message: str, emotion: EmotionState) -> RolePlayReplyPlan:
         if state.status != RolePlayStatus.ACTIVE: raise ValueError("Role-play is not active")
         scenario = SCENARIOS[state.scenario_id]
         state.turn += 1
@@ -66,19 +76,19 @@ class RolePlayService:
             succeeded = state.success_progress == 1
         if succeeded or state.turn >= scenario.max_turns:
             self.finish(state, "success" if succeeded else "maximum_turns")
-            return "Thank you—that gives me a clear understanding of what you need."
-        if item.excessive_apology: return "You do not need to apologise. What is the request or boundary you want me to understand?"
+            return RolePlayReplyPlan("accept_and_close", "Thank you—that gives me a clear understanding of what you need.", True)
+        if item.excessive_apology: return RolePlayReplyPlan("request_clear_boundary", "You do not need to apologise. What is the request or boundary you want me to understand?")
         if not item.concrete_request:
-            if state.scenario_id == "boundary": return "It sounds like you may not have the capacity. Can you give me a clear yes or no?"
-            if state.scenario_id == "relationship": return "I hear that you want more connection. What would you like us to do differently?"
-            return "What specifically would you like me to do or understand?"
+            if state.scenario_id == "boundary": return RolePlayReplyPlan("request_clear_refusal", "It sounds like you may not have the capacity. Can you give me a clear yes or no?")
+            if state.scenario_id == "relationship": return RolePlayReplyPlan("request_clear_need", "I hear that you want more connection. What would you like us to do differently?")
+            return RolePlayReplyPlan("request_clarity", "What specifically would you like me to do or understand?")
         if state.scenario_id == "boundary":
-            if state.difficulty_level == Difficulty.DIFFICULT: return "I understand you are busy, but this puts me in a difficult position. Is your answer still no?"
-            return "Are you sure? I was really counting on you."
-        if state.scenario_id in {"relationship", "household"}: return "What would that change look like in practice—for example, a particular time, task, or routine?"
-        if state.scenario_id == "colleague_feedback": return "Can you describe a recent example and the change you would like me to make?"
-        if state.scenario_id == "deadline": return "What delivery date or scope change are you proposing, and what is driving it?"
-        return "Which responsibilities are most at risk, and what should I deprioritise?"
+            if state.difficulty_level == Difficulty.DIFFICULT: return RolePlayReplyPlan("apply_pressure", "I understand you are busy, but this puts me in a difficult position. Is your answer still no?")
+            return RolePlayReplyPlan("gentle_pushback", "Are you sure? I was really counting on you.")
+        if state.scenario_id in {"relationship", "household"}: return RolePlayReplyPlan("request_specific_routine", "What would that change look like in practice—for example, a particular time, task, or routine?")
+        if state.scenario_id == "colleague_feedback": return RolePlayReplyPlan("request_specific_example", "Can you describe a recent example and the change you would like me to make?")
+        if state.scenario_id == "deadline": return RolePlayReplyPlan("request_proposal", "What delivery date or scope change are you proposing, and what is driving it?")
+        return RolePlayReplyPlan("request_prioritisation", "Which responsibilities are most at risk, and what should I deprioritise?")
     def finish(self, state: RolePlayState, reason: str = "user_finished") -> None:
         state.status = RolePlayStatus.COMPLETED
         state.completion_reason, state.completed_at = reason, utcnow()

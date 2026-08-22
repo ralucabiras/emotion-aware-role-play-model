@@ -22,7 +22,7 @@ from app.services.affect_service import (
 )
 from app.services.interfaces import CognitiveAnalyzer, EmotionAnalyzer, ResponseGenerator, StrategySelector
 from app.services.llm_service import OpenAIResponseGenerator
-from app.services.roleplay_service import RolePlayService
+from app.services.roleplay_service import SCENARIOS, RolePlayService
 from app.services.strategy_service import RuleBasedStrategySelector, ScoredStrategySelector
 
 
@@ -63,12 +63,25 @@ class ConversationService:
         else:
             strategy, strategy_scores, reasons = self.selector.select(state, assessment), {}, []
         session.turns.append(ConversationTurn(role=Role.USER, content=message, emotion_state=state))
+        roleplay_action = "none"
         if crisis:
             content, metadata = CRISIS_RESPONSE, None
             if session.roleplay: session.roleplay.status, session.roleplay.completion_reason = RolePlayStatus.INTERRUPTED, "safety_interruption"
         elif session.roleplay and session.roleplay.status == RolePlayStatus.ACTIVE:
-            content, metadata = self.roleplays.respond(session.roleplay, message, state), None
-            if session.roleplay.status == RolePlayStatus.COMPLETED: await self.complete_feedback(session)
+            plan = self.roleplays.plan_response(session.roleplay, message, state)
+            roleplay_action = plan.action
+            if plan.completed:
+                content, metadata = plan.fallback_text, None
+                await self.complete_feedback(session)
+            elif isinstance(self.generator, OpenAIResponseGenerator):
+                content, metadata = await self.generator.generate_roleplay(
+                    session,
+                    SCENARIOS[session.roleplay.scenario_id],
+                    plan.action,
+                    plan.fallback_text,
+                )
+            else:
+                content, metadata = plan.fallback_text, None
         else: content, metadata = await self.generator.generate(session, message, strategy)
         turn = ConversationTurn(role=Role.ASSISTANT, content=content, strategy=strategy, generation=metadata)
         session.turns.append(turn)
@@ -79,6 +92,7 @@ class ConversationService:
                 "crisis_detected": crisis,
                 "strategy": strategy.value,
                 "roleplay_active": bool(session.roleplay and session.roleplay.status == RolePlayStatus.ACTIVE),
+                "roleplay_action": roleplay_action,
             },
         ))
         await self.save(session)

@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     openai_model: str = "gpt-5.6"
     openai_timeout_seconds: float = 20
+    openai_roleplay_enabled: bool = True
     transcription_enabled: bool = True
     openai_transcription_model: str = "gpt-4o-mini-transcribe"
     transcription_timeout_seconds: float = 30
