@@ -12,6 +12,7 @@ AffectLab is a text-first research prototype for emotion-aware coaching and adap
 - Pause, resume, manual completion, automatic success, and safety interruption
 - Evidence-backed feedback with optional structured LLM wording
 - Adaptive OpenAI role-play wording constrained by deterministic dialogue actions, safety rules, and local fallback
+- Guided first-run onboarding with explicit model/privacy boundaries and one-to-three persistent personal practice goals
 - Pseudonymous research events, versioned consent, pre/post ratings, and text-free personal data export
 - Auditable text-intelligence baselines for emotion, cognitive patterns, intent, readiness, and resistance
 - Scored strategy decisions with machine-readable reasons and model-version metadata
@@ -40,9 +41,9 @@ New accounts must confirm their email address before signing in. Configure the S
 
 Confirmation links use `FRONTEND_ORIGIN` (normally `http://localhost:5173`) and expire after `EMAIL_VERIFICATION_HOURS` (24 by default). Resending a confirmation invalidates the previous link. Responses from the resend endpoint are deliberately generic so they do not reveal whether an email is registered. Existing MongoDB accounts created before this feature can use the resend-confirmation action to become verified.
 
-The frontend provides public routes for the landing page (`/`), About (`/about`), sign in (`/login`), sign up (`/signup`), email confirmation, and single-use password recovery. The authenticated workspace remains at `/app`.
+The frontend provides public routes for the landing page (`/`), About (`/about`), sign in (`/login`), sign up (`/signup`), email confirmation, and single-use password recovery. After first sign-in, `/onboarding` explains the research boundaries, optional voice processing, and asks the user to select personal practice goals before opening the authenticated workspace at `/app`.
 
-Authenticated users can open `/settings` to update their name, country, and timezone; control the local microphone preference; review or delete individual sessions; change their password; or delete the account. Password changes require the current password, revoke every refresh token, clear the refresh cookie, and sign the current browser out. Email changes remain deferred because they require a dedicated reconfirmation flow.
+Authenticated users can open `/settings` to update their name, country, timezone, and personal practice goals; control the local microphone preference; review or delete individual sessions; change their password; or delete the account. Password changes require the current password, revoke every refresh token, clear the refresh cookie, and sign the current browser out. Email changes remain deferred because they require a dedicated reconfirmation flow.
 
 ## Run services locally
 

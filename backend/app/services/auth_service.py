@@ -7,7 +7,7 @@ import jwt
 from pwdlib import PasswordHash
 
 from app.core.config import settings
-from app.models.domain import User, utcnow
+from app.models.domain import PracticeGoal, User, utcnow
 from app.repositories.base import Repository
 from app.services.email_service import EmailService
 
@@ -70,6 +70,16 @@ class AuthService:
                 setattr(user, field, profile[field].strip())
         if not user.first_name or not user.last_name or not user.timezone:
             raise ValueError("First name, last name, and timezone are required")
+        return await self.repository.save_user(user)
+    async def complete_onboarding(
+        self, user: User, practice_goals: list[PracticeGoal]
+    ) -> User:
+        unique_goals = list(dict.fromkeys(practice_goals))
+        if not 1 <= len(unique_goals) <= 3:
+            raise ValueError("Choose between one and three practice goals")
+        user.practice_goals = unique_goals
+        user.onboarding_completed_at = user.onboarding_completed_at or utcnow()
+        user.onboarding_version = settings.onboarding_version
         return await self.repository.save_user(user)
     async def change_password(self, user: User, current_password: str, new_password: str) -> None:
         if not password_hash.verify(current_password, user.password_hash):

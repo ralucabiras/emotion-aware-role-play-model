@@ -24,6 +24,7 @@ from app.schemas.chat import (
     EmailVerificationRequest,
     MultimodalAffectRequest,
     MultimodalAffectResponse,
+    OnboardingRequest,
     PasswordChangeRequest,
     PasswordResetConfirmRequest,
     PasswordResetRequest,
@@ -134,6 +135,9 @@ def user_response(user: User) -> UserResponse:
         country=user.country,
         timezone=user.timezone,
         email_verified=bool(user.email_verified_at),
+        practice_goals=user.practice_goals,
+        onboarding_completed=bool(user.onboarding_completed_at),
+        onboarding_version=user.onboarding_version,
     )
 
 
@@ -223,6 +227,19 @@ async def logout(response: Response, user: User = Depends(current_user), reposit
 async def me(user: User = Depends(current_user)): return user_response(user)
 
 
+@router.put("/auth/onboarding", response_model=UserResponse)
+async def complete_onboarding(
+    request: OnboardingRequest,
+    user: User = Depends(current_user),
+    auth: AuthService = Depends(get_auth_service),
+):
+    try:
+        updated = await auth.complete_onboarding(user, request.practice_goals)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    return user_response(updated)
+
+
 @router.get("/auth/research-export")
 async def research_export(
     user: User = Depends(current_user), repository=Depends(get_repository)
@@ -232,6 +249,7 @@ async def research_export(
         "schema_version": "affectlab-research-export-v1",
         "participant_id": str(user.participant_id),
         "consent": {"version": user.consent_version, "accepted_at": user.consented_at},
+        "practice_goals": [goal.value for goal in user.practice_goals],
         "contains_conversation_text": False,
         "sessions": [
             {

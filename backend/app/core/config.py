@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     email_verification_hours: int = 24
     password_reset_minutes: int = 30
     research_consent_version: str = "2026-08-18-v1"
+    onboarding_version: str = "2026-08-v1"
     model_config = SettingsConfigDict(
         env_file=(REPOSITORY_ROOT / ".env", REPOSITORY_ROOT / "backend" / ".env"),
         extra="ignore",

@@ -57,6 +57,15 @@ class Difficulty(StrEnum):
     DIFFICULT = "difficult"
 
 
+class PracticeGoal(StrEnum):
+    ASSERTIVENESS = "assertiveness"
+    CLEAR_REQUESTS = "clear_requests"
+    REDUCE_APOLOGISING = "reduce_apologising"
+    NEEDS_WITHOUT_BLAME = "needs_without_blame"
+    CALM_DURING_PUSHBACK = "calm_during_pushback"
+    PREPARE_CONVERSATION = "prepare_conversation"
+
+
 class EmotionState(BaseModel):
     dominant_emotion: EmotionLabel = EmotionLabel.NEUTRAL
     distribution: dict[EmotionLabel, float] = Field(default_factory=lambda: {EmotionLabel.NEUTRAL: 1.0})
@@ -193,6 +202,9 @@ class User(BaseModel):
     country: str = ""
     timezone: str = "UTC"
     email_verified_at: datetime | None = None
+    practice_goals: list[PracticeGoal] = Field(default_factory=list)
+    onboarding_completed_at: datetime | None = None
+    onboarding_version: str | None = None
     created_at: datetime = Field(default_factory=utcnow)
 
 

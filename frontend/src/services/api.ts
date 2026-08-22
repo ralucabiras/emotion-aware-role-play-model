@@ -29,6 +29,7 @@ export const api = {
   resetPassword: (token: string, newPassword: string) => request<void>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, new_password: newPassword }) }, false),
   refresh: refreshAccess,
   me: () => request<UserProfile>('/auth/me'),
+  completeOnboarding: (practiceGoals: string[]) => request<UserProfile>('/auth/onboarding', { method: 'PUT', body: JSON.stringify({ practice_goals: practiceGoals }) }),
   updateProfile: (profile: Pick<UserProfile,'first_name'|'last_name'|'preferred_name'|'country'|'timezone'>) => request<UserProfile>('/auth/me', { method: 'PATCH', body: JSON.stringify(profile) }),
   changePassword: (currentPassword: string, newPassword: string) => request<void>('/auth/change-password', { method: 'POST', body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }) }),
   researchExport: () => request<ResearchExport>('/auth/research-export'),

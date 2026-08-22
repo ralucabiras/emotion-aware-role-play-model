@@ -7,6 +7,7 @@ from app.models.domain import (
     ConversationTurn,
     Difficulty,
     EmotionState,
+    PracticeGoal,
     RolePlayScenario,
     RolePlayState,
     SessionFeedback,
@@ -36,6 +37,13 @@ class UserResponse(BaseModel):
     country: str = ""
     timezone: str = "UTC"
     email_verified: bool = False
+    practice_goals: list[PracticeGoal] = Field(default_factory=list)
+    onboarding_completed: bool = False
+    onboarding_version: str | None = None
+
+
+class OnboardingRequest(BaseModel):
+    practice_goals: list[PracticeGoal] = Field(min_length=1, max_length=3)
 
 
 class ProfileUpdateRequest(BaseModel):

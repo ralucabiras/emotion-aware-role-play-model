@@ -1,6 +1,7 @@
 import { Component, useEffect, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import { Dashboard } from './components/Dashboard'
+import { Onboarding } from './components/Onboarding'
 import { SettingsPage } from './components/SettingsPage'
 import { api } from './services/api'
 import type { UserProfile } from './types/api'
@@ -38,7 +39,7 @@ function AuthLayout({title, subtitle, children}: {title: string; subtitle: strin
 
 function Login({onAuth}: {onAuth: (user: UserProfile) => void}) {
   const [email, setEmail] = useState(''), [password, setPassword] = useState(''), [error, setError] = useState(''), [busy, setBusy] = useState(false)
-  async function submit(event: FormEvent) { event.preventDefault(); setBusy(true); setError(''); try { const result = await api.login(email, password); onAuth(result.user); navigate('/app') } catch (caught) { setError(caught instanceof Error ? caught.message : 'Sign in failed') } finally { setBusy(false) } }
+  async function submit(event: FormEvent) { event.preventDefault(); setBusy(true); setError(''); try { const result = await api.login(email, password); onAuth(result.user); navigate(result.user.onboarding_completed ? '/app' : '/onboarding') } catch (caught) { setError(caught instanceof Error ? caught.message : 'Sign in failed') } finally { setBusy(false) } }
   return <AuthLayout title="Welcome back." subtitle="Sign in to continue your private practice sessions."><form className="auth-form" onSubmit={submit}><label>Email<input type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required/></label><label>Password<input type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} required/></label><button type="button" className="forgot-link" onClick={() => navigate('/forgot-password')}>Forgot your password?</button>{error && <p className="error" role="alert">{error}</p>}<button className="primary" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button></form><button className="text-button" onClick={() => navigate('/signup')}>Need an account? Create one</button></AuthLayout>
 }
 
@@ -86,7 +87,9 @@ export default function App() {
   if (path === '/signup') return <Signup/>
   if (path === '/login') return <Login onAuth={setUser}/>
   if (path === '/about') return <About user={user}/>
-  if (path === '/settings') return user ? <SettingsPage user={user} onUser={setUser} onBack={() => navigate('/app')} onSignedOut={() => { setUser(undefined); navigate('/login') }}/> : <Login onAuth={setUser}/>
-  if (path === '/app') return user ? <Dashboard user={user} onLogout={() => { setUser(undefined); navigate('/') }} onHome={() => navigate('/')} onSettings={() => navigate('/settings')}/> : <Login onAuth={setUser}/>
+  const onboarding = user && !user.onboarding_completed ? <Onboarding user={user} onComplete={updated => { setUser(updated); navigate('/app') }} onSignOut={() => { setUser(undefined); navigate('/login') }}/> : null
+  if (path === '/onboarding') return user ? (onboarding ?? <Dashboard user={user} onLogout={() => { setUser(undefined); navigate('/') }} onHome={() => navigate('/')} onSettings={() => navigate('/settings')}/>) : <Login onAuth={setUser}/>
+  if (path === '/settings') return user ? (onboarding ?? <SettingsPage user={user} onUser={setUser} onBack={() => navigate('/app')} onSignedOut={() => { setUser(undefined); navigate('/login') }}/>) : <Login onAuth={setUser}/>
+  if (path === '/app') return user ? (onboarding ?? <Dashboard user={user} onLogout={() => { setUser(undefined); navigate('/') }} onHome={() => navigate('/')} onSettings={() => navigate('/settings')}/>) : <Login onAuth={setUser}/>
   return <Landing user={user}/>
 }

@@ -101,6 +101,31 @@ def test_profile_update_and_password_change() -> None:
         assert client.post("/api/auth/login", json={"email": "settings@example.com", "password": "new-long-password"}).status_code == 200
 
 
+def test_guided_onboarding_persists_one_to_three_practice_goals() -> None:
+    with TestClient(app) as client:
+        headers = auth(client, "onboarding@example.com")
+        initial = client.get("/api/auth/me", headers=headers).json()
+        assert initial["onboarding_completed"] is False
+        assert initial["practice_goals"] == []
+
+        completed = client.put(
+            "/api/auth/onboarding",
+            headers=headers,
+            json={"practice_goals": ["assertiveness", "clear_requests"]},
+        )
+        assert completed.status_code == 200
+        assert completed.json()["onboarding_completed"] is True
+        assert completed.json()["practice_goals"] == ["assertiveness", "clear_requests"]
+        assert client.get("/api/auth/me", headers=headers).json()["practice_goals"] == ["assertiveness", "clear_requests"]
+
+        assert client.put("/api/auth/onboarding", headers=headers, json={"practice_goals": []}).status_code == 422
+        assert client.put(
+            "/api/auth/onboarding",
+            headers=headers,
+            json={"practice_goals": ["assertiveness", "clear_requests", "reduce_apologising", "prepare_conversation"]},
+        ).status_code == 422
+
+
 def test_password_reset_is_generic_single_use_and_changes_credentials() -> None:
     with TestClient(app) as client:
         auth(client, "reset@example.com")
