@@ -3,7 +3,16 @@ import wave
 from dataclasses import dataclass
 from time import perf_counter
 
-from openai import AsyncOpenAI
+from openai import (
+    APIConnectionError,
+    APITimeoutError,
+    AsyncOpenAI,
+    AuthenticationError,
+    BadRequestError,
+    NotFoundError,
+    PermissionDeniedError,
+    RateLimitError,
+)
 
 
 class TranscriptionUnavailable(RuntimeError):
@@ -43,6 +52,20 @@ class TranscriptionService:
                 model=self.model,
                 file=("voice.wav", audio, "audio/wav"),
             )
+        except AuthenticationError as exc:
+            raise TranscriptionUnavailable("Speech transcription credentials were rejected") from exc
+        except PermissionDeniedError as exc:
+            raise TranscriptionUnavailable("This API project cannot use the transcription model") from exc
+        except NotFoundError as exc:
+            raise TranscriptionUnavailable("The configured transcription model is not available") from exc
+        except RateLimitError as exc:
+            code = getattr(exc, "code", None)
+            message = "Speech transcription quota or billing is unavailable" if code == "insufficient_quota" else "Speech transcription is rate limited; try again shortly"
+            raise TranscriptionUnavailable(message) from exc
+        except BadRequestError as exc:
+            raise TranscriptionUnavailable("The transcription provider rejected the audio request") from exc
+        except (APIConnectionError, APITimeoutError) as exc:
+            raise TranscriptionUnavailable("Speech transcription could not reach the provider") from exc
         except Exception as exc:
             raise TranscriptionUnavailable("Speech transcription is temporarily unavailable") from exc
         text = getattr(response, "text", "").strip()

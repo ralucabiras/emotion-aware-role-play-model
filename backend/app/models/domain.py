@@ -109,6 +109,7 @@ class TurnEvidence(BaseModel):
     maintained_boundary: bool = False
     blame_language: bool = False
     specific_detail: bool = False
+    i_statement: bool = False
     arousal: float = 0
 
 

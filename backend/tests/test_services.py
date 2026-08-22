@@ -74,6 +74,28 @@ def test_scenarios_difficulty_observations_and_completion() -> None:
     assert feedback.metrics and all(metric.evidence_turns for metric in feedback.metrics[:2])
 
 
+def test_relationship_roleplay_progresses_and_feedback_is_scenario_specific() -> None:
+    service = RolePlayService()
+    state, _ = service.start("relationship", Difficulty.BEGINNER)
+    first = service.respond(
+        state, "I feel like you don't make time for me anymore.", EmotionState()
+    )
+    second = service.respond(
+        state, "I want you to be more available.", EmotionState()
+    )
+    final = service.respond(
+        state, "I would like two evenings each week when we spend an hour together.", EmotionState()
+    )
+    assert "do differently" in first
+    assert "look like in practice" in second
+    assert state.status == RolePlayStatus.COMPLETED
+    assert "clear understanding" in final
+    feedback = service.feedback(state)
+    metric_names = {metric.name for metric in feedback.metrics}
+    assert metric_names == {"I-statements", "specific need", "non-blaming language"}
+    assert "boundary maintenance" not in " ".join(feedback.suggestions).lower()
+
+
 @pytest.mark.asyncio
 async def test_openai_generator_offline_fallback_records_reason(monkeypatch) -> None:
     monkeypatch.setattr("app.services.llm_service.settings.openai_api_key", None)

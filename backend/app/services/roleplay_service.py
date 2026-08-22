@@ -22,7 +22,16 @@ SCENARIOS = {
 
 def observe(turn: int, text: str, arousal: float) -> TurnEvidence:
     lower = text.lower()
-    return TurnEvidence(turn=turn, concrete_request=any(x in lower for x in ("i need", "could you", "please", "i can't", "i cannot", "no,")), excessive_apology=len(re.findall(r"\b(sorry|apologi[sz]e)\b", lower)) > 1, maintained_boundary=any(x in lower for x in ("i can't", "i cannot", "i won't", "not able", "my boundary")), blame_language=any(x in lower for x in ("you always", "you never", "your fault")), specific_detail=any(x in lower for x in ("deadline", "because", "when ", "this week", "priority", "specifically")), arousal=arousal)
+    return TurnEvidence(
+        turn=turn,
+        concrete_request=any(x in lower for x in ("i need", "i want", "i would like", "could you", "please", "i can't", "i cannot", "no,")),
+        excessive_apology=len(re.findall(r"\b(sorry|apologi[sz]e)\b", lower)) > 1,
+        maintained_boundary=any(x in lower for x in ("i can't", "i cannot", "i won't", "not able", "my boundary", "i need to say no")),
+        blame_language=any(x in lower for x in ("you always", "you never", "you don't", "your fault", "you make me")),
+        specific_detail=any(x in lower for x in ("deadline", "because", "when ", "this week", "priority", "specifically", "each week", "per week", "evening", "weekend", "minutes", "hours")) or bool(re.search(r"\b\d+\b", lower)),
+        i_statement=bool(re.search(r"\bi (?:feel|need|want|would like|am)\b", lower)),
+        arousal=arousal,
+    )
 
 
 class RolePlayService:
@@ -38,15 +47,22 @@ class RolePlayService:
         state.evidence.append(item)
         if emotion.arousal > 0.78:
             state.difficulty, state.cooperation = max(0.1, state.difficulty - 0.1), min(0.9, state.cooperation + 0.1)
-        checks = {"concrete_request": item.concrete_request, "specific_detail": item.specific_detail, "maintained_boundary": item.maintained_boundary, "no_blame": not item.blame_language}
+        checks = {
+            "concrete_request": any(entry.concrete_request for entry in state.evidence),
+            "specific_detail": any(entry.specific_detail for entry in state.evidence),
+            "maintained_boundary": any(entry.maintained_boundary for entry in state.evidence),
+            "no_blame": not item.blame_language,
+        }
         state.success_progress = sum(checks.get(key, False) for key in scenario.success_conditions) / len(scenario.success_conditions)
         if state.success_progress == 1 or state.turn >= scenario.max_turns:
             self.finish(state, "success" if state.success_progress == 1 else "maximum_turns")
             return "Thank you—that gives me a clear understanding of what you need."
         if item.excessive_apology: return "You do not need to apologise. What is the request or boundary you want me to understand?"
-        if not item.concrete_request: return "What specifically would you like me to do or understand?"
+        if not item.concrete_request:
+            if state.scenario_id == "relationship": return "I hear that you want more connection. What would you like us to do differently?"
+            return "What specifically would you like me to do or understand?"
         if state.scenario_id == "boundary": return "Are you sure? I was really counting on you."
-        if state.scenario_id == "relationship": return "Can you give me a specific example and tell me what you need instead?"
+        if state.scenario_id == "relationship": return "What would being more available look like in practice—for example, a particular time or routine together?"
         return "Which responsibilities are most at risk, and what should I deprioritise?"
     def finish(self, state: RolePlayState, reason: str = "user_finished") -> None:
         state.status = RolePlayStatus.COMPLETED
@@ -56,10 +72,27 @@ class RolePlayService:
         def metric(name: str, values: list[bool]) -> FeedbackMetric:
             hits = [item.turn for item, value in zip(evidence, values, strict=True) if value]
             return FeedbackMetric(name=name, score=len(hits) / max(len(values), 1), evidence_turns=hits)
-        metrics = [metric("clarity", [e.concrete_request for e in evidence]), metric("specificity", [e.specific_detail for e in evidence]), metric("boundary maintenance", [e.maintained_boundary for e in evidence]), metric("non-blaming language", [not e.blame_language for e in evidence])]
+        metric_sets = {
+            "workload": [
+                ("clear request", [e.concrete_request for e in evidence]),
+                ("specific evidence", [e.specific_detail for e in evidence]),
+                ("collaborative tone", [not e.blame_language for e in evidence]),
+            ],
+            "boundary": [
+                ("clear refusal", [e.maintained_boundary for e in evidence]),
+                ("boundary maintenance", [e.maintained_boundary for e in evidence]),
+                ("concise delivery", [not e.excessive_apology for e in evidence]),
+            ],
+            "relationship": [
+                ("I-statements", [e.i_statement for e in evidence]),
+                ("specific need", [e.specific_detail for e in evidence]),
+                ("non-blaming language", [not e.blame_language for e in evidence]),
+            ],
+        }
+        metrics = [metric(name, values) for name, values in metric_sets[state.scenario_id]]
         strengths = [f"You demonstrated {m.name}." for m in metrics if m.score >= 0.5]
         suggestions = [f"Try making your {m.name} more explicit on the next attempt." for m in metrics if m.score < 0.5]
         observed = [f"A concrete request appeared in turn {e.turn}." for e in evidence if e.concrete_request]
+        observed.extend(f"An I-statement appeared in turn {e.turn}." for e in evidence if e.i_statement)
         if any(e.excessive_apology for e in evidence): observed.append("Repeated apology language appeared during the exercise.")
         return SessionFeedback(scenario_id=state.scenario_id, metrics=metrics, observed=observed or ["No measurable target behavior was detected."], strengths=strengths or ["You completed the practice conversation."], suggestions=suggestions or ["Repeat the scenario at a higher difficulty."], generation_source="deterministic")
-
