@@ -87,6 +87,8 @@ class ConversationService:
         session = await self.get_session(session_id, user_id)
         state, scenario = self.roleplays.start(scenario_id, level)
         session.roleplay, session.feedback = state, None
+        session.turns = []
+        session.emotion_state = self.analyzer.analyze("")
         turn = ConversationTurn(role=Role.ASSISTANT, content=scenario.opening_line)
         session.turns.append(turn)
         session.research_events.append(ResearchEvent(

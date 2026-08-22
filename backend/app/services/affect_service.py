@@ -9,7 +9,7 @@ EMOTION_TERMS = {
     EmotionLabel.ANXIETY: {"afraid": 1.0, "anxious": 1.0, "nervous": .8, "scared": 1.0, "worried": .8, "panic": 1.2, "uncertain": .5},
     EmotionLabel.SADNESS: {"sad": 1.0, "down": .6, "hurt": .8, "hopeless": 1.2, "cry": .8, "lonely": .8},
     EmotionLabel.ANGER: {"angry": 1.0, "furious": 1.3, "mad": .8, "hate": 1.0, "unfair": .6},
-    EmotionLabel.FRUSTRATION: {"frustrated": 1.0, "annoyed": .7, "stuck": .7, "overloaded": 1.0, "overwhelmed": 1.1},
+    EmotionLabel.FRUSTRATION: {"frustrated": 1.0, "annoyed": .7, "stuck": .7, "overloaded": 1.0, "overwhelmed": 1.1, "fight": .8, "fighting": .8, "argument": .8, "conflict": .7},
     EmotionLabel.SHAME: {"ashamed": 1.0, "embarrassed": .8, "incompetent": 1.0, "failure": 1.0, "worthless": 1.2},
     EmotionLabel.GUILT: {"guilty": 1.0, "regret": .8, "sorry": .5, "fault": .7},
     EmotionLabel.JOY: {"happy": 1.0, "excited": 1.0, "glad": .8, "proud": 1.0, "relieved": .8},

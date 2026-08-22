@@ -23,6 +23,8 @@ class TemplateResponseGenerator(ResponseGenerator):
             SupportStrategy.PRACTICAL_SUGGESTION: "Name the situation, state what you need in one sentence, and suggest a workable next action. We can practise it together.",
             SupportStrategy.ROLEPLAY_INVITATION: "Choose one of the practice scenarios and a difficulty level when you are ready.",
             SupportStrategy.PAUSE_DEESCALATION: "This sounds intense. Try one slow breath and notice your feet on the floor. We can pause or continue one small step at a time.",
+            SupportStrategy.REFLECTION: f"It sounds like the situation is leaving you with some {emotion}. What happened, and what would you most like to be different?",
+            SupportStrategy.CLARIFICATION: f"I’m hearing some {emotion} around this. Would it help more to unpack what happened, decide what to say next, or practise the conversation?",
         }
         return responses.get(strategy, "Tell me a little more about what you need from this conversation."), GenerationMetadata()
 
@@ -64,4 +66,3 @@ class OpenAIResponseGenerator(ResponseGenerator):
         text, metadata = await self.fallback.generate(session, message, strategy)
         metadata.fallback_reason = reason
         return text, metadata
-

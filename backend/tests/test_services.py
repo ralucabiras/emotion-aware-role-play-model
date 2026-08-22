@@ -4,9 +4,11 @@ import pytest
 
 from app.models.domain import Difficulty, EmotionState, RolePlayStatus, Session, User, utcnow
 from app.repositories.memory import MemoryRepository
+from app.services.affect_service import RuleBasedCognitiveAnalyzer, RuleBasedEmotionAnalyzer
 from app.services.auth_service import AuthenticationError, AuthService
-from app.services.llm_service import OpenAIResponseGenerator
+from app.services.llm_service import OpenAIResponseGenerator, TemplateResponseGenerator
 from app.services.roleplay_service import RolePlayService, observe
+from app.services.strategy_service import ScoredStrategySelector
 
 
 class CapturingEmailService:
@@ -79,3 +81,23 @@ async def test_openai_generator_offline_fallback_records_reason(monkeypatch) -> 
     session = Session(user_id=User(email="x@example.com", password_hash="x", consented_at=utcnow()).id)
     text, metadata = await generator.generate(session, "Help me", "validation")
     assert text and metadata.source == "template" and metadata.fallback_reason == "missing_api_key"
+
+
+@pytest.mark.asyncio
+async def test_emotional_statements_receive_specific_offline_support() -> None:
+    analyzer = RuleBasedEmotionAnalyzer()
+    selector = ScoredStrategySelector()
+    cognitive = RuleBasedCognitiveAnalyzer()
+    for message in (
+        "I am nervous, I have an interview tomorrow.",
+        "I had a fight with my manager again.",
+    ):
+        state = analyzer.analyze(message)
+        decision = selector.decide(state, cognitive.analyze(message))
+        text, _ = await TemplateResponseGenerator().generate(
+            Session(user_id=User(email="x@example.com", password_hash="x", consented_at=utcnow()).id, emotion_state=state),
+            message,
+            decision.strategy,
+        )
+        assert "Tell me a little more" not in text
+        assert state.dominant_emotion.value in text.lower()

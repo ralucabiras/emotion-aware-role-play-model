@@ -36,6 +36,13 @@ class ScoredStrategySelector(StrategySelector):
         if assessment.wants_validation or state.valence < -.4:
             scores[SupportStrategy.VALIDATION] += .55
             reasons.append("validation signal or negative valence")
+        if (
+            not assessment.possible_distortion
+            and state.dominant_emotion.value not in {"neutral", "joy"}
+            and state.confidence >= .45
+        ):
+            scores[SupportStrategy.VALIDATION] += .45
+            reasons.append("detected negative affect favors validation")
         if assessment.resistance > .5:
             scores[SupportStrategy.REFLECTION] += .65
             scores[SupportStrategy.PRACTICAL_SUGGESTION] -= .3

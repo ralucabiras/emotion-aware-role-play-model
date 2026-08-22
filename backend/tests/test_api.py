@@ -49,6 +49,9 @@ def test_auth_session_chat_and_feedback() -> None:
         assert response.json()["decision"]["strategy"] == "validate_then_reframe"
         start = client.post(f"/api/sessions/{session_id}/roleplay", headers=headers, json={"scenario_id": "workload", "difficulty": "beginner"})
         assert start.status_code == 200
+        roleplay_session = client.get(f"/api/sessions/{session_id}", headers=headers).json()
+        assert len(roleplay_session["turns"]) == 1
+        assert roleplay_session["turns"][0]["content"] == start.json()["opening_turn"]["content"]
         reply = client.post("/api/chat", headers=headers, json={"session_id": session_id, "message": "I need you to prioritise the deadline because it is this week"}).json()
         assert reply["roleplay"]["status"] == "completed"
         assert reply["feedback"]["metrics"]
