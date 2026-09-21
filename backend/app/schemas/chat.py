@@ -131,6 +131,20 @@ class RolePlayActionRequest(BaseModel):
     action: str
 
 
+class CustomScenarioRequest(BaseModel):
+    title: str = Field(min_length=3, max_length=80)
+    character: str = Field(min_length=2, max_length=50)
+    situation: str = Field(min_length=10, max_length=500)
+    user_objective: str = Field(min_length=10, max_length=300)
+    opening_line: str = Field(min_length=3, max_length=300)
+    skills: list[str] = Field(min_length=1, max_length=3)
+
+
+class RewindResponse(BaseModel):
+    removed_message: str
+    session: SessionResponse
+
+
 class MultimodalAffectRequest(BaseModel):
     session_id: UUID
     message: str = Field(min_length=1, max_length=5000)

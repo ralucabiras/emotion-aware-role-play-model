@@ -84,7 +84,7 @@ class ConversationService:
             elif isinstance(self.generator, OpenAIResponseGenerator):
                 content, metadata = await self.generator.generate_roleplay(
                     session,
-                    SCENARIOS[session.roleplay.scenario_id],
+                    session.roleplay.scenario or SCENARIOS[session.roleplay.scenario_id],
                     plan.action,
                     plan.fallback_text,
                 )
@@ -105,9 +105,9 @@ class ConversationService:
         ))
         await self.save(session)
         return turn, AgentDecision(emotion_state=state, cognitive_assessment=assessment, strategy=strategy, strategy_scores=strategy_scores, decision_reasons=reasons, analyzer_version=getattr(self.analyzer, "version", "unknown")), session
-    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty):
+    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None):
         session = await self.get_session(session_id, user_id)
-        state, scenario = self.roleplays.start(scenario_id, level)
+        state, scenario = self.roleplays.start(scenario_id, level, custom)
         session.roleplay, session.feedback = state, None
         session.title = scenario.title
         session.turns = []
@@ -132,6 +132,39 @@ class ConversationService:
             properties={"scenario_id": session.roleplay.scenario_id},
         ))
         await self.save(session); return session
+    async def rewind_roleplay(self, session_id: UUID, user_id: UUID) -> tuple[str, Session]:
+        session = await self.get_session(session_id, user_id)
+        state = session.roleplay
+        if not state or not state.evidence or len(session.turns) < 3:
+            raise ValueError("There is no role-play exchange to rewind")
+        if session.turns[-1].role == Role.ASSISTANT:
+            session.turns.pop()
+        user_turn = session.turns.pop()
+        state.evidence.pop()
+        state.turn = len(state.evidence)
+        state.status = RolePlayStatus.ACTIVE
+        state.completion_reason = None
+        state.completed_at = None
+        session.feedback = None
+        scenario = state.scenario or SCENARIOS[state.scenario_id]
+        checks = {
+            "concrete_request": any(e.concrete_request for e in state.evidence),
+            "specific_detail": any(e.specific_detail for e in state.evidence),
+            "maintained_boundary": any(e.maintained_boundary for e in state.evidence),
+            "i_statement": any(e.i_statement for e in state.evidence),
+            "no_blame": not any(e.blame_language for e in state.evidence),
+        }
+        if state.scenario_id == "boundary":
+            required = 1 if state.difficulty_level == Difficulty.BEGINNER else 2
+            state.success_progress = min(1, sum(e.maintained_boundary for e in state.evidence) / required)
+        elif state.evidence:
+            state.success_progress = sum(checks.get(key, False) for key in scenario.success_conditions) / len(scenario.success_conditions)
+        else:
+            state.success_progress = 0
+        session.emotion_state = user_turn.emotion_state or self.analyzer.analyze("")
+        session.research_events.append(ResearchEvent(name="roleplay_rewound", properties={"scenario_id": state.scenario_id}))
+        await self.save(session)
+        return user_turn.content, session
     async def submit_questionnaire(
         self, session_id: UUID, user_id: UUID, phase: str, values: dict
     ) -> StudyQuestionnaire:

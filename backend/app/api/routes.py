@@ -1,6 +1,6 @@
 import base64
 import binascii
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -12,7 +12,7 @@ from app.core.container import (
     get_repository,
     get_transcription_service,
 )
-from app.models.domain import User
+from app.models.domain import Difficulty, RolePlayScenario, User
 from app.schemas.chat import (
     AudioTranscriptionRequest,
     AudioTranscriptionResponse,
@@ -21,6 +21,7 @@ from app.schemas.chat import (
     ChatRequest,
     ChatResponse,
     CreateSessionResponse,
+    CustomScenarioRequest,
     EmailVerificationRequest,
     MultimodalAffectRequest,
     MultimodalAffectResponse,
@@ -31,6 +32,7 @@ from app.schemas.chat import (
     ProfileUpdateRequest,
     RegistrationResponse,
     ResendVerificationRequest,
+    RewindResponse,
     RolePlayActionRequest,
     SessionResponse,
     SessionSummary,
@@ -347,12 +349,46 @@ async def chat(request: ChatRequest, user: User = Depends(current_user), service
 
 
 @router.get("/roleplay/scenarios")
-async def list_scenarios(user: User = Depends(current_user)): return list(SCENARIOS.values())
+async def list_scenarios(user: User = Depends(current_user)): return [*SCENARIOS.values(), *user.custom_scenarios]
+
+
+@router.post("/roleplay/scenarios", response_model=RolePlayScenario, status_code=201)
+async def create_custom_scenario(request: CustomScenarioRequest, user: User = Depends(current_user), repository=Depends(get_repository)):
+    allowed = {"clear request", "specific detail", "boundary maintenance", "I-statements", "non-blaming language"}
+    skills = list(dict.fromkeys(request.skills))
+    if any(skill not in allowed for skill in skills):
+        raise HTTPException(422, "Unsupported practice skill")
+    conditions = {
+        "clear request": "concrete_request", "specific detail": "specific_detail",
+        "boundary maintenance": "maintained_boundary", "I-statements": "i_statement",
+        "non-blaming language": "no_blame",
+    }
+    scenario = RolePlayScenario(
+        id=f"custom_{uuid4().hex}", title=" ".join(request.title.split()),
+        character=" ".join(request.character.split()), situation=request.situation.strip(),
+        user_objective=request.user_objective.strip(), opening_line=request.opening_line.strip(),
+        expected_skills=skills,
+        difficulty_behaviors={Difficulty.BEGINNER:"Supportive and curious", Difficulty.INTERMEDIATE:"Questions details and offers mild resistance", Difficulty.DIFFICULT:"Pushes back firmly while remaining respectful"},
+        success_conditions=list(dict.fromkeys(conditions[skill] for skill in skills)), max_turns=8,
+    )
+    user.custom_scenarios.append(scenario)
+    await repository.save_user(user)
+    return scenario
+
+
+@router.delete("/roleplay/scenarios/{scenario_id}", status_code=204)
+async def delete_custom_scenario(scenario_id: str, user: User = Depends(current_user), repository=Depends(get_repository)):
+    before = len(user.custom_scenarios)
+    user.custom_scenarios = [scenario for scenario in user.custom_scenarios if scenario.id != scenario_id]
+    if len(user.custom_scenarios) == before: raise HTTPException(404, "Custom scenario not found")
+    await repository.save_user(user)
 
 
 @router.post("/sessions/{session_id}/roleplay", response_model=StartRolePlayResponse)
 async def start_roleplay(session_id: UUID, request: StartRolePlayRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
-    try: state, scenario, turn = await service.start_roleplay(session_id, user.id, request.scenario_id, request.difficulty)
+    custom = next((scenario for scenario in user.custom_scenarios if scenario.id == request.scenario_id), None)
+    if request.scenario_id not in SCENARIOS and not custom: raise HTTPException(404, "Scenario not found")
+    try: state, scenario, turn = await service.start_roleplay(session_id, user.id, request.scenario_id, request.difficulty, custom)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except KeyError: raise HTTPException(404, "Scenario not found") from None
     return StartRolePlayResponse(state=state, scenario=scenario, opening_turn=turn)
@@ -364,6 +400,14 @@ async def roleplay_action(session_id: UUID, request: RolePlayActionRequest, user
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
     return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback)
+
+
+@router.post("/sessions/{session_id}/roleplay/rewind", response_model=RewindResponse)
+async def rewind_roleplay(session_id: UUID, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
+    try: removed, session = await service.rewind_roleplay(session_id, user.id)
+    except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
+    except ValueError as exc: raise HTTPException(409, str(exc)) from None
+    return RewindResponse(removed_message=removed, session=SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback))
 
 
 @router.get("/sessions/{session_id}/feedback")

@@ -45,8 +45,11 @@ export const api = {
   renameSession: (id: string, title: string) => request<SessionSummary>(`/sessions/${id}/title`, { method: 'PATCH', body: JSON.stringify({ title }) }),
   sendMessage: (sessionId: string, message: string) => request<ChatResponse>('/chat', { method: 'POST', body: JSON.stringify({ session_id: sessionId, message }) }),
   scenarios: () => request<Scenario[]>('/roleplay/scenarios'),
+  createScenario: (data: {title:string;character:string;situation:string;user_objective:string;opening_line:string;skills:string[]}) => request<Scenario>('/roleplay/scenarios', { method:'POST', body:JSON.stringify(data) }),
+  deleteScenario: (id:string) => request<void>(`/roleplay/scenarios/${id}`, { method:'DELETE' }),
   startRoleplay: (sessionId: string, scenarioId: string, difficulty: string) => request<{ opening_turn: ChatResponse['turn']; state: ChatResponse['roleplay'] }>(`/sessions/${sessionId}/roleplay`, { method: 'POST', body: JSON.stringify({ scenario_id: scenarioId, difficulty }) }),
   roleplayAction: (sessionId: string, action: string) => request<SessionResponse>(`/sessions/${sessionId}/roleplay/action`, { method: 'POST', body: JSON.stringify({ action }) }),
+  rewindRoleplay: (sessionId:string) => request<{removed_message:string;session:SessionResponse}>(`/sessions/${sessionId}/roleplay/rewind`, {method:'POST'}),
   submitQuestionnaire: (sessionId: string, phase: 'pre'|'post', values: {confidence?:number;anxiety?:number;realism?:number;usefulness?:number}) => request<{questionnaire:StudyQuestionnaire}>(`/sessions/${sessionId}/questionnaires/${phase}`, { method: 'PUT', body: JSON.stringify(values) }),
   deleteSession: (id: string) => request<void>(`/sessions/${id}`, { method: 'DELETE' }),
 }

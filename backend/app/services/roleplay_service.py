@@ -46,15 +46,15 @@ def observe(turn: int, text: str, arousal: float) -> TurnEvidence:
 
 
 class RolePlayService:
-    def start(self, scenario_id: str, level: Difficulty) -> tuple[RolePlayState, RolePlayScenario]:
-        scenario = SCENARIOS[scenario_id]
+    def start(self, scenario_id: str, level: Difficulty, custom: RolePlayScenario | None = None) -> tuple[RolePlayState, RolePlayScenario]:
+        scenario = custom or SCENARIOS[scenario_id]
         difficulty, cooperation = LEVELS[level]
-        return RolePlayState(scenario_id=scenario_id, difficulty_level=level, difficulty=difficulty, cooperation=cooperation), scenario
+        return RolePlayState(scenario_id=scenario_id, scenario=scenario, difficulty_level=level, difficulty=difficulty, cooperation=cooperation), scenario
     def respond(self, state: RolePlayState, message: str, emotion: EmotionState) -> str:
         return self.plan_response(state, message, emotion).fallback_text
     def plan_response(self, state: RolePlayState, message: str, emotion: EmotionState) -> RolePlayReplyPlan:
         if state.status != RolePlayStatus.ACTIVE: raise ValueError("Role-play is not active")
-        scenario = SCENARIOS[state.scenario_id]
+        scenario = state.scenario or SCENARIOS[state.scenario_id]
         state.turn += 1
         item = observe(state.turn, message, emotion.arousal)
         state.evidence.append(item)
@@ -64,6 +64,7 @@ class RolePlayService:
             "concrete_request": any(entry.concrete_request for entry in state.evidence),
             "specific_detail": any(entry.specific_detail for entry in state.evidence),
             "maintained_boundary": any(entry.maintained_boundary for entry in state.evidence),
+            "i_statement": any(entry.i_statement for entry in state.evidence),
             "no_blame": not item.blame_language,
         }
         if state.scenario_id == "boundary":
@@ -88,6 +89,7 @@ class RolePlayService:
         if state.scenario_id in {"relationship", "household"}: return RolePlayReplyPlan("request_specific_routine", "What would that change look like in practice—for example, a particular time, task, or routine?")
         if state.scenario_id == "colleague_feedback": return RolePlayReplyPlan("request_specific_example", "Can you describe a recent example and the change you would like me to make?")
         if state.scenario_id == "deadline": return RolePlayReplyPlan("request_proposal", "What delivery date or scope change are you proposing, and what is driving it?")
+        if state.scenario_id.startswith("custom_"): return RolePlayReplyPlan("realistic_follow_up", "Can you say a little more about what you would like me to do, and why it matters to you?")
         return RolePlayReplyPlan("request_prioritisation", "Which responsibilities are most at risk, and what should I deprioritise?")
     def finish(self, state: RolePlayState, reason: str = "user_finished") -> None:
         state.status = RolePlayStatus.COMPLETED
@@ -129,7 +131,19 @@ class RolePlayService:
                 ("non-blaming language", [not e.blame_language for e in evidence]),
             ],
         }
-        metrics = [metric(name, values) for name, values in metric_sets[state.scenario_id]]
+        if state.scenario_id.startswith("custom_"):
+            scenario = state.scenario
+            available = {
+                "clear request": [e.concrete_request for e in evidence],
+                "specific detail": [e.specific_detail for e in evidence],
+                "boundary maintenance": [e.maintained_boundary for e in evidence],
+                "I-statements": [e.i_statement for e in evidence],
+                "non-blaming language": [not e.blame_language for e in evidence],
+            }
+            selected = scenario.expected_skills if scenario else list(available)[:3]
+            metrics = [metric(name, available[name]) for name in selected if name in available]
+        else:
+            metrics = [metric(name, values) for name, values in metric_sets[state.scenario_id]]
         strengths = [f"You demonstrated {m.name}." for m in metrics if m.score >= 0.5]
         suggestions = [f"Try making your {m.name} more explicit on the next attempt." for m in metrics if m.score < 0.5]
         observed = [f"A concrete request appeared in turn {e.turn}." for e in evidence if e.concrete_request]

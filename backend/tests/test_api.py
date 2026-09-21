@@ -132,6 +132,50 @@ def test_guided_onboarding_persists_one_to_three_practice_goals() -> None:
         ).status_code == 422
 
 
+def test_custom_scenario_and_rewind_are_owned_and_preserve_history() -> None:
+    with TestClient(app) as client:
+        headers = auth(client, "custom-scenario@example.com")
+        created = client.post(
+            "/api/roleplay/scenarios",
+            headers=headers,
+            json={
+                "title": "Requesting flexible hours",
+                "character": "team lead",
+                "situation": "A recurring appointment conflicts with the current schedule.",
+                "user_objective": "Ask for a predictable change to the weekly schedule.",
+                "opening_line": "You wanted to discuss your schedule. What do you need?",
+                "skills": ["clear request", "specific detail", "non-blaming language"],
+            },
+        )
+        assert created.status_code == 201
+        scenario = created.json()
+        assert scenario["id"].startswith("custom_")
+        assert any(item["id"] == scenario["id"] for item in client.get("/api/roleplay/scenarios", headers=headers).json())
+
+        session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+        started = client.post(
+            f"/api/sessions/{session_id}/roleplay",
+            headers=headers,
+            json={"scenario_id": scenario["id"], "difficulty": "intermediate"},
+        )
+        assert started.status_code == 200
+        assert started.json()["state"]["scenario"]["title"] == "Requesting flexible hours"
+        reply = client.post(
+            "/api/chat", headers=headers,
+            json={"session_id": session_id, "message": "I am not sure how to put this yet."},
+        )
+        assert reply.status_code == 200
+        rewound = client.post(f"/api/sessions/{session_id}/roleplay/rewind", headers=headers)
+        assert rewound.status_code == 200
+        assert rewound.json()["removed_message"] == "I am not sure how to put this yet."
+        assert rewound.json()["session"]["roleplay"]["turn"] == 0
+        assert len(rewound.json()["session"]["turns"]) == 1
+
+        assert client.delete(f"/api/roleplay/scenarios/{scenario['id']}", headers=headers).status_code == 204
+        restored = client.get(f"/api/sessions/{session_id}", headers=headers).json()
+        assert restored["roleplay"]["scenario"]["title"] == "Requesting flexible hours"
+
+
 def test_password_reset_is_generic_single_use_and_changes_credentials() -> None:
     with TestClient(app) as client:
         auth(client, "reset@example.com")

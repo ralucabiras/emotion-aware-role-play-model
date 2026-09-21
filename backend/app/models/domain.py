@@ -126,6 +126,7 @@ class RolePlayScenario(BaseModel):
     id: str
     title: str
     character: str
+    situation: str = ""
     user_objective: str
     opening_line: str
     expected_skills: list[str]
@@ -136,6 +137,7 @@ class RolePlayScenario(BaseModel):
 
 class RolePlayState(BaseModel):
     scenario_id: str
+    scenario: RolePlayScenario | None = None
     status: RolePlayStatus = RolePlayStatus.ACTIVE
     difficulty_level: Difficulty = Difficulty.BEGINNER
     difficulty: float = Field(0.3, ge=0, le=1)
@@ -205,6 +207,7 @@ class User(BaseModel):
     practice_goals: list[PracticeGoal] = Field(default_factory=list)
     onboarding_completed_at: datetime | None = None
     onboarding_version: str | None = None
+    custom_scenarios: list[RolePlayScenario] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=utcnow)
 
 
