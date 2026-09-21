@@ -17,6 +17,7 @@ AffectLab is a text-first research prototype for emotion-aware coaching and adap
 - Account-owned custom scenarios with constrained observable skills, plus one-exchange rewind and editable retry controls
 - Same-scenario comparative feedback with stored metric provenance and user-authored takeaways surfaced on the dashboard
 - Accessible busy/error announcements, keyboard focus treatments, reduced-motion support, and touch-oriented mobile workspace layouts
+- Allowlisted researcher dashboard, access-code pilot enrollment, pseudonymous aggregate monitoring, and text-free CSV export
 - Pseudonymous research events, versioned consent, pre/post ratings, and text-free personal data export
 - Auditable text-intelligence baselines for emotion, cognitive patterns, intent, readiness, and resistance
 - Scored strategy decisions with machine-readable reasons and model-version metadata
@@ -48,6 +49,12 @@ Confirmation links use `FRONTEND_ORIGIN` (normally `http://localhost:5173`) and 
 The frontend provides public routes for the landing page (`/`), About (`/about`), sign in (`/login`), sign up (`/signup`), email confirmation, and single-use password recovery. After first sign-in, `/onboarding` explains the research boundaries, optional voice processing, and asks the user to select personal practice goals before opening the authenticated workspace at `/app`.
 
 Authenticated users can open `/settings` to update their name, country, timezone, and personal practice goals; control the local microphone preference; review or delete individual sessions; change their password; or delete the account. Password changes require the current password, revoke every refresh token, clear the refresh cookie, and sign the current browser out. Email changes remain deferred because they require a dedicated reconfirmation flow.
+
+## Pilot study and researcher access
+
+Set `PILOT_ACCESS_CODE` to the code supplied to pilot participants, `PILOT_STUDY_LABEL` to the study display name, and `RESEARCHER_EMAILS` to a comma-separated allowlist of confirmed researcher accounts. Restart the backend after changing these values. Participants enroll from Settings and receive a pseudonymous participant ID. Allowlisted accounts receive a **Research dashboard** action on `/app` and can open `/research`.
+
+The researcher dashboard and CSV export deliberately exclude names, email addresses, passwords, conversation text, audio, custom scenario wording, and saved takeaways. CSV rows contain pseudonymous participant/session identifiers, timestamps, turn counts, scenario identifiers, difficulty, completion reason, and questionnaire ratings. Keep `PILOT_ACCESS_CODE` and the researcher allowlist private; neither replaces normal account authentication.
 
 ## Run services locally
 

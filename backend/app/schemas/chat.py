@@ -40,10 +40,17 @@ class UserResponse(BaseModel):
     practice_goals: list[PracticeGoal] = Field(default_factory=list)
     onboarding_completed: bool = False
     onboarding_version: str | None = None
+    researcher: bool = False
+    pilot_enrolled: bool = False
+    participant_id: UUID
 
 
 class OnboardingRequest(BaseModel):
     practice_goals: list[PracticeGoal] = Field(min_length=1, max_length=3)
+
+
+class PilotEnrollmentRequest(BaseModel):
+    access_code: str = Field(min_length=1, max_length=100)
 
 
 class ProfileUpdateRequest(BaseModel):

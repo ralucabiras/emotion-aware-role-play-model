@@ -1,4 +1,4 @@
-import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyQuestionnaire, UserProfile } from '../types/api'
+import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyQuestionnaire, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -20,6 +20,13 @@ function refreshAccess() {
   return refreshPromise
 }
 
+async function download(path:string,retry=true):Promise<Blob> {
+  const response=await fetch(`${API_URL}${path}`,{credentials:'include',headers:{...(accessToken?{Authorization:`Bearer ${accessToken}`}:{})}})
+  if(response.status===401&&retry){await refreshAccess();return download(path,false)}
+  if(!response.ok){const body=await response.json().catch(()=>({}));throw new Error(body.detail??'Download failed')}
+  return response.blob()
+}
+
 export const api = {
   register: (data: { email:string; password:string; consent:boolean; first_name:string; last_name:string; preferred_name:string; country:string; timezone:string }) => request<{message:string;email:string}>('/auth/register', { method: 'POST', body: JSON.stringify(data) }, false),
   login: (email: string, password: string) => request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }, false).then(acceptAuth),
@@ -33,6 +40,9 @@ export const api = {
   updateProfile: (profile: Pick<UserProfile,'first_name'|'last_name'|'preferred_name'|'country'|'timezone'>) => request<UserProfile>('/auth/me', { method: 'PATCH', body: JSON.stringify(profile) }),
   changePassword: (currentPassword: string, newPassword: string) => request<void>('/auth/change-password', { method: 'POST', body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }) }),
   researchExport: () => request<ResearchExport>('/auth/research-export'),
+  enrollPilot: (accessCode:string) => request<UserProfile>('/research/enroll',{method:'POST',body:JSON.stringify({access_code:accessCode})}),
+  researchDashboard: () => request<ResearchDashboardData>('/research/dashboard'),
+  researchCsv: () => download('/research/export.csv'),
   logout: async () => { await request('/auth/logout', { method: 'POST' }); api.clearToken() },
   deleteAccount: async () => { await request('/auth/me', { method: 'DELETE' }); api.clearToken() },
   clearToken: () => { accessToken = null; sessionStorage.removeItem('access_token') },

@@ -3,6 +3,7 @@ import type { FormEvent, ReactNode } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { Onboarding } from './components/Onboarding'
 import { HomeDashboard } from './components/HomeDashboard'
+import { ResearcherDashboard } from './components/ResearcherDashboard'
 import { SettingsPage } from './components/SettingsPage'
 import { api } from './services/api'
 import type { UserProfile } from './types/api'
@@ -90,9 +91,10 @@ export default function App() {
   if (path === '/about') return <About user={user}/>
   const onboarding = user && !user.onboarding_completed ? <Onboarding user={user} onComplete={updated => { setUser(updated); navigate('/app') }} onSignOut={() => { setUser(undefined); navigate('/login') }}/> : null
   const practice = (profile:UserProfile) => { const query=new URLSearchParams(location.search);return <Dashboard user={profile} initialSessionId={query.get('session')??undefined} initialRoleplay={query.get('mode')==='roleplay'} onLogout={() => { setUser(undefined); navigate('/') }} onDashboard={() => navigate('/app')} onSettings={() => navigate('/settings')}/> }
-  if (path === '/onboarding') return user ? (onboarding ?? <HomeDashboard user={user} onPractice={(id,roleplay)=>navigate(`/practice?${id?`session=${id}`:roleplay?'mode=roleplay':'new=1'}`)} onSettings={()=>navigate('/settings')} onHome={()=>navigate('/')} onLogout={()=>{setUser(undefined);navigate('/')}}/>) : <Login onAuth={setUser}/>
+  if (path === '/onboarding') return user ? (onboarding ?? <HomeDashboard user={user} onPractice={(id,roleplay)=>navigate(`/practice?${id?`session=${id}`:roleplay?'mode=roleplay':'new=1'}`)} onSettings={()=>navigate('/settings')} onResearch={()=>navigate('/research')} onHome={()=>navigate('/')} onLogout={()=>{setUser(undefined);navigate('/')}}/>) : <Login onAuth={setUser}/>
   if (path === '/settings') return user ? (onboarding ?? <SettingsPage user={user} onUser={setUser} onBack={() => navigate('/app')} onSignedOut={() => { setUser(undefined); navigate('/login') }}/>) : <Login onAuth={setUser}/>
   if (path.startsWith('/practice')) return user ? (onboarding ?? practice(user)) : <Login onAuth={setUser}/>
-  if (path === '/app') return user ? (onboarding ?? <HomeDashboard user={user} onPractice={(id,roleplay)=>navigate(`/practice?${id?`session=${id}`:roleplay?'mode=roleplay':'new=1'}`)} onSettings={()=>navigate('/settings')} onHome={()=>navigate('/')} onLogout={()=>{setUser(undefined);navigate('/')}}/>) : <Login onAuth={setUser}/>
+  if (path === '/research') return user?.researcher ? <ResearcherDashboard onBack={()=>navigate('/app')}/> : <Login onAuth={setUser}/>
+  if (path === '/app') return user ? (onboarding ?? <HomeDashboard user={user} onPractice={(id,roleplay)=>navigate(`/practice?${id?`session=${id}`:roleplay?'mode=roleplay':'new=1'}`)} onSettings={()=>navigate('/settings')} onResearch={()=>navigate('/research')} onHome={()=>navigate('/')} onLogout={()=>{setUser(undefined);navigate('/')}}/>) : <Login onAuth={setUser}/>
   return <Landing user={user}/>
 }

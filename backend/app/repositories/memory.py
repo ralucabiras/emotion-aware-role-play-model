@@ -22,6 +22,7 @@ class MemoryRepository(Repository):
     async def get_user_by_email(self, email: str) -> User | None:
         return next((u for u in self.users.values() if u.email == email), None)
     async def get_user(self, user_id: UUID) -> User | None: return self.users.get(user_id)
+    async def list_users(self) -> list[User]: return list(self.users.values())
     async def save_user(self, user: User) -> User:
         self.users[user.id] = user
         return user

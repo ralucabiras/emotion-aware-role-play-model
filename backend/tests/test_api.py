@@ -4,6 +4,7 @@ import wave
 
 from fastapi.testclient import TestClient
 
+from app.core.config import settings
 from app.core.container import auth_service, get_multimodal_service, get_transcription_service
 from app.main import app
 from app.services.multimodal_service import MultimodalAffectService
@@ -213,6 +214,43 @@ def test_feedback_compares_previous_matching_attempt_and_saves_takeaway() -> Non
         assert saved.json()["takeaway"] == "Lead with the request, then give the deadline."
         history = client.get("/api/sessions", headers=headers).json()
         assert next(item for item in history if item["session_id"] == second_id)["takeaway"] == "Lead with the request, then give the deadline."
+
+
+def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -> None:
+    previous_emails, previous_code = settings.researcher_emails, settings.pilot_access_code
+    settings.researcher_emails = "researcher@example.com"
+    settings.pilot_access_code = "pilot-code-2026"
+    try:
+        with TestClient(app) as client:
+            participant_headers = auth(client, "pilot-participant@example.com")
+            invalid = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "wrong"})
+            assert invalid.status_code == 400
+            enrolled = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026"})
+            assert enrolled.status_code == 200
+            assert enrolled.json()["pilot_enrolled"] is True
+            participant_id = enrolled.json()["participant_id"]
+            session_id = client.post("/api/sessions", headers=participant_headers).json()["session_id"]
+            client.post("/api/chat", headers=participant_headers, json={"session_id": session_id, "message": "private pilot conversation text"})
+            assert client.get("/api/research/dashboard", headers=participant_headers).status_code == 403
+
+            researcher_headers = auth(client, "researcher@example.com")
+            researcher_me = client.get("/api/auth/me", headers=researcher_headers).json()
+            assert researcher_me["researcher"] is True
+            dashboard = client.get("/api/research/dashboard", headers=researcher_headers)
+            assert dashboard.status_code == 200
+            assert dashboard.json()["participants"] == 1
+            assert dashboard.json()["participant_activity"][0]["participant_id"] == participant_id
+            serialized = dashboard.text
+            assert "pilot-participant@example.com" not in serialized
+            assert "private pilot conversation text" not in serialized
+            export = client.get("/api/research/export.csv", headers=researcher_headers)
+            assert export.status_code == 200
+            assert "text/csv" in export.headers["content-type"]
+            assert participant_id in export.text
+            assert "pilot-participant@example.com" not in export.text
+            assert "private pilot conversation text" not in export.text
+    finally:
+        settings.researcher_emails, settings.pilot_access_code = previous_emails, previous_code
 
 
 def test_password_reset_is_generic_single_use_and_changes_credentials() -> None:

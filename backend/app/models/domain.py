@@ -217,6 +217,7 @@ class User(BaseModel):
     onboarding_completed_at: datetime | None = None
     onboarding_version: str | None = None
     custom_scenarios: list[RolePlayScenario] = Field(default_factory=list)
+    pilot_enrolled_at: datetime | None = None
     created_at: datetime = Field(default_factory=utcnow)
 
 

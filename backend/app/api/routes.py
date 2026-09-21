@@ -1,10 +1,16 @@
 import base64
 import binascii
+import csv
+import hmac
+import io
+from collections import defaultdict
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from app.core.config import settings
 from app.core.container import (
     get_auth_service,
     get_conversation_service,
@@ -12,7 +18,7 @@ from app.core.container import (
     get_repository,
     get_transcription_service,
 )
-from app.models.domain import Difficulty, RolePlayScenario, User
+from app.models.domain import Difficulty, RolePlayScenario, User, utcnow
 from app.schemas.chat import (
     AudioTranscriptionRequest,
     AudioTranscriptionResponse,
@@ -29,6 +35,7 @@ from app.schemas.chat import (
     PasswordChangeRequest,
     PasswordResetConfirmRequest,
     PasswordResetRequest,
+    PilotEnrollmentRequest,
     ProfileUpdateRequest,
     RegistrationResponse,
     ResendVerificationRequest,
@@ -61,6 +68,11 @@ from app.services.transcription_service import InvalidAudio, TranscriptionServic
 router, bearer = APIRouter(prefix="/api"), HTTPBearer(auto_error=False)
 
 
+def is_researcher(email: str) -> bool:
+    allowed = {item.strip().lower() for item in settings.researcher_emails.split(",") if item.strip()}
+    return email.strip().lower() in allowed
+
+
 def set_refresh_cookie(response: Response, token: str) -> None:
     response.set_cookie("refresh_token", token, httponly=True, samesite="lax", secure=False, path="/api/auth", max_age=7 * 86400)
 
@@ -72,6 +84,11 @@ async def current_user(credentials: HTTPAuthorizationCredentials | None = Depend
     user = await repository.get_user(user_id)
     if not user: raise HTTPException(401, "Invalid or expired credentials")
     if not user.email_verified_at: raise HTTPException(403, "Email confirmation required")
+    return user
+
+
+async def researcher_user(user: User = Depends(current_user)) -> User:
+    if not is_researcher(user.email): raise HTTPException(403, "Researcher access required")
     return user
 
 
@@ -142,6 +159,9 @@ def user_response(user: User) -> UserResponse:
         practice_goals=user.practice_goals,
         onboarding_completed=bool(user.onboarding_completed_at),
         onboarding_version=user.onboarding_version,
+        researcher=is_researcher(user.email),
+        pilot_enrolled=bool(user.pilot_enrolled_at),
+        participant_id=user.participant_id,
     )
 
 
@@ -274,6 +294,102 @@ async def research_export(
             for session in sessions
         ],
     }
+
+
+@router.post("/research/enroll", response_model=UserResponse)
+async def enroll_in_pilot(
+    request: PilotEnrollmentRequest,
+    user: User = Depends(current_user),
+    repository=Depends(get_repository),
+):
+    if not settings.pilot_access_code:
+        raise HTTPException(503, "Pilot enrollment is not configured")
+    if not hmac.compare_digest(request.access_code, settings.pilot_access_code):
+        raise HTTPException(400, "The pilot access code is not valid")
+    if not user.pilot_enrolled_at:
+        user.pilot_enrolled_at = utcnow()
+        await repository.save_user(user)
+    return user_response(user)
+
+
+async def pilot_dataset(repository):
+    users = [user for user in await repository.list_users() if user.pilot_enrolled_at]
+    records = []
+    metric_values: dict[str, list[float]] = defaultdict(list)
+    scenarios: dict[str, int] = defaultdict(int)
+    difficulties: dict[str, int] = defaultdict(int)
+    questionnaires: dict[str, list[float]] = defaultdict(list)
+    generation_sources: dict[str, int] = defaultdict(int)
+    total_sessions = completed = 0
+    for user in users:
+        sessions = await repository.list_sessions(user.id)
+        total_sessions += len(sessions)
+        user_completed = sum(bool(session.feedback) for session in sessions)
+        completed += user_completed
+        last_active = max((session.updated_at for session in sessions), default=user.pilot_enrolled_at)
+        records.append({
+            "participant_id": str(user.participant_id),
+            "enrolled_at": user.pilot_enrolled_at,
+            "last_active_at": last_active,
+            "sessions": len(sessions),
+            "completed_rehearsals": user_completed,
+            "pre_questionnaires": sum("pre" in session.questionnaires for session in sessions),
+            "post_questionnaires": sum("post" in session.questionnaires for session in sessions),
+        })
+        for session in sessions:
+            if session.roleplay:
+                scenarios[session.roleplay.scenario_id] += int(bool(session.feedback))
+                difficulties[session.roleplay.difficulty_level.value] += int(bool(session.feedback))
+            if session.feedback:
+                generation_sources[session.feedback.generation_source] += 1
+                for metric in session.feedback.metrics: metric_values[metric.name].append(metric.score)
+            for answer in session.questionnaires.values():
+                for name in ("confidence", "anxiety", "realism", "usefulness"):
+                    value = getattr(answer, name)
+                    if value is not None: questionnaires[f"{answer.phase}_{name}"].append(value)
+    return users, records, {
+        "study_label": settings.pilot_study_label,
+        "generated_at": datetime.now(UTC),
+        "participants": len(users), "sessions": total_sessions,
+        "completed_rehearsals": completed,
+        "completion_rate": completed / total_sessions if total_sessions else 0,
+        "scenario_completions": dict(scenarios), "difficulty_completions": dict(difficulties),
+        "average_skill_scores": {name: sum(values) / len(values) for name, values in metric_values.items()},
+        "questionnaire_averages": {name: sum(values) / len(values) for name, values in questionnaires.items()},
+        "generation_sources": dict(generation_sources),
+        "participant_activity": sorted(records, key=lambda item: item["last_active_at"], reverse=True),
+        "privacy": {"contains_names": False, "contains_emails": False, "contains_conversation_text": False, "contains_takeaways": False},
+    }
+
+
+@router.get("/research/dashboard")
+async def research_dashboard(user: User = Depends(researcher_user), repository=Depends(get_repository)):
+    del user
+    _, _, dashboard = await pilot_dataset(repository)
+    return dashboard
+
+
+@router.get("/research/export.csv")
+async def research_csv(user: User = Depends(researcher_user), repository=Depends(get_repository)):
+    del user
+    users = [participant for participant in await repository.list_users() if participant.pilot_enrolled_at]
+    output = io.StringIO()
+    fields = ["participant_id", "session_id", "created_at", "updated_at", "turn_count", "scenario_id", "difficulty", "completion_reason", "pre_confidence", "pre_anxiety", "post_confidence", "post_realism", "post_usefulness"]
+    writer = csv.DictWriter(output, fieldnames=fields); writer.writeheader()
+    for participant in users:
+        for session in await repository.list_sessions(participant.id):
+            pre, post = session.questionnaires.get("pre"), session.questionnaires.get("post")
+            writer.writerow({
+                "participant_id": participant.participant_id, "session_id": session.id,
+                "created_at": session.created_at.isoformat(), "updated_at": session.updated_at.isoformat(),
+                "turn_count": len(session.turns), "scenario_id": session.roleplay.scenario_id if session.roleplay else "",
+                "difficulty": session.roleplay.difficulty_level.value if session.roleplay else "",
+                "completion_reason": session.roleplay.completion_reason if session.roleplay else "",
+                "pre_confidence": pre.confidence if pre else "", "pre_anxiety": pre.anxiety if pre else "",
+                "post_confidence": post.confidence if post else "", "post_realism": post.realism if post else "",
+                "post_usefulness": post.usefulness if post else "",
+            })
+    return Response(content=output.getvalue(), media_type="text/csv", headers={"Content-Disposition": "attachment; filename=affectlab-pilot-export.csv", "Cache-Control": "no-store"})
 
 
 @router.patch("/auth/me", response_model=UserResponse)

@@ -39,6 +39,8 @@ class MongoRepository(Repository):
         if "participant_id" not in doc:
             await self.save_user(user)
         return user
+    async def list_users(self) -> list[User]:
+        return [User.model_validate(doc) async for doc in self.db.users.find({})]
     async def save_user(self, user: User) -> User:
         await self.db.users.replace_one(
             {"id": user.id}, user.model_dump(mode="python"), upsert=False
