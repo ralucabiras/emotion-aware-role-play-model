@@ -25,7 +25,7 @@ export class AppErrorBoundary extends Component<{children: ReactNode}, {error: s
 }
 
 function PublicNav({user}: {user?: UserProfile}) {
-  return <nav className="public-nav"><button className="brand-link" onClick={() => navigate('/')}><span className="brand-mark">A</span><span className="brand">AffectLab</span></button><div><button onClick={() => navigate('/about')}>About us</button>{user ? <button className="nav-primary" onClick={() => navigate('/app')}>Open AffectLab</button> : <><button onClick={() => navigate('/login')}>Sign in</button><button className="nav-primary" onClick={() => navigate('/signup')}>Create account</button></>}</div></nav>
+  return <nav className="public-nav" aria-label="Primary navigation"><button className="brand-link" aria-label="AffectLab home" onClick={() => navigate('/')}><span className="brand-mark" aria-hidden="true">A</span><span className="brand">AffectLab</span></button><div><button onClick={() => navigate('/about')}>About us</button>{user ? <button className="nav-primary" onClick={() => navigate('/app')}>Open AffectLab</button> : <><button onClick={() => navigate('/login')}>Sign in</button><button className="nav-primary" onClick={() => navigate('/signup')}>Create account</button></>}</div></nav>
 }
 
 function Landing({user}: {user?: UserProfile}) {
@@ -80,7 +80,7 @@ function VerifyEmail() {
 export default function App() {
   const path = usePath(), [user, setUser] = useState<UserProfile>(), [checked, setChecked] = useState(false)
   useEffect(() => { let active = true; void api.me().then(profile => active && setUser(profile)).catch(() => api.refresh().then(result => active && setUser(result.user)).catch(() => undefined)).finally(() => active && setChecked(true)); return () => { active = false } }, [])
-  if (!checked) return <main className="loading-page">Loading AffectLab…</main>
+  if (!checked) return <main className="loading-page" role="status" aria-live="polite"><span className="loading-mark" aria-hidden="true">A</span><div><strong>Opening AffectLab</strong><small>Restoring your private workspace…</small></div></main>
   if (path.startsWith('/verify-email')) return <VerifyEmail/>
   if (path.startsWith('/reset-password')) return <ResetPassword/>
   if (path === '/forgot-password') return <ForgotPassword/>
