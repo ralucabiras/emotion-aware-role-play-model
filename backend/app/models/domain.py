@@ -200,6 +200,14 @@ class ResearchEvent(BaseModel):
     properties: dict[str, str | int | float | bool] = Field(default_factory=dict)
 
 
+class StudyConsentRecord(BaseModel):
+    version: str
+    accepted_at: datetime = Field(default_factory=utcnow)
+    information_sheet_read: bool = True
+    research_participation_accepted: bool = True
+    data_processing_accepted: bool = True
+
+
 class User(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     email: str
@@ -218,6 +226,7 @@ class User(BaseModel):
     onboarding_version: str | None = None
     custom_scenarios: list[RolePlayScenario] = Field(default_factory=list)
     pilot_enrolled_at: datetime | None = None
+    study_consent: StudyConsentRecord | None = None
     created_at: datetime = Field(default_factory=utcnow)
 
 

@@ -42,6 +42,8 @@ class UserResponse(BaseModel):
     onboarding_version: str | None = None
     researcher: bool = False
     pilot_enrolled: bool = False
+    study_consent_version: str | None = None
+    study_consented_at: str | None = None
     participant_id: UUID
 
 
@@ -51,6 +53,31 @@ class OnboardingRequest(BaseModel):
 
 class PilotEnrollmentRequest(BaseModel):
     access_code: str = Field(min_length=1, max_length=100)
+    consent_version: str = Field(min_length=1, max_length=80)
+    information_sheet_read: bool = False
+    research_participation_accepted: bool = False
+    data_processing_accepted: bool = False
+
+
+class StudyContact(BaseModel):
+    name: str
+    email: str
+
+
+class StudyInformationResponse(BaseModel):
+    version: str
+    study_label: str
+    title: str
+    summary: str
+    data_collected: list[str]
+    processors: list[str]
+    audio_and_transcripts: list[str]
+    retention: str
+    risks_and_limitations: list[str]
+    withdrawal: list[str]
+    researcher: StudyContact
+    supervisor: StudyContact
+    institution: str
 
 
 class ProfileUpdateRequest(BaseModel):

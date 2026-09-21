@@ -223,11 +223,28 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
     try:
         with TestClient(app) as client:
             participant_headers = auth(client, "pilot-participant@example.com")
-            invalid = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "wrong"})
+            information = client.get("/api/research/study-information", headers=participant_headers)
+            assert information.status_code == 200
+            version = information.json()["version"]
+            assert information.json()["data_collected"]
+            assert information.json()["withdrawal"]
+            consent = {
+                "consent_version": version,
+                "information_sheet_read": True,
+                "research_participation_accepted": True,
+                "data_processing_accepted": True,
+            }
+            invalid = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "wrong", **consent})
             assert invalid.status_code == 400
-            enrolled = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026"})
+            missing_consent = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026", **consent, "research_participation_accepted": False})
+            assert missing_consent.status_code == 400
+            stale = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026", **consent, "consent_version": "old-version"})
+            assert stale.status_code == 409
+            enrolled = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026", **consent})
             assert enrolled.status_code == 200
             assert enrolled.json()["pilot_enrolled"] is True
+            assert enrolled.json()["study_consent_version"] == version
+            assert enrolled.json()["study_consented_at"]
             participant_id = enrolled.json()["participant_id"]
             session_id = client.post("/api/sessions", headers=participant_headers).json()["session_id"]
             client.post("/api/chat", headers=participant_headers, json={"session_id": session_id, "message": "private pilot conversation text"})
@@ -249,6 +266,9 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
             assert participant_id in export.text
             assert "pilot-participant@example.com" not in export.text
             assert "private pilot conversation text" not in export.text
+            personal_export = client.get("/api/auth/research-export", headers=participant_headers).json()
+            assert personal_export["study_consent"]["version"] == version
+            assert personal_export["study_consent"]["accepted_at"]
     finally:
         settings.researcher_emails, settings.pilot_access_code = previous_emails, previous_code
 

@@ -18,7 +18,7 @@ from app.core.container import (
     get_repository,
     get_transcription_service,
 )
-from app.models.domain import Difficulty, RolePlayScenario, User, utcnow
+from app.models.domain import Difficulty, RolePlayScenario, StudyConsentRecord, User, utcnow
 from app.schemas.chat import (
     AudioTranscriptionRequest,
     AudioTranscriptionResponse,
@@ -46,6 +46,7 @@ from app.schemas.chat import (
     SessionTitleRequest,
     StartRolePlayRequest,
     StartRolePlayResponse,
+    StudyInformationResponse,
     StudyQuestionnaireRequest,
     StudyQuestionnaireResponse,
     TakeawayRequest,
@@ -71,6 +72,14 @@ router, bearer = APIRouter(prefix="/api"), HTTPBearer(auto_error=False)
 def is_researcher(email: str) -> bool:
     allowed = {item.strip().lower() for item in settings.researcher_emails.split(",") if item.strip()}
     return email.strip().lower() in allowed
+
+
+def has_current_study_consent(user: User) -> bool:
+    return bool(
+        user.pilot_enrolled_at
+        and user.study_consent
+        and user.study_consent.version == settings.study_consent_version
+    )
 
 
 def set_refresh_cookie(response: Response, token: str) -> None:
@@ -160,7 +169,9 @@ def user_response(user: User) -> UserResponse:
         onboarding_completed=bool(user.onboarding_completed_at),
         onboarding_version=user.onboarding_version,
         researcher=is_researcher(user.email),
-        pilot_enrolled=bool(user.pilot_enrolled_at),
+        pilot_enrolled=has_current_study_consent(user),
+        study_consent_version=user.study_consent.version if user.study_consent else None,
+        study_consented_at=user.study_consent.accepted_at.isoformat() if user.study_consent else None,
         participant_id=user.participant_id,
     )
 
@@ -272,7 +283,8 @@ async def research_export(
     return {
         "schema_version": "affectlab-research-export-v1",
         "participant_id": str(user.participant_id),
-        "consent": {"version": user.consent_version, "accepted_at": user.consented_at},
+        "account_privacy_acceptance": {"version": user.consent_version, "accepted_at": user.consented_at},
+        "study_consent": user.study_consent.model_dump(mode="json") if user.study_consent else None,
         "practice_goals": [goal.value for goal in user.practice_goals],
         "contains_conversation_text": False,
         "sessions": [
@@ -296,6 +308,48 @@ async def research_export(
     }
 
 
+@router.get("/research/study-information", response_model=StudyInformationResponse)
+async def study_information(user: User = Depends(current_user)):
+    return StudyInformationResponse(
+        version=settings.study_consent_version,
+        study_label=settings.pilot_study_label,
+        title="Participant information sheet",
+        summary=("AffectLab is a dissertation study of whether emotion-aware reflection and adaptive role-play can support practice for difficult conversations. Taking part is voluntary and is separate from holding an AffectLab account."),
+        data_collected=[
+            "A pseudonymous participant identifier and study-consent record.",
+            "Questionnaire ratings, interaction events, scenario choices, completion data, and feedback metrics.",
+            "Conversation text in active application sessions; researcher dashboard and CSV exports exclude this text.",
+            "Profile and account data required to operate and secure the application; these are not included in pseudonymous study exports.",
+        ],
+        processors=[
+            "MongoDB stores account, session, and consent records in the configured local database.",
+            "When OpenAI features are configured, session context may be sent to OpenAI to generate responses, phrase feedback, moderate content, or transcribe optional speech.",
+            "Email delivery uses the configured SMTP provider for account messages.",
+        ],
+        audio_and_transcripts=[
+            "Voice input is optional and requires an explicit action for each recording.",
+            "Audio may be sent to OpenAI for transcription and processed in memory by the local research model.",
+            "AffectLab does not persist raw audio. A transcript you approve can become part of the conversation session.",
+        ],
+        retention=settings.study_retention_period,
+        risks_and_limitations=[
+            "Discussing difficult situations may feel uncomfortable; you may pause or stop at any time.",
+            "Emotion estimates and generated replies can be inaccurate, biased, repetitive, or inappropriate.",
+            "AffectLab is not therapy, diagnosis, medical advice, or an emergency service.",
+            "The prototype cannot guarantee confidentiality beyond the safeguards described here.",
+        ],
+        withdrawal=[
+            "Participation is voluntary. Declining does not prevent you from using your account outside the pilot.",
+            "You may stop study activities at any time without giving a reason.",
+            f"To request withdrawal, contact {settings.study_researcher_email}. Account deletion also removes active account and session data.",
+            "The researcher will explain whether data already irreversibly anonymised or included in completed aggregate analysis can still be removed.",
+        ],
+        researcher={"name": settings.study_researcher_name, "email": settings.study_researcher_email},
+        supervisor={"name": settings.study_supervisor_name, "email": settings.study_supervisor_email},
+        institution=settings.study_institution,
+    )
+
+
 @router.post("/research/enroll", response_model=UserResponse)
 async def enroll_in_pilot(
     request: PilotEnrollmentRequest,
@@ -306,14 +360,24 @@ async def enroll_in_pilot(
         raise HTTPException(503, "Pilot enrollment is not configured")
     if not hmac.compare_digest(request.access_code, settings.pilot_access_code):
         raise HTTPException(400, "The pilot access code is not valid")
+    if request.consent_version != settings.study_consent_version:
+        raise HTTPException(409, "The participant information has changed. Review the current version before consenting.")
+    if not all((request.information_sheet_read, request.research_participation_accepted, request.data_processing_accepted)):
+        raise HTTPException(400, "All study consent confirmations are required")
     if not user.pilot_enrolled_at:
         user.pilot_enrolled_at = utcnow()
-        await repository.save_user(user)
+    user.study_consent = StudyConsentRecord(
+        version=settings.study_consent_version,
+        information_sheet_read=request.information_sheet_read,
+        research_participation_accepted=request.research_participation_accepted,
+        data_processing_accepted=request.data_processing_accepted,
+    )
+    await repository.save_user(user)
     return user_response(user)
 
 
 async def pilot_dataset(repository):
-    users = [user for user in await repository.list_users() if user.pilot_enrolled_at]
+    users = [user for user in await repository.list_users() if has_current_study_consent(user)]
     records = []
     metric_values: dict[str, list[float]] = defaultdict(list)
     scenarios: dict[str, int] = defaultdict(int)
@@ -372,7 +436,7 @@ async def research_dashboard(user: User = Depends(researcher_user), repository=D
 @router.get("/research/export.csv")
 async def research_csv(user: User = Depends(researcher_user), repository=Depends(get_repository)):
     del user
-    users = [participant for participant in await repository.list_users() if participant.pilot_enrolled_at]
+    users = [participant for participant in await repository.list_users() if has_current_study_consent(participant)]
     output = io.StringIO()
     fields = ["participant_id", "session_id", "created_at", "updated_at", "turn_count", "scenario_id", "difficulty", "completion_reason", "pre_confidence", "pre_anxiety", "post_confidence", "post_realism", "post_usefulness"]
     writer = csv.DictWriter(output, fieldnames=fields); writer.writeheader()

@@ -40,6 +40,13 @@ class Settings(BaseSettings):
     email_verification_hours: int = 24
     password_reset_minutes: int = 30
     research_consent_version: str = "2026-08-18-v1"
+    study_consent_version: str = "2026-09-21-v1"
+    study_retention_period: str = "Research records are retained until the dissertation assessment is complete, then deleted or irreversibly anonymised in accordance with the approved university protocol. Active conversation sessions expire after 30 days of inactivity."
+    study_researcher_name: str = "Raluca Biras"
+    study_researcher_email: str = "calmai.etherapy@gmail.com"
+    study_supervisor_name: str = "To be confirmed"
+    study_supervisor_email: str = "To be confirmed"
+    study_institution: str = "To be confirmed"
     onboarding_version: str = "2026-08-v1"
     researcher_emails: str = ""
     pilot_access_code: str = ""

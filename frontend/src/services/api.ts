@@ -1,4 +1,4 @@
-import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyQuestionnaire, UserProfile } from '../types/api'
+import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -40,7 +40,8 @@ export const api = {
   updateProfile: (profile: Pick<UserProfile,'first_name'|'last_name'|'preferred_name'|'country'|'timezone'>) => request<UserProfile>('/auth/me', { method: 'PATCH', body: JSON.stringify(profile) }),
   changePassword: (currentPassword: string, newPassword: string) => request<void>('/auth/change-password', { method: 'POST', body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }) }),
   researchExport: () => request<ResearchExport>('/auth/research-export'),
-  enrollPilot: (accessCode:string) => request<UserProfile>('/research/enroll',{method:'POST',body:JSON.stringify({access_code:accessCode})}),
+  studyInformation: () => request<StudyInformation>('/research/study-information'),
+  enrollPilot: (data:{access_code:string;consent_version:string;information_sheet_read:boolean;research_participation_accepted:boolean;data_processing_accepted:boolean}) => request<UserProfile>('/research/enroll',{method:'POST',body:JSON.stringify(data)}),
   researchDashboard: () => request<ResearchDashboardData>('/research/dashboard'),
   researchCsv: () => download('/research/export.csv'),
   logout: async () => { await request('/auth/logout', { method: 'POST' }); api.clearToken() },
