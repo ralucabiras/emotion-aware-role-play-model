@@ -176,6 +176,45 @@ def test_custom_scenario_and_rewind_are_owned_and_preserve_history() -> None:
         assert restored["roleplay"]["scenario"]["title"] == "Requesting flexible hours"
 
 
+def test_feedback_compares_previous_matching_attempt_and_saves_takeaway() -> None:
+    with TestClient(app) as client:
+        headers = auth(client, "comparison@example.com")
+
+        def complete_workload(message: str) -> tuple[str, dict]:
+            session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+            assert client.post(
+                f"/api/sessions/{session_id}/roleplay", headers=headers,
+                json={"scenario_id": "workload", "difficulty": "beginner"},
+            ).status_code == 200
+            result = client.post(
+                "/api/chat", headers=headers,
+                json={"session_id": session_id, "message": message},
+            ).json()
+            return session_id, result["feedback"]
+
+        first_id, first_feedback = complete_workload(
+            "I need you to prioritise this because the deadline is Friday."
+        )
+        assert first_feedback["comparisons"] == []
+        second_id, second_feedback = complete_workload(
+            "I would like us to prioritise this because the deadline is this week."
+        )
+        assert second_feedback["compared_with_session_id"] == first_id
+        assert second_feedback["comparisons"]
+        assert {item["name"] for item in second_feedback["comparisons"]} == {
+            "clear request", "specific evidence", "collaborative tone"
+        }
+
+        saved = client.put(
+            f"/api/sessions/{second_id}/takeaway", headers=headers,
+            json={"takeaway": "  Lead with the request, then give the deadline.  "},
+        )
+        assert saved.status_code == 200
+        assert saved.json()["takeaway"] == "Lead with the request, then give the deadline."
+        history = client.get("/api/sessions", headers=headers).json()
+        assert next(item for item in history if item["session_id"] == second_id)["takeaway"] == "Lead with the request, then give the deadline."
+
+
 def test_password_reset_is_generic_single_use_and_changes_credentials() -> None:
     with TestClient(app) as client:
         auth(client, "reset@example.com")

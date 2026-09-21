@@ -43,6 +43,7 @@ export const api = {
   getSession: (id: string) => request<SessionResponse>(`/sessions/${id}`),
   listSessions: () => request<SessionSummary[]>('/sessions'),
   renameSession: (id: string, title: string) => request<SessionSummary>(`/sessions/${id}/title`, { method: 'PATCH', body: JSON.stringify({ title }) }),
+  saveTakeaway: (id:string, takeaway:string) => request<SessionResponse>(`/sessions/${id}/takeaway`, {method:'PUT',body:JSON.stringify({takeaway})}),
   sendMessage: (sessionId: string, message: string) => request<ChatResponse>('/chat', { method: 'POST', body: JSON.stringify({ session_id: sessionId, message }) }),
   scenarios: () => request<Scenario[]>('/roleplay/scenarios'),
   createScenario: (data: {title:string;character:string;situation:string;user_objective:string;opening_line:string;skills:string[]}) => request<Scenario>('/roleplay/scenarios', { method:'POST', body:JSON.stringify(data) }),

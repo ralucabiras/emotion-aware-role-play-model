@@ -97,6 +97,7 @@ class SessionResponse(BaseModel):
     emotion_state: EmotionState
     roleplay: RolePlayState | None = None
     feedback: SessionFeedback | None = None
+    takeaway: str = ""
 class SessionSummary(BaseModel):
     session_id: UUID
     title: str
@@ -105,10 +106,15 @@ class SessionSummary(BaseModel):
     turn_count: int
     roleplay: RolePlayState | None = None
     feedback: SessionFeedback | None = None
+    takeaway: str = ""
 
 
 class SessionTitleRequest(BaseModel):
     title: str = Field(min_length=1, max_length=80)
+
+
+class TakeawayRequest(BaseModel):
+    takeaway: str = Field(max_length=500)
 
 
 class StudyQuestionnaireRequest(BaseModel):

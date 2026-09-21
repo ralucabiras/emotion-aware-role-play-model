@@ -6,6 +6,7 @@ from app.models.domain import (
     AgentDecision,
     ConversationTurn,
     Difficulty,
+    FeedbackComparison,
     ResearchEvent,
     Role,
     RolePlayStatus,
@@ -50,6 +51,12 @@ class ConversationService:
     async def rename_session(self, session_id: UUID, user_id: UUID, title: str) -> Session:
         session = await self.get_session(session_id, user_id)
         session.title = " ".join(title.split())
+        await self.save(session)
+        return session
+    async def save_takeaway(self, session_id: UUID, user_id: UUID, takeaway: str) -> Session:
+        session = await self.get_session(session_id, user_id)
+        session.takeaway = " ".join(takeaway.split())
+        session.research_events.append(ResearchEvent(name="takeaway_saved", properties={"length": len(session.takeaway)}))
         await self.save(session)
         return session
     async def save(self, session: Session) -> None:
@@ -181,6 +188,11 @@ class ConversationService:
     async def complete_feedback(self, session: Session) -> None:
         if not session.roleplay: return
         feedback = self.roleplays.feedback(session.roleplay)
+        previous = next((item for item in await self.repository.list_sessions(session.user_id) if item.id != session.id and item.feedback and item.feedback.scenario_id == session.roleplay.scenario_id), None)
+        if previous and previous.feedback:
+            old = {metric.name: metric.score for metric in previous.feedback.metrics}
+            feedback.compared_with_session_id = previous.id
+            feedback.comparisons = [FeedbackComparison(name=metric.name, current_score=metric.score, previous_score=old[metric.name], change=metric.score-old[metric.name]) for metric in feedback.metrics if metric.name in old]
         if isinstance(self.generator, OpenAIResponseGenerator): feedback = await self.generator.phrase_feedback(feedback)
         feedback.session_id = session.id
         session.feedback = feedback

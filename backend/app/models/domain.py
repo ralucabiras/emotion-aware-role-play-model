@@ -165,6 +165,13 @@ class FeedbackMetric(BaseModel):
     evidence_turns: list[int] = Field(default_factory=list)
 
 
+class FeedbackComparison(BaseModel):
+    name: str
+    current_score: float = Field(ge=0, le=1)
+    previous_score: float = Field(ge=0, le=1)
+    change: float = Field(ge=-1, le=1)
+
+
 class SessionFeedback(BaseModel):
     session_id: UUID | None = None
     scenario_id: str
@@ -173,6 +180,8 @@ class SessionFeedback(BaseModel):
     strengths: list[str]
     suggestions: list[str]
     generation_source: str = "deterministic"
+    compared_with_session_id: UUID | None = None
+    comparisons: list[FeedbackComparison] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=utcnow)
 
 
@@ -222,5 +231,6 @@ class Session(BaseModel):
     emotion_state: EmotionState = Field(default_factory=EmotionState)
     roleplay: RolePlayState | None = None
     feedback: SessionFeedback | None = None
+    takeaway: str = ""
     questionnaires: dict[str, StudyQuestionnaire] = Field(default_factory=dict)
     research_events: list[ResearchEvent] = Field(default_factory=list)
