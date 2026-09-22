@@ -9,6 +9,7 @@ import pytest_asyncio
 
 from app.models.domain import Session, StudyRecord, User, utcnow
 from app.repositories.mongo import ConcurrentSessionUpdateError, MongoRepository
+from scripts.mongo_backup import backup_database, restore_database
 
 MONGO_URI = os.getenv("TEST_MONGODB_URI")
 pytestmark = [pytest.mark.mongo_integration, pytest.mark.skipif(not MONGO_URI, reason="Set TEST_MONGODB_URI to run real MongoDB tests")]
@@ -78,3 +79,22 @@ async def test_concurrent_session_updates_reject_a_lost_update(mongo_repository)
     persisted = await mongo_repository.get_session(original.id,user.id)
     assert persisted and persisted.title in {"First writer","Second writer"}
     assert persisted.version == original.version + 1
+
+@pytest.mark.asyncio
+async def test_backup_can_be_restored_and_verified(mongo_repository, tmp_path):
+    user = await mongo_repository.create_user(make_user())
+    session = await mongo_repository.save_session(Session(user_id=user.id, title="Backup verification"))
+    await mongo_repository.save_study_record(make_record(user, session))
+    source_database = mongo_repository.db.name
+    target_database = f"affectlab_{uuid4().hex[:20]}_restore_test"
+    backup_path = tmp_path / "backup"
+    manifest = await asyncio.to_thread(backup_database, MONGO_URI, source_database, backup_path)
+    try:
+        result = await asyncio.to_thread(restore_database, MONGO_URI, backup_path, target_database)
+        assert result["verified"] is True
+        assert result["collections"]["users"] == 1
+        assert result["collections"]["sessions"] == 1
+        assert result["collections"]["study_records"] == 1
+        assert manifest["schema_version"] == "affectlab-mongodb-backup-v1"
+    finally:
+        await mongo_repository.client.drop_database(target_database)

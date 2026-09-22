@@ -125,6 +125,8 @@ The evaluator reports accuracy, macro F1, per-class precision/recall/F1, mean co
 
 ## Privacy and safety
 
+Remote participant deployment has a separate mandatory security and safety baseline covering HTTPS, host/CORS restrictions, rate limits, backup restoration, dependency scanning, eligibility, and emergency limitations: [Remote pilot security baseline](docs/remote-pilot-security.md).
+
 Users must accept disclosure that text is stored locally for up to 30 days and that the full session may be sent to OpenAI when configured. Raw prompts and responses are not written to application logs. Crisis phrase checks run before response generation; provider moderation is secondary. The safety layer is a conservative prototype and requires independent evaluation before any study or public deployment.
 
 See [docs/architecture.md](docs/architecture.md) for data flow and extension boundaries.

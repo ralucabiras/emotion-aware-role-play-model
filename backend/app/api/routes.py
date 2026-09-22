@@ -110,7 +110,7 @@ def belongs_to_protocol_cohort(user: User) -> bool:
 
 
 def set_refresh_cookie(response: Response, token: str) -> None:
-    response.set_cookie("refresh_token", token, httponly=True, samesite="lax", secure=False, path="/api/auth", max_age=7 * 86400)
+    response.set_cookie("refresh_token", token, httponly=True, samesite="lax", secure=settings.production, path="/api/auth", max_age=settings.refresh_token_days * 86400)
 
 
 async def current_user(credentials: HTTPAuthorizationCredentials | None = Depends(bearer), auth: AuthService = Depends(get_auth_service), repository=Depends(get_repository)) -> User:
@@ -368,9 +368,11 @@ async def study_information(user: User = Depends(current_user)):
         ],
         retention=settings.study_retention_period,
         risks_and_limitations=[
+            f"Eligibility is limited to people aged {settings.minimum_participant_age} or over, located in {settings.geographic_scope}, using {settings.supported_language}.",
             "Discussing difficult situations may feel uncomfortable; you may pause or stop at any time.",
             "Emotion estimates and generated replies can be inaccurate, biased, repetitive, or inappropriate.",
             "AffectLab is not therapy, diagnosis, medical advice, or an emergency service.",
+            settings.emergency_limitations,
             "The prototype cannot guarantee confidentiality beyond the safeguards described here.",
         ],
         withdrawal=[
