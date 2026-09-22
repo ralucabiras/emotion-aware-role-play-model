@@ -96,12 +96,24 @@ cd backend
 cd ..\frontend
 npm run lint
 npm run build
+npm run test:e2e
 
 cd ..
 docker compose config
 ```
 
-Tests use an in-memory repository adapter and never require live MongoDB or OpenAI access. Docker and normal configured deployments use the async PyMongo repository.
+The normal backend suite uses an in-memory repository and the Playwright suite uses a deterministic API boundary, so neither requires OpenAI or a mail service. Playwright runs the journeys in desktop and mobile Chromium and applies automated WCAG A/AA checks to representative screens. Install its browser once with `npx playwright install chromium`.
+
+Real MongoDB persistence checks are deliberately opt-in and always create a uniquely named disposable database. With the local MongoDB service running:
+
+```powershell
+cd backend
+$env:TEST_MONGODB_URI = "mongodb://localhost:27017"
+..\.venv\Scripts\python.exe -m pytest -m mongo_integration -v
+Remove-Item Env:TEST_MONGODB_URI
+```
+
+These checks cover client restart persistence, TTL index and logical expiry behavior, account cascade deletion, and optimistic concurrency protection. Never point `TEST_MONGODB_URI` at a server where the test account cannot safely create and drop `affectlab_integration_*` databases.
 
 Run the bundled evaluation smoke dataset with:
 

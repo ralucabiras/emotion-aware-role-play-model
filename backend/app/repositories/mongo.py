@@ -7,6 +7,10 @@ from app.models.domain import FrozenStudyExport, Session, StudyLifecycle, StudyR
 from app.repositories.base import Repository
 
 
+class ConcurrentSessionUpdateError(RuntimeError):
+    """Raised instead of silently overwriting a concurrently updated session."""
+
+
 class MongoRepository(Repository):
     def __init__(self, uri: str, database: str) -> None:
         self.client = AsyncMongoClient(uri, uuidRepresentation="standard")
@@ -14,6 +18,7 @@ class MongoRepository(Repository):
 
     async def initialize(self) -> None:
         await self.db.users.create_index("email", unique=True)
+        await self.db.sessions.create_index("id", unique=True)
         await self.db.sessions.create_index("expires_at", expireAfterSeconds=0)
         await self.db.sessions.create_index([("user_id", ASCENDING), ("updated_at", -1)])
         await self.db.study_records.create_index("session_id", unique=True)
@@ -58,7 +63,28 @@ class MongoRepository(Repository):
         await self.db.email_verification_tokens.delete_many({"user_id": user_id})
         await self.db.password_reset_tokens.delete_many({"user_id": user_id})
     async def save_session(self, session: Session) -> Session:
-        await self.db.sessions.replace_one({"id": session.id}, session.model_dump(mode="python"), upsert=True)
+        expected_version = session.version
+        next_version = expected_version + 1
+        document = session.model_dump(mode="python")
+        document["version"] = next_version
+        if expected_version == 0:
+            result = await self.db.sessions.replace_one(
+                {"id": session.id, "$or": [{"version": 0}, {"version": {"$exists": False}}]},
+                document,
+                upsert=False,
+            )
+            if result.matched_count == 0:
+                try:
+                    await self.db.sessions.insert_one(document)
+                except DuplicateKeyError as exc:
+                    raise ConcurrentSessionUpdateError("Session was updated by another request") from exc
+        else:
+            result = await self.db.sessions.replace_one(
+                {"id": session.id, "version": expected_version}, document, upsert=False
+            )
+            if result.matched_count == 0:
+                raise ConcurrentSessionUpdateError("Session was updated by another request")
+        session.version = next_version
         return session
     async def get_session(self, session_id: UUID, user_id: UUID) -> Session | None:
         doc = await self.db.sessions.find_one({"id": session_id, "user_id": user_id, "expires_at": {"$gt": utcnow()}})

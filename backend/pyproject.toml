@@ -2,6 +2,7 @@
 pythonpath = [".", ".."]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = ["mongo_integration: requires TEST_MONGODB_URI and uses a disposable real MongoDB database"]
 
 [tool.ruff]
 line-length = 110
