@@ -56,6 +56,8 @@ Set `PILOT_ACCESS_CODE` to the code supplied to pilot participants, `PILOT_STUDY
 
 The researcher dashboard and CSV export deliberately exclude names, email addresses, passwords, conversation text, audio, custom scenario wording, and saved takeaways. CSV rows contain pseudonymous participant/session identifiers, timestamps, turn counts, scenario identifiers, difficulty, completion reason, and questionnaire ratings. Keep `PILOT_ACCESS_CODE` and the researcher allowlist private; neither replaces normal account authentication.
 
+Enrolled participants can withdraw from the study in Settings without deleting their AffectLab account. Withdrawal is timestamped, immediately excludes the participant from future researcher dashboards and CSV exports, and deletes study questionnaires and research-event telemetry still held in active sessions. Ordinary conversations, feedback, and takeaways remain available to the account holder. The interface explains that data already irreversibly anonymised or included in completed aggregate analysis may no longer be identifiable and therefore may not be removable. Re-enrollment is intentionally blocked after withdrawal.
+
 ## Run services locally
 
 Start MongoDB on `localhost:27017`, then:

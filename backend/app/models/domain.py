@@ -208,6 +208,12 @@ class StudyConsentRecord(BaseModel):
     data_processing_accepted: bool = True
 
 
+class StudyWithdrawalRecord(BaseModel):
+    withdrawn_at: datetime = Field(default_factory=utcnow)
+    consent_version: str
+    data_action: str = "study_questionnaires_and_research_events_deleted"
+
+
 class User(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     email: str
@@ -227,6 +233,7 @@ class User(BaseModel):
     custom_scenarios: list[RolePlayScenario] = Field(default_factory=list)
     pilot_enrolled_at: datetime | None = None
     study_consent: StudyConsentRecord | None = None
+    study_withdrawal: StudyWithdrawalRecord | None = None
     created_at: datetime = Field(default_factory=utcnow)
 
 

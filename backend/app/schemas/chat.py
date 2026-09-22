@@ -44,6 +44,8 @@ class UserResponse(BaseModel):
     pilot_enrolled: bool = False
     study_consent_version: str | None = None
     study_consented_at: str | None = None
+    study_withdrawn: bool = False
+    study_withdrawn_at: str | None = None
     participant_id: UUID
 
 
@@ -78,6 +80,18 @@ class StudyInformationResponse(BaseModel):
     researcher: StudyContact
     supervisor: StudyContact
     institution: str
+
+
+class StudyWithdrawalRequest(BaseModel):
+    confirm_withdrawal: bool = False
+
+
+class StudyWithdrawalResponse(BaseModel):
+    user: UserResponse
+    questionnaires_deleted: int
+    research_events_deleted: int
+    message: str
+    anonymized_analysis_notice: str
 
 
 class ProfileUpdateRequest(BaseModel):

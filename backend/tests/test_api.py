@@ -269,6 +269,54 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
             personal_export = client.get("/api/auth/research-export", headers=participant_headers).json()
             assert personal_export["study_consent"]["version"] == version
             assert personal_export["study_consent"]["accepted_at"]
+
+            client.put(
+                f"/api/sessions/{session_id}/questionnaires/pre",
+                headers=participant_headers,
+                json={"confidence": 4, "anxiety": 6},
+            )
+            unconfirmed = client.post(
+                "/api/research/withdraw",
+                headers=participant_headers,
+                json={"confirm_withdrawal": False},
+            )
+            assert unconfirmed.status_code == 400
+            withdrawn = client.post(
+                "/api/research/withdraw",
+                headers=participant_headers,
+                json={"confirm_withdrawal": True},
+            )
+            assert withdrawn.status_code == 200
+            withdrawal = withdrawn.json()
+            assert withdrawal["user"]["study_withdrawn"] is True
+            assert withdrawal["user"]["pilot_enrolled"] is False
+            assert withdrawal["user"]["study_withdrawn_at"]
+            assert withdrawal["questionnaires_deleted"] == 1
+            assert withdrawal["research_events_deleted"] > 0
+            assert "irreversibly anonymised" in withdrawal["anonymized_analysis_notice"]
+
+            retained_session = client.get(
+                f"/api/sessions/{session_id}", headers=participant_headers
+            )
+            assert retained_session.status_code == 200
+            assert "private pilot conversation text" in retained_session.text
+            withdrawn_export = client.get(
+                "/api/auth/research-export", headers=participant_headers
+            ).json()
+            assert withdrawn_export["study_withdrawal"]["withdrawn_at"]
+            assert withdrawn_export["sessions"][0]["questionnaires"] == {}
+            assert withdrawn_export["sessions"][0]["events"] == []
+            assert client.get(
+                "/api/research/dashboard", headers=researcher_headers
+            ).json()["participants"] == 0
+            assert participant_id not in client.get(
+                "/api/research/export.csv", headers=researcher_headers
+            ).text
+            assert client.post(
+                "/api/research/enroll",
+                headers=participant_headers,
+                json={"access_code": "pilot-code-2026", **consent},
+            ).status_code == 409
     finally:
         settings.researcher_emails, settings.pilot_access_code = previous_emails, previous_code
 

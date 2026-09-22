@@ -1,4 +1,4 @@
-import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, UserProfile } from '../types/api'
+import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, StudyWithdrawal, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -42,6 +42,7 @@ export const api = {
   researchExport: () => request<ResearchExport>('/auth/research-export'),
   studyInformation: () => request<StudyInformation>('/research/study-information'),
   enrollPilot: (data:{access_code:string;consent_version:string;information_sheet_read:boolean;research_participation_accepted:boolean;data_processing_accepted:boolean}) => request<UserProfile>('/research/enroll',{method:'POST',body:JSON.stringify(data)}),
+  withdrawFromStudy: () => request<StudyWithdrawal>('/research/withdraw',{method:'POST',body:JSON.stringify({confirm_withdrawal:true})}),
   researchDashboard: () => request<ResearchDashboardData>('/research/dashboard'),
   researchCsv: () => download('/research/export.csv'),
   logout: async () => { await request('/auth/logout', { method: 'POST' }); api.clearToken() },

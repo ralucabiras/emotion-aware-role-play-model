@@ -18,7 +18,14 @@ from app.core.container import (
     get_repository,
     get_transcription_service,
 )
-from app.models.domain import Difficulty, RolePlayScenario, StudyConsentRecord, User, utcnow
+from app.models.domain import (
+    Difficulty,
+    RolePlayScenario,
+    StudyConsentRecord,
+    StudyWithdrawalRecord,
+    User,
+    utcnow,
+)
 from app.schemas.chat import (
     AudioTranscriptionRequest,
     AudioTranscriptionResponse,
@@ -49,6 +56,8 @@ from app.schemas.chat import (
     StudyInformationResponse,
     StudyQuestionnaireRequest,
     StudyQuestionnaireResponse,
+    StudyWithdrawalRequest,
+    StudyWithdrawalResponse,
     TakeawayRequest,
     UserResponse,
 )
@@ -79,6 +88,7 @@ def has_current_study_consent(user: User) -> bool:
         user.pilot_enrolled_at
         and user.study_consent
         and user.study_consent.version == settings.study_consent_version
+        and not user.study_withdrawal
     )
 
 
@@ -172,6 +182,8 @@ def user_response(user: User) -> UserResponse:
         pilot_enrolled=has_current_study_consent(user),
         study_consent_version=user.study_consent.version if user.study_consent else None,
         study_consented_at=user.study_consent.accepted_at.isoformat() if user.study_consent else None,
+        study_withdrawn=bool(user.study_withdrawal),
+        study_withdrawn_at=(user.study_withdrawal.withdrawn_at.isoformat() if user.study_withdrawal else None),
         participant_id=user.participant_id,
     )
 
@@ -285,6 +297,7 @@ async def research_export(
         "participant_id": str(user.participant_id),
         "account_privacy_acceptance": {"version": user.consent_version, "accepted_at": user.consented_at},
         "study_consent": user.study_consent.model_dump(mode="json") if user.study_consent else None,
+        "study_withdrawal": user.study_withdrawal.model_dump(mode="json") if user.study_withdrawal else None,
         "practice_goals": [goal.value for goal in user.practice_goals],
         "contains_conversation_text": False,
         "sessions": [
@@ -360,6 +373,8 @@ async def enroll_in_pilot(
         raise HTTPException(503, "Pilot enrollment is not configured")
     if not hmac.compare_digest(request.access_code, settings.pilot_access_code):
         raise HTTPException(400, "The pilot access code is not valid")
+    if user.study_withdrawal:
+        raise HTTPException(409, "This account has withdrawn from the pilot study")
     if request.consent_version != settings.study_consent_version:
         raise HTTPException(409, "The participant information has changed. Review the current version before consenting.")
     if not all((request.information_sheet_read, request.research_participation_accepted, request.data_processing_accepted)):
@@ -374,6 +389,41 @@ async def enroll_in_pilot(
     )
     await repository.save_user(user)
     return user_response(user)
+
+
+@router.post("/research/withdraw", response_model=StudyWithdrawalResponse)
+async def withdraw_from_study(
+    request: StudyWithdrawalRequest,
+    user: User = Depends(current_user),
+    repository=Depends(get_repository),
+):
+    if not request.confirm_withdrawal:
+        raise HTTPException(400, "Explicit withdrawal confirmation is required")
+    if not user.study_consent or not user.pilot_enrolled_at:
+        raise HTTPException(409, "This account is not enrolled in the pilot study")
+    if user.study_withdrawal:
+        raise HTTPException(409, "This account has already withdrawn from the pilot study")
+
+    questionnaires_deleted = 0
+    research_events_deleted = 0
+    for session in await repository.list_sessions(user.id):
+        questionnaires_deleted += len(session.questionnaires)
+        research_events_deleted += len(session.research_events)
+        session.questionnaires = {}
+        session.research_events = []
+        await repository.save_session(session)
+
+    user.study_withdrawal = StudyWithdrawalRecord(consent_version=user.study_consent.version)
+    await repository.save_user(user)
+    return StudyWithdrawalResponse(
+        user=user_response(user),
+        questionnaires_deleted=questionnaires_deleted,
+        research_events_deleted=research_events_deleted,
+        message="You have withdrawn from the pilot study. Your AffectLab account remains available.",
+        anonymized_analysis_notice=(
+            "Your account is excluded from future research exports. Study questionnaires and research-event telemetry still held by AffectLab were deleted. Data already irreversibly anonymised or included in completed aggregate analysis may no longer be identifiable and therefore may not be removable."
+        ),
+    )
 
 
 async def pilot_dataset(repository):
