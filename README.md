@@ -58,6 +58,8 @@ The researcher dashboard and CSV export deliberately exclude names, email addres
 
 Enrolled participants can withdraw from the study in Settings without deleting their AffectLab account. Withdrawal is timestamped, immediately excludes the participant from future researcher dashboards and CSV exports, and deletes study questionnaires and research-event telemetry still held in active sessions. Ordinary conversations, feedback, and takeaways remain available to the account holder. The interface explains that data already irreversibly anonymised or included in completed aggregate analysis may no longer be identifiable and therefore may not be removable. Re-enrollment is intentionally blocked after withdrawal.
 
+Research analysis data is stored separately in the `study_records` collection and does not inherit the 30-day session expiry. Set `STUDY_RECORD_RETENTION_DAYS` and keep the participant-facing `STUDY_RETENTION_PERIOD` statement consistent with the approved protocol. MongoDB applies a TTL index to `retention_expires_at`. Each activity refreshes that explicit deadline. Records contain pseudonymous participant/session identifiers, consent version, timestamps, turn counts, scenario and completion fields, numeric feedback metrics, questionnaire ratings, generation source, and text-free event properties. They exclude names, email, conversation text, audio, custom scenario wording, feedback prose, and takeaways. Active post-consent session data is safely projected into this collection at startup; pre-consent events and questionnaire responses are not copied.
+
 ## Run services locally
 
 Start MongoDB on `localhost:27017`, then:

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     access_token_minutes: int = 15
     refresh_token_days: int = 7
     session_retention_days: int = 30
+    study_record_retention_days: int = 365
     openai_api_key: str | None = None
     openai_model: str = "gpt-5.6"
     openai_timeout_seconds: float = 20
@@ -41,7 +42,7 @@ class Settings(BaseSettings):
     password_reset_minutes: int = 30
     research_consent_version: str = "2026-08-18-v1"
     study_consent_version: str = "2026-09-21-v1"
-    study_retention_period: str = "Research records are retained until the dissertation assessment is complete, then deleted or irreversibly anonymised in accordance with the approved university protocol. Active conversation sessions expire after 30 days of inactivity."
+    study_retention_period: str = "Minimized pseudonymous study records are retained for 365 days after their most recent study activity, then automatically deleted. Active conversation sessions expire separately after 30 days of inactivity."
     study_researcher_name: str = "Raluca Biras"
     study_researcher_email: str = "calmai.etherapy@gmail.com"
     study_supervisor_name: str = "To be confirmed"

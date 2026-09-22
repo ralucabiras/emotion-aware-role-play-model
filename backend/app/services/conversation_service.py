@@ -12,6 +12,7 @@ from app.models.domain import (
     RolePlayStatus,
     Session,
     StudyQuestionnaire,
+    StudyRecord,
     utcnow,
 )
 from app.repositories.base import Repository
@@ -40,12 +41,24 @@ class ConversationService:
     async def create_session(self, user_id: UUID) -> Session:
         session = Session(user_id=user_id)
         session.research_events.append(ResearchEvent(name="session_created"))
-        return await self.repository.save_session(session)
+        await self.save(session)
+        return session
     async def get_session(self, session_id: UUID, user_id: UUID) -> Session:
         session = await self.repository.get_session(session_id, user_id)
         if not session: raise SessionNotFoundError
         return session
     async def list_sessions(self, user_id: UUID) -> list[Session]: return await self.repository.list_sessions(user_id)
+    async def backfill_active_study_records(self) -> None:
+        for user in await self.repository.list_users():
+            if not (
+                user.pilot_enrolled_at
+                and user.study_consent
+                and user.study_consent.version == settings.study_consent_version
+                and not user.study_withdrawal
+            ):
+                continue
+            for session in await self.repository.list_sessions(user.id):
+                await self.sync_study_record(session)
     async def delete_session(self, session_id: UUID, user_id: UUID) -> None:
         if not await self.repository.delete_session(session_id, user_id): raise SessionNotFoundError
     async def rename_session(self, session_id: UUID, user_id: UUID, title: str) -> Session:
@@ -62,6 +75,52 @@ class ConversationService:
     async def save(self, session: Session) -> None:
         session.updated_at, session.expires_at = utcnow(), utcnow() + timedelta(days=settings.session_retention_days)
         await self.repository.save_session(session)
+        await self.sync_study_record(session)
+    async def sync_study_record(self, session: Session) -> None:
+        user = await self.repository.get_user(session.user_id)
+        if not (
+            user
+            and user.pilot_enrolled_at
+            and user.study_consent
+            and user.study_consent.version == settings.study_consent_version
+            and not user.study_withdrawal
+        ):
+            return
+        consented_at = user.study_consent.accepted_at
+        roleplay = session.roleplay if session.roleplay and session.roleplay.started_at >= consented_at else None
+        feedback = (
+            session.feedback
+            if session.feedback and roleplay and roleplay.completed_at and roleplay.completed_at >= consented_at
+            else None
+        )
+        questionnaires = {
+            phase: answer
+            for phase, answer in session.questionnaires.items()
+            if answer.submitted_at >= consented_at
+        }
+        events = [event for event in session.research_events if event.created_at >= consented_at]
+        post_consent_turn_count = sum(turn.created_at >= consented_at for turn in session.turns)
+        if not (post_consent_turn_count or roleplay or questionnaires or events):
+            return
+        await self.repository.save_study_record(StudyRecord(
+            user_id=user.id,
+            participant_id=user.participant_id,
+            session_id=session.id,
+            consent_version=user.study_consent.version,
+            enrolled_at=user.pilot_enrolled_at,
+            session_created_at=session.created_at,
+            last_activity_at=session.updated_at,
+            retention_expires_at=utcnow() + timedelta(days=settings.study_record_retention_days),
+            turn_count=post_consent_turn_count,
+            scenario_id=roleplay.scenario_id if roleplay else None,
+            difficulty=roleplay.difficulty_level if roleplay else None,
+            completion_reason=roleplay.completion_reason if roleplay else None,
+            feedback_metrics=feedback.metrics if feedback else [],
+            feedback_generation_source=feedback.generation_source if feedback else None,
+            questionnaires=questionnaires,
+            events=events,
+            updated_at=utcnow(),
+        ))
     async def chat(self, session_id: UUID, user_id: UUID, message: str) -> tuple[ConversationTurn, AgentDecision, Session]:
         session = await self.get_session(session_id, user_id)
         if session.title == "New reflection":

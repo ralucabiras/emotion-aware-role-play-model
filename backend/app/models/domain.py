@@ -251,3 +251,25 @@ class Session(BaseModel):
     takeaway: str = ""
     questionnaires: dict[str, StudyQuestionnaire] = Field(default_factory=dict)
     research_events: list[ResearchEvent] = Field(default_factory=list)
+
+
+class StudyRecord(BaseModel):
+    id: UUID = Field(default_factory=uuid4)
+    user_id: UUID
+    participant_id: UUID
+    session_id: UUID
+    consent_version: str
+    enrolled_at: datetime
+    session_created_at: datetime
+    last_activity_at: datetime
+    retention_expires_at: datetime
+    turn_count: int = 0
+    scenario_id: str | None = None
+    difficulty: Difficulty | None = None
+    completion_reason: str | None = None
+    feedback_metrics: list[FeedbackMetric] = Field(default_factory=list)
+    feedback_generation_source: str | None = None
+    questionnaires: dict[str, StudyQuestionnaire] = Field(default_factory=dict)
+    events: list[ResearchEvent] = Field(default_factory=list)
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)

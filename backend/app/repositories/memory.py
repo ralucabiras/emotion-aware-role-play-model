@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from app.models.domain import Session, User, utcnow
+from app.models.domain import Session, StudyRecord, User, utcnow
 from app.repositories.base import Repository
 
 
@@ -9,6 +9,7 @@ class MemoryRepository(Repository):
     def __init__(self) -> None:
         self.users: dict[UUID, User] = {}
         self.sessions: dict[UUID, Session] = {}
+        self.study_records: dict[UUID, StudyRecord] = {}
         self.tokens: dict[str, tuple[UUID, str, datetime]] = {}
         self.email_verification_tokens: dict[str, tuple[UUID, datetime]] = {}
         self.password_reset_tokens: dict[str, tuple[UUID, datetime]] = {}
@@ -29,6 +30,7 @@ class MemoryRepository(Repository):
     async def delete_user(self, user_id: UUID) -> None:
         self.users.pop(user_id, None)
         self.sessions = {key: val for key, val in self.sessions.items() if val.user_id != user_id}
+        await self.delete_study_records(user_id)
         await self.revoke_user_tokens(user_id)
         self.email_verification_tokens = {
             digest: record
@@ -53,6 +55,22 @@ class MemoryRepository(Repository):
             del self.sessions[session_id]
             return True
         return False
+    async def save_study_record(self, record: StudyRecord) -> StudyRecord:
+        existing = next((item for item in self.study_records.values() if item.session_id == record.session_id), None)
+        if existing:
+            record.id, record.created_at = existing.id, existing.created_at
+        self.study_records[record.id] = record
+        return record
+    async def list_study_records(self, user_id: UUID | None = None) -> list[StudyRecord]:
+        records = [record for record in self.study_records.values() if record.retention_expires_at > utcnow()]
+        if user_id is not None:
+            records = [record for record in records if record.user_id == user_id]
+        return sorted(records, key=lambda record: record.last_activity_at, reverse=True)
+    async def delete_study_records(self, user_id: UUID) -> int:
+        matching = [key for key, record in self.study_records.items() if record.user_id == user_id]
+        for key in matching:
+            del self.study_records[key]
+        return len(matching)
     async def store_refresh_token(self, token_id: str, user_id: UUID, digest: str, expires_at) -> None:
         self.tokens[token_id] = (user_id, digest, expires_at)
     async def rotate_refresh_token(self, token_id: str, digest: str) -> UUID | None:

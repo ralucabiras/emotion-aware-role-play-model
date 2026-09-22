@@ -3,7 +3,7 @@ from uuid import UUID
 from pymongo import ASCENDING, AsyncMongoClient
 from pymongo.errors import DuplicateKeyError
 
-from app.models.domain import Session, User, utcnow
+from app.models.domain import Session, StudyRecord, User, utcnow
 from app.repositories.base import Repository
 
 
@@ -16,6 +16,9 @@ class MongoRepository(Repository):
         await self.db.users.create_index("email", unique=True)
         await self.db.sessions.create_index("expires_at", expireAfterSeconds=0)
         await self.db.sessions.create_index([("user_id", ASCENDING), ("updated_at", -1)])
+        await self.db.study_records.create_index("session_id", unique=True)
+        await self.db.study_records.create_index([("user_id", ASCENDING), ("last_activity_at", -1)])
+        await self.db.study_records.create_index("retention_expires_at", expireAfterSeconds=0)
         await self.db.refresh_tokens.create_index("expires_at", expireAfterSeconds=0)
         await self.db.email_verification_tokens.create_index("expires_at", expireAfterSeconds=0)
         await self.db.email_verification_tokens.create_index("user_id", unique=True)
@@ -49,6 +52,7 @@ class MongoRepository(Repository):
     async def delete_user(self, user_id: UUID) -> None:
         await self.db.users.delete_one({"id": user_id})
         await self.db.sessions.delete_many({"user_id": user_id})
+        await self.db.study_records.delete_many({"user_id": user_id})
         await self.db.refresh_tokens.delete_many({"user_id": user_id})
         await self.db.email_verification_tokens.delete_many({"user_id": user_id})
         await self.db.password_reset_tokens.delete_many({"user_id": user_id})
@@ -63,6 +67,23 @@ class MongoRepository(Repository):
         return [Session.model_validate(doc) for doc in docs]
     async def delete_session(self, session_id: UUID, user_id: UUID) -> bool:
         return (await self.db.sessions.delete_one({"id": session_id, "user_id": user_id})).deleted_count == 1
+    async def save_study_record(self, record: StudyRecord) -> StudyRecord:
+        document = record.model_dump(mode="python")
+        record_id, created_at = document.pop("id"), document.pop("created_at")
+        await self.db.study_records.update_one(
+            {"session_id": record.session_id},
+            {"$set": document, "$setOnInsert": {"id": record_id, "created_at": created_at}},
+            upsert=True,
+        )
+        return record
+    async def list_study_records(self, user_id: UUID | None = None) -> list[StudyRecord]:
+        query = {"retention_expires_at": {"$gt": utcnow()}}
+        if user_id is not None:
+            query["user_id"] = user_id
+        docs = await self.db.study_records.find(query).sort("last_activity_at", -1).to_list(None)
+        return [StudyRecord.model_validate(doc) for doc in docs]
+    async def delete_study_records(self, user_id: UUID) -> int:
+        return (await self.db.study_records.delete_many({"user_id": user_id})).deleted_count
     async def store_refresh_token(self, token_id: str, user_id: UUID, digest: str, expires_at) -> None:
         await self.db.refresh_tokens.insert_one({"token_id": token_id, "user_id": user_id, "digest": digest, "expires_at": expires_at})
     async def rotate_refresh_token(self, token_id: str, digest: str) -> UUID | None:

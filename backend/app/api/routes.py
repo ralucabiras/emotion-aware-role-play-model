@@ -291,32 +291,34 @@ async def complete_onboarding(
 async def research_export(
     user: User = Depends(current_user), repository=Depends(get_repository)
 ):
-    sessions = await repository.list_sessions(user.id)
+    records = await repository.list_study_records(user.id)
     return {
-        "schema_version": "affectlab-research-export-v1",
+        "schema_version": "affectlab-research-export-v2",
         "participant_id": str(user.participant_id),
         "account_privacy_acceptance": {"version": user.consent_version, "accepted_at": user.consented_at},
         "study_consent": user.study_consent.model_dump(mode="json") if user.study_consent else None,
         "study_withdrawal": user.study_withdrawal.model_dump(mode="json") if user.study_withdrawal else None,
         "practice_goals": [goal.value for goal in user.practice_goals],
         "contains_conversation_text": False,
-        "sessions": [
+        "records": [
             {
-                "session_id": str(session.id),
-                "created_at": session.created_at,
-                "updated_at": session.updated_at,
-                "turn_count": len(session.turns),
-                "roleplay": session.roleplay.model_dump(mode="json") if session.roleplay else None,
-                "feedback_metrics": [
-                    metric.model_dump(mode="json") for metric in session.feedback.metrics
-                ] if session.feedback else [],
+                "session_id": str(record.session_id),
+                "session_created_at": record.session_created_at,
+                "last_activity_at": record.last_activity_at,
+                "retention_expires_at": record.retention_expires_at,
+                "turn_count": record.turn_count,
+                "scenario_id": record.scenario_id,
+                "difficulty": record.difficulty,
+                "completion_reason": record.completion_reason,
+                "feedback_metrics": [metric.model_dump(mode="json") for metric in record.feedback_metrics],
+                "feedback_generation_source": record.feedback_generation_source,
                 "questionnaires": {
                     phase: answer.model_dump(mode="json")
-                    for phase, answer in session.questionnaires.items()
+                    for phase, answer in record.questionnaires.items()
                 },
-                "events": [event.model_dump(mode="json") for event in session.research_events],
+                "events": [event.model_dump(mode="json") for event in record.events],
             }
-            for session in sessions
+            for record in records
         ],
     }
 
@@ -404,14 +406,14 @@ async def withdraw_from_study(
     if user.study_withdrawal:
         raise HTTPException(409, "This account has already withdrawn from the pilot study")
 
-    questionnaires_deleted = 0
-    research_events_deleted = 0
+    records = await repository.list_study_records(user.id)
+    questionnaires_deleted = sum(len(record.questionnaires) for record in records)
+    research_events_deleted = sum(len(record.events) for record in records)
     for session in await repository.list_sessions(user.id):
-        questionnaires_deleted += len(session.questionnaires)
-        research_events_deleted += len(session.research_events)
         session.questionnaires = {}
         session.research_events = []
         await repository.save_session(session)
+    await repository.delete_study_records(user.id)
 
     user.study_withdrawal = StudyWithdrawalRecord(consent_version=user.study_consent.version)
     await repository.save_user(user)
@@ -428,6 +430,7 @@ async def withdraw_from_study(
 
 async def pilot_dataset(repository):
     users = [user for user in await repository.list_users() if has_current_study_consent(user)]
+    all_records = await repository.list_study_records()
     records = []
     metric_values: dict[str, list[float]] = defaultdict(list)
     scenarios: dict[str, int] = defaultdict(int)
@@ -436,28 +439,28 @@ async def pilot_dataset(repository):
     generation_sources: dict[str, int] = defaultdict(int)
     total_sessions = completed = 0
     for user in users:
-        sessions = await repository.list_sessions(user.id)
-        total_sessions += len(sessions)
-        user_completed = sum(bool(session.feedback) for session in sessions)
+        study_records = [record for record in all_records if record.user_id == user.id]
+        total_sessions += len(study_records)
+        user_completed = sum(bool(record.completion_reason) for record in study_records)
         completed += user_completed
-        last_active = max((session.updated_at for session in sessions), default=user.pilot_enrolled_at)
+        last_active = max((record.last_activity_at for record in study_records), default=user.pilot_enrolled_at)
         records.append({
             "participant_id": str(user.participant_id),
             "enrolled_at": user.pilot_enrolled_at,
             "last_active_at": last_active,
-            "sessions": len(sessions),
+            "sessions": len(study_records),
             "completed_rehearsals": user_completed,
-            "pre_questionnaires": sum("pre" in session.questionnaires for session in sessions),
-            "post_questionnaires": sum("post" in session.questionnaires for session in sessions),
+            "pre_questionnaires": sum("pre" in record.questionnaires for record in study_records),
+            "post_questionnaires": sum("post" in record.questionnaires for record in study_records),
         })
-        for session in sessions:
-            if session.roleplay:
-                scenarios[session.roleplay.scenario_id] += int(bool(session.feedback))
-                difficulties[session.roleplay.difficulty_level.value] += int(bool(session.feedback))
-            if session.feedback:
-                generation_sources[session.feedback.generation_source] += 1
-                for metric in session.feedback.metrics: metric_values[metric.name].append(metric.score)
-            for answer in session.questionnaires.values():
+        for record in study_records:
+            if record.scenario_id and record.completion_reason:
+                scenarios[record.scenario_id] += 1
+                if record.difficulty: difficulties[record.difficulty.value] += 1
+            if record.feedback_generation_source:
+                generation_sources[record.feedback_generation_source] += 1
+                for metric in record.feedback_metrics: metric_values[metric.name].append(metric.score)
+            for answer in record.questionnaires.values():
                 for name in ("confidence", "anxiety", "realism", "usefulness"):
                     value = getattr(answer, name)
                     if value is not None: questionnaires[f"{answer.phase}_{name}"].append(value)
@@ -491,14 +494,14 @@ async def research_csv(user: User = Depends(researcher_user), repository=Depends
     fields = ["participant_id", "session_id", "created_at", "updated_at", "turn_count", "scenario_id", "difficulty", "completion_reason", "pre_confidence", "pre_anxiety", "post_confidence", "post_realism", "post_usefulness"]
     writer = csv.DictWriter(output, fieldnames=fields); writer.writeheader()
     for participant in users:
-        for session in await repository.list_sessions(participant.id):
-            pre, post = session.questionnaires.get("pre"), session.questionnaires.get("post")
+        for record in await repository.list_study_records(participant.id):
+            pre, post = record.questionnaires.get("pre"), record.questionnaires.get("post")
             writer.writerow({
-                "participant_id": participant.participant_id, "session_id": session.id,
-                "created_at": session.created_at.isoformat(), "updated_at": session.updated_at.isoformat(),
-                "turn_count": len(session.turns), "scenario_id": session.roleplay.scenario_id if session.roleplay else "",
-                "difficulty": session.roleplay.difficulty_level.value if session.roleplay else "",
-                "completion_reason": session.roleplay.completion_reason if session.roleplay else "",
+                "participant_id": participant.participant_id, "session_id": record.session_id,
+                "created_at": record.session_created_at.isoformat(), "updated_at": record.last_activity_at.isoformat(),
+                "turn_count": record.turn_count, "scenario_id": record.scenario_id or "",
+                "difficulty": record.difficulty.value if record.difficulty else "",
+                "completion_reason": record.completion_reason or "",
                 "pre_confidence": pre.confidence if pre else "", "pre_anxiety": pre.anxiety if pre else "",
                 "post_confidence": post.confidence if post else "", "post_realism": post.realism if post else "",
                 "post_usefulness": post.usefulness if post else "",

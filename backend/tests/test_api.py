@@ -304,8 +304,7 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
                 "/api/auth/research-export", headers=participant_headers
             ).json()
             assert withdrawn_export["study_withdrawal"]["withdrawn_at"]
-            assert withdrawn_export["sessions"][0]["questionnaires"] == {}
-            assert withdrawn_export["sessions"][0]["events"] == []
+            assert withdrawn_export["records"] == []
             assert client.get(
                 "/api/research/dashboard", headers=researcher_headers
             ).json()["participants"] == 0
@@ -353,28 +352,48 @@ def test_password_reset_is_generic_single_use_and_changes_credentials() -> None:
 
 
 def test_research_questionnaires_and_export_exclude_identity_and_conversation_text() -> None:
-    with TestClient(app) as client:
-        headers = auth(client, "research@example.com")
-        session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
-        pre = client.put(
-            f"/api/sessions/{session_id}/questionnaires/pre",
-            headers=headers,
-            json={"confidence": 3, "anxiety": 6},
-        )
-        assert pre.status_code == 200
-        client.post(
-            "/api/chat",
-            headers=headers,
-            json={"session_id": session_id, "message": "private conversation wording"},
-        )
-        export = client.get("/api/auth/research-export", headers=headers)
-        assert export.status_code == 200
-        body = export.json()
-        assert body["contains_conversation_text"] is False
-        assert body["sessions"][0]["questionnaires"]["pre"]["anxiety"] == 6
-        serialized = export.text
-        assert "private conversation wording" not in serialized
-        assert "research@example.com" not in serialized
+    previous_code = settings.pilot_access_code
+    settings.pilot_access_code = "research-export-code"
+    try:
+        with TestClient(app) as client:
+            headers = auth(client, "research@example.com")
+            version = client.get(
+                "/api/research/study-information", headers=headers
+            ).json()["version"]
+            enrolled = client.post(
+                "/api/research/enroll",
+                headers=headers,
+                json={
+                    "access_code": "research-export-code",
+                    "consent_version": version,
+                    "information_sheet_read": True,
+                    "research_participation_accepted": True,
+                    "data_processing_accepted": True,
+                },
+            )
+            assert enrolled.status_code == 200
+            session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+            pre = client.put(
+                f"/api/sessions/{session_id}/questionnaires/pre",
+                headers=headers,
+                json={"confidence": 3, "anxiety": 6},
+            )
+            assert pre.status_code == 200
+            client.post(
+                "/api/chat",
+                headers=headers,
+                json={"session_id": session_id, "message": "private conversation wording"},
+            )
+            export = client.get("/api/auth/research-export", headers=headers)
+            assert export.status_code == 200
+            body = export.json()
+            assert body["contains_conversation_text"] is False
+            assert body["records"][0]["questionnaires"]["pre"]["anxiety"] == 6
+            serialized = export.text
+            assert "private conversation wording" not in serialized
+            assert "research@example.com" not in serialized
+    finally:
+        settings.pilot_access_code = previous_code
 
 
 def test_multimodal_endpoint_is_authenticated_and_explicitly_unavailable_by_default() -> None:

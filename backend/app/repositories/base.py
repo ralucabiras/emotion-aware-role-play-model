@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from app.models.domain import Session, User
+from app.models.domain import Session, StudyRecord, User
 
 
 class Repository(ABC):
@@ -27,6 +27,12 @@ class Repository(ABC):
     async def list_sessions(self, user_id: UUID) -> list[Session]: ...
     @abstractmethod
     async def delete_session(self, session_id: UUID, user_id: UUID) -> bool: ...
+    @abstractmethod
+    async def save_study_record(self, record: StudyRecord) -> StudyRecord: ...
+    @abstractmethod
+    async def list_study_records(self, user_id: UUID | None = None) -> list[StudyRecord]: ...
+    @abstractmethod
+    async def delete_study_records(self, user_id: UUID) -> int: ...
     @abstractmethod
     async def store_refresh_token(self, token_id: str, user_id: UUID, digest: str, expires_at) -> None: ...
     @abstractmethod

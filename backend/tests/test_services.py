@@ -2,7 +2,15 @@ from datetime import timedelta
 
 import pytest
 
-from app.models.domain import Difficulty, EmotionState, RolePlayStatus, Session, User, utcnow
+from app.models.domain import (
+    Difficulty,
+    EmotionState,
+    RolePlayStatus,
+    Session,
+    StudyRecord,
+    User,
+    utcnow,
+)
 from app.repositories.memory import MemoryRepository
 from app.services.affect_service import RuleBasedCognitiveAnalyzer, RuleBasedEmotionAnalyzer
 from app.services.auth_service import AuthenticationError, AuthService
@@ -52,11 +60,23 @@ async def test_repository_ownership_expiry_and_cascade() -> None:
     await repository.create_user(first)
     await repository.create_user(second)
     session = await repository.save_session(Session(user_id=first.id))
+    study_record = await repository.save_study_record(StudyRecord(
+        user_id=first.id,
+        participant_id=first.participant_id,
+        session_id=session.id,
+        consent_version="test-v1",
+        enrolled_at=utcnow(),
+        session_created_at=session.created_at,
+        last_activity_at=utcnow(),
+        retention_expires_at=utcnow() + timedelta(days=365),
+    ))
     assert await repository.get_session(session.id, second.id) is None
     session.expires_at = utcnow() - timedelta(seconds=1)
     assert await repository.get_session(session.id, first.id) is None
+    assert (await repository.list_study_records(first.id))[0].id == study_record.id
     await repository.delete_user(first.id)
     assert not [item for item in repository.sessions.values() if item.user_id == first.id]
+    assert not await repository.list_study_records(first.id)
 
 
 def test_scenarios_difficulty_observations_and_completion() -> None:
