@@ -45,7 +45,15 @@ class OpenAIResponseGenerator(ResponseGenerator):
         instructions = "You are AffectLab, a research social-rehearsal coach. Never diagnose, prescribe medication, claim certainty about emotions, or encourage dependency. Follow the selected support strategy. Be warm, concise, and explicitly tentative about inferred affect."
         context = {"emotion_state": session.emotion_state.model_dump(mode="json"), "strategy": strategy.value, "roleplay": session.roleplay.model_dump(mode="json") if session.roleplay else None}
         try:
-            response = await self.client.responses.create(model=settings.openai_model, instructions=instructions, input=history + [{"role":"user", "content": json.dumps({"message": message, "context": context})}])
+            response = await self.client.responses.create(
+                model=settings.openai_model,
+                instructions=instructions,
+                input=history + [{
+                    "role": "user",
+                    "content": json.dumps({"message": message, "context": context}),
+                }],
+                store=False,
+            )
             text = response.output_text.strip()
             if not text: return await self._fallback(session, message, strategy, "empty_or_refused")
             usage = getattr(response, "usage", None)
@@ -139,7 +147,13 @@ class OpenAIResponseGenerator(ResponseGenerator):
     async def phrase_feedback(self, feedback: SessionFeedback) -> SessionFeedback:
         if not self.client: return feedback
         try:
-            response = await self.client.responses.parse(model=settings.openai_model, instructions="Rephrase only the supplied evidence-backed strengths and suggestions. Do not introduce observations, diagnoses, or personality claims.", input=json.dumps(feedback.model_dump(mode="json")), text_format=FeedbackWording)
+            response = await self.client.responses.parse(
+                model=settings.openai_model,
+                instructions="Rephrase only the supplied evidence-backed strengths and suggestions. Do not introduce observations, diagnoses, or personality claims.",
+                input=json.dumps(feedback.model_dump(mode="json")),
+                text_format=FeedbackWording,
+                store=False,
+            )
             wording = response.output_parsed
             if wording:
                 feedback.strengths, feedback.suggestions, feedback.generation_source = wording.strengths, wording.suggestions, "openai_from_deterministic_metrics"

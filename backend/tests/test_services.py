@@ -8,6 +8,7 @@ from app.models.domain import (
     RolePlayStatus,
     Session,
     StudyRecord,
+    SupportStrategy,
     User,
     utcnow,
 )
@@ -135,6 +136,35 @@ async def test_openai_generator_offline_fallback_records_reason(monkeypatch) -> 
     session = Session(user_id=User(email="x@example.com", password_hash="x", consented_at=utcnow()).id)
     text, metadata = await generator.generate(session, "Help me", "validation")
     assert text and metadata.source == "template" and metadata.fallback_reason == "missing_api_key"
+
+
+@pytest.mark.asyncio
+async def test_openai_reflection_explicitly_disables_response_storage() -> None:
+    generator = OpenAIResponseGenerator()
+
+    class Response:
+        output_text = "That sounds difficult. What outcome would feel most useful?"
+        usage = None
+
+    class Responses:
+        async def create(self, **kwargs):
+            assert kwargs["store"] is False
+            return Response()
+
+    class Client:
+        responses = Responses()
+
+    generator.client = Client()
+    session = Session(
+        user_id=User(
+            email="privacy@example.com", password_hash="x", consented_at=utcnow()
+        ).id
+    )
+    text, metadata = await generator.generate(
+        session, "I need help preparing for a conversation", SupportStrategy.REFLECTION
+    )
+    assert text.startswith("That sounds difficult")
+    assert metadata.source == "openai"
 
 
 @pytest.mark.asyncio
