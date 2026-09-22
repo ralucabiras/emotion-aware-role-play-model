@@ -76,6 +76,7 @@ from app.services.roleplay_service import SCENARIOS
 from app.services.transcription_service import InvalidAudio, TranscriptionService, TranscriptionUnavailable
 
 router, bearer = APIRouter(prefix="/api"), HTTPBearer(auto_error=False)
+PROTOCOL_REQUIRED_SCENARIOS = {"workload", "boundary", "relationship"}
 
 
 def is_researcher(email: str) -> bool:
@@ -88,6 +89,7 @@ def has_current_study_consent(user: User) -> bool:
         user.pilot_enrolled_at
         and user.study_consent
         and user.study_consent.version == settings.study_consent_version
+        and user.study_consent.protocol_version == settings.study_protocol_version
         and not user.study_withdrawal
     )
 
@@ -294,6 +296,7 @@ async def research_export(
     records = await repository.list_study_records(user.id)
     return {
         "schema_version": "affectlab-research-export-v2",
+        "protocol_version": settings.study_protocol_version,
         "participant_id": str(user.participant_id),
         "account_privacy_acceptance": {"version": user.consent_version, "accepted_at": user.consented_at},
         "study_consent": user.study_consent.model_dump(mode="json") if user.study_consent else None,
@@ -303,6 +306,7 @@ async def research_export(
         "records": [
             {
                 "session_id": str(record.session_id),
+                "protocol_version": record.protocol_version,
                 "session_created_at": record.session_created_at,
                 "last_activity_at": record.last_activity_at,
                 "retention_expires_at": record.retention_expires_at,
@@ -327,6 +331,7 @@ async def research_export(
 async def study_information(user: User = Depends(current_user)):
     return StudyInformationResponse(
         version=settings.study_consent_version,
+        protocol_version=settings.study_protocol_version,
         study_label=settings.pilot_study_label,
         title="Participant information sheet",
         summary=("AffectLab is a dissertation study of whether emotion-aware reflection and adaptive role-play can support practice for difficult conversations. Taking part is voluntary and is separate from holding an AffectLab account."),
@@ -385,6 +390,7 @@ async def enroll_in_pilot(
         user.pilot_enrolled_at = utcnow()
     user.study_consent = StudyConsentRecord(
         version=settings.study_consent_version,
+        protocol_version=settings.study_protocol_version,
         information_sheet_read=request.information_sheet_read,
         research_participation_accepted=request.research_participation_accepted,
         data_processing_accepted=request.data_processing_accepted,
@@ -437,11 +443,21 @@ async def pilot_dataset(repository):
     difficulties: dict[str, int] = defaultdict(int)
     questionnaires: dict[str, list[float]] = defaultdict(list)
     generation_sources: dict[str, int] = defaultdict(int)
-    total_sessions = completed = 0
+    total_sessions = completed = protocol_completers = 0
     for user in users:
         study_records = [record for record in all_records if record.user_id == user.id]
         total_sessions += len(study_records)
         user_completed = sum(bool(record.completion_reason) for record in study_records)
+        qualifying_scenarios = {
+            record.scenario_id
+            for record in study_records
+            if record.scenario_id in PROTOCOL_REQUIRED_SCENARIOS
+            and record.difficulty == Difficulty.INTERMEDIATE
+            and record.completion_reason
+            and "post" in record.questionnaires
+        }
+        protocol_complete = qualifying_scenarios == PROTOCOL_REQUIRED_SCENARIOS
+        protocol_completers += int(protocol_complete)
         completed += user_completed
         last_active = max((record.last_activity_at for record in study_records), default=user.pilot_enrolled_at)
         records.append({
@@ -450,6 +466,7 @@ async def pilot_dataset(repository):
             "last_active_at": last_active,
             "sessions": len(study_records),
             "completed_rehearsals": user_completed,
+            "protocol_complete": protocol_complete,
             "pre_questionnaires": sum("pre" in record.questionnaires for record in study_records),
             "post_questionnaires": sum("post" in record.questionnaires for record in study_records),
         })
@@ -466,9 +483,14 @@ async def pilot_dataset(repository):
                     if value is not None: questionnaires[f"{answer.phase}_{name}"].append(value)
     return users, records, {
         "study_label": settings.pilot_study_label,
+        "protocol_version": settings.study_protocol_version,
         "generated_at": datetime.now(UTC),
         "participants": len(users), "sessions": total_sessions,
+        "participant_target": settings.study_participant_target,
         "completed_rehearsals": completed,
+        "protocol_completers": protocol_completers,
+        "completer_target": settings.study_completer_target,
+        "protocol_completion_rate": protocol_completers / len(users) if users else 0,
         "completion_rate": completed / total_sessions if total_sessions else 0,
         "scenario_completions": dict(scenarios), "difficulty_completions": dict(difficulties),
         "average_skill_scores": {name: sum(values) / len(values) for name, values in metric_values.items()},
@@ -491,12 +513,13 @@ async def research_csv(user: User = Depends(researcher_user), repository=Depends
     del user
     users = [participant for participant in await repository.list_users() if has_current_study_consent(participant)]
     output = io.StringIO()
-    fields = ["participant_id", "session_id", "created_at", "updated_at", "turn_count", "scenario_id", "difficulty", "completion_reason", "pre_confidence", "pre_anxiety", "post_confidence", "post_realism", "post_usefulness"]
+    fields = ["protocol_version", "participant_id", "session_id", "created_at", "updated_at", "turn_count", "scenario_id", "difficulty", "completion_reason", "pre_confidence", "pre_anxiety", "post_confidence", "post_realism", "post_usefulness"]
     writer = csv.DictWriter(output, fieldnames=fields); writer.writeheader()
     for participant in users:
         for record in await repository.list_study_records(participant.id):
             pre, post = record.questionnaires.get("pre"), record.questionnaires.get("post")
             writer.writerow({
+                "protocol_version": record.protocol_version,
                 "participant_id": participant.participant_id, "session_id": record.session_id,
                 "created_at": record.session_created_at.isoformat(), "updated_at": record.last_activity_at.isoformat(),
                 "turn_count": record.turn_count, "scenario_id": record.scenario_id or "",

@@ -68,6 +68,7 @@ class StudyContact(BaseModel):
 
 class StudyInformationResponse(BaseModel):
     version: str
+    protocol_version: str
     study_label: str
     title: str
     summary: str

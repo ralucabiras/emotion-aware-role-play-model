@@ -54,6 +54,7 @@ class ConversationService:
                 user.pilot_enrolled_at
                 and user.study_consent
                 and user.study_consent.version == settings.study_consent_version
+                and user.study_consent.protocol_version == settings.study_protocol_version
                 and not user.study_withdrawal
             ):
                 continue
@@ -83,6 +84,7 @@ class ConversationService:
             and user.pilot_enrolled_at
             and user.study_consent
             and user.study_consent.version == settings.study_consent_version
+            and user.study_consent.protocol_version == settings.study_protocol_version
             and not user.study_withdrawal
         ):
             return
@@ -107,6 +109,7 @@ class ConversationService:
             participant_id=user.participant_id,
             session_id=session.id,
             consent_version=user.study_consent.version,
+            protocol_version=user.study_consent.protocol_version,
             enrolled_at=user.pilot_enrolled_at,
             session_created_at=session.created_at,
             last_activity_at=session.updated_at,

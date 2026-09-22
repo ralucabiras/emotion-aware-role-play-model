@@ -202,6 +202,7 @@ class ResearchEvent(BaseModel):
 
 class StudyConsentRecord(BaseModel):
     version: str
+    protocol_version: str = "legacy-unversioned"
     accepted_at: datetime = Field(default_factory=utcnow)
     information_sheet_read: bool = True
     research_participation_accepted: bool = True
@@ -259,6 +260,7 @@ class StudyRecord(BaseModel):
     participant_id: UUID
     session_id: UUID
     consent_version: str
+    protocol_version: str = "legacy-unversioned"
     enrolled_at: datetime
     session_created_at: datetime
     last_activity_at: datetime

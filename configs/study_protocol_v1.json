@@ -1,0 +1,31 @@
+{
+  "protocol_id": "affectlab-feasibility-v1.0",
+  "status": "frozen_before_recruitment",
+  "frozen_on": "2026-09-22",
+  "design": "single_arm_within_participant_feasibility_usability_pilot",
+  "participant_target": 30,
+  "completer_target": 24,
+  "primary_outcome": {
+    "name": "protocol_completion",
+    "definition": "Completed workload, boundary, and relationship scenarios at intermediate difficulty with a post questionnaire for each",
+    "feasibility_threshold": 0.8
+  },
+  "required_tasks": [
+    {"order": 1, "scenario_id": "workload", "difficulty": "intermediate"},
+    {"order": 2, "scenario_id": "boundary", "difficulty": "intermediate"},
+    {"order": 3, "scenario_id": "relationship", "difficulty": "intermediate"}
+  ],
+  "measurements": {
+    "pre": ["confidence", "anxiety"],
+    "post": ["confidence", "realism", "usefulness"],
+    "scale": {"minimum": 1, "maximum": 7}
+  },
+  "missing_data": {
+    "primary": "noncompletion_no_imputation",
+    "secondary": "available_case_with_denominators",
+    "paired_confidence": "requires_same_task_pre_and_post",
+    "prohibited": ["mean_imputation", "last_observation_carried_forward"]
+  },
+  "multimodal_role": "exploratory_not_core_intervention",
+  "efficacy_claims_permitted": false
+}
