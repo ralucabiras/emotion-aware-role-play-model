@@ -63,6 +63,9 @@ class Settings(BaseSettings):
     minimum_participant_age: int = 18
     geographic_scope: str = "Romania"
     emergency_limitations: str = "AffectLab is not monitored, cannot contact emergency services, and does not know your location. In an emergency, call 112 in Romania or your local emergency number."
+    offline_demo_mode: bool = False
+    offline_demo_email: str = "demo@example.com"
+    offline_demo_password: str = "affectlab-offline-demo"
     rate_limit_enabled: bool = False
     rate_limit_auth_per_minute: int = 10
     rate_limit_email_per_hour: int = 5
@@ -90,6 +93,8 @@ class Settings(BaseSettings):
     def validate_deployment_security(self):
         if not self.production:
             return self
+        if self.offline_demo_mode:
+            raise ValueError("OFFLINE_DEMO_MODE cannot be enabled outside local development")
         weak = {
             "development-only-change-me-at-least-32-bytes",
             "replace-with-a-long-random-secret",

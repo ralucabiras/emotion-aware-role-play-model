@@ -1,0 +1,16 @@
+{
+  "schema_version": "affectlab-synthetic-demo-v1",
+  "synthetic": true,
+  "participant": {"name": "Demo Participant", "email": "demo@example.com"},
+  "reflection_prompts": [
+    "I am nervous about asking my manager to reprioritise my workload.",
+    "I need one task moved to next week so I can finish the client deadline well."
+  ],
+  "roleplay_turns": [
+    "Could we review my priorities for this week?",
+    "I can complete the client deadline, but I need the internal report moved to next week.",
+    "If both remain due Friday, I need help deciding which one should receive less attention."
+  ],
+  "expected_observations": ["concrete request", "specific detail", "boundary maintenance"],
+  "notice": "All people, situations, and wording in this file are fictional. It contains no IEMOCAP material or participant data."
+}

@@ -9,11 +9,30 @@ from app.api.routes import router
 from app.core.config import settings
 from app.core.container import conversation_service, repository
 from app.core.security import RateLimitMiddleware, SecurityHeadersMiddleware
+from app.models.domain import PracticeGoal, User, utcnow
+from app.services.auth_service import password_hash
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await repository.initialize()
+    if settings.offline_demo_mode:
+        demo = await repository.get_user_by_email(settings.offline_demo_email)
+        if not demo:
+            await repository.create_user(User(
+                email=settings.offline_demo_email,
+                password_hash=password_hash.hash(settings.offline_demo_password),
+                consented_at=utcnow(),
+                email_verified_at=utcnow(),
+                first_name="Demo",
+                last_name="Participant",
+                preferred_name="Demo",
+                country="Romania",
+                timezone="Europe/Bucharest",
+                practice_goals=[PracticeGoal.CLEAR_REQUESTS, PracticeGoal.ASSERTIVENESS],
+                onboarding_completed_at=utcnow(),
+                onboarding_version=settings.onboarding_version,
+            ))
     await conversation_service.backfill_active_study_records()
     yield
 
