@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from app.models.domain import Session, StudyRecord, User
+from app.models.domain import FrozenStudyExport, Session, StudyLifecycle, StudyRecord, User
 
 
 class Repository(ABC):
@@ -33,6 +33,14 @@ class Repository(ABC):
     async def list_study_records(self, user_id: UUID | None = None) -> list[StudyRecord]: ...
     @abstractmethod
     async def delete_study_records(self, user_id: UUID) -> int: ...
+    @abstractmethod
+    async def get_study_lifecycle(self, protocol_version: str) -> StudyLifecycle | None: ...
+    @abstractmethod
+    async def save_study_lifecycle(self, lifecycle: StudyLifecycle) -> StudyLifecycle: ...
+    @abstractmethod
+    async def save_frozen_export(self, export: FrozenStudyExport) -> FrozenStudyExport: ...
+    @abstractmethod
+    async def get_frozen_export(self, export_id: UUID) -> FrozenStudyExport | None: ...
     @abstractmethod
     async def store_refresh_token(self, token_id: str, user_id: UUID, digest: str, expires_at) -> None: ...
     @abstractmethod

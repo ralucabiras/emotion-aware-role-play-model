@@ -1,7 +1,14 @@
 from datetime import datetime
 from uuid import UUID
 
-from app.models.domain import Session, StudyRecord, User, utcnow
+from app.models.domain import (
+    FrozenStudyExport,
+    Session,
+    StudyLifecycle,
+    StudyRecord,
+    User,
+    utcnow,
+)
 from app.repositories.base import Repository
 
 
@@ -10,6 +17,8 @@ class MemoryRepository(Repository):
         self.users: dict[UUID, User] = {}
         self.sessions: dict[UUID, Session] = {}
         self.study_records: dict[UUID, StudyRecord] = {}
+        self.study_lifecycles: dict[str, StudyLifecycle] = {}
+        self.frozen_exports: dict[UUID, FrozenStudyExport] = {}
         self.tokens: dict[str, tuple[UUID, str, datetime]] = {}
         self.email_verification_tokens: dict[str, tuple[UUID, datetime]] = {}
         self.password_reset_tokens: dict[str, tuple[UUID, datetime]] = {}
@@ -71,6 +80,16 @@ class MemoryRepository(Repository):
         for key in matching:
             del self.study_records[key]
         return len(matching)
+    async def get_study_lifecycle(self, protocol_version: str) -> StudyLifecycle | None:
+        return self.study_lifecycles.get(protocol_version)
+    async def save_study_lifecycle(self, lifecycle: StudyLifecycle) -> StudyLifecycle:
+        self.study_lifecycles[lifecycle.protocol_version] = lifecycle
+        return lifecycle
+    async def save_frozen_export(self, export: FrozenStudyExport) -> FrozenStudyExport:
+        self.frozen_exports[export.id] = export
+        return export
+    async def get_frozen_export(self, export_id: UUID) -> FrozenStudyExport | None:
+        return self.frozen_exports.get(export_id)
     async def store_refresh_token(self, token_id: str, user_id: UUID, digest: str, expires_at) -> None:
         self.tokens[token_id] = (user_id, digest, expires_at)
     async def rotate_refresh_token(self, token_id: str, digest: str) -> UUID | None:

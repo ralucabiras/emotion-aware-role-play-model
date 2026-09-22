@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
@@ -93,6 +94,21 @@ class StudyWithdrawalResponse(BaseModel):
     research_events_deleted: int
     message: str
     anonymized_analysis_notice: str
+
+
+class StudyLifecycleUpdateRequest(BaseModel):
+    start_date: date
+    end_date: date
+
+
+class ParticipantResearchUpdateRequest(BaseModel):
+    excluded: bool
+    exclusion_reason: str = Field(default="", max_length=300)
+    data_quality_notes: str = Field(default="", max_length=500)
+
+
+class DatasetFreezeRequest(BaseModel):
+    confirm_freeze: bool = False
 
 
 class ProfileUpdateRequest(BaseModel):

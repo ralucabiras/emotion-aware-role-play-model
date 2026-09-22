@@ -1,6 +1,7 @@
 import base64
 import binascii
 import csv
+import hashlib
 import hmac
 import io
 from collections import defaultdict
@@ -20,8 +21,10 @@ from app.core.container import (
 )
 from app.models.domain import (
     Difficulty,
+    FrozenStudyExport,
     RolePlayScenario,
     StudyConsentRecord,
+    StudyLifecycle,
     StudyWithdrawalRecord,
     User,
     utcnow,
@@ -35,10 +38,12 @@ from app.schemas.chat import (
     ChatResponse,
     CreateSessionResponse,
     CustomScenarioRequest,
+    DatasetFreezeRequest,
     EmailVerificationRequest,
     MultimodalAffectRequest,
     MultimodalAffectResponse,
     OnboardingRequest,
+    ParticipantResearchUpdateRequest,
     PasswordChangeRequest,
     PasswordResetConfirmRequest,
     PasswordResetRequest,
@@ -54,6 +59,7 @@ from app.schemas.chat import (
     StartRolePlayRequest,
     StartRolePlayResponse,
     StudyInformationResponse,
+    StudyLifecycleUpdateRequest,
     StudyQuestionnaireRequest,
     StudyQuestionnaireResponse,
     StudyWithdrawalRequest,
@@ -91,6 +97,15 @@ def has_current_study_consent(user: User) -> bool:
         and user.study_consent.version == settings.study_consent_version
         and user.study_consent.protocol_version == settings.study_protocol_version
         and not user.study_withdrawal
+        and not user.study_excluded_at
+    )
+
+
+def belongs_to_protocol_cohort(user: User) -> bool:
+    return bool(
+        user.pilot_enrolled_at
+        and user.study_consent
+        and user.study_consent.protocol_version == settings.study_protocol_version
     )
 
 
@@ -378,10 +393,20 @@ async def enroll_in_pilot(
 ):
     if not settings.pilot_access_code:
         raise HTTPException(503, "Pilot enrollment is not configured")
+    lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
+    if lifecycle and lifecycle.dataset_frozen_at:
+        raise HTTPException(409, "The study dataset is frozen and enrollment is closed")
+    today = datetime.now(UTC).date()
+    if lifecycle and lifecycle.start_date and today < lifecycle.start_date:
+        raise HTTPException(409, "Study enrollment has not opened")
+    if lifecycle and lifecycle.end_date and today > lifecycle.end_date:
+        raise HTTPException(409, "Study enrollment has closed")
     if not hmac.compare_digest(request.access_code, settings.pilot_access_code):
         raise HTTPException(400, "The pilot access code is not valid")
     if user.study_withdrawal:
         raise HTTPException(409, "This account has withdrawn from the pilot study")
+    if user.study_excluded_at:
+        raise HTTPException(409, "This account is excluded from the pilot study")
     if request.consent_version != settings.study_consent_version:
         raise HTTPException(409, "The participant information has changed. Review the current version before consenting.")
     if not all((request.information_sheet_read, request.research_participation_accepted, request.data_processing_accepted)):
@@ -435,18 +460,20 @@ async def withdraw_from_study(
 
 
 async def pilot_dataset(repository):
-    users = [user for user in await repository.list_users() if has_current_study_consent(user)]
+    cohort = [user for user in await repository.list_users() if belongs_to_protocol_cohort(user)]
+    users = [user for user in cohort if has_current_study_consent(user)]
     all_records = await repository.list_study_records()
-    records = []
     metric_values: dict[str, list[float]] = defaultdict(list)
     scenarios: dict[str, int] = defaultdict(int)
     difficulties: dict[str, int] = defaultdict(int)
     questionnaires: dict[str, list[float]] = defaultdict(list)
     generation_sources: dict[str, int] = defaultdict(int)
     total_sessions = completed = protocol_completers = 0
-    for user in users:
+    activity_records = []
+    for user in cohort:
         study_records = [record for record in all_records if record.user_id == user.id]
-        total_sessions += len(study_records)
+        eligible = has_current_study_consent(user)
+        if eligible: total_sessions += len(study_records)
         user_completed = sum(bool(record.completion_reason) for record in study_records)
         qualifying_scenarios = {
             record.scenario_id
@@ -457,19 +484,27 @@ async def pilot_dataset(repository):
             and "post" in record.questionnaires
         }
         protocol_complete = qualifying_scenarios == PROTOCOL_REQUIRED_SCENARIOS
-        protocol_completers += int(protocol_complete)
-        completed += user_completed
+        if eligible:
+            protocol_completers += int(protocol_complete)
+            completed += user_completed
         last_active = max((record.last_activity_at for record in study_records), default=user.pilot_enrolled_at)
-        records.append({
+        activity_records.append({
             "participant_id": str(user.participant_id),
             "enrolled_at": user.pilot_enrolled_at,
             "last_active_at": last_active,
             "sessions": len(study_records),
             "completed_rehearsals": user_completed,
             "protocol_complete": protocol_complete,
+            "completion_status": "withdrawn" if user.study_withdrawal else "excluded" if user.study_excluded_at else "complete" if protocol_complete else "in_progress",
+            "excluded": bool(user.study_excluded_at),
+            "withdrawn": bool(user.study_withdrawal),
+            "exclusion_reason": user.study_exclusion_reason,
+            "data_quality_notes": user.study_data_quality_notes,
             "pre_questionnaires": sum("pre" in record.questionnaires for record in study_records),
             "post_questionnaires": sum("post" in record.questionnaires for record in study_records),
         })
+        if not eligible:
+            continue
         for record in study_records:
             if record.scenario_id and record.completion_reason:
                 scenarios[record.scenario_id] += 1
@@ -481,7 +516,12 @@ async def pilot_dataset(repository):
                 for name in ("confidence", "anxiety", "realism", "usefulness"):
                     value = getattr(answer, name)
                     if value is not None: questionnaires[f"{answer.phase}_{name}"].append(value)
-    return users, records, {
+    lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
+    frozen_export = (
+        await repository.get_frozen_export(lifecycle.frozen_export_id)
+        if lifecycle and lifecycle.frozen_export_id else None
+    )
+    return users, activity_records, {
         "study_label": settings.pilot_study_label,
         "protocol_version": settings.study_protocol_version,
         "generated_at": datetime.now(UTC),
@@ -496,7 +536,20 @@ async def pilot_dataset(repository):
         "average_skill_scores": {name: sum(values) / len(values) for name, values in metric_values.items()},
         "questionnaire_averages": {name: sum(values) / len(values) for name, values in questionnaires.items()},
         "generation_sources": dict(generation_sources),
-        "participant_activity": sorted(records, key=lambda item: item["last_active_at"], reverse=True),
+        "participant_activity": sorted(activity_records, key=lambda item: item["last_active_at"], reverse=True),
+        "lifecycle": lifecycle.model_dump(mode="json") if lifecycle else {
+            "protocol_version": settings.study_protocol_version,
+            "start_date": None, "end_date": None, "dataset_frozen_at": None,
+            "frozen_export_id": None,
+        },
+        "frozen_export": ({
+            "export_id": str(frozen_export.id),
+            "schema_version": frozen_export.schema_version,
+            "created_at": frozen_export.created_at,
+            "record_count": frozen_export.record_count,
+            "participant_count": frozen_export.participant_count,
+            "sha256": frozen_export.sha256,
+        } if frozen_export else None),
         "privacy": {"contains_names": False, "contains_emails": False, "contains_conversation_text": False, "contains_takeaways": False},
     }
 
@@ -508,19 +561,70 @@ async def research_dashboard(user: User = Depends(researcher_user), repository=D
     return dashboard
 
 
-@router.get("/research/export.csv")
-async def research_csv(user: User = Depends(researcher_user), repository=Depends(get_repository)):
+@router.put("/research/lifecycle")
+async def update_research_lifecycle(
+    request: StudyLifecycleUpdateRequest,
+    user: User = Depends(researcher_user),
+    repository=Depends(get_repository),
+):
     del user
+    if request.end_date < request.start_date:
+        raise HTTPException(400, "Study end date must not precede the start date")
+    current = await repository.get_study_lifecycle(settings.study_protocol_version)
+    if current and current.dataset_frozen_at:
+        raise HTTPException(409, "The frozen study lifecycle cannot be edited")
+    lifecycle = current or StudyLifecycle(protocol_version=settings.study_protocol_version)
+    lifecycle.start_date, lifecycle.end_date, lifecycle.updated_at = (
+        request.start_date, request.end_date, utcnow()
+    )
+    return await repository.save_study_lifecycle(lifecycle)
+
+
+@router.patch("/research/participants/{participant_id}")
+async def update_participant_research_status(
+    participant_id: UUID,
+    request: ParticipantResearchUpdateRequest,
+    user: User = Depends(researcher_user),
+    repository=Depends(get_repository),
+):
+    del user
+    lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
+    if lifecycle and lifecycle.dataset_frozen_at:
+        raise HTTPException(409, "Participant research data cannot be edited after dataset freeze")
+    participant = next(
+        (item for item in await repository.list_users() if item.participant_id == participant_id),
+        None,
+    )
+    if not participant or not belongs_to_protocol_cohort(participant):
+        raise HTTPException(404, "Study participant not found")
+    if participant.study_withdrawal:
+        raise HTTPException(409, "A withdrawn participant record cannot be edited")
+    if request.excluded and not request.exclusion_reason.strip():
+        raise HTTPException(400, "An exclusion reason is required")
+    participant.study_excluded_at = utcnow() if request.excluded else None
+    participant.study_exclusion_reason = request.exclusion_reason.strip() if request.excluded else ""
+    participant.study_data_quality_notes = request.data_quality_notes.strip()
+    await repository.save_user(participant)
+    return {"participant_id": participant.participant_id, "excluded": bool(participant.study_excluded_at)}
+
+
+async def build_research_csv(repository, deidentified: bool = False) -> tuple[str, int, int]:
     users = [participant for participant in await repository.list_users() if has_current_study_consent(participant)]
+    users.sort(key=lambda participant: (participant.pilot_enrolled_at, str(participant.participant_id)))
     output = io.StringIO()
     fields = ["protocol_version", "participant_id", "session_id", "created_at", "updated_at", "turn_count", "scenario_id", "difficulty", "completion_reason", "pre_confidence", "pre_anxiety", "post_confidence", "post_realism", "post_usefulness"]
-    writer = csv.DictWriter(output, fieldnames=fields); writer.writeheader()
-    for participant in users:
-        for record in await repository.list_study_records(participant.id):
+    writer = csv.DictWriter(output, fieldnames=fields)
+    writer.writeheader()
+    count = 0
+    for participant_index, participant in enumerate(users, 1):
+        records = await repository.list_study_records(participant.id)
+        records.sort(key=lambda record: (record.session_created_at, str(record.session_id)))
+        for session_index, record in enumerate(records, 1):
             pre, post = record.questionnaires.get("pre"), record.questionnaires.get("post")
             writer.writerow({
                 "protocol_version": record.protocol_version,
-                "participant_id": participant.participant_id, "session_id": record.session_id,
+                "participant_id": f"P{participant_index:04d}" if deidentified else participant.participant_id,
+                "session_id": f"P{participant_index:04d}-S{session_index:03d}" if deidentified else record.session_id,
                 "created_at": record.session_created_at.isoformat(), "updated_at": record.last_activity_at.isoformat(),
                 "turn_count": record.turn_count, "scenario_id": record.scenario_id or "",
                 "difficulty": record.difficulty.value if record.difficulty else "",
@@ -529,7 +633,58 @@ async def research_csv(user: User = Depends(researcher_user), repository=Depends
                 "post_confidence": post.confidence if post else "", "post_realism": post.realism if post else "",
                 "post_usefulness": post.usefulness if post else "",
             })
-    return Response(content=output.getvalue(), media_type="text/csv", headers={"Content-Disposition": "attachment; filename=affectlab-pilot-export.csv", "Cache-Control": "no-store"})
+            count += 1
+    return output.getvalue(), count, len(users)
+
+
+@router.post("/research/freeze")
+async def freeze_research_dataset(
+    request: DatasetFreezeRequest,
+    user: User = Depends(researcher_user),
+    repository=Depends(get_repository),
+):
+    if not request.confirm_freeze:
+        raise HTTPException(400, "Explicit dataset-freeze confirmation is required")
+    lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
+    if not lifecycle or not lifecycle.start_date or not lifecycle.end_date:
+        raise HTTPException(409, "Set study start and end dates before freezing the dataset")
+    if lifecycle.end_date > datetime.now(UTC).date():
+        raise HTTPException(409, "The study end date must be reached before dataset freeze")
+    if lifecycle.dataset_frozen_at:
+        raise HTTPException(409, "The study dataset is already frozen")
+    content, record_count, participant_count = await build_research_csv(repository, True)
+    digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
+    frozen = await repository.save_frozen_export(FrozenStudyExport(
+        protocol_version=settings.study_protocol_version,
+        record_count=record_count,
+        participant_count=participant_count,
+        sha256=digest,
+        csv_content=content,
+    ))
+    lifecycle.dataset_frozen_at = frozen.created_at
+    lifecycle.frozen_export_id = frozen.id
+    lifecycle.updated_at = frozen.created_at
+    await repository.save_study_lifecycle(lifecycle)
+    return {
+        "export_id": frozen.id, "protocol_version": frozen.protocol_version,
+        "schema_version": frozen.schema_version, "created_at": frozen.created_at,
+        "record_count": record_count, "participant_count": participant_count,
+        "sha256": digest,
+    }
+
+
+@router.get("/research/export.csv")
+async def research_csv(user: User = Depends(researcher_user), repository=Depends(get_repository)):
+    del user
+    lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
+    frozen = await repository.get_frozen_export(lifecycle.frozen_export_id) if lifecycle and lifecycle.frozen_export_id else None
+    if frozen:
+        content, filename = frozen.csv_content, f"affectlab-frozen-{frozen.id}.csv"
+        checksum = frozen.sha256
+    else:
+        content, _, _ = await build_research_csv(repository)
+        filename, checksum = "affectlab-pilot-live-export.csv", hashlib.sha256(content.encode("utf-8")).hexdigest()
+    return Response(content=content, media_type="text/csv", headers={"Content-Disposition": f"attachment; filename={filename}", "Cache-Control": "no-store", "X-Content-SHA256": checksum})
 
 
 @router.patch("/auth/me", response_model=UserResponse)

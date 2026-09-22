@@ -3,7 +3,7 @@ from uuid import UUID
 from pymongo import ASCENDING, AsyncMongoClient
 from pymongo.errors import DuplicateKeyError
 
-from app.models.domain import Session, StudyRecord, User, utcnow
+from app.models.domain import FrozenStudyExport, Session, StudyLifecycle, StudyRecord, User, utcnow
 from app.repositories.base import Repository
 
 
@@ -19,6 +19,7 @@ class MongoRepository(Repository):
         await self.db.study_records.create_index("session_id", unique=True)
         await self.db.study_records.create_index([("user_id", ASCENDING), ("last_activity_at", -1)])
         await self.db.study_records.create_index("retention_expires_at", expireAfterSeconds=0)
+        await self.db.study_lifecycle.create_index("protocol_version", unique=True)
         await self.db.refresh_tokens.create_index("expires_at", expireAfterSeconds=0)
         await self.db.email_verification_tokens.create_index("expires_at", expireAfterSeconds=0)
         await self.db.email_verification_tokens.create_index("user_id", unique=True)
@@ -84,6 +85,22 @@ class MongoRepository(Repository):
         return [StudyRecord.model_validate(doc) for doc in docs]
     async def delete_study_records(self, user_id: UUID) -> int:
         return (await self.db.study_records.delete_many({"user_id": user_id})).deleted_count
+    async def get_study_lifecycle(self, protocol_version: str) -> StudyLifecycle | None:
+        doc = await self.db.study_lifecycle.find_one({"protocol_version": protocol_version})
+        return StudyLifecycle.model_validate(doc) if doc else None
+    async def save_study_lifecycle(self, lifecycle: StudyLifecycle) -> StudyLifecycle:
+        await self.db.study_lifecycle.replace_one(
+            {"protocol_version": lifecycle.protocol_version},
+            lifecycle.model_dump(mode="python"),
+            upsert=True,
+        )
+        return lifecycle
+    async def save_frozen_export(self, export: FrozenStudyExport) -> FrozenStudyExport:
+        await self.db.frozen_study_exports.insert_one(export.model_dump(mode="python"))
+        return export
+    async def get_frozen_export(self, export_id: UUID) -> FrozenStudyExport | None:
+        doc = await self.db.frozen_study_exports.find_one({"id": export_id})
+        return FrozenStudyExport.model_validate(doc) if doc else None
     async def store_refresh_token(self, token_id: str, user_id: UUID, digest: str, expires_at) -> None:
         await self.db.refresh_tokens.insert_one({"token_id": token_id, "user_id": user_id, "digest": digest, "expires_at": expires_at})
     async def rotate_refresh_token(self, token_id: str, digest: str) -> UUID | None:

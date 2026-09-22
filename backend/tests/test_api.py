@@ -320,6 +320,85 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
         settings.researcher_emails, settings.pilot_access_code = previous_emails, previous_code
 
 
+def test_research_lifecycle_review_and_immutable_frozen_export() -> None:
+    previous = (
+        settings.researcher_emails,
+        settings.pilot_access_code,
+        settings.study_protocol_version,
+    )
+    settings.researcher_emails = "freeze-researcher@example.com"
+    settings.pilot_access_code = "freeze-code"
+    settings.study_protocol_version = "freeze-test-v1"
+    try:
+        with TestClient(app) as client:
+            participant_headers = auth(client, "freeze-participant@example.com")
+            information = client.get(
+                "/api/research/study-information", headers=participant_headers
+            ).json()
+            enrolled = client.post(
+                "/api/research/enroll",
+                headers=participant_headers,
+                json={
+                    "access_code": "freeze-code",
+                    "consent_version": information["version"],
+                    "information_sheet_read": True,
+                    "research_participation_accepted": True,
+                    "data_processing_accepted": True,
+                },
+            ).json()
+            participant_id = enrolled["participant_id"]
+            session_id = client.post(
+                "/api/sessions", headers=participant_headers
+            ).json()["session_id"]
+            client.post(
+                "/api/chat", headers=participant_headers,
+                json={"session_id": session_id, "message": "private frozen wording"},
+            )
+
+            researcher_headers = auth(client, "freeze-researcher@example.com")
+            lifecycle = client.put(
+                "/api/research/lifecycle", headers=researcher_headers,
+                json={"start_date": "2026-01-01", "end_date": "2026-01-31"},
+            )
+            assert lifecycle.status_code == 200
+            reviewed = client.patch(
+                f"/api/research/participants/{participant_id}",
+                headers=researcher_headers,
+                json={"excluded": False, "exclusion_reason": "", "data_quality_notes": "Audio unavailable; text task valid."},
+            )
+            assert reviewed.status_code == 200
+            frozen = client.post(
+                "/api/research/freeze", headers=researcher_headers,
+                json={"confirm_freeze": True},
+            )
+            assert frozen.status_code == 200
+            manifest = frozen.json()
+            assert manifest["schema_version"] == "affectlab-frozen-dataset-v1"
+            assert manifest["record_count"] == 1
+            assert len(manifest["sha256"]) == 64
+
+            export = client.get("/api/research/export.csv", headers=researcher_headers)
+            assert export.headers["x-content-sha256"] == manifest["sha256"]
+            assert "P0001" in export.text
+            assert participant_id not in export.text
+            assert "private frozen wording" not in export.text
+            assert client.patch(
+                f"/api/research/participants/{participant_id}",
+                headers=researcher_headers,
+                json={"excluded": True, "exclusion_reason": "late", "data_quality_notes": ""},
+            ).status_code == 409
+            assert client.put(
+                "/api/research/lifecycle", headers=researcher_headers,
+                json={"start_date": "2026-01-01", "end_date": "2026-02-01"},
+            ).status_code == 409
+    finally:
+        (
+            settings.researcher_emails,
+            settings.pilot_access_code,
+            settings.study_protocol_version,
+        ) = previous
+
+
 def test_password_reset_is_generic_single_use_and_changes_credentials() -> None:
     with TestClient(app) as client:
         auth(client, "reset@example.com")

@@ -78,6 +78,14 @@ class ConversationService:
         await self.repository.save_session(session)
         await self.sync_study_record(session)
     async def sync_study_record(self, session: Session) -> None:
+        lifecycle = await self.repository.get_study_lifecycle(settings.study_protocol_version)
+        if lifecycle and lifecycle.dataset_frozen_at:
+            return
+        today = utcnow().date()
+        if lifecycle and lifecycle.start_date and today < lifecycle.start_date:
+            return
+        if lifecycle and lifecycle.end_date and today > lifecycle.end_date:
+            return
         user = await self.repository.get_user(session.user_id)
         if not (
             user
@@ -86,6 +94,7 @@ class ConversationService:
             and user.study_consent.version == settings.study_consent_version
             and user.study_consent.protocol_version == settings.study_protocol_version
             and not user.study_withdrawal
+            and not user.study_excluded_at
         ):
             return
         consented_at = user.study_consent.accepted_at

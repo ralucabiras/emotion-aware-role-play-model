@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from enum import StrEnum
 from uuid import UUID, uuid4
 
@@ -235,6 +235,9 @@ class User(BaseModel):
     pilot_enrolled_at: datetime | None = None
     study_consent: StudyConsentRecord | None = None
     study_withdrawal: StudyWithdrawalRecord | None = None
+    study_excluded_at: datetime | None = None
+    study_exclusion_reason: str = ""
+    study_data_quality_notes: str = ""
     created_at: datetime = Field(default_factory=utcnow)
 
 
@@ -275,3 +278,23 @@ class StudyRecord(BaseModel):
     events: list[ResearchEvent] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
+
+
+class StudyLifecycle(BaseModel):
+    protocol_version: str
+    start_date: date | None = None
+    end_date: date | None = None
+    dataset_frozen_at: datetime | None = None
+    frozen_export_id: UUID | None = None
+    updated_at: datetime = Field(default_factory=utcnow)
+
+
+class FrozenStudyExport(BaseModel):
+    id: UUID = Field(default_factory=uuid4)
+    protocol_version: str
+    schema_version: str = "affectlab-frozen-dataset-v1"
+    created_at: datetime = Field(default_factory=utcnow)
+    record_count: int
+    participant_count: int
+    sha256: str
+    csv_content: str
