@@ -1,9 +1,7 @@
 import base64
 import binascii
-import csv
 import hashlib
 import hmac
-import io
 from collections import defaultdict
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
@@ -82,6 +80,7 @@ from app.services.multimodal_service import (
     MultimodalAffectService,
     MultimodalInferenceUnavailable,
 )
+from app.services.research_export import CSV_SCHEMA_VERSION, export_research_rows
 from app.services.roleplay_service import SCENARIOS
 from app.services.transcription_service import InvalidAudio, TranscriptionService, TranscriptionUnavailable
 
@@ -666,31 +665,8 @@ async def update_participant_research_status(
 
 async def build_research_csv(repository, deidentified: bool = False) -> tuple[str, int, int]:
     users = [participant for participant in await repository.list_users() if has_current_study_consent(participant)]
-    users.sort(key=lambda participant: (participant.pilot_enrolled_at, str(participant.participant_id)))
-    output = io.StringIO()
-    fields = ["protocol_version", "participant_id", "session_id", "created_at", "updated_at", "turn_count", "scenario_id", "difficulty", "completion_reason", "pre_confidence", "pre_anxiety", "post_confidence", "post_realism", "post_usefulness"]
-    writer = csv.DictWriter(output, fieldnames=fields)
-    writer.writeheader()
-    count = 0
-    for participant_index, participant in enumerate(users, 1):
-        records = await repository.list_study_records(participant.id)
-        records.sort(key=lambda record: (record.session_created_at, str(record.session_id)))
-        for session_index, record in enumerate(records, 1):
-            pre, post = record.questionnaires.get("pre"), record.questionnaires.get("post")
-            writer.writerow({
-                "protocol_version": record.protocol_version,
-                "participant_id": f"P{participant_index:04d}" if deidentified else participant.participant_id,
-                "session_id": f"P{participant_index:04d}-S{session_index:03d}" if deidentified else record.session_id,
-                "created_at": record.session_created_at.isoformat(), "updated_at": record.last_activity_at.isoformat(),
-                "turn_count": record.turn_count, "scenario_id": record.scenario_id or "",
-                "difficulty": record.difficulty.value if record.difficulty else "",
-                "completion_reason": record.completion_reason or "",
-                "pre_confidence": pre.confidence if pre else "", "pre_anxiety": pre.anxiety if pre else "",
-                "post_confidence": post.confidence if post else "", "post_realism": post.realism if post else "",
-                "post_usefulness": post.usefulness if post else "",
-            })
-            count += 1
-    return output.getvalue(), count, len(users)
+    return await export_research_rows(repository, users, deidentified)
+
 
 
 @router.post("/research/freeze")
@@ -716,6 +692,7 @@ async def freeze_research_dataset(
         content, record_count, participant_count = await build_research_csv(repository, True)
         digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
         frozen = FrozenStudyExport(
+            schema_version=CSV_SCHEMA_VERSION,
             protocol_version=settings.study_protocol_version,
             record_count=record_count,
             participant_count=participant_count,

@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import timedelta
 from uuid import UUID
 
@@ -7,6 +8,7 @@ from app.models.domain import (
     ConversationTurn,
     Difficulty,
     FeedbackComparison,
+    GenerationMetadata,
     ResearchEvent,
     Role,
     RolePlayStatus,
@@ -116,6 +118,7 @@ class ConversationService:
         post_consent_turn_count = sum(turn.created_at >= consented_at for turn in session.turns)
         if not (post_consent_turn_count or roleplay or questionnaires or events):
             return
+        assistant_turns = [turn for turn in session.turns if turn.role == Role.ASSISTANT and turn.created_at >= consented_at]
         await self.repository.save_study_record(StudyRecord(
             user_id=user.id,
             participant_id=user.participant_id,
@@ -132,6 +135,15 @@ class ConversationService:
             completion_reason=roleplay.completion_reason if roleplay else None,
             feedback_metrics=feedback.metrics if feedback else [],
             feedback_generation_source=feedback.generation_source if feedback else None,
+            roleplay_started_at=roleplay.started_at if roleplay else None,
+            roleplay_completed_at=roleplay.completed_at if roleplay else None,
+            generation_source_counts=dict(Counter(
+                turn.generation.source if turn.generation else "unrecorded" for turn in assistant_turns
+            )),
+            fallback_reason_counts=dict(Counter(
+                turn.generation.fallback_reason for turn in assistant_turns
+                if turn.generation and turn.generation.fallback_reason
+            )),
             questionnaires=questionnaires,
             events=events,
             updated_at=utcnow(),
@@ -154,13 +166,13 @@ class ConversationService:
         session.turns.append(ConversationTurn(role=Role.USER, content=message, emotion_state=state))
         roleplay_action = "none"
         if crisis:
-            content, metadata = CRISIS_RESPONSE, None
+            content, metadata = CRISIS_RESPONSE, GenerationMetadata(source="safety_response")
             if session.roleplay: session.roleplay.status, session.roleplay.completion_reason = RolePlayStatus.INTERRUPTED, "safety_interruption"
         elif session.roleplay and session.roleplay.status == RolePlayStatus.ACTIVE:
             plan = self.roleplays.plan_response(session.roleplay, message, state)
             roleplay_action = plan.action
             if plan.completed:
-                content, metadata = plan.fallback_text, None
+                content, metadata = plan.fallback_text, GenerationMetadata(source="deterministic_roleplay")
                 await self.complete_feedback(session)
             elif isinstance(self.generator, OpenAIResponseGenerator):
                 content, metadata = await self.generator.generate_roleplay(
@@ -170,7 +182,7 @@ class ConversationService:
                     plan.fallback_text,
                 )
             else:
-                content, metadata = plan.fallback_text, None
+                content, metadata = plan.fallback_text, GenerationMetadata(source="deterministic_roleplay")
         else: content, metadata = await self.generator.generate(session, message, strategy)
         turn = ConversationTurn(role=Role.ASSISTANT, content=content, strategy=strategy, generation=metadata)
         session.turns.append(turn)
@@ -202,7 +214,7 @@ class ConversationService:
         session.title = scenario.title
         session.turns = []
         session.emotion_state = self.analyzer.analyze("")
-        turn = ConversationTurn(role=Role.ASSISTANT, content=scenario.opening_line)
+        turn = ConversationTurn(role=Role.ASSISTANT, content=scenario.opening_line, generation=GenerationMetadata(source="scenario_opening"))
         session.turns.append(turn)
         session.research_events.append(ResearchEvent(
             name="roleplay_started",

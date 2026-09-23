@@ -1,5 +1,8 @@
 import base64
+import csv
+import hashlib
 import io
+import json
 import wave
 
 from fastapi.testclient import TestClient
@@ -481,6 +484,15 @@ def test_research_lifecycle_review_and_immutable_frozen_export() -> None:
                 },
             ).json()
             participant_id = enrolled["participant_id"]
+            idle_headers = auth(client, "freeze-idle@example.com")
+            idle_enrollment = client.post("/api/research/enroll", headers=idle_headers, json={
+                "access_code": "freeze-code", "consent_version": information["version"],
+                "information_sheet_read": True, "research_participation_accepted": True,
+                "data_processing_accepted": True, "eligibility_version": eligibility_version(),
+                "age_confirmed": True, "geography_confirmed": True,
+                "english_confirmed": True, "other_criteria_confirmed": True,
+            })
+            assert idle_enrollment.status_code == 200
             session_id = client.post(
                 "/api/sessions", headers=participant_headers
             ).json()["session_id"]
@@ -507,8 +519,9 @@ def test_research_lifecycle_review_and_immutable_frozen_export() -> None:
             )
             assert frozen.status_code == 200
             manifest = frozen.json()
-            assert manifest["schema_version"] == "affectlab-frozen-dataset-v1"
-            assert manifest["record_count"] == 1
+            assert manifest["schema_version"] == "affectlab-frozen-dataset-v2"
+            assert manifest["record_count"] == 2
+            assert manifest["participant_count"] == 2
             assert len(manifest["sha256"]) == 64
 
             export = client.get("/api/research/export.csv", headers=researcher_headers)
@@ -516,6 +529,14 @@ def test_research_lifecycle_review_and_immutable_frozen_export() -> None:
             assert "P0001" in export.text
             assert participant_id not in export.text
             assert "private frozen wording" not in export.text
+            rows = list(csv.DictReader(io.StringIO(export.text)))
+            assert rows[0]["row_type"] == "session"
+            assert json.loads(rows[0]["generation_source_counts_json"]) == {"template": 1}
+            assert rows[1]["row_type"] == "participant"
+            assert rows[1]["participant_id"] == "P0002" and rows[1]["session_id"] == ""
+            assert hashlib.sha256(export.content).hexdigest() == manifest["sha256"]
+            assert client.post("/api/research/withdraw", headers=idle_headers, json={"confirm_withdrawal": True}).status_code == 200
+            assert client.get("/api/research/export.csv", headers=researcher_headers).content == export.content
             assert client.patch(
                 f"/api/research/participants/{participant_id}",
                 headers=researcher_headers,

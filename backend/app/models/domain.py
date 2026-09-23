@@ -282,6 +282,11 @@ class StudyRecord(BaseModel):
     completion_reason: str | None = None
     feedback_metrics: list[FeedbackMetric] = Field(default_factory=list)
     feedback_generation_source: str | None = None
+    roleplay_started_at: datetime | None = None
+    roleplay_completed_at: datetime | None = None
+    # None means unavailable in legacy records, not an observed zero.
+    generation_source_counts: dict[str, int] | None = None
+    fallback_reason_counts: dict[str, int] | None = None
     questionnaires: dict[str, StudyQuestionnaire] = Field(default_factory=dict)
     events: list[ResearchEvent] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=utcnow)
