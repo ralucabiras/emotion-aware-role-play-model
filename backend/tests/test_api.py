@@ -128,6 +128,11 @@ def test_auth_session_chat_and_feedback() -> None:
         assert response.json()["decision"]["strategy"] == "validate_then_reframe"
         start = client.post(f"/api/sessions/{session_id}/roleplay", headers=headers, json={"scenario_id": "workload", "difficulty": "beginner"})
         assert start.status_code == 200
+        reflection = client.get(f"/api/sessions/{session_id}", headers=headers).json()
+        assert len(reflection["turns"]) == 2
+        assert reflection["roleplay"] is None
+        assert start.json()["session_id"] != session_id
+        session_id = start.json()["session_id"]
         roleplay_session = client.get(f"/api/sessions/{session_id}", headers=headers).json()
         assert len(roleplay_session["turns"]) == 1
         assert roleplay_session["turns"][0]["content"] == start.json()["opening_turn"]["content"]

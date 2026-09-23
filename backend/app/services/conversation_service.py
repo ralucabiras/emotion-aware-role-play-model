@@ -186,9 +186,18 @@ class ConversationService:
         ))
         await self.save(session)
         return turn, AgentDecision(emotion_state=state, cognitive_assessment=assessment, strategy=strategy, strategy_scores=strategy_scores, decision_reasons=reasons, analyzer_version=getattr(self.analyzer, "version", "unknown")), session
-    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None):
+    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None, pre_ratings: dict | None = None):
         session = await self.get_session(session_id, user_id)
         state, scenario = self.roleplays.start(scenario_id, level, custom)
+        pre = StudyQuestionnaire(phase="pre", **pre_ratings) if pre_ratings is not None else None
+        # A populated session belongs to its existing reflection/rehearsal. Reuse only
+        # an unused workspace; retries must never replace history or study records.
+        if session.turns or session.roleplay or session.feedback or session.takeaway or "post" in session.questionnaires:
+            session = Session(user_id=user_id)
+            session.research_events.append(ResearchEvent(name="session_created"))
+        if pre is not None:
+            session.questionnaires["pre"] = pre
+            session.research_events.append(ResearchEvent(name="questionnaire_pre_submitted"))
         session.roleplay, session.feedback = state, None
         session.title = scenario.title
         session.turns = []
@@ -200,7 +209,7 @@ class ConversationService:
             properties={"scenario_id": scenario_id, "difficulty": level.value},
         ))
         await self.save(session)
-        return state, scenario, turn
+        return session, scenario, turn
     async def set_roleplay_status(self, session_id: UUID, user_id: UUID, action: str):
         session = await self.get_session(session_id, user_id)
         if not session.roleplay: raise ValueError("No role-play")

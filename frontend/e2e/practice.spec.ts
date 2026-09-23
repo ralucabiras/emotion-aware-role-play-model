@@ -56,3 +56,46 @@ test('creates a custom scenario and exercises role-play controls and feedback', 
   await page.getByRole('button',{name:'Practise again'}).click()
   await expect(page.getByRole('button',{name:/Begin with the/})).toBeVisible()
 })
+
+
+test('practise again switches to a fresh session and sends its own pre-ratings', async ({ page }) => {
+  const state = await installApiMock(page)
+  const preSubmissions: string[] = []
+  page.on('request', request => {
+    if (request.url().endsWith('/questionnaires/pre')) preSubmissions.push(request.url())
+  })
+  await page.goto('/practice?mode=roleplay')
+  await page.getByRole('button', {name: /Begin with the manager/}).click()
+  await page.getByRole('button', {name: 'Finish & review'}).click()
+  await page.getByLabel('Personal takeaway').fill('Preserve this first attempt.')
+  await page.getByRole('button', {name: 'Save takeaway'}).click()
+  await expect(page.getByRole('button', {name: 'Saved', exact: true})).toBeVisible()
+  const previousRoleplay = {...state.roleplay}
+  const previousTurns = [...state.turns]
+  const emotion = {dominant_emotion:'neutral',valence:0,arousal:.2,confidence:.7,trend:'stable'}
+  const scenario = {id:'workload',title:'Workload conversation',character:'manager',user_objective:'Agree a realistic priority.',expected_skills:['clarity']}
+  const opening = {id:'new-opening',role:'assistant',content:'A new rehearsal starts here.',created_at:new Date().toISOString()}
+  const roleplay = {scenario_id:'workload',scenario,difficulty_level:'beginner',status:'active',turn:0,success_progress:0}
+  await page.route('**/api/sessions/session-1/roleplay', async route => {
+    expect(route.request().postDataJSON()).toMatchObject({scenario_id:'workload',pre_ratings:{confidence:4,anxiety:4}})
+    await route.fulfill({json:{session_id:'session-2',emotion_state:emotion,scenario,opening_turn:opening,state:roleplay}})
+  })
+  await page.route('**/api/sessions/session-2', route => route.fulfill({json:{session_id:'session-2',title:scenario.title,turns:[opening],emotion_state:emotion,roleplay,feedback:null,takeaway:''}}))
+  await page.getByRole('button', {name:'Practise again'}).click()
+  await page.getByRole('button', {name:/Begin with the manager/}).click()
+  await expect(page).toHaveURL(/session=session-2$/)
+  await expect(page.getByText(opening.content)).toBeVisible()
+  expect(preSubmissions).toEqual([])
+  expect(state.savedTakeaway).toBe('Preserve this first attempt.')
+  expect(state.roleplay).toEqual(previousRoleplay)
+  expect(state.turns).toEqual(previousTurns)
+  await page.reload()
+  await expect(page.getByText(opening.content)).toBeVisible()
+  await page.route('**/api/chat', async route => {
+    expect(route.request().postDataJSON().session_id).toBe('session-2')
+    await route.fulfill({json:{turn:{...opening,id:'reply',content:'Reply in the new attempt.'},decision:{emotion_state:emotion},roleplay,feedback:null}})
+  })
+  await page.getByPlaceholder(/Respond to your manager/).fill('My second attempt.')
+  await page.getByLabel('Send message').click()
+  await expect(page.getByText('Reply in the new attempt.')).toBeVisible()
+})

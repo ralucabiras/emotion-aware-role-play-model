@@ -4,12 +4,15 @@ from uuid import uuid4
 
 import pytest
 
+from app.core.config import settings
 from app.models.domain import (
     Difficulty,
     EmotionState,
     FrozenStudyExport,
     RolePlayStatus,
     Session,
+    StudyConsentRecord,
+    StudyEligibilityRecord,
     StudyLifecycle,
     StudyRecord,
     SupportStrategy,
@@ -19,6 +22,8 @@ from app.models.domain import (
 from app.repositories.memory import MemoryRepository
 from app.services.affect_service import RuleBasedCognitiveAnalyzer, RuleBasedEmotionAnalyzer
 from app.services.auth_service import AuthenticationError, AuthService
+from app.services.conversation_service import ConversationService
+from app.services.eligibility import eligibility_version
 from app.services.llm_service import OpenAIResponseGenerator, RolePlayWording, TemplateResponseGenerator
 from app.services.roleplay_service import SCENARIOS, RolePlayService, observe
 from app.services.strategy_service import ScoredStrategySelector
@@ -275,3 +280,55 @@ async def test_dataset_freeze_abort_releases_claim_without_export() -> None:
 
     assert await repository.begin_dataset_freeze(protocol, retry_token)
     assert repository.frozen_exports == {}
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("next_scenario", ["workload", "boundary"])
+async def test_new_rehearsal_preserves_attempt_ratings_and_study_record(next_scenario) -> None:
+    repository = MemoryRepository()
+    user = User(
+        email="attempts@example.com", password_hash="unused", consented_at=utcnow(),
+        pilot_enrolled_at=utcnow(),
+        study_consent=StudyConsentRecord(version=settings.study_consent_version, protocol_version=settings.study_protocol_version),
+        study_eligibility=StudyEligibilityRecord(version=eligibility_version(), protocol_version=settings.study_protocol_version),
+    )
+    await repository.create_user(user)
+    service = ConversationService(repository, generator=TemplateResponseGenerator())
+    workspace = await service.create_session(user.id)
+    first, _, _ = await service.start_roleplay(workspace.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_ratings={"confidence": 2, "anxiety": 6})
+    assert first.id == workspace.id  # Do not leave an empty workspace behind.
+    await service.chat(first.id, user.id, "I need you to move the report deadline to Friday because I have 12 hours of work this week.")
+    assert first.feedback is not None
+    await service.submit_questionnaire(first.id, user.id, "post", {"confidence": 6, "realism": 5, "usefulness": 7})
+    await service.save_takeaway(first.id, user.id, "Keep the first takeaway.")
+    original_session = first.model_dump(mode="json")
+    original_record = (await repository.list_study_records(user.id))[0].model_dump(mode="json")
+
+    second, _, _ = await service.start_roleplay(first.id, user.id, next_scenario, Difficulty.INTERMEDIATE, pre_ratings={"confidence": 3, "anxiety": 4})
+    assert second.id != first.id
+    assert second.questionnaires["pre"].confidence == 3
+    assert "post" not in second.questionnaires
+    assert second.takeaway == ""
+    assert second.feedback is None
+    assert len(second.turns) == 1
+    assert len(await repository.list_sessions(user.id)) == 2
+    assert (await repository.get_session(first.id, user.id)).model_dump(mode="json") == original_session
+    records = {record.session_id: record for record in await repository.list_study_records(user.id)}
+    assert len(records) == 2
+    assert records[first.id].model_dump(mode="json") == original_record
+    assert records[second.id].questionnaires["pre"].confidence == 3
+    assert "post" not in records[second.id].questionnaires
+
+    if next_scenario == "workload":
+        await service.chat(second.id, user.id, "I need you to prioritise the deadline because it is this week.")
+        assert second.feedback.compared_with_session_id == first.id
+        assert second.feedback.comparisons
+        original_metrics = {metric.name: metric.score for metric in first.feedback.metrics}
+        for comparison in second.feedback.comparisons:
+            assert comparison.previous_score == original_metrics[comparison.name]
+        assert (await repository.get_session(first.id, user.id)).model_dump(mode="json") == original_session
+
+    # An invalid start must not create an orphan attempt or alter either session.
+    with pytest.raises(KeyError):
+        await service.start_roleplay(second.id, user.id, "unknown", Difficulty.INTERMEDIATE)
+    assert len(await repository.list_sessions(user.id)) == 2

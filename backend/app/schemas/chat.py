@@ -203,10 +203,18 @@ class StudyQuestionnaireRequest(BaseModel):
 
 class StudyQuestionnaireResponse(BaseModel):
     questionnaire: StudyQuestionnaire
+class PreRehearsalRatings(BaseModel):
+    confidence: int = Field(ge=1, le=7)
+    anxiety: int = Field(ge=1, le=7)
+
+
 class StartRolePlayRequest(BaseModel):
     scenario_id: str
     difficulty: Difficulty = Difficulty.BEGINNER
+    pre_ratings: PreRehearsalRatings | None = None
 class StartRolePlayResponse(BaseModel):
+    session_id: UUID
+    emotion_state: EmotionState
     state: RolePlayState
     scenario: RolePlayScenario
     opening_turn: ConversationTurn

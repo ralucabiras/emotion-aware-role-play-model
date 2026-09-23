@@ -868,10 +868,14 @@ async def delete_custom_scenario(scenario_id: str, user: User = Depends(current_
 async def start_roleplay(session_id: UUID, request: StartRolePlayRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     custom = next((scenario for scenario in user.custom_scenarios if scenario.id == request.scenario_id), None)
     if request.scenario_id not in SCENARIOS and not custom: raise HTTPException(404, "Scenario not found")
-    try: state, scenario, turn = await service.start_roleplay(session_id, user.id, request.scenario_id, request.difficulty, custom)
+    try:
+        session, scenario, turn = await service.start_roleplay(
+            session_id, user.id, request.scenario_id, request.difficulty, custom,
+            request.pre_ratings.model_dump() if request.pre_ratings else None,
+        )
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except KeyError: raise HTTPException(404, "Scenario not found") from None
-    return StartRolePlayResponse(state=state, scenario=scenario, opening_turn=turn)
+    return StartRolePlayResponse(session_id=session.id, emotion_state=session.emotion_state, state=session.roleplay, scenario=scenario, opening_turn=turn)
 
 
 @router.post("/sessions/{session_id}/roleplay/action", response_model=SessionResponse)
