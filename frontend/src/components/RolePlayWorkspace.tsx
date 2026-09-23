@@ -11,12 +11,12 @@ const difficultyCopy: Record<string, string> = {
   difficult: 'Stronger pushback while preserving safety',
 }
 
-export function ModeTabs({mode, roleplay, onChange}: {mode: WorkspaceMode; roleplay: RolePlayState | null; onChange: (mode: WorkspaceMode) => void}) {
+export function ModeTabs({mode, roleplay, onChange, disabled=false}: {mode: WorkspaceMode; roleplay: RolePlayState | null; onChange: (mode: WorkspaceMode) => void; disabled?:boolean}) {
   const active = roleplay && ['active', 'paused'].includes(roleplay.status)
   return <nav className="mode-tabs" aria-label="Workspace mode">
-    <button className={mode === 'reflect' ? 'active' : ''} aria-current={mode==='reflect'?'page':undefined} onClick={() => onChange('reflect')}>Reflect</button>
-    <button className={mode === 'roleplay' ? 'active' : ''} aria-current={mode==='roleplay'?'page':undefined} onClick={() => onChange('roleplay')}>{active ? 'Active role-play' : 'Role-play'}</button>
-    {roleplay?.status === 'completed' && <button className={mode === 'feedback' ? 'active' : ''} aria-current={mode==='feedback'?'page':undefined} onClick={() => onChange('feedback')}>Feedback</button>}
+    <button disabled={disabled} className={mode === 'reflect' ? 'active' : ''} aria-current={mode==='reflect'?'page':undefined} onClick={() => onChange('reflect')}>Reflect</button>
+    <button disabled={disabled} className={mode === 'roleplay' ? 'active' : ''} aria-current={mode==='roleplay'?'page':undefined} onClick={() => onChange('roleplay')}>{active ? 'Active role-play' : 'Role-play'}</button>
+    {roleplay?.status === 'completed' && <button disabled={disabled} className={mode === 'feedback' ? 'active' : ''} aria-current={mode==='feedback'?'page':undefined} onClick={() => onChange('feedback')}>Feedback</button>}
   </nav>
 }
 

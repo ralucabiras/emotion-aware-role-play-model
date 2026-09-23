@@ -332,3 +332,22 @@ async def test_new_rehearsal_preserves_attempt_ratings_and_study_record(next_sce
     with pytest.raises(KeyError):
         await service.start_roleplay(second.id, user.id, "unknown", Difficulty.INTERMEDIATE)
     assert len(await repository.list_sessions(user.id)) == 2
+
+
+@pytest.mark.asyncio
+async def test_reflection_messages_do_not_advance_a_paused_rehearsal():
+    repository = MemoryRepository()
+    user = User(email="pause-reflect@example.com", password_hash="unused", consented_at=utcnow())
+    await repository.create_user(user)
+    service = ConversationService(repository, generator=TemplateResponseGenerator())
+    workspace = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(workspace.id, user.id, "boundary", Difficulty.INTERMEDIATE, pre_skipped=True)
+    await service.set_roleplay_status(session.id, user.id, "pause")
+    evidence = session.roleplay.evidence.copy()
+    reply, _, reflected = await service.chat(session.id, user.id, "I feel nervous about this conversation.")
+    assert reply.content
+    assert reflected.roleplay.status == RolePlayStatus.PAUSED
+    assert reflected.roleplay.turn == 0 and reflected.roleplay.evidence == evidence
+    await service.set_roleplay_status(session.id, user.id, "resume")
+    _, _, resumed = await service.chat(session.id, user.id, "I cannot help this week.")
+    assert resumed.roleplay.turn == 1
