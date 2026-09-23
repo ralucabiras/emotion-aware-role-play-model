@@ -5,8 +5,14 @@ import wave
 from fastapi.testclient import TestClient
 
 from app.core.config import settings
-from app.core.container import auth_service, get_multimodal_service, get_transcription_service
+from app.core.container import (
+    auth_service,
+    get_multimodal_service,
+    get_transcription_service,
+    repository,
+)
 from app.main import app
+from app.repositories.mongo import ConcurrentSessionUpdateError
 from app.services.multimodal_service import MultimodalAffectService
 from app.services.transcription_service import TranscriptionResult
 
@@ -62,6 +68,32 @@ def test_auth_session_chat_and_feedback() -> None:
         history = client.get("/api/sessions", headers=headers).json()
         assert history[0]["title"] == "Workload conversation"
         assert history[0]["feedback"]["metrics"]
+
+
+def test_concurrent_session_update_returns_reloadable_conflict(monkeypatch) -> None:
+    with TestClient(app) as client:
+        headers = auth(client, "concurrent-edit@example.com")
+        session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+
+        async def reject_stale_save(session):
+            del session
+            raise ConcurrentSessionUpdateError("Session was updated by another request")
+
+        monkeypatch.setattr(repository, "save_session", reject_stale_save)
+        response = client.patch(
+            f"/api/sessions/{session_id}/title",
+            headers=headers,
+            json={"title": "A stale edit"},
+        )
+
+        assert response.status_code == 409
+        assert response.json() == {
+            "detail": (
+                "This session changed in another browser or tab. "
+                "Reload the session, review the latest changes, and try again."
+            ),
+            "code": "session_update_conflict",
+        }
 
 
 def test_ownership_and_crisis_precedence() -> None:

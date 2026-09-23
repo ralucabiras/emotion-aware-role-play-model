@@ -1,15 +1,17 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api.routes import router
 from app.core.config import settings
 from app.core.container import conversation_service, repository
 from app.core.security import RateLimitMiddleware, SecurityHeadersMiddleware
 from app.models.domain import PracticeGoal, User, utcnow
+from app.repositories.mongo import ConcurrentSessionUpdateError
 from app.services.auth_service import password_hash
 
 
@@ -38,6 +40,25 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title=settings.app_name, version="0.2.0", lifespan=lifespan)
+
+
+@app.exception_handler(ConcurrentSessionUpdateError)
+async def concurrent_session_update_handler(
+    request: Request, exc: ConcurrentSessionUpdateError
+) -> JSONResponse:
+    del request, exc
+    return JSONResponse(
+        status_code=409,
+        content={
+            "detail": (
+                "This session changed in another browser or tab. "
+                "Reload the session, review the latest changes, and try again."
+            ),
+            "code": "session_update_conflict",
+        },
+    )
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
