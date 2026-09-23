@@ -1,3 +1,4 @@
+import secrets
 from collections import Counter
 from datetime import timedelta
 from uuid import UUID
@@ -32,6 +33,7 @@ from app.services.strategy_service import RuleBasedStrategySelector, ScoredStrat
 
 
 class SessionNotFoundError(KeyError): pass
+class QuestionnaireConflictError(ValueError): pass
 
 
 class ConversationService:
@@ -150,6 +152,9 @@ class ConversationService:
         ))
     async def chat(self, session_id: UUID, user_id: UUID, message: str) -> tuple[ConversationTurn, AgentDecision, Session]:
         session = await self.get_session(session_id, user_id)
+        if session.post_questionnaire_token:
+            session.post_questionnaire_token = None
+            session.research_events.append(ResearchEvent(name="questionnaire_post_closed"))
         if session.title == "New reflection":
             clean = " ".join(message.split())
             session.title = clean[:57].rstrip(" ,.;:-") + ("…" if len(clean) > 57 else "")
@@ -198,18 +203,30 @@ class ConversationService:
         ))
         await self.save(session)
         return turn, AgentDecision(emotion_state=state, cognitive_assessment=assessment, strategy=strategy, strategy_scores=strategy_scores, decision_reasons=reasons, analyzer_version=getattr(self.analyzer, "version", "unknown")), session
-    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None, pre_ratings: dict | None = None):
+    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None, pre_ratings: dict | None = None, pre_skipped: bool = False):
         session = await self.get_session(session_id, user_id)
         state, scenario = self.roleplays.start(scenario_id, level, custom)
+        if pre_ratings is not None and pre_skipped:
+            raise ValueError("Choose either pre-ratings or skip")
         pre = StudyQuestionnaire(phase="pre", **pre_ratings) if pre_ratings is not None else None
         # A populated session belongs to its existing reflection/rehearsal. Reuse only
         # an unused workspace; retries must never replace history or study records.
         if session.turns or session.roleplay or session.feedback or session.takeaway or "post" in session.questionnaires:
             session = Session(user_id=user_id)
             session.research_events.append(ResearchEvent(name="session_created"))
+        if not pre and not pre_skipped and "pre" not in session.questionnaires and "pre" not in session.questionnaire_skips:
+            raise ValueError("Answer or explicitly skip the pre-questionnaire before starting")
+        if pre is not None and ("pre" in session.questionnaires or "pre" in session.questionnaire_skips):
+            raise QuestionnaireConflictError("The pre-questionnaire decision is already recorded")
+        if pre_skipped and "pre" in session.questionnaires:
+            raise QuestionnaireConflictError("The pre-questionnaire decision is already recorded")
+        if pre_skipped and "pre" not in session.questionnaire_skips:
+            session.questionnaire_skips["pre"] = utcnow()
+            session.research_events.append(ResearchEvent(name="questionnaire_pre_skipped"))
         if pre is not None:
             session.questionnaires["pre"] = pre
             session.research_events.append(ResearchEvent(name="questionnaire_pre_submitted"))
+        state.started_at = utcnow()
         session.roleplay, session.feedback = state, None
         session.title = scenario.title
         session.turns = []
@@ -227,7 +244,7 @@ class ConversationService:
         if not session.roleplay: raise ValueError("No role-play")
         if action == "pause" and session.roleplay.status == RolePlayStatus.ACTIVE: session.roleplay.status = RolePlayStatus.PAUSED
         elif action == "resume" and session.roleplay.status == RolePlayStatus.PAUSED: session.roleplay.status = RolePlayStatus.ACTIVE
-        elif action == "finish": self.roleplays.finish(session.roleplay); await self.complete_feedback(session)
+        elif action == "finish" and session.roleplay.status in {RolePlayStatus.ACTIVE, RolePlayStatus.PAUSED}: self.roleplays.finish(session.roleplay); await self.complete_feedback(session)
         else: raise ValueError("Invalid role-play transition")
         session.research_events.append(ResearchEvent(
             name=f"roleplay_{action}",
@@ -237,8 +254,11 @@ class ConversationService:
     async def rewind_roleplay(self, session_id: UUID, user_id: UUID) -> tuple[str, Session]:
         session = await self.get_session(session_id, user_id)
         state = session.roleplay
+        if "post" in session.questionnaires or "post" in session.questionnaire_skips:
+            raise ValueError("Start a new attempt to retry after recording post-ratings or a skip")
         if not state or not state.evidence or len(session.turns) < 3:
             raise ValueError("There is no role-play exchange to rewind")
+        session.post_questionnaire_token = None
         if session.turns[-1].role == Role.ASSISTANT:
             session.turns.pop()
         user_turn = session.turns.pop()
@@ -268,18 +288,44 @@ class ConversationService:
         await self.save(session)
         return user_turn.content, session
     async def submit_questionnaire(
-        self, session_id: UUID, user_id: UUID, phase: str, values: dict
-    ) -> StudyQuestionnaire:
+        self, session_id: UUID, user_id: UUID, phase: str, values: dict,
+        skipped: bool = False, post_token: str | None = None,
+    ) -> StudyQuestionnaire | None:
         if phase not in {"pre", "post"}:
             raise ValueError("Questionnaire phase must be pre or post")
-        if not any(value is not None for value in values.values()):
-            raise ValueError("At least one rating is required")
         session = await self.get_session(session_id, user_id)
-        questionnaire = StudyQuestionnaire(phase=phase, **values)
-        session.questionnaires[phase] = questionnaire
-        session.research_events.append(ResearchEvent(name=f"questionnaire_{phase}_submitted"))
+        if phase in session.questionnaires or phase in session.questionnaire_skips:
+            raise QuestionnaireConflictError("This questionnaire decision is already recorded and cannot be changed")
+        if phase == "pre" and session.roleplay:
+            raise QuestionnaireConflictError("Pre-ratings must be recorded before the rehearsal starts")
+        if phase == "post" and (
+            not session.roleplay or session.roleplay.status != RolePlayStatus.COMPLETED
+            or not session.roleplay.completed_at or not session.feedback
+            or not post_token or post_token != session.post_questionnaire_token
+        ):
+            raise QuestionnaireConflictError("Post-ratings are only available immediately after completing the rehearsal")
+        answers = {key: value for key, value in values.items() if value is not None}
+        required = {"confidence", "anxiety"} if phase == "pre" else {"confidence", "realism", "usefulness"}
+        if (skipped and answers) or (not skipped and set(answers) != required):
+            raise ValueError("Answer every question for this phase, or explicitly skip without ratings")
+        questionnaire = None if skipped else StudyQuestionnaire(phase=phase, **answers)
+        if questionnaire:
+            session.questionnaires[phase] = questionnaire
+        else:
+            session.questionnaire_skips[phase] = utcnow()
+        if phase == "post":
+            session.post_questionnaire_token = None
+        session.research_events.append(ResearchEvent(name=f"questionnaire_{phase}_{'skipped' if skipped else 'submitted'}"))
         await self.save(session)
         return questionnaire
+
+    async def close_post_questionnaire(self, session_id: UUID, user_id: UUID) -> None:
+        session = await self.get_session(session_id, user_id)
+        if session.post_questionnaire_token:
+            session.post_questionnaire_token = None
+            session.research_events.append(ResearchEvent(name="questionnaire_post_closed"))
+            await self.save(session)
+
     async def complete_feedback(self, session: Session) -> None:
         if not session.roleplay: return
         feedback = self.roleplays.feedback(session.roleplay)
@@ -291,3 +337,4 @@ class ConversationService:
         if isinstance(self.generator, OpenAIResponseGenerator): feedback = await self.generator.phrase_feedback(feedback)
         feedback.session_id = session.id
         session.feedback = feedback
+        session.post_questionnaire_token = secrets.token_urlsafe(32)

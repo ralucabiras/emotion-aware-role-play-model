@@ -129,7 +129,7 @@ def test_auth_session_chat_and_feedback() -> None:
         response = client.post("/api/chat", headers=headers, json={"session_id": session_id, "message": "I'm scared they will think I'm incompetent"})
         assert response.status_code == 200
         assert response.json()["decision"]["strategy"] == "validate_then_reframe"
-        start = client.post(f"/api/sessions/{session_id}/roleplay", headers=headers, json={"scenario_id": "workload", "difficulty": "beginner"})
+        start = client.post(f"/api/sessions/{session_id}/roleplay", headers=headers, json={"pre_skipped": True, "scenario_id": "workload", "difficulty": "beginner"})
         assert start.status_code == 200
         reflection = client.get(f"/api/sessions/{session_id}", headers=headers).json()
         assert len(reflection["turns"]) == 2
@@ -266,7 +266,7 @@ def test_custom_scenario_and_rewind_are_owned_and_preserve_history() -> None:
         started = client.post(
             f"/api/sessions/{session_id}/roleplay",
             headers=headers,
-            json={"scenario_id": scenario["id"], "difficulty": "intermediate"},
+            json={"pre_skipped": True, "scenario_id": scenario["id"], "difficulty": "intermediate"},
         )
         assert started.status_code == 200
         assert started.json()["state"]["scenario"]["title"] == "Requesting flexible hours"
@@ -294,7 +294,7 @@ def test_feedback_compares_previous_matching_attempt_and_saves_takeaway() -> Non
             session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
             assert client.post(
                 f"/api/sessions/{session_id}/roleplay", headers=headers,
-                json={"scenario_id": "workload", "difficulty": "beginner"},
+                json={"pre_skipped": True, "scenario_id": "workload", "difficulty": "beginner"},
             ).status_code == 200
             result = client.post(
                 "/api/chat", headers=headers,
@@ -720,3 +720,56 @@ def test_registration_does_not_disclose_existing_accounts(monkeypatch) -> None:
         assert failed_fresh.json() == failed_duplicate.json()
         for address in (email, "not-registered@example.com"):
             assert client.post("/api/auth/register", json={**payload, "email": address, "consent": False}).status_code == 400
+
+
+def test_questionnaires_require_explicit_decisions_correct_timing_and_preserve_answers() -> None:
+    with TestClient(app) as client:
+        headers = auth(client, "questionnaire-timing@example.com")
+        session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+        pre_url = f"/api/sessions/{session_id}/questionnaires/pre"
+        post_url = f"/api/sessions/{session_id}/questionnaires/post"
+        start_url = f"/api/sessions/{session_id}/roleplay"
+        post = {"confidence": 6, "realism": 5, "usefulness": 7}
+        assert client.put(post_url, headers=headers, json=post).status_code == 409
+        assert client.post(start_url, headers=headers, json={"scenario_id": "workload"}).status_code == 409
+        assert client.put(pre_url, headers=headers, json={"confidence": 4}).status_code == 400
+        assert client.put(pre_url, headers=headers, json={"skipped": True, "confidence": 4}).status_code == 400
+        started = client.post(start_url, headers=headers, json={"scenario_id": "workload", "pre_ratings": {"confidence": 2, "anxiety": 6}})
+        assert started.status_code == 200
+        initial = client.get(f"/api/sessions/{session_id}", headers=headers).json()
+        original_pre = initial["questionnaires"]["pre"]
+        assert original_pre["submitted_at"] <= initial["roleplay"]["started_at"]
+        assert client.put(pre_url, headers=headers, json={"confidence": 7, "anxiety": 1}).status_code == 409
+        assert client.put(post_url, headers=headers, json=post).status_code == 409
+        finished = client.post(f"{start_url}/action", headers=headers, json={"action": "finish"}).json()
+        token = finished["post_questionnaire_token"]
+        assert token
+        assert client.get(f"/api/sessions/{session_id}", headers=headers).json()["post_questionnaire_token"] is None
+        assert client.put(post_url, headers=headers, json=post).status_code == 409
+        assert client.put(post_url, headers=headers, json={"confidence": 4, "post_token": token}).status_code == 400
+        saved = client.put(post_url, headers=headers, json={**post, "post_token": token})
+        assert saved.status_code == 200
+        assert client.put(post_url, headers=headers, json={**post, "confidence": 1, "post_token": token}).status_code == 409
+        assert client.post(f"{start_url}/action", headers=headers, json={"action": "finish"}).status_code == 409
+        restored = client.get(f"/api/sessions/{session_id}", headers=headers).json()
+        assert restored["questionnaires"]["pre"] == original_pre
+        assert restored["questionnaires"]["post"] == saved.json()["questionnaire"]
+
+        # Explicit skips record no numeric response; late submissions stay closed.
+        retry = client.post(start_url, headers=headers, json={"scenario_id": "boundary", "pre_skipped": True}).json()
+        second_id = retry["session_id"]
+        second_url = f"/api/sessions/{second_id}"
+        second = client.get(second_url, headers=headers).json()
+        assert second["questionnaires"] == {} and second["questionnaire_skips"]["pre"]
+        assert client.put(second_url+"/questionnaires/pre", headers=headers, json={"confidence": 2, "anxiety": 6}).status_code == 409
+        completed = client.post(second_url+"/roleplay/action", headers=headers, json={"action": "finish"}).json()
+        skip = client.put(second_url+"/questionnaires/post", headers=headers, json={"skipped": True, "post_token": completed["post_questionnaire_token"]})
+        assert skip.status_code == 200 and skip.json()["questionnaire"] is None
+        second = client.get(second_url, headers=headers).json()
+        assert second["questionnaires"] == {} and second["questionnaire_skips"]["post"]
+        third = client.post(start_url, headers=headers, json={"scenario_id": "workload", "pre_skipped": True}).json()["session_id"]
+        third_url = f"/api/sessions/{third}"
+        completed = client.post(third_url+"/roleplay/action", headers=headers, json={"action": "finish"}).json()
+        assert client.post(third_url+"/questionnaires/post/close", headers=headers).status_code == 204
+        assert client.put(third_url+"/questionnaires/post", headers=headers, json={**post, "post_token": completed["post_questionnaire_token"]}).status_code == 409
+        assert client.get(third_url, headers=headers).json()["questionnaires"] == {}

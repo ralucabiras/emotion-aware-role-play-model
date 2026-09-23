@@ -48,3 +48,5 @@ Source counts cover assistant turns, including scripted openings and closing/saf
 Skill metrics, timestamps, and source/fallback counts live in durable `study_records`, so CSV generation does not require the original conversation session to remain available. Freezing stores the complete CSV bytes and SHA-256 checksum; subsequent downloads return those bytes even if identifiable live records are later removed by withdrawal.
 
 The export excludes names, emails, password data, account IDs, conversation text, raw audio, custom scenario wording, feedback prose, takeaways, and free-text event properties. Fixed numeric metric names and generation/event codes remain available for analysis.
+
+Questionnaire decisions are immutable. Explicit skips leave the corresponding numeric columns blank and appear in `event_counts_json` as `questionnaire_pre_skipped` or `questionnaire_post_skipped`. Leaving a pending post-questionnaire produces `questionnaire_post_closed`. These events distinguish intentional skipping and screen exit from otherwise unknown missingness; neither is a zero rating. Reopening a completed session cannot add retrospective ratings.

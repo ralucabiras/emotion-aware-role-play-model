@@ -73,7 +73,11 @@ from app.services.auth_service import (
     AuthService,
     EmailNotVerifiedError,
 )
-from app.services.conversation_service import ConversationService, SessionNotFoundError
+from app.services.conversation_service import (
+    ConversationService,
+    QuestionnaireConflictError,
+    SessionNotFoundError,
+)
 from app.services.eligibility import OTHER_CRITERIA, eligibility_version, has_current_eligibility
 from app.services.email_service import EmailDeliveryError
 from app.services.multimodal_service import (
@@ -497,6 +501,8 @@ async def withdraw_from_study(
     research_events_deleted = sum(len(record.events) for record in records)
     for session in await repository.list_sessions(user.id):
         session.questionnaires = {}
+        session.questionnaire_skips = {}
+        session.post_questionnaire_token = None
         session.research_events = []
         await repository.save_session(session)
     await repository.delete_study_records(user.id)
@@ -774,7 +780,7 @@ async def list_sessions(user: User = Depends(current_user), service: Conversatio
 async def get_session(session_id: UUID, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     try: session = await service.get_session(session_id, user.id)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
-    return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway)
+    return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
 
 
 @router.patch("/sessions/{session_id}/title", response_model=SessionSummary)
@@ -788,7 +794,7 @@ async def rename_session(session_id: UUID, request: SessionTitleRequest, user: U
 async def save_takeaway(session_id: UUID, request: TakeawayRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     try: session = await service.save_takeaway(session_id, user.id, request.takeaway)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
-    return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway)
+    return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
 
 
 @router.delete("/sessions/{session_id}", status_code=204)
@@ -802,7 +808,7 @@ async def chat(request: ChatRequest, user: User = Depends(current_user), service
     try: turn, decision, session = await service.chat(request.session_id, user.id, request.message)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return ChatResponse(turn=turn, decision=decision, roleplay=session.roleplay, feedback=session.feedback)
+    return ChatResponse(turn=turn, decision=decision, roleplay=session.roleplay, feedback=session.feedback, post_questionnaire_token=session.post_questionnaire_token)
 
 
 @router.get("/roleplay/scenarios")
@@ -848,10 +854,11 @@ async def start_roleplay(session_id: UUID, request: StartRolePlayRequest, user: 
     try:
         session, scenario, turn = await service.start_roleplay(
             session_id, user.id, request.scenario_id, request.difficulty, custom,
-            request.pre_ratings.model_dump() if request.pre_ratings else None,
+            request.pre_ratings.model_dump() if request.pre_ratings else None, request.pre_skipped,
         )
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except KeyError: raise HTTPException(404, "Scenario not found") from None
+    except ValueError as exc: raise HTTPException(409, str(exc)) from None
     return StartRolePlayResponse(session_id=session.id, emotion_state=session.emotion_state, state=session.roleplay, scenario=scenario, opening_turn=turn)
 
 
@@ -860,7 +867,7 @@ async def roleplay_action(session_id: UUID, request: RolePlayActionRequest, user
     try: session = await service.set_roleplay_status(session_id, user.id, request.action)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway)
+    return SessionResponse(post_questionnaire_token=session.post_questionnaire_token, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
 
 
 @router.post("/sessions/{session_id}/roleplay/rewind", response_model=RewindResponse)
@@ -868,7 +875,7 @@ async def rewind_roleplay(session_id: UUID, user: User = Depends(current_user), 
     try: removed, session = await service.rewind_roleplay(session_id, user.id)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return RewindResponse(removed_message=removed, session=SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway))
+    return RewindResponse(removed_message=removed, session=SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()}))
 
 
 @router.get("/sessions/{session_id}/feedback")
@@ -891,10 +898,20 @@ async def submit_questionnaire(
 ):
     try:
         questionnaire = await service.submit_questionnaire(
-            session_id, user.id, phase, request.model_dump()
+            session_id, user.id, phase, request.model_dump(exclude={"skipped", "post_token"}), request.skipped, request.post_token
         )
     except SessionNotFoundError:
         raise HTTPException(404, "Session not found") from None
+    except QuestionnaireConflictError as exc:
+        raise HTTPException(409, str(exc)) from None
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from None
     return StudyQuestionnaireResponse(questionnaire=questionnaire)
+
+
+@router.post("/sessions/{session_id}/questionnaires/post/close", status_code=204)
+async def close_post_questionnaire(session_id: UUID, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
+    try:
+        await service.close_post_questionnaire(session_id, user.id)
+    except SessionNotFoundError:
+        raise HTTPException(404, "Session not found") from None

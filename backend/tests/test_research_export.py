@@ -49,7 +49,7 @@ async def test_export_contains_scores_sources_and_zero_session_participants():
     workspace = await service.create_session(active.id)
     session, _, _ = await service.start_roleplay(workspace.id, active.id, "workload", Difficulty.INTERMEDIATE, pre_ratings={"confidence": 2, "anxiety": 6})
     await service.chat(session.id, active.id, "I need you to move the report deadline to Friday because I have 12 hours of work this week.")
-    await service.submit_questionnaire(session.id, active.id, "post", {"confidence": 5, "realism": 6, "usefulness": 7})
+    await service.submit_questionnaire(session.id, active.id, "post", {"confidence": 5, "realism": 6, "usefulness": 7}, post_token=session.post_questionnaire_token)
     session.takeaway = "PRIVATE_TAKEAWAY"
     session.research_events.append(ResearchEvent(name="custom_event", properties={"note": "PRIVATE_EVENT_TEXT"}))
     await service.save(session)

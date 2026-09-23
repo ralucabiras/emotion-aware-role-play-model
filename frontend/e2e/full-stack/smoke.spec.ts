@@ -42,6 +42,8 @@ test('compiled app, FastAPI, and MongoDB complete and persist the core study jou
   await page.goto('/app')
   await page.getByRole('button', { name: 'Start a role-play' }).click()
   await page.getByLabel('intermediate').check()
+  await page.getByLabel('How confident do you feel about this conversation?').selectOption('4')
+  await page.getByLabel('How anxious do you feel about this conversation?').selectOption('4')
   await page.getByRole('button', { name: /Begin with the manager/ }).click()
   await expect(page.getByText('Thanks for meeting with me. What did you want to discuss?')).toBeVisible()
   await page.getByPlaceholder(/Respond to your manager/).fill(
@@ -49,8 +51,11 @@ test('compiled app, FastAPI, and MongoDB complete and persist the core study jou
   )
   await page.getByLabel('Send message').click()
   await expect(page.getByText('Rehearsal complete')).toBeVisible()
+  await page.getByLabel('Confidence now').selectOption('4')
+  await page.getByLabel('Scenario realism').selectOption('4')
+  await page.getByLabel('Feedback usefulness').selectOption('4')
   await page.getByRole('button', { name: 'Save research ratings' }).click()
-  await expect(page.getByText('Thank you. Your ratings were saved with this session.')).toBeVisible()
+  await expect(page.getByText('Your original ratings are saved and cannot be changed.')).toBeVisible()
 
   const studySessions = await api<Array<{session_id:string; roleplay?:{status:string}}>>(page, '/sessions')
   const roleplaySession = studySessions.find(item => item.roleplay?.status === 'completed')

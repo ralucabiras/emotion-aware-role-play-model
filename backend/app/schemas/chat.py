@@ -167,13 +167,17 @@ class ChatResponse(BaseModel):
     decision: AgentDecision
     roleplay: RolePlayState | None = None
     feedback: SessionFeedback | None = None
+    post_questionnaire_token: str | None = None
 class SessionResponse(BaseModel):
+    questionnaires: dict[str, StudyQuestionnaire] = Field(default_factory=dict)
+    questionnaire_skips: dict[str, str] = Field(default_factory=dict)
     session_id: UUID
     title: str
     turns: list[ConversationTurn]
     emotion_state: EmotionState
     roleplay: RolePlayState | None = None
     feedback: SessionFeedback | None = None
+    post_questionnaire_token: str | None = None
     takeaway: str = ""
 class SessionSummary(BaseModel):
     session_id: UUID
@@ -195,6 +199,8 @@ class TakeawayRequest(BaseModel):
 
 
 class StudyQuestionnaireRequest(BaseModel):
+    skipped: StrictBool = False
+    post_token: str | None = Field(default=None, max_length=100)
     confidence: int | None = Field(default=None, ge=1, le=7)
     anxiety: int | None = Field(default=None, ge=1, le=7)
     realism: int | None = Field(default=None, ge=1, le=7)
@@ -202,7 +208,7 @@ class StudyQuestionnaireRequest(BaseModel):
 
 
 class StudyQuestionnaireResponse(BaseModel):
-    questionnaire: StudyQuestionnaire
+    questionnaire: StudyQuestionnaire | None
 class PreRehearsalRatings(BaseModel):
     confidence: int = Field(ge=1, le=7)
     anxiety: int = Field(ge=1, le=7)
@@ -212,6 +218,7 @@ class StartRolePlayRequest(BaseModel):
     scenario_id: str
     difficulty: Difficulty = Difficulty.BEGINNER
     pre_ratings: PreRehearsalRatings | None = None
+    pre_skipped: StrictBool = False
 class StartRolePlayResponse(BaseModel):
     session_id: UUID
     emotion_state: EmotionState

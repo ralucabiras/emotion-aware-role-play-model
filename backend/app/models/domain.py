@@ -262,6 +262,8 @@ class Session(BaseModel):
     feedback: SessionFeedback | None = None
     takeaway: str = ""
     questionnaires: dict[str, StudyQuestionnaire] = Field(default_factory=dict)
+    questionnaire_skips: dict[str, datetime] = Field(default_factory=dict)
+    post_questionnaire_token: str | None = None
     research_events: list[ResearchEvent] = Field(default_factory=list)
 
 

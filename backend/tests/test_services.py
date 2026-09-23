@@ -299,7 +299,7 @@ async def test_new_rehearsal_preserves_attempt_ratings_and_study_record(next_sce
     assert first.id == workspace.id  # Do not leave an empty workspace behind.
     await service.chat(first.id, user.id, "I need you to move the report deadline to Friday because I have 12 hours of work this week.")
     assert first.feedback is not None
-    await service.submit_questionnaire(first.id, user.id, "post", {"confidence": 6, "realism": 5, "usefulness": 7})
+    await service.submit_questionnaire(first.id, user.id, "post", {"confidence": 6, "realism": 5, "usefulness": 7}, post_token=first.post_questionnaire_token)
     await service.save_takeaway(first.id, user.id, "Keep the first takeaway.")
     original_session = first.model_dump(mode="json")
     original_record = (await repository.list_study_records(user.id))[0].model_dump(mode="json")
