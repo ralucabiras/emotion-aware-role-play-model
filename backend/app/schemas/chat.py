@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, StrictBool
 
 from app.models.domain import (
     AgentDecision,
@@ -45,6 +45,8 @@ class UserResponse(BaseModel):
     pilot_enrolled: bool = False
     study_consent_version: str | None = None
     study_consented_at: str | None = None
+    eligibility_version: str | None = None
+    eligibility_confirmed_at: str | None = None
     study_withdrawn: bool = False
     study_withdrawn_at: str | None = None
     participant_id: UUID
@@ -57,6 +59,11 @@ class OnboardingRequest(BaseModel):
 class PilotEnrollmentRequest(BaseModel):
     access_code: str = Field(min_length=1, max_length=100)
     consent_version: str = Field(min_length=1, max_length=80)
+    eligibility_version: str = Field(min_length=1, max_length=80)
+    age_confirmed: StrictBool = False
+    geography_confirmed: StrictBool = False
+    english_confirmed: StrictBool = False
+    other_criteria_confirmed: StrictBool = False
     information_sheet_read: bool = False
     research_participation_accepted: bool = False
     data_processing_accepted: bool = False
@@ -68,6 +75,11 @@ class StudyContact(BaseModel):
 
 
 class StudyInformationResponse(BaseModel):
+    eligibility_version: str
+    minimum_participant_age: int
+    geographic_scope: str
+    supported_language: str
+    other_eligibility_criteria: list[str]
     version: str
     protocol_version: str
     study_label: str

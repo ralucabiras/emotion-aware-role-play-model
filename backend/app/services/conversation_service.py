@@ -22,6 +22,7 @@ from app.services.affect_service import (
     RuleBasedCognitiveAnalyzer,
     RuleBasedEmotionAnalyzer,
 )
+from app.services.eligibility import has_current_eligibility
 from app.services.interfaces import CognitiveAnalyzer, EmotionAnalyzer, ResponseGenerator, StrategySelector
 from app.services.llm_service import OpenAIResponseGenerator
 from app.services.roleplay_service import SCENARIOS, RolePlayService
@@ -53,6 +54,7 @@ class ConversationService:
             if not (
                 user.pilot_enrolled_at
                 and user.study_consent
+                and has_current_eligibility(user)
                 and user.study_consent.version == settings.study_consent_version
                 and user.study_consent.protocol_version == settings.study_protocol_version
                 and not user.study_withdrawal
@@ -91,6 +93,7 @@ class ConversationService:
             user
             and user.pilot_enrolled_at
             and user.study_consent
+            and has_current_eligibility(user)
             and user.study_consent.version == settings.study_consent_version
             and user.study_consent.protocol_version == settings.study_protocol_version
             and not user.study_withdrawal

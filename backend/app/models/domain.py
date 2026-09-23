@@ -209,6 +209,12 @@ class StudyConsentRecord(BaseModel):
     data_processing_accepted: bool = True
 
 
+class StudyEligibilityRecord(BaseModel):
+    version: str
+    protocol_version: str
+    confirmed_at: datetime = Field(default_factory=utcnow)
+
+
 class StudyWithdrawalRecord(BaseModel):
     withdrawn_at: datetime = Field(default_factory=utcnow)
     consent_version: str
@@ -234,6 +240,7 @@ class User(BaseModel):
     custom_scenarios: list[RolePlayScenario] = Field(default_factory=list)
     pilot_enrolled_at: datetime | None = None
     study_consent: StudyConsentRecord | None = None
+    study_eligibility: StudyEligibilityRecord | None = None
     study_withdrawal: StudyWithdrawalRecord | None = None
     study_excluded_at: datetime | None = None
     study_exclusion_reason: str = ""

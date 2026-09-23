@@ -25,6 +25,7 @@ from app.models.domain import (
     FrozenStudyExport,
     RolePlayScenario,
     StudyConsentRecord,
+    StudyEligibilityRecord,
     StudyLifecycle,
     StudyWithdrawalRecord,
     User,
@@ -75,6 +76,7 @@ from app.services.auth_service import (
     EmailNotVerifiedError,
 )
 from app.services.conversation_service import ConversationService, SessionNotFoundError
+from app.services.eligibility import OTHER_CRITERIA, eligibility_version, has_current_eligibility
 from app.services.email_service import EmailDeliveryError
 from app.services.multimodal_service import (
     MultimodalAffectService,
@@ -96,6 +98,7 @@ def has_current_study_consent(user: User) -> bool:
     return bool(
         user.pilot_enrolled_at
         and user.study_consent
+        and has_current_eligibility(user)
         and user.study_consent.version == settings.study_consent_version
         and user.study_consent.protocol_version == settings.study_protocol_version
         and not user.study_withdrawal
@@ -233,6 +236,8 @@ def user_response(user: User) -> UserResponse:
         pilot_enrolled=has_current_study_consent(user),
         study_consent_version=user.study_consent.version if user.study_consent else None,
         study_consented_at=user.study_consent.accepted_at.isoformat() if user.study_consent else None,
+        eligibility_version=user.study_eligibility.version if user.study_eligibility else None,
+        eligibility_confirmed_at=user.study_eligibility.confirmed_at.isoformat() if user.study_eligibility else None,
         study_withdrawn=bool(user.study_withdrawal),
         study_withdrawn_at=(user.study_withdrawal.withdrawn_at.isoformat() if user.study_withdrawal else None),
         participant_id=user.participant_id,
@@ -349,6 +354,7 @@ async def research_export(
         "participant_id": str(user.participant_id),
         "account_privacy_acceptance": {"version": user.consent_version, "accepted_at": user.consented_at},
         "study_consent": user.study_consent.model_dump(mode="json") if user.study_consent else None,
+        "study_eligibility": user.study_eligibility.model_dump(mode="json") if user.study_eligibility else None,
         "study_withdrawal": user.study_withdrawal.model_dump(mode="json") if user.study_withdrawal else None,
         "practice_goals": [goal.value for goal in user.practice_goals],
         "contains_conversation_text": False,
@@ -379,6 +385,11 @@ async def research_export(
 @router.get("/research/study-information", response_model=StudyInformationResponse)
 async def study_information(user: User = Depends(current_user)):
     return StudyInformationResponse(
+        eligibility_version=eligibility_version(),
+        minimum_participant_age=settings.minimum_participant_age,
+        geographic_scope=settings.geographic_scope,
+        supported_language=settings.supported_language,
+        other_eligibility_criteria=OTHER_CRITERIA,
         version=settings.study_consent_version,
         protocol_version=settings.study_protocol_version,
         study_label=settings.pilot_study_label,
@@ -447,6 +458,11 @@ async def enroll_in_pilot(
         raise HTTPException(409, "The participant information has changed. Review the current version before consenting.")
     if not all((request.information_sheet_read, request.research_participation_accepted, request.data_processing_accepted)):
         raise HTTPException(400, "All study consent confirmations are required")
+    if request.eligibility_version != eligibility_version():
+        raise HTTPException(409, "Eligibility criteria have changed. Review and confirm the current criteria.")
+    if not all((request.age_confirmed, request.geography_confirmed, request.english_confirmed, request.other_criteria_confirmed)):
+        raise HTTPException(400, "All eligibility confirmations are required")
+    user.study_eligibility = StudyEligibilityRecord(version=eligibility_version(), protocol_version=settings.study_protocol_version)
     if not user.pilot_enrolled_at:
         user.pilot_enrolled_at = utcnow()
     user.study_consent = StudyConsentRecord(

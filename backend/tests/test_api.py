@@ -15,6 +15,7 @@ from app.core.container import (
 from app.main import app
 from app.repositories.base import RepositoryIndexesNotReadyError
 from app.repositories.mongo import ConcurrentSessionUpdateError
+from app.services.eligibility import eligibility_version
 from app.services.multimodal_service import MultimodalAffectService
 from app.services.transcription_service import TranscriptionResult
 
@@ -332,6 +333,11 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
                 "information_sheet_read": True,
                 "research_participation_accepted": True,
                 "data_processing_accepted": True,
+                "eligibility_version": eligibility_version(),
+                "age_confirmed": True,
+                "geography_confirmed": True,
+                "english_confirmed": True,
+                "other_criteria_confirmed": True,
             }
             invalid = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "wrong", **consent})
             assert invalid.status_code == 400
@@ -339,11 +345,27 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
             assert missing_consent.status_code == 400
             stale = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026", **consent, "consent_version": "old-version"})
             assert stale.status_code == 409
+            for field in ("age_confirmed", "geography_confirmed", "english_confirmed", "other_criteria_confirmed"):
+                for value in (False, None, "true"):
+                    rejected = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026", **consent, field: value})
+                    assert rejected.status_code in (400, 422)
+                missing = {key: value for key, value in consent.items() if key != field}
+                assert client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026", **missing}).status_code == 400
+            assert client.get("/api/auth/me", headers=participant_headers).json()["eligibility_confirmed_at"] is None
+            assert client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026", **consent, "eligibility_version": "stale"}).status_code == 409
             enrolled = client.post("/api/research/enroll", headers=participant_headers, json={"access_code": "pilot-code-2026", **consent})
             assert enrolled.status_code == 200
             assert enrolled.json()["pilot_enrolled"] is True
             assert enrolled.json()["study_consent_version"] == version
             assert enrolled.json()["study_consented_at"]
+            assert enrolled.json()["eligibility_version"] == information.json()["eligibility_version"]
+            assert enrolled.json()["eligibility_confirmed_at"]
+            previous_scope = settings.geographic_scope
+            try:
+                settings.geographic_scope = "Changed scope"
+                assert client.get("/api/auth/me", headers=participant_headers).json()["pilot_enrolled"] is False
+            finally:
+                settings.geographic_scope = previous_scope
             participant_id = enrolled.json()["participant_id"]
             session_id = client.post("/api/sessions", headers=participant_headers).json()["session_id"]
             client.post("/api/chat", headers=participant_headers, json={"session_id": session_id, "message": "private pilot conversation text"})
@@ -368,6 +390,8 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
             personal_export = client.get("/api/auth/research-export", headers=participant_headers).json()
             assert personal_export["study_consent"]["version"] == version
             assert personal_export["study_consent"]["accepted_at"]
+            assert set(personal_export["study_eligibility"]) == {"version", "protocol_version", "confirmed_at"}
+            assert personal_export["study_eligibility"]["confirmed_at"].replace("Z", "+00:00") == enrolled.json()["eligibility_confirmed_at"]
 
             client.put(
                 f"/api/sessions/{session_id}/questionnaires/pre",
@@ -443,6 +467,11 @@ def test_research_lifecycle_review_and_immutable_frozen_export() -> None:
                     "information_sheet_read": True,
                     "research_participation_accepted": True,
                     "data_processing_accepted": True,
+                    "eligibility_version": eligibility_version(),
+                    "age_confirmed": True,
+                    "geography_confirmed": True,
+                    "english_confirmed": True,
+                    "other_criteria_confirmed": True,
                 },
             ).json()
             participant_id = enrolled["participant_id"]
@@ -547,6 +576,11 @@ def test_research_questionnaires_and_export_exclude_identity_and_conversation_te
                     "information_sheet_read": True,
                     "research_participation_accepted": True,
                     "data_processing_accepted": True,
+                    "eligibility_version": eligibility_version(),
+                    "age_confirmed": True,
+                    "geography_confirmed": True,
+                    "english_confirmed": True,
+                    "other_criteria_confirmed": True,
                 },
             )
             assert enrolled.status_code == 200
