@@ -11,6 +11,7 @@ export const baseUser = {
 
 const emotion = { dominant_emotion: 'neutral', valence: 0, arousal: .2, confidence: .7, trend: 'stable' }
 const scenario = { id: 'workload', title: 'Workload conversation', character: 'manager', situation: 'Your workload is too high.', user_objective: 'Agree a realistic priority.', opening_line: 'What did you want to discuss?', expected_skills: ['clarity', 'specificity', 'boundary_maintenance'] }
+const studyScenarios = [scenario, {...scenario,id:'boundary',title:'Boundary conversation',character:'friend'}, {...scenario,id:'relationship',title:'Relationship conversation',character:'partner'}]
 const feedback = { session_id: 'session-1', scenario_id: 'workload', observed: ['You made a concrete request.'], strengths: ['Your request was specific.'], suggestions: ['State the boundary earlier.'], generation_source: 'template', metrics: [{name:'clarity',score:.8,evidence_turns:[1]}], compared_with_session_id:null, comparisons:[] }
 
 export type MockOptions = { authenticated?: boolean; onboarding?: boolean; researcher?: boolean; enrolled?: boolean; transcription?: 'success'|'unavailable'; existingSession?: boolean }
@@ -26,6 +27,7 @@ export async function installApiMock(page: Page, options: MockOptions = {}) {
     questionnaires: {} as Record<string,unknown>,
     questionnaire_skips: {} as Record<string,string>,
     postToken: null as string|null,
+    studyTaskStatuses: {workload:'not_started',boundary:'not_started',relationship:'not_started'} as Record<string,string>,
     deletedAccount: false,
     exported: false,
     customScenario: null as null | typeof scenario,
@@ -45,7 +47,7 @@ export async function installApiMock(page: Page, options: MockOptions = {}) {
     if (path === '/auth/logout') { state.authenticated=false; return json(route,null,204) }
     if (path === '/auth/me' && method === 'DELETE') { state.deletedAccount=true; state.authenticated=false; return json(route,null,204) }
     if (path === '/models/info') return json(route,{trained_model:true,multimodal_model:'test',multimodal_status:'ready',transcription_available:options.transcription!=='unavailable',transcription_model:'gpt-4o-mini-transcribe',disclaimer:'Research estimate.'})
-    if (path === '/roleplay/scenarios' && method === 'GET') return json(route,[scenario])
+    if (path === '/roleplay/scenarios' && method === 'GET') return json(route,options.enrolled?studyScenarios:[scenario])
     if (path === '/roleplay/scenarios' && method === 'POST') { state.customScenario={...scenario,id:'custom_assertiveness',title:'Flexible hours',character:'team lead',opening_line:'What would you like to discuss?'}; return json(route,state.customScenario) }
     if (path === '/sessions' && method === 'GET') return json(route,(options.existingSession || state.turns.length || state.roleplay) ? [summary()] : [])
     if (path === '/sessions' && method === 'POST') return json(route,{session_id:'session-1',emotion_state:emotion},201)
@@ -56,16 +58,21 @@ export async function installApiMock(page: Page, options: MockOptions = {}) {
     if (path === '/chat') { const message=JSON.parse(request.postData()||'{}').message; state.turns.push({id:`user-${state.turns.length}`,role:'user',content:message,created_at:now}); const turn={id:`assistant-${state.turns.length}`,role:'assistant',content:state.roleplay?'Could we agree which task should move to next week?':'What outcome would feel useful to you?',created_at:now};state.turns.push(turn);if(state.roleplay)state.roleplay={...state.roleplay,turn:Number(state.roleplay.turn)+1,success_progress:.67};return json(route,{turn,decision:{emotion_state:emotion,strategy:'clarify',cognitive_assessment:{possible_distortion:null,possible_cause:null,intent:'practice'},decision_reasons:[],analyzer_version:'test'},roleplay:state.roleplay,feedback:null}) }
     if (path === '/audio/transcriptions') return options.transcription === 'unavailable' ? json(route,{detail:'Transcription unavailable'},503) : json(route,{text:'I am nervous about tomorrow.',model:'test',latency_ms:12,audio_persisted:false})
     if (path === '/affect/multimodal') return json(route,{label:'anxiety',confidence:.72,distribution:{anxiety:.72,neutral:.28},text_label:'anxiety',text_confidence:.8,text_distribution:{anxiety:.8},audio_label:'neutral',audio_confidence:.55,audio_distribution:{neutral:.55},modalities_agree:false,confidence_level:'moderate',low_confidence_threshold:.5,model_version:'test',latency_ms:10,queue_ms:0,audio_persisted:false,disclaimer:'Research estimate.'})
-    if (path === '/sessions/session-1/questionnaires/post/close') {state.postToken=null;return json(route,null,204)}
+    if (path === '/sessions/session-1/questionnaires/post/close') {state.postToken=null;if(state.roleplay&&state.studyTaskStatuses[String(state.roleplay.scenario_id)]==='awaiting_ratings')state.studyTaskStatuses[String(state.roleplay.scenario_id)]='incomplete';return json(route,null,204)}
     if (path === '/sessions/session-1/questionnaires/pre' || path === '/sessions/session-1/questionnaires/post') {
       const phase=path.endsWith('/pre')?'pre':'post',payload=request.postDataJSON()
       if(state.questionnaires[phase]||state.questionnaire_skips[phase])return json(route,{detail:'Decision already recorded'},409)
-      if(payload.skipped){state.questionnaire_skips[phase]=now;return json(route,{questionnaire:null})}
+      if(payload.skipped){if(phase==='post'&&state.roleplay)state.studyTaskStatuses[String(state.roleplay.scenario_id)]='incomplete';state.questionnaire_skips[phase]=now;return json(route,{questionnaire:null})}
+      if(phase==='post'&&state.roleplay)state.studyTaskStatuses[String(state.roleplay.scenario_id)]='complete'
       state.questionnaires[phase]={phase,...payload,submitted_at:now};return json(route,{questionnaire:state.questionnaires[phase]})
     }
-    if (path === '/sessions/session-1/roleplay' && method === 'POST') { const requested=JSON.parse(request.postData()||'{}').scenario_id;const selected=requested?.startsWith('custom_')&&state.customScenario?state.customScenario:scenario;state.roleplay={scenario_id:selected.id,scenario:selected,difficulty_level:'intermediate',status:'active',turn:0,success_progress:0,completion_reason:null}; const opening={id:'opening',role:'assistant',content:selected.opening_line,created_at:now};state.turns=[opening];return json(route,{session_id:'session-1',emotion_state:emotion,scenario:selected,opening_turn:opening,state:state.roleplay}) }
-    if (path === '/sessions/session-1/roleplay/action') { const action=JSON.parse(request.postData()||'{}').action; if(action==='finish')state.postToken='post-token';state.roleplay={...state.roleplay,status:action==='finish'?'completed':action==='pause'?'paused':'active',completion_reason:action==='finish'?'manual':null};return json(route,{...session(),post_questionnaire_token:state.postToken}) }
+    if (path === '/sessions/session-1/roleplay' && method === 'POST') { const requested=JSON.parse(request.postData()||'{}').scenario_id;const selected=requested?.startsWith('custom_')&&state.customScenario?state.customScenario:(studyScenarios.find(item=>item.id===requested)??scenario);state.questionnaires={};state.questionnaire_skips={};state.postToken=null;state.studyTaskStatuses[selected.id]='in_progress';state.roleplay={scenario_id:selected.id,scenario:selected,difficulty_level:'intermediate',status:'active',turn:0,success_progress:0,completion_reason:null}; const opening={id:'opening',role:'assistant',content:selected.opening_line,created_at:now};state.turns=[opening];return json(route,{session_id:'session-1',emotion_state:emotion,scenario:selected,opening_turn:opening,state:state.roleplay}) }
+    if (path === '/sessions/session-1/roleplay/action') { const action=JSON.parse(request.postData()||'{}').action; if(action==='finish'){state.postToken='post-token';state.studyTaskStatuses[String(state.roleplay?.scenario_id)]='awaiting_ratings'}state.roleplay={...state.roleplay,status:action==='finish'?'completed':action==='pause'?'paused':'active',completion_reason:action==='finish'?'manual':null};return json(route,{...session(),post_questionnaire_token:state.postToken}) }
     if (path === '/sessions/session-1/roleplay/rewind') { state.turns=state.turns.slice(0,-2);state.roleplay={...state.roleplay,turn:Math.max(0,Number(state.roleplay?.turn||0)-1)};return json(route,{removed_message:'test',session:session()}) }
+    if (path === '/research/progress') {
+      const tasks=studyScenarios.map((item,index)=>({order:index+1,scenario_id:item.id,title:item.title,difficulty:'intermediate',status:state.studyTaskStatuses[item.id],session_id:['in_progress','awaiting_ratings'].includes(state.studyTaskStatuses[item.id])?'session-1':null}))
+      return json(route,{protocol_version:'test-v1',tasks,completed_tasks:tasks.filter(task=>task.status==='complete').length,next_task_id:tasks.find(task=>['not_started','in_progress','awaiting_ratings'].includes(task.status))?.scenario_id??null,available:true})
+    }
     if (path === '/research/study-information') return json(route,{version:'2026.1',protocol_version:'AL-FEAS-1.0',study_label:'AffectLab pilot',title:'Participant information',summary:'A feasibility study.',data_collected:['Ratings'],processors:['OpenAI'],audio_and_transcripts:['Audio is not retained.'],retention:'One year.',risks_and_limitations:['Predictions may be wrong.'],withdrawal:['Withdraw from settings.'],researcher:{name:'Researcher',email:'research@example.com'},supervisor:{name:'Supervisor',email:'supervisor@example.com'},institution:'Test University'})
     if (path === '/research/enroll') { state.user={...state.user,pilot_enrolled:true,study_consent_version:'2026.1',study_consented_at:now};return json(route,state.user) }
     if (path === '/research/withdraw') { state.user={...state.user,pilot_enrolled:false,study_withdrawn:true,study_withdrawn_at:now};return json(route,{user:state.user,questionnaires_deleted:1,research_events_deleted:2,message:'Withdrawal recorded.',anonymized_analysis_notice:'Aggregate analysis may remain.'}) }

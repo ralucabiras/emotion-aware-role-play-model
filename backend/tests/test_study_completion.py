@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.api.routes import pilot_dataset
+from app.api.routes import participant_study_progress, pilot_dataset
 from app.core.config import settings
 from app.models.domain import (
     Difficulty,
@@ -102,3 +102,64 @@ async def test_protocol_completion_requires_current_protocol_all_scenarios_and_i
     _, rows, dashboard = await pilot_dataset(repository)
     assert dashboard["protocol_completers"] == 1
     assert rows[0]["protocol_complete"] is True
+
+
+@pytest.mark.asyncio
+async def test_participant_checklist_uses_durable_records_and_protocol_order():
+    repository, user = await enrolled_cohort()
+    progress = await participant_study_progress(user, repository)
+    assert [task["scenario_id"] for task in progress["tasks"]] == ["workload", "boundary", "relationship"]
+    assert all(task["difficulty"] == "intermediate" for task in progress["tasks"])
+    assert progress["completed_tasks"] == 0 and progress["next_task_id"] == "workload"
+    await add_task(repository, user, "workload", difficulty=Difficulty.BEGINNER)
+    assert (await participant_study_progress(user, repository))["next_task_id"] == "workload"
+    # A completed durable record counts even after the conversation has expired.
+    await add_task(repository, user, "workload")
+    progress = await participant_study_progress(user, repository)
+    assert progress["tasks"][0]["status"] == "complete"
+    assert progress["completed_tasks"] == 1 and progress["next_task_id"] == "boundary"
+    await add_task(repository, user, "boundary", post=False)
+    progress = await participant_study_progress(user, repository)
+    assert progress["tasks"][1]["status"] == "incomplete"
+    assert progress["next_task_id"] == "relationship"
+    await add_task(repository, user, "relationship", reason="safety_interruption")
+    progress = await participant_study_progress(user, repository)
+    assert progress["completed_tasks"] == 1 and progress["next_task_id"] is None
+
+
+@pytest.mark.asyncio
+async def test_checklist_resumes_active_attempt_and_waits_for_post_decision():
+    from app.models.domain import StudyLifecycle
+    from app.services.conversation_service import ConversationService
+    from app.services.llm_service import TemplateResponseGenerator
+
+    repository, user = await enrolled_cohort()
+    service = ConversationService(repository, generator=TemplateResponseGenerator())
+    workspace = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(workspace.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_skipped=True)
+    progress = await participant_study_progress(user, repository)
+    assert progress["tasks"][0]["status"] == "in_progress"
+    assert progress["tasks"][0]["session_id"] == str(session.id)
+    await service.set_roleplay_status(session.id, user.id, "finish")
+    assert (await participant_study_progress(user, repository))["tasks"][0]["status"] == "awaiting_ratings"
+    await service.submit_questionnaire(session.id, user.id, "post", {}, skipped=True, post_token=session.post_questionnaire_token)
+    progress = await participant_study_progress(user, repository)
+    assert progress["next_task_id"] == "boundary" and progress["completed_tasks"] == 0
+    await repository.save_study_lifecycle(StudyLifecycle(protocol_version=settings.study_protocol_version, end_date=utcnow().date()-timedelta(days=1)))
+    progress = await participant_study_progress(user, repository)
+    assert progress["available"] is False and progress["next_task_id"] is None
+
+
+@pytest.mark.asyncio
+async def test_participant_progress_does_not_include_another_participant():
+    from fastapi import HTTPException
+
+    repository, user = await enrolled_cohort()
+    other = user.model_copy(update={"id": uuid4(), "participant_id": uuid4(), "email": "other@example.com"})
+    await repository.create_user(other)
+    await add_task(repository, other, "workload")
+    assert (await participant_study_progress(user, repository))["completed_tasks"] == 0
+    user.study_eligibility = None
+    with pytest.raises(HTTPException) as error:
+        await participant_study_progress(user, repository)
+    assert error.value.status_code == 403

@@ -90,7 +90,8 @@ from app.services.roleplay_service import SCENARIOS
 from app.services.transcription_service import InvalidAudio, TranscriptionService, TranscriptionUnavailable
 
 router, bearer = APIRouter(prefix="/api"), HTTPBearer(auto_error=False)
-PROTOCOL_REQUIRED_SCENARIOS = {"workload", "boundary", "relationship"}
+PROTOCOL_TASK_ORDER = ("workload", "boundary", "relationship")
+PROTOCOL_REQUIRED_SCENARIOS = set(PROTOCOL_TASK_ORDER)
 QUALIFYING_COMPLETION_REASONS = {"success", "maximum_turns", "user_finished"}
 
 
@@ -106,6 +107,12 @@ def has_complete_post_questionnaire(record: StudyRecord) -> bool:
             post.confidence, post.realism, post.usefulness,
         ))
     )
+
+
+def is_completed_protocol_task(record: StudyRecord) -> bool:
+    return bool(record.scenario_id in PROTOCOL_REQUIRED_SCENARIOS
+                and record.difficulty == Difficulty.INTERMEDIATE
+                and is_completed_rehearsal(record) and has_complete_post_questionnaire(record))
 
 
 def is_researcher(email: str) -> bool:
@@ -536,6 +543,49 @@ async def withdraw_from_study(
     )
 
 
+@router.get("/research/progress")
+async def participant_study_progress(user: User = Depends(current_user), repository=Depends(get_repository)):
+    if not has_current_study_consent(user):
+        raise HTTPException(403, "Current study enrollment is required")
+    records = [record for record in await repository.list_study_records(user.id)
+               if record.protocol_version == settings.study_protocol_version
+               and record.difficulty == Difficulty.INTERMEDIATE]
+    sessions = {session.id: session for session in await repository.list_sessions(user.id)}
+    tasks = []
+    for index, scenario_id in enumerate(PROTOCOL_TASK_ORDER, 1):
+        attempts = sorted((record for record in records if record.scenario_id == scenario_id),
+                          key=lambda record: record.last_activity_at, reverse=True)
+        latest = attempts[0] if attempts else None
+        session = sessions.get(latest.session_id) if latest else None
+        resumable = session and session.roleplay and session.roleplay.status in {"active", "paused"}
+        awaiting_ratings = session and session.post_questionnaire_token and latest and is_completed_rehearsal(latest)
+        if any(is_completed_protocol_task(record) for record in attempts):
+            status = "complete"
+        elif resumable:
+            status = "in_progress"
+        elif awaiting_ratings:
+            status = "awaiting_ratings"
+        elif latest:
+            status = "incomplete"
+        else:
+            status = "not_started"
+        tasks.append({
+            "order": index, "scenario_id": scenario_id, "title": SCENARIOS[scenario_id].title,
+            "difficulty": "intermediate", "status": status,
+            "session_id": str(session.id) if session and status in {"in_progress", "awaiting_ratings"} else None,
+        })
+    next_task = next((task for task in tasks if task["status"] in {"not_started", "in_progress", "awaiting_ratings"}), None)
+    lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
+    today = utcnow().date()
+    available = not (lifecycle and (lifecycle.dataset_frozen_at or lifecycle.freeze_token
+                     or (lifecycle.start_date and today < lifecycle.start_date)
+                     or (lifecycle.end_date and today > lifecycle.end_date)))
+    return {"protocol_version": settings.study_protocol_version, "tasks": tasks,
+            "completed_tasks": sum(task["status"] == "complete" for task in tasks),
+            "next_task_id": next_task["scenario_id"] if next_task and available else None,
+            "available": available}
+
+
 async def pilot_dataset(repository):
     cohort = [user for user in await repository.list_users() if belongs_to_protocol_cohort(user)]
     users = [user for user in cohort if has_current_study_consent(user)]
@@ -555,10 +605,7 @@ async def pilot_dataset(repository):
         qualifying_scenarios = {
             record.scenario_id
             for record in study_records
-            if record.scenario_id in PROTOCOL_REQUIRED_SCENARIOS
-            and record.difficulty == Difficulty.INTERMEDIATE
-            and is_completed_rehearsal(record)
-            and has_complete_post_questionnaire(record)
+            if is_completed_protocol_task(record)
         }
         protocol_complete = qualifying_scenarios == PROTOCOL_REQUIRED_SCENARIOS
         if eligible:

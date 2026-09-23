@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../services/api'
+import { notifyStudyProgress } from '../services/studyProgress'
 import type { StudyQuestionnaire } from '../types/api'
 
 export function RatingInput({label,value,onChange}:{label:string;value:number|null;onChange:(value:number|null)=>void}) {
@@ -13,7 +14,7 @@ export function PostRatings({sessionId,token}:{sessionId:string;token?:string|nu
   useEffect(()=>{
     let active=true
     const current=++generation.current
-    const close=()=>{void api.closePostQuestionnaire(sessionId).catch(()=>undefined)}
+    const close=()=>{void api.closePostQuestionnaire(sessionId).then(notifyStudyProgress).catch(()=>undefined)}
     // Ignore StrictMode's simulated unmount, but close on a real task-screen exit.
     const closeIfUnmounted=()=>{if(generation.current===current)close()}
     void api.getSession(sessionId).then(session=>{if(active){setSaved(session.questionnaires?.post);setSkipped(Boolean(session.questionnaire_skips?.post));setLoading(false)}}).catch(()=>{if(active){setError('Saved ratings could not be loaded. Reopen this session to review them.');setLoading(false)}})
@@ -27,6 +28,7 @@ export function PostRatings({sessionId,token}:{sessionId:string;token?:string|nu
     try{
       const result=await api.submitQuestionnaire(sessionId,'post',skip?{skipped:true,post_token:token}:{confidence:confidence!,realism:realism!,usefulness:usefulness!,post_token:token})
       if(result.questionnaire)setSaved(result.questionnaire);else setSkipped(true)
+      notifyStudyProgress()
     }catch(caught){setError(caught instanceof Error?caught.message:'Ratings could not be saved. Please try again.')}
     finally{setBusy(false)}
   }

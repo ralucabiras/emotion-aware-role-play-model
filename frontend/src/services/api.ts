@@ -1,4 +1,4 @@
-import type { AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, StudyWithdrawal, UserProfile } from '../types/api'
+import type { StudyProgress, AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, StudyWithdrawal, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -40,6 +40,7 @@ export const api = {
   updateProfile: (profile: Pick<UserProfile,'first_name'|'last_name'|'preferred_name'|'country'|'timezone'>) => request<UserProfile>('/auth/me', { method: 'PATCH', body: JSON.stringify(profile) }),
   changePassword: (currentPassword: string, newPassword: string) => request<void>('/auth/change-password', { method: 'POST', body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }) }),
   researchExport: () => request<ResearchExport>('/auth/research-export'),
+  studyProgress: () => request<StudyProgress>('/research/progress'),
   studyInformation: () => request<StudyInformation>('/research/study-information'),
   enrollPilot: (data:{access_code:string;consent_version:string;eligibility_version:string;age_confirmed:boolean;geography_confirmed:boolean;english_confirmed:boolean;other_criteria_confirmed:boolean;information_sheet_read:boolean;research_participation_accepted:boolean;data_processing_accepted:boolean}) => request<UserProfile>('/research/enroll',{method:'POST',body:JSON.stringify(data)}),
   withdrawFromStudy: () => request<StudyWithdrawal>('/research/withdraw',{method:'POST',body:JSON.stringify({confirm_withdrawal:true})}),
