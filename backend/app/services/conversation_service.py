@@ -79,7 +79,7 @@ class ConversationService:
         await self.sync_study_record(session)
     async def sync_study_record(self, session: Session) -> None:
         lifecycle = await self.repository.get_study_lifecycle(settings.study_protocol_version)
-        if lifecycle and lifecycle.dataset_frozen_at:
+        if lifecycle and (lifecycle.dataset_frozen_at or lifecycle.freeze_token):
             return
         today = utcnow().date()
         if lifecycle and lifecycle.start_date and today < lifecycle.start_date:

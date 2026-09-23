@@ -1,12 +1,16 @@
+import asyncio
 from datetime import timedelta
+from uuid import uuid4
 
 import pytest
 
 from app.models.domain import (
     Difficulty,
     EmotionState,
+    FrozenStudyExport,
     RolePlayStatus,
     Session,
+    StudyLifecycle,
     StudyRecord,
     SupportStrategy,
     User,
@@ -227,3 +231,47 @@ async def test_roleplay_generation_accepts_only_the_deterministic_action() -> No
     )
     assert text == "fallback"
     assert metadata.fallback_reason == "invalid_roleplay_output"
+
+
+@pytest.mark.asyncio
+async def test_dataset_freeze_allows_only_one_owner_and_commits_atomically() -> None:
+    repository = MemoryRepository()
+    protocol = "freeze-concurrency-test"
+    await repository.save_study_lifecycle(StudyLifecycle(protocol_version=protocol))
+    tokens = uuid4(), uuid4()
+
+    claims = await asyncio.gather(
+        *(repository.begin_dataset_freeze(protocol, token) for token in tokens)
+    )
+
+    assert sum(claim is not None for claim in claims) == 1
+    winning_token = tokens[claims.index(next(claim for claim in claims if claim is not None))]
+    export = FrozenStudyExport(
+        protocol_version=protocol,
+        record_count=0,
+        participant_count=0,
+        sha256="0" * 64,
+        csv_content="header\n",
+    )
+    await repository.complete_dataset_freeze(export, winning_token)
+
+    lifecycle = await repository.get_study_lifecycle(protocol)
+    assert lifecycle is not None
+    assert lifecycle.dataset_frozen_at == export.created_at
+    assert lifecycle.frozen_export_id == export.id
+    assert lifecycle.freeze_token is None
+    assert await repository.get_frozen_export(export.id) == export
+
+
+@pytest.mark.asyncio
+async def test_dataset_freeze_abort_releases_claim_without_export() -> None:
+    repository = MemoryRepository()
+    protocol = "freeze-retry-test"
+    await repository.save_study_lifecycle(StudyLifecycle(protocol_version=protocol))
+    first_token, retry_token = uuid4(), uuid4()
+
+    assert await repository.begin_dataset_freeze(protocol, first_token)
+    await repository.abort_dataset_freeze(protocol, first_token)
+
+    assert await repository.begin_dataset_freeze(protocol, retry_token)
+    assert repository.frozen_exports == {}

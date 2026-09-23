@@ -1,7 +1,8 @@
+from datetime import timedelta
 from uuid import UUID
 
-from pymongo import ASCENDING, AsyncMongoClient
-from pymongo.errors import DuplicateKeyError
+from pymongo import ASCENDING, AsyncMongoClient, ReturnDocument
+from pymongo.errors import DuplicateKeyError, OperationFailure
 
 from app.models.domain import FrozenStudyExport, Session, StudyLifecycle, StudyRecord, User, utcnow
 from app.repositories.base import Repository
@@ -25,6 +26,8 @@ class MongoRepository(Repository):
         await self.db.study_records.create_index([("user_id", ASCENDING), ("last_activity_at", -1)])
         await self.db.study_records.create_index("retention_expires_at", expireAfterSeconds=0)
         await self.db.study_lifecycle.create_index("protocol_version", unique=True)
+        await self.db.frozen_study_exports.create_index("id", unique=True)
+        await self.db.frozen_study_exports.create_index("protocol_version", unique=True)
         await self.db.refresh_tokens.create_index("expires_at", expireAfterSeconds=0)
         await self.db.email_verification_tokens.create_index("expires_at", expireAfterSeconds=0)
         await self.db.email_verification_tokens.create_index("user_id", unique=True)
@@ -127,6 +130,74 @@ class MongoRepository(Repository):
     async def get_frozen_export(self, export_id: UUID) -> FrozenStudyExport | None:
         doc = await self.db.frozen_study_exports.find_one({"id": export_id})
         return FrozenStudyExport.model_validate(doc) if doc else None
+    async def begin_dataset_freeze(self, protocol_version: str, token: UUID) -> StudyLifecycle | None:
+        now = utcnow()
+        stale_before = now - timedelta(hours=1)
+        doc = await self.db.study_lifecycle.find_one_and_update(
+            {
+                "protocol_version": protocol_version,
+                "dataset_frozen_at": None,
+                "$or": [
+                    {"freeze_token": None},
+                    {"freeze_token": {"$exists": False}},
+                    {"freeze_started_at": {"$lte": stale_before}},
+                ],
+            },
+            {"$set": {"freeze_token": token, "freeze_started_at": now, "updated_at": now}},
+            return_document=ReturnDocument.AFTER,
+        )
+        if doc:
+            # A worker may have died after writing an export but before publishing
+            # it on the lifecycle. Once its lease is reclaimed, that unreachable
+            # export is safe to remove before rebuilding it.
+            await self.db.frozen_study_exports.delete_many({"protocol_version": protocol_version})
+        return StudyLifecycle.model_validate(doc) if doc else None
+    async def complete_dataset_freeze(self, export: FrozenStudyExport, token: UUID) -> StudyLifecycle:
+        try:
+            async with await self.client.start_session() as session:
+                async with session.start_transaction():
+                    await self._write_completed_freeze(export, token, session=session)
+        except OperationFailure as exc:
+            if exc.code != 20 and "Transaction numbers are only allowed" not in str(exc):
+                raise
+            # Standalone MongoDB deployments do not support transactions. The
+            # lifecycle claim fences concurrent freezes; begin_dataset_freeze
+            # removes an unreachable export left by a crashed worker.
+            try:
+                await self._write_completed_freeze(export, token)
+            except Exception:
+                await self.db.frozen_study_exports.delete_one({"id": export.id})
+                raise
+        lifecycle = await self.get_study_lifecycle(export.protocol_version)
+        if lifecycle is None:
+            raise RuntimeError("Dataset lifecycle disappeared after freeze")
+        return lifecycle
+    async def _write_completed_freeze(self, export: FrozenStudyExport, token: UUID, session=None) -> None:
+        await self.db.frozen_study_exports.insert_one(
+            export.model_dump(mode="python"), session=session
+        )
+        result = await self.db.study_lifecycle.update_one(
+            {
+                "protocol_version": export.protocol_version,
+                "freeze_token": token,
+                "dataset_frozen_at": None,
+            },
+            {"$set": {
+                "dataset_frozen_at": export.created_at,
+                "frozen_export_id": export.id,
+                "freeze_token": None,
+                "freeze_started_at": None,
+                "updated_at": export.created_at,
+            }},
+            session=session,
+        )
+        if result.modified_count != 1:
+            raise RuntimeError("Dataset freeze lock was lost")
+    async def abort_dataset_freeze(self, protocol_version: str, token: UUID) -> None:
+        await self.db.study_lifecycle.update_one(
+            {"protocol_version": protocol_version, "freeze_token": token, "dataset_frozen_at": None},
+            {"$set": {"freeze_token": None, "freeze_started_at": None, "updated_at": utcnow()}},
+        )
     async def store_refresh_token(self, token_id: str, user_id: UUID, digest: str, expires_at) -> None:
         await self.db.refresh_tokens.insert_one({"token_id": token_id, "user_id": user_id, "digest": digest, "expires_at": expires_at})
     async def rotate_refresh_token(self, token_id: str, digest: str) -> UUID | None:

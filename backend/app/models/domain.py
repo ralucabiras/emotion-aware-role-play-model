@@ -287,6 +287,8 @@ class StudyLifecycle(BaseModel):
     end_date: date | None = None
     dataset_frozen_at: datetime | None = None
     frozen_export_id: UUID | None = None
+    freeze_token: UUID | None = None
+    freeze_started_at: datetime | None = None
     updated_at: datetime = Field(default_factory=utcnow)
 
 

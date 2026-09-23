@@ -1,4 +1,5 @@
-from datetime import datetime
+import asyncio
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from app.models.domain import (
@@ -22,6 +23,7 @@ class MemoryRepository(Repository):
         self.tokens: dict[str, tuple[UUID, str, datetime]] = {}
         self.email_verification_tokens: dict[str, tuple[UUID, datetime]] = {}
         self.password_reset_tokens: dict[str, tuple[UUID, datetime]] = {}
+        self._freeze_lock = asyncio.Lock()
 
     async def initialize(self) -> None: pass
     async def create_user(self, user: User) -> User:
@@ -90,6 +92,39 @@ class MemoryRepository(Repository):
         return export
     async def get_frozen_export(self, export_id: UUID) -> FrozenStudyExport | None:
         return self.frozen_exports.get(export_id)
+    async def begin_dataset_freeze(self, protocol_version: str, token: UUID) -> StudyLifecycle | None:
+        async with self._freeze_lock:
+            lifecycle = self.study_lifecycles.get(protocol_version)
+            stale_before = utcnow() - timedelta(hours=1)
+            lock_is_active = (
+                lifecycle
+                and lifecycle.freeze_token
+                and lifecycle.freeze_started_at
+                and lifecycle.freeze_started_at > stale_before
+            )
+            if not lifecycle or lifecycle.dataset_frozen_at or lock_is_active:
+                return None
+            lifecycle.freeze_token = token
+            lifecycle.freeze_started_at = utcnow()
+            return lifecycle
+    async def complete_dataset_freeze(self, export: FrozenStudyExport, token: UUID) -> StudyLifecycle:
+        async with self._freeze_lock:
+            lifecycle = self.study_lifecycles.get(export.protocol_version)
+            if not lifecycle or lifecycle.freeze_token != token or lifecycle.dataset_frozen_at:
+                raise RuntimeError("Dataset freeze lock was lost")
+            self.frozen_exports[export.id] = export
+            lifecycle.dataset_frozen_at = export.created_at
+            lifecycle.frozen_export_id = export.id
+            lifecycle.freeze_token = None
+            lifecycle.freeze_started_at = None
+            lifecycle.updated_at = export.created_at
+            return lifecycle
+    async def abort_dataset_freeze(self, protocol_version: str, token: UUID) -> None:
+        async with self._freeze_lock:
+            lifecycle = self.study_lifecycles.get(protocol_version)
+            if lifecycle and lifecycle.freeze_token == token and not lifecycle.dataset_frozen_at:
+                lifecycle.freeze_token = None
+                lifecycle.freeze_started_at = None
     async def store_refresh_token(self, token_id: str, user_id: UUID, digest: str, expires_at) -> None:
         self.tokens[token_id] = (user_id, digest, expires_at)
     async def rotate_refresh_token(self, token_id: str, digest: str) -> UUID | None:

@@ -396,7 +396,7 @@ async def enroll_in_pilot(
     if not settings.pilot_access_code:
         raise HTTPException(503, "Pilot enrollment is not configured")
     lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
-    if lifecycle and lifecycle.dataset_frozen_at:
+    if lifecycle and (lifecycle.dataset_frozen_at or lifecycle.freeze_token):
         raise HTTPException(409, "The study dataset is frozen and enrollment is closed")
     today = datetime.now(UTC).date()
     if lifecycle and lifecycle.start_date and today < lifecycle.start_date:
@@ -573,8 +573,8 @@ async def update_research_lifecycle(
     if request.end_date < request.start_date:
         raise HTTPException(400, "Study end date must not precede the start date")
     current = await repository.get_study_lifecycle(settings.study_protocol_version)
-    if current and current.dataset_frozen_at:
-        raise HTTPException(409, "The frozen study lifecycle cannot be edited")
+    if current and (current.dataset_frozen_at or current.freeze_token):
+        raise HTTPException(409, "The study lifecycle cannot be edited during or after dataset freeze")
     lifecycle = current or StudyLifecycle(protocol_version=settings.study_protocol_version)
     lifecycle.start_date, lifecycle.end_date, lifecycle.updated_at = (
         request.start_date, request.end_date, utcnow()
@@ -591,8 +591,8 @@ async def update_participant_research_status(
 ):
     del user
     lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
-    if lifecycle and lifecycle.dataset_frozen_at:
-        raise HTTPException(409, "Participant research data cannot be edited after dataset freeze")
+    if lifecycle and (lifecycle.dataset_frozen_at or lifecycle.freeze_token):
+        raise HTTPException(409, "Participant research data cannot be edited during or after dataset freeze")
     participant = next(
         (item for item in await repository.list_users() if item.participant_id == participant_id),
         None,
@@ -654,19 +654,24 @@ async def freeze_research_dataset(
         raise HTTPException(409, "The study end date must be reached before dataset freeze")
     if lifecycle.dataset_frozen_at:
         raise HTTPException(409, "The study dataset is already frozen")
-    content, record_count, participant_count = await build_research_csv(repository, True)
-    digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
-    frozen = await repository.save_frozen_export(FrozenStudyExport(
-        protocol_version=settings.study_protocol_version,
-        record_count=record_count,
-        participant_count=participant_count,
-        sha256=digest,
-        csv_content=content,
-    ))
-    lifecycle.dataset_frozen_at = frozen.created_at
-    lifecycle.frozen_export_id = frozen.id
-    lifecycle.updated_at = frozen.created_at
-    await repository.save_study_lifecycle(lifecycle)
+    freeze_token = uuid4()
+    lifecycle = await repository.begin_dataset_freeze(settings.study_protocol_version, freeze_token)
+    if not lifecycle:
+        raise HTTPException(409, "The study dataset is already frozen or a freeze is in progress")
+    try:
+        content, record_count, participant_count = await build_research_csv(repository, True)
+        digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
+        frozen = FrozenStudyExport(
+            protocol_version=settings.study_protocol_version,
+            record_count=record_count,
+            participant_count=participant_count,
+            sha256=digest,
+            csv_content=content,
+        )
+        await repository.complete_dataset_freeze(frozen, freeze_token)
+    except Exception:
+        await repository.abort_dataset_freeze(settings.study_protocol_version, freeze_token)
+        raise
     return {
         "export_id": frozen.id, "protocol_version": frozen.protocol_version,
         "schema_version": frozen.schema_version, "created_at": frozen.created_at,
