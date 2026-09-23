@@ -25,6 +25,7 @@ from app.models.domain import (
     StudyConsentRecord,
     StudyEligibilityRecord,
     StudyLifecycle,
+    StudyRecord,
     StudyWithdrawalRecord,
     User,
     utcnow,
@@ -90,6 +91,21 @@ from app.services.transcription_service import InvalidAudio, TranscriptionServic
 
 router, bearer = APIRouter(prefix="/api"), HTTPBearer(auto_error=False)
 PROTOCOL_REQUIRED_SCENARIOS = {"workload", "boundary", "relationship"}
+QUALIFYING_COMPLETION_REASONS = {"success", "maximum_turns", "user_finished"}
+
+
+def is_completed_rehearsal(record: StudyRecord) -> bool:
+    return bool(record.scenario_id and record.completion_reason in QUALIFYING_COMPLETION_REASONS)
+
+
+def has_complete_post_questionnaire(record: StudyRecord) -> bool:
+    post = record.questionnaires.get("post")
+    return bool(
+        post and post.phase == "post"
+        and all(value is not None and 1 <= value <= 7 for value in (
+            post.confidence, post.realism, post.usefulness,
+        ))
+    )
 
 
 def is_researcher(email: str) -> bool:
@@ -532,17 +548,17 @@ async def pilot_dataset(repository):
     total_sessions = completed = protocol_completers = 0
     activity_records = []
     for user in cohort:
-        study_records = [record for record in all_records if record.user_id == user.id]
+        study_records = [record for record in all_records if record.user_id == user.id and record.protocol_version == settings.study_protocol_version]
         eligible = has_current_study_consent(user)
         if eligible: total_sessions += len(study_records)
-        user_completed = sum(bool(record.completion_reason) for record in study_records)
+        user_completed = sum(is_completed_rehearsal(record) for record in study_records)
         qualifying_scenarios = {
             record.scenario_id
             for record in study_records
             if record.scenario_id in PROTOCOL_REQUIRED_SCENARIOS
             and record.difficulty == Difficulty.INTERMEDIATE
-            and record.completion_reason
-            and "post" in record.questionnaires
+            and is_completed_rehearsal(record)
+            and has_complete_post_questionnaire(record)
         }
         protocol_complete = qualifying_scenarios == PROTOCOL_REQUIRED_SCENARIOS
         if eligible:
@@ -567,7 +583,7 @@ async def pilot_dataset(repository):
         if not eligible:
             continue
         for record in study_records:
-            if record.scenario_id and record.completion_reason:
+            if is_completed_rehearsal(record):
                 scenarios[record.scenario_id] += 1
                 if record.difficulty: difficulties[record.difficulty.value] += 1
             if record.feedback_generation_source:
