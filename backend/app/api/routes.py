@@ -249,16 +249,20 @@ async def register(request: AuthRequest, response: Response, auth: AuthService =
     profile = request.model_dump(
         include={"first_name", "last_name", "preferred_name", "country", "timezone"}
     )
-    try: user = await auth.register(str(request.email), request.password, request.consent, profile)
-    except ValueError as exc:
-        detail = "An account with this email already exists" if "duplicate" in str(exc) else str(exc)
-        raise HTTPException(409 if "duplicate" in str(exc) else 400, detail) from None
+    try:
+        try:
+            await auth.register(str(request.email), request.password, request.consent, profile)
+        except ValueError as exc:
+            if str(exc) != "duplicate email":
+                raise HTTPException(400, str(exc)) from None
+            # Handle the unique-insert conflict too; never overwrite existing credentials.
+            await auth.resend_verification(str(request.email))
     except EmailDeliveryError:
-        return RegistrationResponse(
-            message="Account created, but email delivery is temporarily unavailable. Use resend shortly.",
-            email=request.email,
-        )
-    return RegistrationResponse(message="Check your email to confirm your account", email=user.email)
+        pass
+    return RegistrationResponse(
+        message="Request accepted. If this email is eligible for confirmation, check your inbox. You can also sign in or request a password reset.",
+        email=str(request.email).strip().lower(),
+    )
 
 
 @router.post("/auth/login", response_model=AuthResponse)

@@ -67,7 +67,7 @@ function Signup() {
 }
 
 function CheckEmail() {
-  const email = new URLSearchParams(location.search).get('email') || '', [message, setMessage] = useState('Check your inbox and open the confirmation link before signing in.'), [busy, setBusy] = useState(false)
+  const email = new URLSearchParams(location.search).get('email') || '', [message, setMessage] = useState('If this email is eligible for confirmation, check your inbox for a link. You can also sign in or request a password reset.'), [busy, setBusy] = useState(false)
   async function resend() { setBusy(true); try { setMessage((await api.resendVerification(email)).message) } finally { setBusy(false) } }
   return <AuthLayout title="Check your email." subtitle={message}><div className="email-icon">✉</div><p className="email-address">{email}</p><button className="primary wide" disabled={!email || busy} onClick={resend}>{busy ? 'Sending…' : 'Resend confirmation'}</button><button className="text-button" onClick={() => navigate('/login')}>Return to sign in</button></AuthLayout>
 }

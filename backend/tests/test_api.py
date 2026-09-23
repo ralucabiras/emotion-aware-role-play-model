@@ -16,6 +16,7 @@ from app.main import app
 from app.repositories.base import RepositoryIndexesNotReadyError
 from app.repositories.mongo import ConcurrentSessionUpdateError
 from app.services.eligibility import eligibility_version
+from app.services.email_service import EmailDeliveryError
 from app.services.multimodal_service import MultimodalAffectService
 from app.services.transcription_service import TranscriptionResult
 
@@ -652,3 +653,44 @@ def test_audio_transcription_is_authenticated_and_returns_transient_result() -> 
             assert response.json() == {"text": "I need more time for this task.", "model": "test-transcriber", "latency_ms": 12, "audio_persisted": False}
     finally:
         app.dependency_overrides.pop(get_transcription_service, None)
+
+
+def test_registration_does_not_disclose_existing_accounts(monkeypatch) -> None:
+    email = "registration-privacy@example.com"
+    payload = {"email": email, "password": "original-password", "consent": True, "first_name": "Original"}
+    with TestClient(app) as client:
+        fresh = client.post("/api/auth/register", json=payload)
+        assert fresh.status_code == 202
+        original_token = capturing_email.tokens[email]
+        duplicate_payload = {**payload, "email": email.upper(), "password": "replacement-password", "first_name": "Replacement"}
+        duplicate = client.post("/api/auth/register", json=duplicate_payload)
+        assert duplicate.status_code == fresh.status_code
+        assert duplicate.json() == fresh.json()
+        assert "set-cookie" not in duplicate.headers
+        assert capturing_email.tokens[email] != original_token
+        assert client.post("/api/auth/verify-email", json={"token": capturing_email.tokens[email]}).status_code == 200
+        verified_token = capturing_email.tokens[email]
+        verified = client.post("/api/auth/register", json=duplicate_payload)
+        assert verified.status_code == fresh.status_code
+        assert verified.json() == fresh.json()
+        assert capturing_email.tokens[email] == verified_token
+        login = client.post("/api/auth/login", json={"email": email, "password": payload["password"]})
+        assert login.status_code == 200
+        assert login.json()["user"]["first_name"] == "Original"
+        assert client.post("/api/auth/login", json={"email": email, "password": duplicate_payload["password"]}).status_code == 401
+
+        async def fail_delivery(*args, **kwargs):
+            raise EmailDeliveryError("private SMTP failure")
+
+        monkeypatch.setattr(capturing_email, "send_verification", fail_delivery)
+        failing_payload = {**payload, "email": "registration-delivery@example.com"}
+        failed_fresh = client.post("/api/auth/register", json=failing_payload)
+        failed_duplicate = client.post("/api/auth/register", json=failing_payload)
+        verified_during_outage = client.post("/api/auth/register", json=payload)
+        for response in (failed_fresh, failed_duplicate, verified_during_outage):
+            assert response.status_code == 202
+            assert response.json()["message"] == fresh.json()["message"]
+            assert "set-cookie" not in response.headers
+        assert failed_fresh.json() == failed_duplicate.json()
+        for address in (email, "not-registered@example.com"):
+            assert client.post("/api/auth/register", json={**payload, "email": address, "consent": False}).status_code == 400
