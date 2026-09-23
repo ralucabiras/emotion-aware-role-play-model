@@ -33,6 +33,10 @@ try {
     true,
   )
   if (status !== 0) process.exitCode = status
+} catch (error) {
+  process.exitCode = error.exitCode ?? 1
+  console.error(error)
 } finally {
+  if (process.exitCode) run('docker', [...compose, 'logs', '--no-color', '--tail', '200'], true)
   run('docker', [...compose, 'down', '--volumes', '--remove-orphans'], true)
 }

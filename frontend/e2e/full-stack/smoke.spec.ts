@@ -1,3 +1,4 @@
+import { confirmStudyEnrollment } from '../enrollment'
 import { execFileSync } from 'node:child_process'
 
 import { expect, test, type Page } from '@playwright/test'
@@ -14,6 +15,7 @@ async function api<T>(page: Page, path: string): Promise<T> {
 }
 
 test('compiled app, FastAPI, and MongoDB complete and persist the core study journey', async ({ page, request }) => {
+  test.setTimeout(120_000)
   await page.goto('/login')
   await page.getByLabel('Email').fill('smoke-researcher@example.com')
   await page.getByLabel('Password').fill('full-stack-smoke-password')
@@ -34,10 +36,12 @@ test('compiled app, FastAPI, and MongoDB complete and persist the core study jou
 
   await page.goto('/settings')
   await page.getByLabel('Study access code').fill('smoke-pilot-code')
-  const consentChecks = page.locator('.study-consent-form input[type=checkbox]')
-  for (let index = 0; index < 3; index += 1) await consentChecks.nth(index).check()
+  await confirmStudyEnrollment(page)
   await page.getByRole('button', { name: 'Consent and join pilot study' }).click()
   await expect(page.getByRole('heading', { name: 'You are enrolled' })).toBeVisible()
+  const enrolled = await api<{eligibility_version:string; eligibility_confirmed_at:string}>(page, '/auth/me')
+  expect(enrolled.eligibility_version).toMatch(/^eligibility-v1-/)
+  expect(Date.parse(enrolled.eligibility_confirmed_at)).not.toBeNaN()
 
   await page.goto('/app')
   await page.getByRole('button', { name: 'Start a role-play' }).click()

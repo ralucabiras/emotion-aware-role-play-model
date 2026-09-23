@@ -1,3 +1,4 @@
+import type { StudyInformation } from '../src/types/api'
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, type Route } from '@playwright/test'
 
@@ -5,8 +6,8 @@ const now = '2026-09-22T10:00:00Z'
 export const baseUser = {
   id: '11111111-1111-4111-8111-111111111111', email: 'participant@example.com', first_name: 'Alex', last_name: 'Morgan', preferred_name: 'Alex',
   country: 'Romania', timezone: 'Europe/Bucharest', email_verified: true, practice_goals: ['clear_requests'], onboarding_completed: true,
-  onboarding_version: '1.0', researcher: false, pilot_enrolled: false, study_consent_version: null, study_consented_at: null,
-  study_withdrawn: false, study_withdrawn_at: null, participant_id: '22222222-2222-4222-8222-222222222222',
+  onboarding_version: '1.0', researcher: false, pilot_enrolled: false, study_consent_version: null, study_consented_at: null, eligibility_version: null as string|null, eligibility_confirmed_at: null as string|null,
+  study_withdrawn: false, study_withdrawn_at: null as string|null, participant_id: '22222222-2222-4222-8222-222222222222',
 }
 
 const emotion = { dominant_emotion: 'neutral', valence: 0, arousal: .2, confidence: .7, trend: 'stable' }
@@ -14,12 +15,14 @@ const scenario = { id: 'workload', title: 'Workload conversation', character: 'm
 const studyScenarios = [scenario, {...scenario,id:'boundary',title:'Boundary conversation',character:'friend'}, {...scenario,id:'relationship',title:'Relationship conversation',character:'partner'}]
 const feedback = { session_id: 'session-1', scenario_id: 'workload', observed: ['You made a concrete request.'], strengths: ['Your request was specific.'], suggestions: ['State the boundary earlier.'], generation_source: 'template', metrics: [{name:'clarity',score:.8,evidence_turns:[1]}], compared_with_session_id:null, comparisons:[] }
 
+export const studyInformation: StudyInformation = {version:'2026.1',protocol_version:'AL-FEAS-1.0',study_label:'AffectLab pilot',title:'Participant information',summary:'A feasibility study.',data_collected:['Ratings'],processors:['OpenAI'],audio_and_transcripts:['Audio is not retained.'],retention:'One year.',risks_and_limitations:['Predictions may be wrong.'],withdrawal:['Withdraw from settings.'],researcher:{name:'Researcher',email:'research@example.com'},supervisor:{name:'Supervisor',email:'supervisor@example.com'},institution:'Test University',eligibility_version:'eligibility-test-v1',minimum_participant_age:18,geographic_scope:'Romania',supported_language:'English',other_eligibility_criteria:['I can provide informed consent and complete the study independently.']}
+
 export type MockOptions = { authenticated?: boolean; onboarding?: boolean; researcher?: boolean; enrolled?: boolean; transcription?: 'success'|'unavailable'; existingSession?: boolean }
 
 export async function installApiMock(page: Page, options: MockOptions = {}) {
   const state = {
     user: { ...baseUser, onboarding_completed: options.onboarding ?? true, researcher: options.researcher ?? false, pilot_enrolled: options.enrolled ?? false,
-      study_consent_version: options.enrolled ? '2026.1' : null, study_consented_at: options.enrolled ? now : null },
+      study_consent_version: options.enrolled ? '2026.1' : null, study_consented_at: options.enrolled ? now : null, eligibility_version: options.enrolled ? studyInformation.eligibility_version : null, eligibility_confirmed_at: options.enrolled ? now : null },
     authenticated: options.authenticated ?? true,
     turns: options.existingSession ? [{id:'turn-old',role:'user',content:'I need help preparing for a conversation.',created_at:now}] : [] as Array<Record<string, unknown>>,
     roleplay: null as null | Record<string, unknown>,
@@ -73,8 +76,8 @@ export async function installApiMock(page: Page, options: MockOptions = {}) {
       const tasks=studyScenarios.map((item,index)=>({order:index+1,scenario_id:item.id,title:item.title,difficulty:'intermediate',status:state.studyTaskStatuses[item.id],session_id:['in_progress','awaiting_ratings'].includes(state.studyTaskStatuses[item.id])?'session-1':null}))
       return json(route,{protocol_version:'test-v1',tasks,completed_tasks:tasks.filter(task=>task.status==='complete').length,next_task_id:tasks.find(task=>['not_started','in_progress','awaiting_ratings'].includes(task.status))?.scenario_id??null,available:true})
     }
-    if (path === '/research/study-information') return json(route,{version:'2026.1',protocol_version:'AL-FEAS-1.0',study_label:'AffectLab pilot',title:'Participant information',summary:'A feasibility study.',data_collected:['Ratings'],processors:['OpenAI'],audio_and_transcripts:['Audio is not retained.'],retention:'One year.',risks_and_limitations:['Predictions may be wrong.'],withdrawal:['Withdraw from settings.'],researcher:{name:'Researcher',email:'research@example.com'},supervisor:{name:'Supervisor',email:'supervisor@example.com'},institution:'Test University'})
-    if (path === '/research/enroll') { state.user={...state.user,pilot_enrolled:true,study_consent_version:'2026.1',study_consented_at:now};return json(route,state.user) }
+    if (path === '/research/study-information') return json(route,studyInformation)
+    if (path === '/research/enroll') { state.user={...state.user,pilot_enrolled:true,study_consent_version:'2026.1',study_consented_at:now,eligibility_version:studyInformation.eligibility_version,eligibility_confirmed_at:now};return json(route,state.user) }
     if (path === '/research/withdraw') { state.user={...state.user,pilot_enrolled:false,study_withdrawn:true,study_withdrawn_at:now};return json(route,{user:state.user,questionnaires_deleted:1,research_events_deleted:2,message:'Withdrawal recorded.',anonymized_analysis_notice:'Aggregate analysis may remain.'}) }
     if (path === '/research/dashboard') return json(route,{study_label:'AffectLab pilot',protocol_version:'AL-FEAS-1.0',generated_at:now,participants:1,participant_target:20,sessions:1,completed_rehearsals:1,completion_rate:1,protocol_completers:1,completer_target:20,protocol_completion_rate:.05,scenario_completions:{workload:1},difficulty_completions:{intermediate:1},average_skill_scores:{clarity:.8},questionnaire_averages:{confidence:.7},generation_sources:{template:1},lifecycle:{protocol_version:'AL-FEAS-1.0',start_date:'2026-09-01',end_date:'2026-12-01',dataset_frozen_at:null,frozen_export_id:null},frozen_export:null,participant_activity:[{participant_id:state.user.participant_id,enrolled_at:now,last_active_at:now,sessions:1,completed_rehearsals:1,protocol_complete:true,completion_status:'complete',excluded:false,withdrawn:false,exclusion_reason:'',data_quality_notes:'',pre_questionnaires:1,post_questionnaires:1}],privacy:{contains_names:false,contains_emails:false,contains_conversation_text:false,contains_takeaways:false}})
     if (path === '/research/export.csv') { state.exported=true; return route.fulfill({status:200,contentType:'text/csv',headers:{'Content-Disposition':'attachment; filename="affectlab.csv"'},body:'participant_id,completed\nabc,true\n'}) }
