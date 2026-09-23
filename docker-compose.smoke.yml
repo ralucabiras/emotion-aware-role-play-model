@@ -1,0 +1,17 @@
+services:
+  mongodb:
+    ports: ["27018:27017"]
+  backend:
+    environment:
+      FRONTEND_ORIGIN: http://localhost:5173
+      MONGODB_DATABASE: affectlab_full_stack_smoke
+      JWT_SECRET: full-stack-smoke-secret-at-least-32-bytes-long
+      OFFLINE_DEMO_MODE: "true"
+      OFFLINE_DEMO_EMAIL: smoke-researcher@example.com
+      OFFLINE_DEMO_PASSWORD: full-stack-smoke-password
+      RESEARCHER_EMAILS: smoke-researcher@example.com
+      PILOT_ACCESS_CODE: smoke-pilot-code
+      OPENAI_API_KEY: ""
+      OPENAI_ROLEPLAY_ENABLED: "false"
+      TRANSCRIPTION_ENABLED: "false"
+      MULTIMODAL_INFERENCE_ENABLED: "false"

@@ -9,6 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:e2e": "playwright test",
+    "test:e2e:full-stack": "node ./scripts/full-stack-smoke.mjs",
+    "test:e2e:full-stack:attached": "playwright test --config=playwright.fullstack.config.ts",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report"
   },

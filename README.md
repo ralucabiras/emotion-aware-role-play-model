@@ -40,6 +40,19 @@ docker compose up --build
 
 Open `http://localhost:5173`. MongoDB data is kept in the `mongodb_data` volume. The API and interactive documentation are available at `http://localhost:8000` and `http://localhost:8000/docs`.
 
+### Full-stack smoke test
+
+The opt-in smoke suite builds and starts the production frontend, FastAPI backend, and MongoDB; seeds a verified demo researcher; exercises the core participant and research journey; restarts the backend; and removes its isolated containers and volume afterward.
+
+```powershell
+cd frontend
+npm install
+npx playwright install chromium
+npm run test:e2e:full-stack
+```
+
+Use `npm run test:e2e:full-stack:attached` only when the smoke Compose stack is already running. The regular `npm run test:e2e` command remains the fast, backend-mocked browser suite.
+
 ## Email confirmation
 
 New accounts must confirm their email address before signing in. Configure the SMTP settings in the repository `.env`; for Gmail on port 587, `SMTP_USE_TLS=true` and `SMTP_PASSWORD` must be a Google App Password, not the account's normal password. Google App Passwords require 2-Step Verification on the sender account. Keep the password only in `.env` and restart the backend after changing it.
