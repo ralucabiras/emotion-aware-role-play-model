@@ -4,9 +4,15 @@ from uuid import UUID
 from app.models.domain import FrozenStudyExport, Session, StudyLifecycle, StudyRecord, User
 
 
+class RepositoryIndexesNotReadyError(RuntimeError):
+    """Raised when persistence responds but required indexes are unavailable."""
+
+
 class Repository(ABC):
     @abstractmethod
     async def initialize(self) -> None: ...
+    @abstractmethod
+    async def check_readiness(self) -> None: ...
     @abstractmethod
     async def create_user(self, user: User) -> User: ...
     @abstractmethod

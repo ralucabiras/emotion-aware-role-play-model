@@ -8,10 +8,12 @@ from app.core.config import settings
 from app.core.container import (
     auth_service,
     get_multimodal_service,
+    get_repository,
     get_transcription_service,
     repository,
 )
 from app.main import app
+from app.repositories.base import RepositoryIndexesNotReadyError
 from app.repositories.mongo import ConcurrentSessionUpdateError
 from app.services.multimodal_service import MultimodalAffectService
 from app.services.transcription_service import TranscriptionResult
@@ -31,6 +33,71 @@ class CapturingEmailService:
 
 capturing_email = CapturingEmailService()
 auth_service.email_service = capturing_email
+
+
+def test_liveness_and_readiness_health_contracts() -> None:
+    with TestClient(app) as client:
+        live = client.get("/api/health/live")
+        ready = client.get("/api/health/ready")
+
+        assert live.status_code == 200
+        assert live.json() == {"status": "alive"}
+        assert ready.status_code == 200
+        assert ready.json()["status"] == "ready"
+        assert ready.json()["checks"] == {
+            "configuration": "ok",
+            "persistence": "ok",
+            "indexes": "ok",
+        }
+        assert set(ready.json()["optional_services"]) == {
+            "multimodal_model",
+            "transcription",
+        }
+
+
+def test_readiness_returns_503_when_persistence_is_unavailable() -> None:
+    class UnavailableRepository:
+        async def check_readiness(self) -> None:
+            raise RuntimeError("sensitive database connection detail")
+
+    app.dependency_overrides[get_repository] = lambda: UnavailableRepository()
+    try:
+        with TestClient(app) as client:
+            response = client.get("/api/health/ready")
+    finally:
+        app.dependency_overrides.pop(get_repository, None)
+
+    assert response.status_code == 503
+    assert response.json() == {
+        "status": "not_ready",
+        "checks": {
+            "configuration": "ok",
+            "persistence": "failed",
+            "indexes": "unknown",
+        },
+    }
+    assert "sensitive" not in response.text
+
+
+def test_readiness_distinguishes_missing_indexes_from_database_failure() -> None:
+    class RepositoryWithMissingIndexes:
+        async def check_readiness(self) -> None:
+            raise RepositoryIndexesNotReadyError("missing private_index_name")
+
+    app.dependency_overrides[get_repository] = lambda: RepositoryWithMissingIndexes()
+    try:
+        with TestClient(app) as client:
+            response = client.get("/api/health/ready")
+    finally:
+        app.dependency_overrides.pop(get_repository, None)
+
+    assert response.status_code == 503
+    assert response.json()["checks"] == {
+        "configuration": "ok",
+        "persistence": "ok",
+        "indexes": "failed",
+    }
+    assert "private_index_name" not in response.text
 
 
 def auth(client: TestClient, email: str = "user@example.com") -> dict[str, str]:

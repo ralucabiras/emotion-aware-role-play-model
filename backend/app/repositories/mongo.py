@@ -5,7 +5,7 @@ from pymongo import ASCENDING, AsyncMongoClient, ReturnDocument
 from pymongo.errors import DuplicateKeyError, OperationFailure
 
 from app.models.domain import FrozenStudyExport, Session, StudyLifecycle, StudyRecord, User, utcnow
-from app.repositories.base import Repository
+from app.repositories.base import Repository, RepositoryIndexesNotReadyError
 
 
 class ConcurrentSessionUpdateError(RuntimeError):
@@ -13,9 +13,25 @@ class ConcurrentSessionUpdateError(RuntimeError):
 
 
 class MongoRepository(Repository):
+    REQUIRED_INDEXES = {
+        "users": {"email_1"},
+        "sessions": {"id_1", "expires_at_1", "user_id_1_updated_at_-1"},
+        "study_records": {
+            "session_id_1",
+            "user_id_1_last_activity_at_-1",
+            "retention_expires_at_1",
+        },
+        "study_lifecycle": {"protocol_version_1"},
+        "frozen_study_exports": {"id_1", "protocol_version_1"},
+        "refresh_tokens": {"expires_at_1"},
+        "email_verification_tokens": {"expires_at_1", "user_id_1"},
+        "password_reset_tokens": {"expires_at_1", "user_id_1"},
+    }
+
     def __init__(self, uri: str, database: str) -> None:
         self.client = AsyncMongoClient(uri, uuidRepresentation="standard")
         self.db = self.client[database]
+        self._initialized = False
 
     async def initialize(self) -> None:
         await self.db.users.create_index("email", unique=True)
@@ -33,6 +49,17 @@ class MongoRepository(Repository):
         await self.db.email_verification_tokens.create_index("user_id", unique=True)
         await self.db.password_reset_tokens.create_index("expires_at", expireAfterSeconds=0)
         await self.db.password_reset_tokens.create_index("user_id", unique=True)
+        self._initialized = True
+    async def check_readiness(self) -> None:
+        await self.db.command("ping")
+        if not self._initialized:
+            raise RuntimeError("Repository initialization has not completed")
+        for collection_name, required in self.REQUIRED_INDEXES.items():
+            indexes = await self.db[collection_name].index_information()
+            if not required.issubset(indexes):
+                raise RepositoryIndexesNotReadyError(
+                    f"Required indexes are missing for {collection_name}"
+                )
     async def create_user(self, user: User) -> User:
         try: await self.db.users.insert_one(user.model_dump(mode="python"))
         except DuplicateKeyError as exc: raise ValueError("duplicate email") from exc

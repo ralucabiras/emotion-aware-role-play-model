@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
+from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.config import settings
@@ -29,6 +30,7 @@ from app.models.domain import (
     User,
     utcnow,
 )
+from app.repositories.base import RepositoryIndexesNotReadyError
 from app.schemas.chat import (
     AudioTranscriptionRequest,
     AudioTranscriptionResponse,
@@ -128,9 +130,41 @@ async def researcher_user(user: User = Depends(current_user)) -> User:
     return user
 
 
-@router.get("/health")
-async def health(repository=Depends(get_repository)):
-    return {"status": "ok", "persistence": type(repository).__name__}
+@router.get("/health/live")
+async def health_live():
+    return {"status": "alive"}
+
+
+@router.get("/health/ready")
+async def health_ready(repository=Depends(get_repository)):
+    checks = {"configuration": "ok", "persistence": "pending", "indexes": "pending"}
+    try:
+        settings.__class__.model_validate(settings.model_dump())
+    except Exception:
+        checks["configuration"] = "failed"
+        return JSONResponse(status_code=503, content={"status": "not_ready", "checks": checks})
+    try:
+        await repository.check_readiness()
+    except RepositoryIndexesNotReadyError:
+        checks["persistence"] = "ok"
+        checks["indexes"] = "failed"
+        return JSONResponse(status_code=503, content={"status": "not_ready", "checks": checks})
+    except Exception:
+        checks["persistence"] = "failed"
+        checks["indexes"] = "unknown"
+        return JSONResponse(status_code=503, content={"status": "not_ready", "checks": checks})
+    checks["persistence"] = "ok"
+    checks["indexes"] = "ok"
+    multimodal = get_multimodal_service()
+    transcription = get_transcription_service()
+    return {
+        "status": "ready",
+        "checks": checks,
+        "optional_services": {
+            "multimodal_model": {"available": multimodal.available, "status": multimodal.status},
+            "transcription": {"available": transcription.available},
+        },
+    }
 
 
 @router.get("/models/info")

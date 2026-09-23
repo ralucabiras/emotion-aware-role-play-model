@@ -24,8 +24,13 @@ class MemoryRepository(Repository):
         self.email_verification_tokens: dict[str, tuple[UUID, datetime]] = {}
         self.password_reset_tokens: dict[str, tuple[UUID, datetime]] = {}
         self._freeze_lock = asyncio.Lock()
+        self._initialized = False
 
-    async def initialize(self) -> None: pass
+    async def initialize(self) -> None:
+        self._initialized = True
+    async def check_readiness(self) -> None:
+        if not self._initialized:
+            raise RuntimeError("Repository initialization has not completed")
     async def create_user(self, user: User) -> User:
         if await self.get_user_by_email(user.email):
             raise ValueError("duplicate email")
