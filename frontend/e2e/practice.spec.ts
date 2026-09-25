@@ -163,3 +163,35 @@ test('leaving feedback closes unanswered post-ratings',async({page})=>{
   await expect(page.getByText('Ratings are closed after leaving the task screen. No retrospective answers can be added.')).toBeVisible()
   expect(state.questionnaires.post).toBeUndefined()
 })
+
+
+test('transcribes without a trained multimodal model and sends only text for analysis', async ({ page }) => {
+  await installApiMock(page, {multimodal:false, transcription:'success'})
+  const affectRequests: string[] = []
+  page.on('request', request => {
+    if (request.url().includes('/affect/multimodal')) affectRequests.push(request.url())
+  })
+  await page.goto('/practice?new=1')
+  await page.getByRole('button', {name:'Record voice sample'}).click()
+  await page.getByRole('button', {name:'Stop voice recording'}).click()
+  await expect(page.getByRole('textbox')).toHaveValue('I am nervous about tomorrow.')
+  await page.getByRole('textbox').fill('My reviewed transcript.')
+  await page.getByLabel('Send message').click()
+  await expect(page.locator('.message.user')).toHaveText('My reviewed transcript.')
+  await expect(page.getByText('What outcome would feel useful to you?')).toBeVisible()
+  expect(affectRequests).toEqual([])
+  await expect(page.getByText(/Voice analysis was unavailable/)).not.toBeVisible()
+})
+
+for (const microphoneDisabled of [false, true]) {
+  test(`keeps voice input disabled when ${microphoneDisabled ? 'the microphone preference is off' : 'both capabilities are unavailable'}`, async ({ page }) => {
+    await installApiMock(page, {multimodal:false, transcription:microphoneDisabled?'success':'unavailable'})
+    if (microphoneDisabled) await page.addInitScript(() => localStorage.setItem('affectlab_microphone_enabled', 'false'))
+    await page.goto('/practice?new=1')
+    await expect(page.getByText('Voice input unavailable')).toBeVisible()
+    await expect(page.getByRole('button', {name:'Record voice sample'})).not.toBeVisible()
+    await page.getByRole('textbox').fill('Text still works.')
+    await page.getByLabel('Send message').click()
+    await expect(page.locator('.message.user')).toHaveText('Text still works.')
+  })
+}

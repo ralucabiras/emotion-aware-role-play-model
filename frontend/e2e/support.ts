@@ -17,7 +17,7 @@ const feedback = { session_id: 'session-1', scenario_id: 'workload', observed: [
 
 export const studyInformation: StudyInformation = {version:'2026.1',protocol_version:'AL-FEAS-1.0',study_label:'AffectLab pilot',title:'Participant information',summary:'A feasibility study.',data_collected:['Ratings'],processors:['OpenAI'],audio_and_transcripts:['Audio is not retained.'],retention:'One year.',risks_and_limitations:['Predictions may be wrong.'],withdrawal:['Withdraw from settings.'],researcher:{name:'Researcher',email:'research@example.com'},supervisor:{name:'Supervisor',email:'supervisor@example.com'},institution:'Test University',eligibility_version:'eligibility-test-v1',minimum_participant_age:18,geographic_scope:'Romania',supported_language:'English',other_eligibility_criteria:['I can provide informed consent and complete the study independently.']}
 
-export type MockOptions = { authenticated?: boolean; onboarding?: boolean; researcher?: boolean; enrolled?: boolean; transcription?: 'success'|'unavailable'; existingSession?: boolean }
+export type MockOptions = { authenticated?: boolean; onboarding?: boolean; researcher?: boolean; enrolled?: boolean; transcription?: 'success'|'unavailable'; multimodal?: boolean; existingSession?: boolean }
 
 export async function installApiMock(page: Page, options: MockOptions = {}) {
   const state = {
@@ -49,7 +49,7 @@ export async function installApiMock(page: Page, options: MockOptions = {}) {
     if (path === '/auth/onboarding') { state.user={...state.user,onboarding_completed:true,practice_goals:['clear_requests']}; return json(route,state.user) }
     if (path === '/auth/logout') { state.authenticated=false; return json(route,null,204) }
     if (path === '/auth/me' && method === 'DELETE') { state.deletedAccount=true; state.authenticated=false; return json(route,null,204) }
-    if (path === '/models/info') return json(route,{trained_model:true,multimodal_model:'test',multimodal_status:'ready',transcription_available:options.transcription!=='unavailable',transcription_model:'gpt-4o-mini-transcribe',disclaimer:'Research estimate.'})
+    if (path === '/models/info') return json(route,{trained_model:options.multimodal??true,multimodal_model:options.multimodal===false?null:'test',multimodal_status:options.multimodal===false?'unavailable':'ready',transcription_available:options.transcription!=='unavailable',transcription_model:'gpt-4o-mini-transcribe',disclaimer:'Research estimate.'})
     if (path === '/roleplay/scenarios' && method === 'GET') return json(route,options.enrolled?studyScenarios:[scenario])
     if (path === '/roleplay/scenarios' && method === 'POST') { state.customScenario={...scenario,id:'custom_assertiveness',title:'Flexible hours',character:'team lead',opening_line:'What would you like to discuss?'}; return json(route,state.customScenario) }
     if (path === '/sessions' && method === 'GET') return json(route,(options.existingSession || state.turns.length || state.roleplay) ? [summary()] : [])
