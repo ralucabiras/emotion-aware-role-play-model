@@ -139,3 +139,77 @@ async def test_empty_export_has_versioned_columns_and_no_invented_participants()
     assert reader.fieldnames == CSV_FIELDS
     assert list(reader) == []
     assert count == participants == 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("manual", [False, True])
+async def test_completed_measurements_and_export_ignore_later_reflection(manual):
+    repository = MemoryRepository()
+    user = participant("completed-reflection@example.com")
+    await repository.create_user(user)
+    service = ConversationService(repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_ratings={"confidence": 2, "anxiety": 6})
+    if manual:
+        await service.chat(session.id, user.id, "I am unsure what to say.")
+        session = await service.set_roleplay_status(session.id, user.id, "finish")
+    else:
+        _, _, session = await service.chat(session.id, user.id, "I need the deadline moved to Friday because I have 12 hours of work.")
+    assert (await repository.list_study_records(user.id))[0].turn_count == 3
+    await service.submit_questionnaire(session.id, user.id, "post", {"confidence": 5, "realism": 6, "usefulness": 7}, post_token=session.post_questionnaire_token)
+    before = (await repository.list_study_records(user.id))[0].model_dump(exclude={"updated_at", "id", "created_at"})
+    original_export = (await build_research_csv(repository))[0]
+    state = session.roleplay.model_dump()
+    feedback = session.feedback.model_dump()
+    for message in ["I feel better prepared now.", "I want to kill myself"]:
+        reply, _, session = await service.chat(session.id, user.id, message)
+        assert reply.content
+        assert session.roleplay.model_dump() == state
+        assert session.feedback.model_dump() == feedback
+        assert (await repository.list_study_records(user.id))[0].model_dump(exclude={"updated_at", "id", "created_at"}) == before
+        assert (await build_research_csv(repository))[0] == original_export
+    assert reply.generation.source == "safety_response"
+    assert len(session.turns) == 7
+    # Restart/backfill uses the persisted boundary, not the later session timestamp.
+    await service.backfill_active_study_records()
+    assert (await build_research_csv(repository))[0] == original_export
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("paused", [False, True])
+async def test_safety_still_interrupts_running_rehearsals_and_bounds_measurement(paused):
+    repository = MemoryRepository()
+    user = participant("interrupted-reflection@example.com")
+    await repository.create_user(user)
+    service = ConversationService(repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id, user.id, "boundary", Difficulty.INTERMEDIATE, pre_skipped=True)
+    if paused:
+        await service.set_roleplay_status(session.id, user.id, "pause")
+    reply, _, session = await service.chat(session.id, user.id, "I want to kill myself")
+    assert reply.generation.source == "safety_response"
+    assert session.roleplay.status == "interrupted"
+    assert session.roleplay.completion_reason == "safety_interruption"
+    assert session.roleplay.completed_at and session.roleplay.measurement_ended_at
+    before = (await build_research_csv(repository))[0]
+    await service.chat(session.id, user.id, "I am ready to reflect now.")
+    assert (await build_research_csv(repository))[0] == before
+
+
+@pytest.mark.asyncio
+async def test_legacy_completion_excludes_later_reflection_without_losing_closing_reply():
+    repository = MemoryRepository()
+    user = participant("legacy-completed@example.com")
+    await repository.create_user(user)
+    service = ConversationService(repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_skipped=True)
+    _, _, session = await service.chat(session.id, user.id, "I need the deadline moved to Friday.")
+    session.roleplay.measurement_ended_at = None
+    await service.save(session)
+    await service.close_post_questionnaire(session.id, user.id)
+    before = (await build_research_csv(repository))[0]
+    await service.chat(session.id, user.id, "A later reflection.")
+    await service.chat(session.id, user.id, "I want to kill myself")
+    assert (await repository.list_study_records(user.id))[0].turn_count == 3
+    assert (await build_research_csv(repository))[0] == before

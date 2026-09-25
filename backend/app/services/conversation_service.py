@@ -116,11 +116,29 @@ class ConversationService:
             for phase, answer in session.questionnaires.items()
             if answer.submitted_at >= consented_at
         }
-        events = [event for event in session.research_events if event.created_at >= consented_at]
-        post_consent_turn_count = sum(turn.created_at >= consented_at for turn in session.turns)
+        measurement_end = roleplay.measurement_ended_at if roleplay else None
+        if roleplay and roleplay.completed_at and measurement_end is None:
+            # Legacy completions predate the explicit boundary. Include the closing
+            # reply paired with a pre-completion message, never later reflection.
+            measurement_end = roleplay.completed_at
+            for index, turn in enumerate(session.turns):
+                if (turn.role == Role.ASSISTANT and index > 0
+                        and session.turns[index - 1].role == Role.USER
+                        and session.turns[index - 1].created_at <= roleplay.completed_at):
+                    measurement_end = max(measurement_end, turn.created_at)
+        events = [event for event in session.research_events
+                  if event.created_at >= consented_at
+                  and (measurement_end is None or event.created_at <= measurement_end
+                       or event.name.startswith("questionnaire_"))]
+        measured_turns = [turn for turn in session.turns if turn.created_at >= consented_at
+                          and (measurement_end is None or turn.created_at <= measurement_end)]
+        post_consent_turn_count = len(measured_turns)
+        last_activity = (max([measurement_end, *[event.created_at for event in events],
+                              *[answer.submitted_at for answer in questionnaires.values()]])
+                         if measurement_end else session.updated_at)
         if not (post_consent_turn_count or roleplay or questionnaires or events):
             return
-        assistant_turns = [turn for turn in session.turns if turn.role == Role.ASSISTANT and turn.created_at >= consented_at]
+        assistant_turns = [turn for turn in measured_turns if turn.role == Role.ASSISTANT]
         await self.repository.save_study_record(StudyRecord(
             user_id=user.id,
             participant_id=user.participant_id,
@@ -129,8 +147,8 @@ class ConversationService:
             protocol_version=user.study_consent.protocol_version,
             enrolled_at=user.pilot_enrolled_at,
             session_created_at=session.created_at,
-            last_activity_at=session.updated_at,
-            retention_expires_at=utcnow() + timedelta(days=settings.study_record_retention_days),
+            last_activity_at=last_activity,
+            retention_expires_at=last_activity + timedelta(days=settings.study_record_retention_days),
             turn_count=post_consent_turn_count,
             scenario_id=roleplay.scenario_id if roleplay else None,
             difficulty=roleplay.difficulty_level if roleplay else None,
@@ -152,6 +170,7 @@ class ConversationService:
         ))
     async def chat(self, session_id: UUID, user_id: UUID, message: str) -> tuple[ConversationTurn, AgentDecision, Session]:
         session = await self.get_session(session_id, user_id)
+        rehearsal_running = session.roleplay and session.roleplay.status in {RolePlayStatus.ACTIVE, RolePlayStatus.PAUSED}
         if session.post_questionnaire_token:
             session.post_questionnaire_token = None
             session.research_events.append(ResearchEvent(name="questionnaire_post_closed"))
@@ -172,7 +191,9 @@ class ConversationService:
         roleplay_action = "none"
         if crisis:
             content, metadata = CRISIS_RESPONSE, GenerationMetadata(source="safety_response")
-            if session.roleplay: session.roleplay.status, session.roleplay.completion_reason = RolePlayStatus.INTERRUPTED, "safety_interruption"
+            if session.roleplay and session.roleplay.status in {RolePlayStatus.ACTIVE, RolePlayStatus.PAUSED}:
+                session.roleplay.status, session.roleplay.completion_reason = RolePlayStatus.INTERRUPTED, "safety_interruption"
+                session.roleplay.completed_at = utcnow()
         elif session.roleplay and session.roleplay.status == RolePlayStatus.ACTIVE:
             plan = self.roleplays.plan_response(session.roleplay, message, state)
             session.roleplay.evidence[-1].conversation_turn_id = session.turns[-1].id
@@ -202,6 +223,9 @@ class ConversationService:
                 "roleplay_action": roleplay_action,
             },
         ))
+        if rehearsal_running and session.roleplay.completed_at:
+            # The closing assistant reply and its event belong to the rehearsal.
+            session.roleplay.measurement_ended_at = utcnow()
         await self.save(session)
         return turn, AgentDecision(emotion_state=state, cognitive_assessment=assessment, strategy=strategy, strategy_scores=strategy_scores, decision_reasons=reasons, analyzer_version=getattr(self.analyzer, "version", "unknown")), session
     async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None, pre_ratings: dict | None = None, pre_skipped: bool = False):
@@ -251,6 +275,8 @@ class ConversationService:
             name=f"roleplay_{action}",
             properties={"scenario_id": session.roleplay.scenario_id},
         ))
+        if action == "finish":
+            session.roleplay.measurement_ended_at = utcnow()
         await self.save(session); return session
     async def rewind_roleplay(self, session_id: UUID, user_id: UUID) -> tuple[str, Session]:
         session = await self.get_session(session_id, user_id)
@@ -277,6 +303,7 @@ class ConversationService:
         state.status = RolePlayStatus.ACTIVE
         state.completion_reason = None
         state.completed_at = None
+        state.measurement_ended_at = None
         session.feedback = None
         scenario = state.scenario or SCENARIOS[state.scenario_id]
         checks = {

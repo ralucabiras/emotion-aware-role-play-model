@@ -149,6 +149,7 @@ class RolePlayState(BaseModel):
     completion_reason: str | None = None
     started_at: datetime = Field(default_factory=utcnow)
     completed_at: datetime | None = None
+    measurement_ended_at: datetime | None = None
 
 
 class AgentDecision(BaseModel):
