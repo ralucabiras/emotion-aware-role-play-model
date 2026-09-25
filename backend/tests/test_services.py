@@ -351,3 +351,55 @@ async def test_reflection_messages_do_not_advance_a_paused_rehearsal():
     await service.set_roleplay_status(session.id, user.id, "resume")
     _, _, resumed = await service.chat(session.id, user.id, "I cannot help this week.")
     assert resumed.roleplay.turn == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("resume_before_rewind", [False, True])
+async def test_rewind_preserves_rehearsal_and_later_reflection(resume_before_rewind):
+    repository = MemoryRepository()
+    user = User(email="rewind-reflect@example.com", password_hash="unused", consented_at=utcnow())
+    await repository.create_user(user)
+    service = ConversationService(repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id, user.id, "boundary", Difficulty.INTERMEDIATE, pre_skipped=True)
+    await service.chat(session.id, user.id, "I cannot help this week.")
+    await service.set_roleplay_status(session.id, user.id, "pause")
+    await service.chat(session.id, user.id, "I feel nervous about saying that.")
+    if resume_before_rewind:
+        await service.set_roleplay_status(session.id, user.id, "resume")
+    before = (await service.get_session(session.id, user.id)).model_dump()
+    with pytest.raises(ValueError, match="Your history has been kept"):
+        await service.rewind_roleplay(session.id, user.id)
+    assert (await service.get_session(session.id, user.id)).model_dump() == before
+
+    # A subsequent rehearsal exchange can be rewound without touching reflection.
+    if not resume_before_rewind:
+        await service.set_roleplay_status(session.id, user.id, "resume")
+    await service.chat(session.id, user.id, "I still cannot help this week.")
+    removed, rewound = await service.rewind_roleplay(session.id, user.id)
+    assert removed == "I still cannot help this week."
+    assert [turn.content for turn in rewound.turns] == [turn["content"] for turn in before["turns"]]
+    assert rewound.roleplay.turn == 1
+    assert len(rewound.roleplay.evidence) == 1
+    assert rewound.roleplay.success_progress == .5
+    snapshot = rewound.model_dump()
+    with pytest.raises(ValueError, match="Your history has been kept"):
+        await service.rewind_roleplay(session.id, user.id)
+    assert (await service.get_session(session.id, user.id)).model_dump() == snapshot
+
+
+@pytest.mark.asyncio
+async def test_rewind_preserves_legacy_unlinked_evidence():
+    repository = MemoryRepository()
+    user = User(email="legacy-rewind@example.com", password_hash="unused", consented_at=utcnow())
+    await repository.create_user(user)
+    service = ConversationService(repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id, user.id, "boundary", Difficulty.INTERMEDIATE, pre_skipped=True)
+    _, _, session = await service.chat(session.id, user.id, "I cannot help this week.")
+    session.roleplay.evidence[-1].conversation_turn_id = None
+    await service.save(session)
+    snapshot = session.model_dump()
+    with pytest.raises(ValueError, match="Practise again"):
+        await service.rewind_roleplay(session.id, user.id)
+    assert (await service.get_session(session.id, user.id)).model_dump() == snapshot

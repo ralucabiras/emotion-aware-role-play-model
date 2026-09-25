@@ -113,6 +113,7 @@ class ConversationTurn(BaseModel):
 
 class TurnEvidence(BaseModel):
     turn: int
+    conversation_turn_id: UUID | None = None
     concrete_request: bool = False
     excessive_apology: bool = False
     maintained_boundary: bool = False

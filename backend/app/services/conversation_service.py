@@ -175,6 +175,7 @@ class ConversationService:
             if session.roleplay: session.roleplay.status, session.roleplay.completion_reason = RolePlayStatus.INTERRUPTED, "safety_interruption"
         elif session.roleplay and session.roleplay.status == RolePlayStatus.ACTIVE:
             plan = self.roleplays.plan_response(session.roleplay, message, state)
+            session.roleplay.evidence[-1].conversation_turn_id = session.turns[-1].id
             roleplay_action = plan.action
             if plan.completed:
                 content, metadata = plan.fallback_text, GenerationMetadata(source="deterministic_roleplay")
@@ -258,9 +259,18 @@ class ConversationService:
             raise ValueError("Start a new attempt to retry after recording post-ratings or a skip")
         if not state or not state.evidence or len(session.turns) < 3:
             raise ValueError("There is no role-play exchange to rewind")
+        # Only remove the exchange that produced the latest rehearsal evidence.
+        # Legacy evidence has no reliable link, so preserve its history as well.
+        if (session.turns[-1].role != Role.ASSISTANT
+                or session.turns[-2].role != Role.USER
+                or state.evidence[-1].conversation_turn_id != session.turns[-2].id):
+            raise ValueError(
+                "The latest conversation exchange is not linked to this rehearsal turn. "
+                "Your history has been kept. To start a new attempt, choose Finish & review "
+                "if the rehearsal is still active, then Practise again."
+            )
         session.post_questionnaire_token = None
-        if session.turns[-1].role == Role.ASSISTANT:
-            session.turns.pop()
+        session.turns.pop()
         user_turn = session.turns.pop()
         state.evidence.pop()
         state.turn = len(state.evidence)

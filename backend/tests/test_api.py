@@ -773,3 +773,25 @@ def test_questionnaires_require_explicit_decisions_correct_timing_and_preserve_a
         assert client.post(third_url+"/questionnaires/post/close", headers=headers).status_code == 204
         assert client.put(third_url+"/questionnaires/post", headers=headers, json={**post, "post_token": completed["post_questionnaire_token"]}).status_code == 409
         assert client.get(third_url, headers=headers).json()["questionnaires"] == {}
+
+
+def test_rewind_after_reflection_returns_conflict_without_changing_history() -> None:
+    with TestClient(app) as client:
+        headers = auth(client, "rewind-reflection-api@example.com")
+        session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+        base = f"/api/sessions/{session_id}"
+        assert client.post(f"{base}/roleplay", headers=headers, json={
+            "pre_skipped": True, "scenario_id": "boundary", "difficulty": "intermediate",
+        }).status_code == 200
+        assert client.post("/api/chat", headers=headers, json={
+            "session_id": session_id, "message": "I cannot help this week.",
+        }).status_code == 200
+        assert client.post(f"{base}/roleplay/action", headers=headers, json={"action": "pause"}).status_code == 200
+        assert client.post("/api/chat", headers=headers, json={
+            "session_id": session_id, "message": "I feel nervous about that conversation.",
+        }).status_code == 200
+        before = client.get(base, headers=headers).json()
+        response = client.post(f"{base}/roleplay/rewind", headers=headers)
+        assert response.status_code == 409
+        assert "Practise again" in response.json()["detail"]
+        assert client.get(base, headers=headers).json() == before
