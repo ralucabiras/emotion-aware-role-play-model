@@ -1,5 +1,6 @@
 from datetime import UTC, date, datetime, timedelta
 from enum import StrEnum
+from typing import Literal
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
@@ -137,6 +138,8 @@ class RolePlayScenario(BaseModel):
 
 
 class RolePlayState(BaseModel):
+    attempt_purpose: Literal["required", "additional", "retry", "legacy_unknown"] = "legacy_unknown"
+    required_task_id: str | None = None
     scenario_id: str
     scenario: RolePlayScenario | None = None
     status: RolePlayStatus = RolePlayStatus.ACTIVE
@@ -270,6 +273,8 @@ class Session(BaseModel):
 
 
 class StudyRecord(BaseModel):
+    attempt_purpose: Literal["required", "additional", "retry", "legacy_unknown"] = "legacy_unknown"
+    required_task_id: str | None = None
     id: UUID = Field(default_factory=uuid4)
     user_id: UUID
     participant_id: UUID

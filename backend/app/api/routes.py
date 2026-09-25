@@ -25,7 +25,6 @@ from app.models.domain import (
     StudyConsentRecord,
     StudyEligibilityRecord,
     StudyLifecycle,
-    StudyRecord,
     StudyWithdrawalRecord,
     User,
     utcnow,
@@ -87,33 +86,16 @@ from app.services.multimodal_service import (
 )
 from app.services.research_export import CSV_SCHEMA_VERSION, export_research_rows
 from app.services.roleplay_service import SCENARIOS
+from app.services.study_tasks import (
+    PROTOCOL_REQUIRED_SCENARIOS,
+    PROTOCOL_TASK_ORDER,
+    is_completed_protocol_task,
+    is_completed_rehearsal,
+    select_required_attempts,
+)
 from app.services.transcription_service import InvalidAudio, TranscriptionService, TranscriptionUnavailable
 
 router, bearer = APIRouter(prefix="/api"), HTTPBearer(auto_error=False)
-PROTOCOL_TASK_ORDER = ("workload", "boundary", "relationship")
-PROTOCOL_REQUIRED_SCENARIOS = set(PROTOCOL_TASK_ORDER)
-QUALIFYING_COMPLETION_REASONS = {"success", "maximum_turns", "user_finished"}
-
-
-def is_completed_rehearsal(record: StudyRecord) -> bool:
-    return bool(record.scenario_id and record.completion_reason in QUALIFYING_COMPLETION_REASONS)
-
-
-def has_complete_post_questionnaire(record: StudyRecord) -> bool:
-    post = record.questionnaires.get("post")
-    return bool(
-        post and post.phase == "post"
-        and all(value is not None and 1 <= value <= 7 for value in (
-            post.confidence, post.realism, post.usefulness,
-        ))
-    )
-
-
-def is_completed_protocol_task(record: StudyRecord) -> bool:
-    return bool(record.scenario_id in PROTOCOL_REQUIRED_SCENARIOS
-                and record.difficulty == Difficulty.INTERMEDIATE
-                and is_completed_rehearsal(record) and has_complete_post_questionnaire(record))
-
 
 def is_researcher(email: str) -> bool:
     allowed = {item.strip().lower() for item in settings.researcher_emails.split(",") if item.strip()}
@@ -378,8 +360,9 @@ async def research_export(
     user: User = Depends(current_user), repository=Depends(get_repository)
 ):
     records = await repository.list_study_records(user.id)
+    primary_ids = {record.session_id for record in select_required_attempts(records).values()}
     return {
-        "schema_version": "affectlab-research-export-v2",
+        "schema_version": "affectlab-research-export-v3",
         "protocol_version": settings.study_protocol_version,
         "participant_id": str(user.participant_id),
         "account_privacy_acceptance": {"version": user.consent_version, "accepted_at": user.consented_at},
@@ -397,6 +380,10 @@ async def research_export(
                 "retention_expires_at": record.retention_expires_at,
                 "turn_count": record.turn_count,
                 "scenario_id": record.scenario_id,
+                "attempt_purpose": record.attempt_purpose,
+                "required_task_id": record.required_task_id,
+                "primary_attempt": record.session_id in primary_ids,
+                "primary_task_complete": record.session_id in primary_ids and is_completed_protocol_task(record),
                 "difficulty": record.difficulty,
                 "completion_reason": record.completion_reason,
                 "feedback_metrics": [metric.model_dump(mode="json") for metric in record.feedback_metrics],
@@ -551,15 +538,14 @@ async def participant_study_progress(user: User = Depends(current_user), reposit
                if record.protocol_version == settings.study_protocol_version
                and record.difficulty == Difficulty.INTERMEDIATE]
     sessions = {session.id: session for session in await repository.list_sessions(user.id)}
+    required_attempts = select_required_attempts(records)
     tasks = []
     for index, scenario_id in enumerate(PROTOCOL_TASK_ORDER, 1):
-        attempts = sorted((record for record in records if record.scenario_id == scenario_id),
-                          key=lambda record: record.last_activity_at, reverse=True)
-        latest = attempts[0] if attempts else None
+        latest = required_attempts.get(scenario_id)
         session = sessions.get(latest.session_id) if latest else None
         resumable = session and session.roleplay and session.roleplay.status in {"active", "paused"}
         awaiting_ratings = session and session.post_questionnaire_token and latest and is_completed_rehearsal(latest)
-        if any(is_completed_protocol_task(record) for record in attempts):
+        if latest and is_completed_protocol_task(latest):
             status = "complete"
         elif resumable:
             status = "in_progress"
@@ -604,7 +590,7 @@ async def pilot_dataset(repository):
         user_completed = sum(is_completed_rehearsal(record) for record in study_records)
         qualifying_scenarios = {
             record.scenario_id
-            for record in study_records
+            for record in select_required_attempts(study_records).values()
             if is_completed_protocol_task(record)
         }
         protocol_complete = qualifying_scenarios == PROTOCOL_REQUIRED_SCENARIOS
@@ -918,6 +904,7 @@ async def start_roleplay(session_id: UUID, request: StartRolePlayRequest, user: 
         session, scenario, turn = await service.start_roleplay(
             session_id, user.id, request.scenario_id, request.difficulty, custom,
             request.pre_ratings.model_dump() if request.pre_ratings else None, request.pre_skipped,
+            request.attempt_purpose, request.required_task_id,
         )
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except KeyError: raise HTTPException(404, "Scenario not found") from None

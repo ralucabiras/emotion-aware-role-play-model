@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, StrictBool
@@ -215,6 +216,8 @@ class PreRehearsalRatings(BaseModel):
 
 
 class StartRolePlayRequest(BaseModel):
+    attempt_purpose: Literal["required", "additional", "retry"] = "additional"
+    required_task_id: Literal["workload", "boundary", "relationship"] | None = None
     scenario_id: str
     difficulty: Difficulty = Difficulty.BEGINNER
     pre_ratings: PreRehearsalRatings | None = None

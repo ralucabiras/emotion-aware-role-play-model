@@ -519,7 +519,7 @@ def test_research_lifecycle_review_and_immutable_frozen_export() -> None:
             )
             assert frozen.status_code == 200
             manifest = frozen.json()
-            assert manifest["schema_version"] == "affectlab-frozen-dataset-v2"
+            assert manifest["schema_version"] == "affectlab-frozen-dataset-v3"
             assert manifest["record_count"] == 2
             assert manifest["participant_count"] == 2
             assert len(manifest["sha256"]) == 64

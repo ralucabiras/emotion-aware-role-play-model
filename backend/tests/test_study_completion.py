@@ -36,7 +36,7 @@ async def add_task(repository, user, scenario, reason="success", post=True, **ov
         consent_version=user.study_consent.version, protocol_version=settings.study_protocol_version,
         enrolled_at=user.pilot_enrolled_at, session_created_at=utcnow(), last_activity_at=utcnow(),
         retention_expires_at=utcnow()+timedelta(days=1),
-        scenario_id=scenario, difficulty=Difficulty.INTERMEDIATE, completion_reason=reason,
+        scenario_id=scenario, attempt_purpose="required", required_task_id=scenario, difficulty=Difficulty.INTERMEDIATE, completion_reason=reason,
         questionnaires={"post": StudyQuestionnaire(phase="post", confidence=1, realism=4, usefulness=7)} if post else {},
     ).model_copy(update=overrides)
     await repository.save_study_record(record)
@@ -136,7 +136,7 @@ async def test_checklist_resumes_active_attempt_and_waits_for_post_decision():
     repository, user = await enrolled_cohort()
     service = ConversationService(repository, generator=TemplateResponseGenerator())
     workspace = await service.create_session(user.id)
-    session, _, _ = await service.start_roleplay(workspace.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_skipped=True)
+    session, _, _ = await service.start_roleplay(workspace.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_skipped=True, attempt_purpose="required", required_task_id="workload")
     progress = await participant_study_progress(user, repository)
     assert progress["tasks"][0]["status"] == "in_progress"
     assert progress["tasks"][0]["session_id"] == str(session.id)
@@ -163,3 +163,78 @@ async def test_participant_progress_does_not_include_another_participant():
     with pytest.raises(HTTPException) as error:
         await participant_study_progress(user, repository)
     assert error.value.status_code == 403
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("purpose", ["additional", "retry", "legacy_unknown", "required"])
+async def test_later_success_never_replaces_first_incomplete_required_attempt(purpose):
+    import csv
+    import io
+
+    from app.api.routes import build_research_csv, research_export
+
+    repository, user = await enrolled_cohort()
+    first = await add_task(repository, user, "workload", post=False)
+    later = await add_task(repository, user, "workload", attempt_purpose=purpose)
+    await add_task(repository, user, "boundary")
+    await add_task(repository, user, "relationship")
+    progress = await participant_study_progress(user, repository)
+    assert progress["tasks"][0]["status"] == "incomplete"
+    assert progress["completed_tasks"] == 2
+    assert (await pilot_dataset(repository))[2]["protocol_completers"] == 0
+    for frozen in [False, True]:
+        content, _, _ = await build_research_csv(repository, frozen)
+        rows = list(csv.DictReader(io.StringIO(content)))
+        workload = [row for row in rows if row["scenario_id"] == "workload"]
+        assert [row["primary_attempt"] for row in workload] == ["True", "False"]
+        assert [row["primary_task_complete"] for row in workload] == ["False", "False"]
+        assert workload[1]["attempt_purpose"] == purpose
+    personal = await research_export(user, repository)
+    flags = {row["session_id"]: row["primary_attempt"] for row in personal["records"]}
+    assert flags[str(first.session_id)] is True and flags[str(later.session_id)] is False
+    # Selection is by start/creation time, never last activity or repository order.
+    first.last_activity_at = later.last_activity_at + timedelta(days=1)
+    await repository.save_study_record(first)
+    assert (await participant_study_progress(user, repository))["completed_tasks"] == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("purpose", ["additional", "retry", "legacy_unknown"])
+async def test_practice_and_legacy_records_do_not_start_required_checklist(purpose):
+    repository, user = await enrolled_cohort()
+    for scenario in ("workload", "boundary", "relationship"):
+        await add_task(repository, user, scenario, attempt_purpose=purpose)
+    progress = await participant_study_progress(user, repository)
+    assert all(task["status"] == "not_started" for task in progress["tasks"])
+    assert progress["next_task_id"] == "workload"
+    assert (await pilot_dataset(repository))[2]["protocol_completers"] == 0
+
+
+@pytest.mark.asyncio
+async def test_required_start_validates_purpose_and_preserves_first_attempt_after_deletion():
+    from app.services.conversation_service import ConversationService
+    from app.services.llm_service import TemplateResponseGenerator
+
+    repository, user = await enrolled_cohort()
+    service = ConversationService(repository, generator=TemplateResponseGenerator())
+    workspace = await service.create_session(user.id)
+    for scenario, level, association in [("workload", Difficulty.BEGINNER, "workload"),
+                                         ("workload", Difficulty.INTERMEDIATE, "boundary"),
+                                         ("workload", Difficulty.INTERMEDIATE, None)]:
+        with pytest.raises(ValueError):
+            await service.start_roleplay(workspace.id, user.id, scenario, level, pre_skipped=True,
+                                         attempt_purpose="required", required_task_id=association)
+    session, _, _ = await service.start_roleplay(workspace.id, user.id, "workload", Difficulty.INTERMEDIATE,
+                                               pre_skipped=True, attempt_purpose="required", required_task_id="workload")
+    assert session.roleplay.attempt_purpose == "required"
+    record = next(record for record in await repository.list_study_records(user.id) if record.session_id == session.id)
+    assert record.required_task_id == "workload" and record.attempt_purpose == "required"
+    await repository.delete_session(session.id, user.id)
+    workspace = await service.create_session(user.id)
+    with pytest.raises(ValueError, match="already has an attempt"):
+        await service.start_roleplay(workspace.id, user.id, "workload", Difficulty.INTERMEDIATE,
+                                     pre_skipped=True, attempt_purpose="required", required_task_id="workload")
+    retry, _, _ = await service.start_roleplay(workspace.id, user.id, "workload", Difficulty.INTERMEDIATE,
+                                             pre_skipped=True, attempt_purpose="retry", required_task_id="workload")
+    assert retry.roleplay.attempt_purpose == "retry"
+    assert (await participant_study_progress(user, repository))["tasks"][0]["status"] == "incomplete"

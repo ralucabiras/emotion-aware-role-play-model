@@ -30,6 +30,7 @@ from app.services.interfaces import CognitiveAnalyzer, EmotionAnalyzer, Response
 from app.services.llm_service import OpenAIResponseGenerator
 from app.services.roleplay_service import SCENARIOS, RolePlayService
 from app.services.strategy_service import RuleBasedStrategySelector, ScoredStrategySelector
+from app.services.study_tasks import PROTOCOL_REQUIRED_SCENARIOS, select_required_attempts
 
 
 class SessionNotFoundError(KeyError): pass
@@ -150,6 +151,8 @@ class ConversationService:
             last_activity_at=last_activity,
             retention_expires_at=last_activity + timedelta(days=settings.study_record_retention_days),
             turn_count=post_consent_turn_count,
+            attempt_purpose=roleplay.attempt_purpose if roleplay else "additional",
+            required_task_id=roleplay.required_task_id if roleplay else None,
             scenario_id=roleplay.scenario_id if roleplay else None,
             difficulty=roleplay.difficulty_level if roleplay else None,
             completion_reason=roleplay.completion_reason if roleplay else None,
@@ -228,9 +231,33 @@ class ConversationService:
             session.roleplay.measurement_ended_at = utcnow()
         await self.save(session)
         return turn, AgentDecision(emotion_state=state, cognitive_assessment=assessment, strategy=strategy, strategy_scores=strategy_scores, decision_reasons=reasons, analyzer_version=getattr(self.analyzer, "version", "unknown")), session
-    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None, pre_ratings: dict | None = None, pre_skipped: bool = False):
+    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None, pre_ratings: dict | None = None, pre_skipped: bool = False, attempt_purpose: str = "additional", required_task_id: str | None = None):
         session = await self.get_session(session_id, user_id)
         state, scenario = self.roleplays.start(scenario_id, level, custom)
+        if attempt_purpose not in {"required", "additional", "retry"}:
+            raise ValueError("Unknown attempt purpose")
+        if required_task_id is not None and (required_task_id not in PROTOCOL_REQUIRED_SCENARIOS or required_task_id != scenario_id):
+            raise ValueError("Required task association must match a standard scenario")
+        if attempt_purpose == "additional" and required_task_id is not None:
+            raise ValueError("Additional practice cannot claim a required task")
+        if attempt_purpose == "required":
+            if required_task_id != scenario_id or scenario_id not in PROTOCOL_REQUIRED_SCENARIOS or level != Difficulty.INTERMEDIATE:
+                raise ValueError("Required study tasks must match the checklist at intermediate difficulty")
+            user = await self.repository.get_user(user_id)
+            if not (user and user.pilot_enrolled_at and user.study_consent and has_current_eligibility(user)
+                    and user.study_consent.version == settings.study_consent_version
+                    and user.study_consent.protocol_version == settings.study_protocol_version
+                    and not user.study_withdrawal and not user.study_excluded_at):
+                raise ValueError("Current study enrollment is required")
+            lifecycle = await self.repository.get_study_lifecycle(settings.study_protocol_version)
+            today = utcnow().date()
+            if lifecycle and (lifecycle.dataset_frozen_at or lifecycle.freeze_token
+                              or (lifecycle.start_date and today < lifecycle.start_date)
+                              or (lifecycle.end_date and today > lifecycle.end_date)):
+                raise ValueError("Study collection is closed; choose additional practice")
+            if required_task_id in select_required_attempts(await self.repository.list_study_records(user_id)):
+                raise ValueError("This required task already has an attempt. Resume it or choose additional practice.")
+        state.attempt_purpose, state.required_task_id = attempt_purpose, required_task_id
         if pre_ratings is not None and pre_skipped:
             raise ValueError("Choose either pre-ratings or skip")
         pre = StudyQuestionnaire(phase="pre", **pre_ratings) if pre_ratings is not None else None

@@ -1,5 +1,7 @@
 # Research CSV v2 data dictionary
 
+Historical schema: new exports now use [CSV v3 and its explicit required-attempt selection](research-export-v3.md). Existing v2 snapshots remain unchanged.
+
 New live exports and newly frozen datasets use `affectlab-frozen-dataset-v2`. Existing frozen snapshots remain byte-for-byte unchanged, with their original schema version and checksum. This changes the export representation, not the frozen study protocol or rating scales.
 
 ## Rows and denominators
