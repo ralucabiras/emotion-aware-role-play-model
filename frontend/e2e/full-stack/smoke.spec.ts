@@ -19,14 +19,17 @@ test('compiled app, FastAPI, and MongoDB complete and persist the core study jou
   await page.goto('/login')
   await page.getByLabel('Email').fill('smoke-researcher@example.com')
   await page.getByLabel('Password').fill('full-stack-smoke-password')
-  await page.getByRole('button', { name: 'Sign in', exact: true }).click()
+  await page.locator('form').getByRole('button', { name: 'Sign in', exact: true }).click()
   await expect(page.getByRole('heading', { name: /Welcome back, Demo/ })).toBeVisible()
 
   await page.getByRole('button', { name: 'Start a reflection' }).click()
   const syntheticMessage = 'Synthetic pre-enrollment reflection that must stay outside the study export.'
   await page.getByRole('textbox').fill(syntheticMessage)
+  const reflectionSaved = page.waitForResponse(response => response.url() === `${apiUrl}/chat` && response.request().method() === 'POST')
   await page.getByLabel('Send message').click()
-  await expect(page.getByText(syntheticMessage)).toBeVisible()
+  expect((await reflectionSaved).ok()).toBeTruthy()
+  await expect(page.getByRole('textbox')).toHaveValue('')
+  await expect(page.getByText(syntheticMessage, { exact: true })).toBeVisible()
   const sessionsAfterReflection = await api<Array<{session_id:string; title:string}>>(page, '/sessions')
   const syntheticSession = sessionsAfterReflection.find(item => item.title.startsWith('Synthetic pre-enrollment'))
   expect(syntheticSession).toBeTruthy()
@@ -44,8 +47,9 @@ test('compiled app, FastAPI, and MongoDB complete and persist the core study jou
   expect(Date.parse(enrolled.eligibility_confirmed_at)).not.toBeNaN()
 
   await page.goto('/app')
-  await page.getByRole('button', { name: 'Start a role-play' }).click()
-  await page.getByLabel('intermediate').check()
+  // The goal-based recommendation can be a different scenario. Exercise the
+  // required checklist task, which also fixes intermediate difficulty.
+  await page.getByRole('button', { name: 'Next task: Workload conversation', exact: true }).click()
   await page.getByLabel('How confident do you feel about this conversation?').selectOption('4')
   await page.getByLabel('How anxious do you feel about this conversation?').selectOption('4')
   await page.getByRole('button', { name: /Begin with the manager/ }).click()
@@ -64,6 +68,9 @@ test('compiled app, FastAPI, and MongoDB complete and persist the core study jou
   const studySessions = await api<Array<{session_id:string; roleplay?:{status:string}}>>(page, '/sessions')
   const roleplaySession = studySessions.find(item => item.roleplay?.status === 'completed')
   expect(roleplaySession).toBeTruthy()
+
+  const progress = await api<{completed_tasks:number}>(page, '/research/progress')
+  expect(progress.completed_tasks).toBe(1)
 
   await page.goto('/research')
   await expect(page.getByRole('heading', { name: 'AffectLab pilot study' })).toBeVisible()
