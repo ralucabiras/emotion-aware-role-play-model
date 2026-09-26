@@ -111,7 +111,24 @@ export function Dashboard({user, initialSessionId, initialRoleplay=false, initia
   }
   async function action(name: string, nextMode: WorkspaceMode = 'roleplay') { if (!sessionId) return; setBusy(true); setError(''); try { const session = await api.roleplayAction(sessionId, name); load(session); setMode(session.feedback ? 'feedback' : nextMode); notifyStudyProgress() } catch(caught) { setError(caught instanceof Error?caught.message:'The role-play could not be updated.') } finally { setBusy(false) } }
   async function rewind() { if (!sessionId) return; setBusy(true); setError(''); try { const result=await api.rewindRoleplay(sessionId); load(result.session); setMessage(result.removed_message); setMode('roleplay') } catch(caught) { setError(caught instanceof Error?caught.message:'The last turn could not be restored.') } finally { setBusy(false) } }
-  async function fresh() { setStudyTask(undefined); setRetryAttempt(false); setRetryTask(null); if (sessionId) await api.deleteSession(sessionId); const session = await api.createSession(); setSessionId(session.session_id); setSessionTitle('New reflection'); setTurns([]); setEmotion(session.emotion_state); setRoleplay(null); setFeedback(null); setMode('reflect'); storeVoiceSample(null); setTranscriptionStatus('idle'); setMultimodal(null); setSessions(await api.listSessions()) }
+  async function fresh() {
+    if(busy)return
+    setBusy(true);setError('')
+    try{
+      if(sessionId){await api.deleteSession(sessionId);setSessions(current=>current.filter(item=>item.session_id!==sessionId))}
+      setSessionId(undefined);history.replaceState({},'', '/practice?new=1');setStudyTask(undefined);setRetryAttempt(false);setRetryTask(null)
+      setSessionTitle('New reflection');setTurns([]);setEmotion(null);setRoleplay(null);setFeedback(null);setPostToken(null);setMode('reflect')
+      storeVoiceSample(null);setMessage('');setTranscriptionStatus('idle');setMultimodal(null);setVoiceNotice('')
+      try{
+        const session=await api.createSession();setSessionId(session.session_id);history.replaceState({},'',`/practice?session=${session.session_id}`);setEmotion(session.emotion_state)
+      }catch{
+        setError('The previous session was deleted, but a new workspace could not be created. Use Delete & start fresh to try creating it again.')
+        return
+      }
+      try{setSessions(await api.listSessions())}catch{setError('Your new workspace is ready, but the saved-session list could not be refreshed.')}
+    }catch(caught){setError(caught instanceof Error?caught.message:'The session could not be deleted. Please try again.')}
+    finally{setBusy(false)}
+  }
   function retry() { setStudyTask(undefined); setRetryAttempt(true); setRetryTask(roleplay?.required_task_id??null); setPostToken(null); setSelected(roleplay?.scenario_id ?? selected); setDifficulty(roleplay?.difficulty_level ?? difficulty); setFeedback(null); setRoleplay(null); setMode('roleplay') }
 
   const composer = <><VoiceCapture enabled={(transcriptionAvailable || multimodalEnabled) && microphoneEnabled} disabled={busy || transcriptionStatus === 'transcribing'} sample={voiceSample} onChange={setVoiceSample}/><form onSubmit={submit}><textarea readOnly={busy} value={message} onChange={event => setMessage(event.target.value)} placeholder={transcriptionStatus === 'transcribing' ? 'Transcribing your recording…' : transcriptionStatus === 'review' ? 'Review or edit the transcript before sending…' : inRoleplay ? `Respond to your ${activeScenario?.character ?? 'practice partner'}…` : 'Type a message or add your voice…'} rows={2}/><button className="send" disabled={!message.trim() || sendingBlocked} aria-label="Send message">↑</button></form><p className="privacy">Session text is retained locally for up to 30 days. Optional audio may be sent to OpenAI for transcription, processed in memory, and is not stored by AffectLab.</p></>
