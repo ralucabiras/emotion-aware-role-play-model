@@ -27,3 +27,6 @@ ml/checkpoints/
 *.tar.gz
 *.tgz
 .huggingface/
+
+# Local database fixture backups
+.local/
