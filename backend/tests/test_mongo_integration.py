@@ -165,3 +165,40 @@ async def test_enrolled_rehearsal_round_trip_and_restart(mongo_repository):
         assert records[0].roleplay_completed_at >= records[0].roleplay_started_at
     finally:
         await restarted.client.close()
+
+
+@pytest.mark.asyncio
+async def test_enhanced_workload_state_survives_restart(mongo_repository):
+    from app.models.domain import Difficulty
+    from app.services.conversation_service import ConversationService
+    from app.services.llm_service import TemplateResponseGenerator
+
+    user = await mongo_repository.create_user(make_user())
+    service = ConversationService(mongo_repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_skipped=True)
+    _, _, session = await service.chat(session.id, user.id, "I have too many tasks and 12 hours of work. Could you help me prioritise?")
+    before = session.roleplay.model_dump(mode="json")
+    restarted = MongoRepository(MONGO_URI, mongo_repository.db.name)
+    try:
+        await restarted.initialize()
+        service = ConversationService(restarted, generator=TemplateResponseGenerator())
+        restored = await service.get_session(session.id, user.id)
+        # MongoDB timestamps have millisecond precision; compare stored snapshots.
+        assert restored.roleplay.dialogue == session.roleplay.dialogue
+        assert restored.roleplay.decisions == session.roleplay.decisions
+        assert restored.roleplay.evidence == session.roleplay.evidence
+        assert restored.roleplay.policy_version == before["policy_version"]
+        _, _, restored = await service.chat(session.id, user.id, "I understand the report must be ready by Friday. Could we move the other tasks to Monday?")
+        assert restored.roleplay.dialogue.stage == "agree"
+        _, restored = await service.rewind_roleplay(session.id, user.id)
+        assert restored.roleplay.dialogue.stage == "constraints"
+        assert len(restored.roleplay.decisions) == 1
+        await service.chat(session.id, user.id, "I understand the report must be ready by Friday. Could we move the other tasks to Monday?")
+        _, _, restored = await service.chat(session.id, user.id, "Agreed, I will carry out that plan.")
+        assert restored.roleplay.completion_reason == "success"
+        loaded = await service.get_session(session.id, user.id)
+        assert loaded.roleplay.dialogue.final_agreement
+        assert loaded.feedback.metrics[-1].score == 1
+    finally:
+        await restarted.client.close()

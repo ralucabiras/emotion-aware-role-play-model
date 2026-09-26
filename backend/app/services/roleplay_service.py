@@ -12,6 +12,7 @@ from app.models.domain import (
     TurnEvidence,
     utcnow,
 )
+from app.services import workload_dialogue
 
 LEVELS = {Difficulty.BEGINNER: (0.25, 0.8), Difficulty.INTERMEDIATE: (0.5, 0.6), Difficulty.DIFFICULT: (0.75, 0.4)}
 SCENARIOS = {
@@ -29,6 +30,7 @@ class RolePlayReplyPlan:
     action: str
     fallback_text: str
     completed: bool = False
+    reason_codes: tuple[str, ...] = ()
 
 
 def observe(turn: int, text: str, arousal: float) -> TurnEvidence:
@@ -58,6 +60,17 @@ class RolePlayService:
         state.turn += 1
         item = observe(state.turn, message, emotion.arousal)
         state.evidence.append(item)
+        if state.dialogue is not None:
+            item.language_features = workload_dialogue.features(message)
+            action, wording, reasons = workload_dialogue.advance(state, message)
+            state.success_progress = {"explain": 0, "constraints": 1/3, "agree": 2/3, "resolved": 1}[state.dialogue.stage]
+            if state.dialogue.stage == "resolved":
+                self.finish(state, "success")
+            elif state.turn >= scenario.max_turns:
+                self.finish(state, "maximum_turns")
+                action, wording = "close_unresolved", "We have reached the end of this practice without a confirmed agreement."
+                reasons.append("turn_limit_without_agreement")
+            return RolePlayReplyPlan(action, wording, state.status == RolePlayStatus.COMPLETED, tuple(reasons))
         if emotion.arousal > 0.78:
             state.difficulty, state.cooperation = max(0.1, state.difficulty - 0.1), min(0.9, state.cooperation + 0.1)
         checks = {
@@ -95,6 +108,8 @@ class RolePlayService:
         state.status = RolePlayStatus.COMPLETED
         state.completion_reason, state.completed_at = reason, utcnow()
     def feedback(self, state: RolePlayState) -> SessionFeedback:
+        if state.dialogue is not None:
+            return workload_dialogue.feedback(state)
         evidence = state.evidence
         def metric(name: str, values: list[bool]) -> FeedbackMetric:
             hits = [item.turn for item, value in zip(evidence, values, strict=True) if value]

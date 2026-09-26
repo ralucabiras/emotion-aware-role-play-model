@@ -122,6 +122,40 @@ class TurnEvidence(BaseModel):
     specific_detail: bool = False
     i_statement: bool = False
     arousal: float = 0
+    language_features: list[str] = Field(default_factory=list)
+
+
+class DialogueState(BaseModel):
+    stage: Literal["explain", "constraints", "agree", "resolved"] = "explain"
+    objection: str | None = None
+    addressed_constraints: list[str] = Field(default_factory=list)
+    proposed_options: list[str] = Field(default_factory=list)
+    final_agreement: str | None = None
+
+
+class DialogueSnapshot(BaseModel):
+    dialogue: DialogueState
+    status: RolePlayStatus
+    completion_reason: str | None = None
+    turn: int
+    success_progress: float
+    difficulty: float
+    cooperation: float
+    emotion_state: EmotionState
+
+
+class DialogueDecision(BaseModel):
+    user_turn_id: UUID
+    assistant_turn_id: UUID
+    before: DialogueSnapshot
+    after: DialogueSnapshot
+    action: str
+    reason_codes: list[str]
+    evidence_turn_ids: list[UUID]
+    scenario_version: str
+    policy_version: str
+    scoring_version: str
+    generation: GenerationMetadata
 
 
 class RolePlayScenario(BaseModel):
@@ -138,6 +172,11 @@ class RolePlayScenario(BaseModel):
 
 
 class RolePlayState(BaseModel):
+    scenario_version: str = "legacy-v1"
+    policy_version: str = "legacy-v1"
+    scoring_version: str = "legacy-v1"
+    dialogue: DialogueState | None = None
+    decisions: list[DialogueDecision] = Field(default_factory=list)
     attempt_purpose: Literal["required", "additional", "retry", "legacy_unknown"] = "legacy_unknown"
     required_task_id: str | None = None
     scenario_id: str

@@ -298,6 +298,8 @@ async def test_new_rehearsal_preserves_attempt_ratings_and_study_record(next_sce
     first, _, _ = await service.start_roleplay(workspace.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_ratings={"confidence": 2, "anxiety": 6})
     assert first.id == workspace.id  # Do not leave an empty workspace behind.
     await service.chat(first.id, user.id, "I need you to move the report deadline to Friday because I have 12 hours of work this week.")
+    await service.chat(first.id, user.id, "I understand the report must be ready by Friday. Could we move the other tasks to Monday?")
+    await service.chat(first.id, user.id, "Agreed, I will carry out that plan.")
     assert first.feedback is not None
     await service.submit_questionnaire(first.id, user.id, "post", {"confidence": 6, "realism": 5, "usefulness": 7}, post_token=first.post_questionnaire_token)
     await service.save_takeaway(first.id, user.id, "Keep the first takeaway.")
@@ -321,6 +323,9 @@ async def test_new_rehearsal_preserves_attempt_ratings_and_study_record(next_sce
 
     if next_scenario == "workload":
         await service.chat(second.id, user.id, "I need you to prioritise the deadline because it is this week.")
+        await service.chat(second.id, user.id, "I am overloaded with tasks.")
+        await service.chat(second.id, user.id, "I understand the report must be ready by Friday. Could we move the other tasks to Monday?")
+        await service.chat(second.id, user.id, "Agreed, I will carry out that plan.")
         assert second.feedback.compared_with_session_id == first.id
         assert second.feedback.comparisons
         original_metrics = {metric.name: metric.score for metric in first.feedback.metrics}

@@ -1,6 +1,6 @@
 # AffectLab product development plan
 
-Status: proposed implementation sequence, 26 September 2026. This plan does not change the application or the frozen study protocol.
+Status: Step 1 first implementation slice implemented, 26 September 2026; interaction review pending before Step 2. The frozen study protocol is unchanged.
 
 ## Objective
 
@@ -36,6 +36,18 @@ Each step should be independently demonstrable, tested, and reviewed before star
 - Keep synthetic test cases identifiable. Demonstration output is not participant evidence.
 
 ## Step 1 - A real multi-stage workload rehearsal
+
+### Implementation status - 26 September 2026
+
+Implemented for new additional-practice workload attempts at intermediate difficulty. See [the versioned policy, limitations and synthetic demo](workload-dialogue-v2.md).
+
+- Explicit explain -> constraints -> agreement -> resolved stages, with a disclosed Friday client-report constraint and bounded supported trade-offs.
+- Persisted versioned decisions, evidence links and snapshots; deterministic feedback separates observable features from completion.
+- Progress labels in the workspace; pause/resume, exact snapshot rewind, early finish, turn-cap and safety interruption handling.
+- Legacy sessions, required study tasks and study retries retain the original policy. Feedback comparisons require the same scoring version.
+- Offline wording and validated online fallback share the same authoritative controller. Free online paraphrasing is intentionally deferred until it can be validated.
+
+Validation: the full backend suite passed with real MongoDB enabled (159 tests); desktop/mobile progress and pause/reload accessibility checks passed (2 tests); frontend production build and lint passed. This includes the additional paraphrase and negation fixtures. Real MongoDB checks recreate repository and service instances; a full-stack browser/backend-process restart demonstration remains part of Step 7. The next product action is to review the synthetic three-exchange interaction before extending the engine to Step 2. Interactive replay and branching remain future steps.
 
 ### Purpose and experience
 
@@ -240,4 +252,4 @@ Prepare architecture and sequence diagrams, policy tables, representative replay
 
 ## First task to implement
 
-Start with Step 1: enhanced workload rehearsal. The first reviewable milestone is one complete multi-stage manager conversation, with state persisted across reloads, evidence-linked feedback and no regression to existing required study tasks. Approve that interaction before extending it to other scenarios or adding multimodal adaptation.
+Step 1 now provides the first reviewable milestone: a complete multi-stage manager conversation with persisted state, evidence-linked feedback and preserved required-task behavior. Review the synthetic interaction in [workload-dialogue-v2.md](workload-dialogue-v2.md) before extending it to other scenarios or adding multimodal adaptation.

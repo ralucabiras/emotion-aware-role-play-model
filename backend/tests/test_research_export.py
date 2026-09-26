@@ -47,7 +47,7 @@ async def test_export_contains_scores_sources_and_zero_session_participants():
         await repository.create_user(user)
     service = ConversationService(repository, generator=TemplateResponseGenerator())
     workspace = await service.create_session(active.id)
-    session, _, _ = await service.start_roleplay(workspace.id, active.id, "workload", Difficulty.INTERMEDIATE, pre_ratings={"confidence": 2, "anxiety": 6})
+    session, _, _ = await service.start_roleplay(workspace.id, active.id, "workload", Difficulty.INTERMEDIATE, attempt_purpose="required", required_task_id="workload", pre_ratings={"confidence": 2, "anxiety": 6})
     await service.chat(session.id, active.id, "I need you to move the report deadline to Friday because I have 12 hours of work this week.")
     await service.submit_questionnaire(session.id, active.id, "post", {"confidence": 5, "realism": 6, "usefulness": 7}, post_token=session.post_questionnaire_token)
     session.takeaway = "PRIVATE_TAKEAWAY"
@@ -149,7 +149,7 @@ async def test_completed_measurements_and_export_ignore_later_reflection(manual)
     await repository.create_user(user)
     service = ConversationService(repository, generator=TemplateResponseGenerator())
     session = await service.create_session(user.id)
-    session, _, _ = await service.start_roleplay(session.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_ratings={"confidence": 2, "anxiety": 6})
+    session, _, _ = await service.start_roleplay(session.id, user.id, "workload", Difficulty.INTERMEDIATE, attempt_purpose="required", required_task_id="workload", pre_ratings={"confidence": 2, "anxiety": 6})
     if manual:
         await service.chat(session.id, user.id, "I am unsure what to say.")
         session = await service.set_roleplay_status(session.id, user.id, "finish")
@@ -203,7 +203,7 @@ async def test_legacy_completion_excludes_later_reflection_without_losing_closin
     await repository.create_user(user)
     service = ConversationService(repository, generator=TemplateResponseGenerator())
     session = await service.create_session(user.id)
-    session, _, _ = await service.start_roleplay(session.id, user.id, "workload", Difficulty.INTERMEDIATE, pre_skipped=True)
+    session, _, _ = await service.start_roleplay(session.id, user.id, "workload", Difficulty.INTERMEDIATE, attempt_purpose="required", required_task_id="workload", pre_skipped=True)
     _, _, session = await service.chat(session.id, user.id, "I need the deadline moved to Friday.")
     session.roleplay.measurement_ended_at = None
     await service.save(session)

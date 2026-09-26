@@ -93,6 +93,7 @@ class OpenAIResponseGenerator(ResponseGenerator):
             if state else None,
             "roleplay_state": state.model_dump(mode="json") if state else None,
             "required_character_action": required_action,
+            "authoritative_wording": fallback_text,
             "affect_estimate": session.emotion_state.model_dump(mode="json"),
         }
         instructions = (
@@ -111,6 +112,11 @@ class OpenAIResponseGenerator(ResponseGenerator):
                 store=False,
             )
             wording = response.output_parsed
+            # Enhanced policy wording contains the actual constraint/proposal being
+            # negotiated. Until semantic validation exists, only exact wording is
+            # accepted; an action label alone cannot validate an invented promise.
+            if state and state.dialogue and wording and wording.dialogue.strip() != fallback_text:
+                return fallback_text, GenerationMetadata(source="template", fallback_reason="unverified_policy_wording")
             if (
                 not wording
                 or wording.character_action != required_action

@@ -149,3 +149,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { border-color
 
 .study-checklist{margin:1.5rem 0;padding:1.5rem;border:1px solid var(--line,#d8dedb);border-radius:20px;background:var(--surface,#fff)}
 .study-checklist h2{margin:.3rem 0}.study-checklist ol{display:grid;gap:.7rem;padding-left:1.4rem}.study-checklist li{padding:.5rem}.study-checklist li span{display:block;font-size:.9rem;margin-top:.3rem}.study-checklist [aria-current=step]{background:#eef4ef;border-radius:8px}.study-checklist small{display:block;margin-top:1rem}.study-checklist button{margin:.3rem 0}
+
+.dialogue-progress { display:flex; flex-wrap:wrap; gap:1rem; list-style:none; padding:0; grid-column:1/-1; }
+.dialogue-progress [aria-current="step"] { font-weight:700; text-decoration:underline; text-underline-offset:.3em; }

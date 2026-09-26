@@ -7,6 +7,8 @@ from app.core.config import settings
 from app.models.domain import (
     AgentDecision,
     ConversationTurn,
+    DialogueDecision,
+    DialogueSnapshot,
     Difficulty,
     FeedbackComparison,
     GenerationMetadata,
@@ -20,6 +22,7 @@ from app.models.domain import (
 )
 from app.repositories.base import Repository
 from app.safety.crisis import CRISIS_RESPONSE, contains_crisis_language
+from app.services import workload_dialogue
 from app.services.affect_service import (
     ExponentialStateTracker,
     RuleBasedCognitiveAnalyzer,
@@ -31,6 +34,15 @@ from app.services.llm_service import OpenAIResponseGenerator
 from app.services.roleplay_service import SCENARIOS, RolePlayService
 from app.services.strategy_service import RuleBasedStrategySelector, ScoredStrategySelector
 from app.services.study_tasks import PROTOCOL_REQUIRED_SCENARIOS, select_required_attempts
+
+
+def dialogue_snapshot(session: Session) -> DialogueSnapshot:
+    state = session.roleplay
+    assert state and state.dialogue
+    return DialogueSnapshot(dialogue=state.dialogue.model_copy(deep=True), turn=state.turn,
+        status=state.status, completion_reason=state.completion_reason,
+        success_progress=state.success_progress, difficulty=state.difficulty,
+        cooperation=state.cooperation, emotion_state=session.emotion_state.model_copy(deep=True))
 
 
 class SessionNotFoundError(KeyError): pass
@@ -174,6 +186,8 @@ class ConversationService:
     async def chat(self, session_id: UUID, user_id: UUID, message: str) -> tuple[ConversationTurn, AgentDecision, Session]:
         session = await self.get_session(session_id, user_id)
         rehearsal_running = session.roleplay and session.roleplay.status in {RolePlayStatus.ACTIVE, RolePlayStatus.PAUSED}
+        before = dialogue_snapshot(session) if rehearsal_running and session.roleplay.dialogue else None
+        plan = None
         if session.post_questionnaire_token:
             session.post_questionnaire_token = None
             session.research_events.append(ResearchEvent(name="questionnaire_post_closed"))
@@ -216,6 +230,16 @@ class ConversationService:
         else: content, metadata = await self.generator.generate(session, message, strategy)
         turn = ConversationTurn(role=Role.ASSISTANT, content=content, strategy=strategy, generation=metadata)
         session.turns.append(turn)
+        if before and (plan or crisis):
+            roleplay = session.roleplay
+            roleplay.decisions.append(DialogueDecision(
+                user_turn_id=session.turns[-2].id, assistant_turn_id=turn.id,
+                before=before, after=dialogue_snapshot(session),
+                action=plan.action if plan else "safety_interruption",
+                reason_codes=list(plan.reason_codes) if plan else ["safety_interruption"],
+                evidence_turn_ids=[e.conversation_turn_id for e in roleplay.evidence if e.conversation_turn_id],
+                scenario_version=roleplay.scenario_version, policy_version=roleplay.policy_version,
+                scoring_version=roleplay.scoring_version, generation=metadata.model_copy(deep=True)))
         session.research_events.append(ResearchEvent(
             name="message_completed",
             properties={
@@ -258,6 +282,9 @@ class ConversationService:
             if required_task_id in select_required_attempts(await self.repository.list_study_records(user_id)):
                 raise ValueError("This required task already has an attempt. Resume it or choose additional practice.")
         state.attempt_purpose, state.required_task_id = attempt_purpose, required_task_id
+        if attempt_purpose == "additional" and scenario_id == "workload" and level == Difficulty.INTERMEDIATE and custom is None:
+            workload_dialogue.enable(state)
+            scenario = state.scenario
         if pre_ratings is not None and pre_skipped:
             raise ValueError("Choose either pre-ratings or skip")
         pre = StudyQuestionnaire(phase="pre", **pre_ratings) if pre_ratings is not None else None
@@ -325,6 +352,21 @@ class ConversationService:
         session.post_questionnaire_token = None
         session.turns.pop()
         user_turn = session.turns.pop()
+        if state.dialogue is not None:
+            decision = state.decisions.pop()
+            snapshot = decision.before
+            state.dialogue = snapshot.dialogue.model_copy(deep=True)
+            state.turn, state.success_progress = snapshot.turn, snapshot.success_progress
+            state.difficulty, state.cooperation = snapshot.difficulty, snapshot.cooperation
+            state.evidence = state.evidence[:snapshot.turn]
+            state.status = RolePlayStatus.ACTIVE
+            state.completion_reason = state.completed_at = state.measurement_ended_at = None
+            session.feedback = None
+            session.emotion_state = snapshot.emotion_state.model_copy(deep=True)
+            session.research_events = [e for e in session.research_events if e.created_at < user_turn.created_at]
+            session.research_events.append(ResearchEvent(name="roleplay_rewound", properties={"scenario_id": state.scenario_id}))
+            await self.save(session)
+            return user_turn.content, session
         state.evidence.pop()
         state.turn = len(state.evidence)
         state.status = RolePlayStatus.ACTIVE
@@ -393,12 +435,12 @@ class ConversationService:
     async def complete_feedback(self, session: Session) -> None:
         if not session.roleplay: return
         feedback = self.roleplays.feedback(session.roleplay)
-        previous = next((item for item in await self.repository.list_sessions(session.user_id) if item.id != session.id and item.feedback and item.feedback.scenario_id == session.roleplay.scenario_id), None)
+        previous = next((item for item in await self.repository.list_sessions(session.user_id) if item.id != session.id and item.feedback and item.feedback.scenario_id == session.roleplay.scenario_id and item.roleplay and item.roleplay.scoring_version == session.roleplay.scoring_version), None)
         if previous and previous.feedback:
             old = {metric.name: metric.score for metric in previous.feedback.metrics}
             feedback.compared_with_session_id = previous.id
             feedback.comparisons = [FeedbackComparison(name=metric.name, current_score=metric.score, previous_score=old[metric.name], change=metric.score-old[metric.name]) for metric in feedback.metrics if metric.name in old]
-        if isinstance(self.generator, OpenAIResponseGenerator): feedback = await self.generator.phrase_feedback(feedback)
+        if isinstance(self.generator, OpenAIResponseGenerator) and session.roleplay.dialogue is None: feedback = await self.generator.phrase_feedback(feedback)
         feedback.session_id = session.id
         session.feedback = feedback
         session.post_questionnaire_token = secrets.token_urlsafe(32)

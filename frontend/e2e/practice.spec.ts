@@ -195,3 +195,19 @@ for (const microphoneDisabled of [false, true]) {
     await expect(page.locator('.message.user')).toHaveText('Text still works.')
   })
 }
+
+
+test('restores enhanced workload progress on desktop and mobile', async ({ page }) => {
+  const state = await installApiMock(page, {existingSession:true})
+  state.roleplay = {scenario_id:'workload',status:'active',difficulty_level:'intermediate',turn:1,success_progress:1/3,
+    dialogue:{stage:'constraints',final_agreement:null},policy_version:'workload-v2'}
+  await page.goto('/practice?session=session-1')
+  const progress = page.getByRole('list', {name:'Conversation progress'})
+  await expect(progress).toBeVisible()
+  await expect(progress.locator('[aria-current="step"]')).toHaveText('2. Discuss constraints')
+  await page.getByRole('button', {name:'Pause',exact:true}).click()
+  await page.reload()
+  await expect(page.getByRole('button', {name:'Resume',exact:true})).toBeVisible()
+  await expect(progress.locator('[aria-current="step"]')).toHaveText('2. Discuss constraints')
+  await expectAccessible(page)
+})
