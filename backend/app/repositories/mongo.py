@@ -29,7 +29,9 @@ class MongoRepository(Repository):
     }
 
     def __init__(self, uri: str, database: str) -> None:
-        self.client = AsyncMongoClient(uri, uuidRepresentation="standard")
+        # BSON stores UTC instants; decode them with timezone information so
+        # persisted dates remain comparable with newly created UTC timestamps.
+        self.client = AsyncMongoClient(uri, uuidRepresentation="standard", tz_aware=True)
         self.db = self.client[database]
         self._initialized = False
 

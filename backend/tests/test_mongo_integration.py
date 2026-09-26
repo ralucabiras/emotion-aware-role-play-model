@@ -124,3 +124,44 @@ async def test_password_reset_rejection_preserves_link_and_concurrent_success_is
     assert await mongo_repository.get_password_reset_user(digest) is None
     with pytest.raises(AuthenticationError):
         await auth.reset_password("reset-token", "third-new-password")
+
+
+@pytest.mark.asyncio
+async def test_enrolled_rehearsal_round_trip_and_restart(mongo_repository):
+    from app.core.config import settings
+    from app.models.domain import Difficulty, StudyConsentRecord, StudyEligibilityRecord
+    from app.services.conversation_service import ConversationService
+    from app.services.eligibility import eligibility_version
+    from app.services.llm_service import TemplateResponseGenerator
+
+    user = make_user()
+    user.pilot_enrolled_at = utcnow()
+    user.study_consent = StudyConsentRecord(version=settings.study_consent_version,
+        protocol_version=settings.study_protocol_version, accepted_at=user.pilot_enrolled_at)
+    user.study_eligibility = StudyEligibilityRecord(version=eligibility_version(),
+        protocol_version=settings.study_protocol_version)
+    await mongo_repository.create_user(user)
+    service = ConversationService(mongo_repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id, user.id, "workload",
+        Difficulty.INTERMEDIATE, pre_ratings={"confidence": 4, "anxiety": 4},
+        attempt_purpose="required", required_task_id="workload")
+    _, _, session = await service.chat(session.id, user.id,
+        "I need the report deadline moved to Friday because I have 12 hours of work.")
+    await service.submit_questionnaire(session.id, user.id, "post",
+        {"confidence": 5, "realism": 4, "usefulness": 6}, post_token=session.post_questionnaire_token)
+    restarted = MongoRepository(MONGO_URI, mongo_repository.db.name)
+    try:
+        await restarted.initialize()
+        restored_user = await restarted.get_user(user.id)
+        restored_session = await restarted.get_session(session.id, user.id)
+        assert restored_user.study_consent.accepted_at.utcoffset() == timedelta(0)
+        assert restored_session.roleplay.completed_at.utcoffset() == timedelta(0)
+        await ConversationService(restarted, generator=TemplateResponseGenerator()).backfill_active_study_records()
+        records = await restarted.list_study_records(user.id)
+        assert len(records) == 1
+        assert records[0].completion_reason == "success"
+        assert records[0].questionnaires["post"].confidence == 5
+        assert records[0].roleplay_completed_at >= records[0].roleplay_started_at
+    finally:
+        await restarted.client.close()
