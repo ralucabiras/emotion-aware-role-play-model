@@ -152,6 +152,9 @@ class MemoryRepository(Repository):
             key: record for key, record in self.password_reset_tokens.items() if record[0] != user_id
         }
         self.password_reset_tokens[digest] = (user_id, expires_at)
+    async def get_password_reset_user(self, digest: str) -> UUID | None:
+        record = self.password_reset_tokens.get(digest)
+        return record[0] if record and record[1] > utcnow() else None
     async def consume_password_reset_token(self, digest: str) -> UUID | None:
         record = self.password_reset_tokens.pop(digest, None)
         if not record or record[1] <= utcnow(): return None

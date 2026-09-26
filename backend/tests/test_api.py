@@ -566,6 +566,9 @@ def test_password_reset_is_generic_single_use_and_changes_credentials() -> None:
         assert unknown.status_code == requested.status_code == 202
         assert unknown.json() == requested.json()
         token = capturing_email.reset_tokens["reset@example.com"]
+        rejected = client.post("/api/auth/reset-password", json={"token": token, "new_password": "long-test-password"})
+        assert rejected.status_code == 400
+        assert rejected.json()["detail"] == "New password must be different"
         reset = client.post(
             "/api/auth/reset-password",
             json={"token": token, "new_password": "replacement-password"},

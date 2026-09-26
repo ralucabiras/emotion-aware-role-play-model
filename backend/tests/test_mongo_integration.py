@@ -98,3 +98,29 @@ async def test_backup_can_be_restored_and_verified(mongo_repository, tmp_path):
         assert manifest["schema_version"] == "affectlab-mongodb-backup-v1"
     finally:
         await mongo_repository.client.drop_database(target_database)
+
+
+@pytest.mark.asyncio
+async def test_password_reset_rejection_preserves_link_and_concurrent_success_is_single_use(mongo_repository):
+    import hashlib
+
+    from app.services.auth_service import AuthenticationError, AuthService, password_hash
+
+    user = make_user()
+    user.password_hash = password_hash.hash("original-password")
+    await mongo_repository.create_user(user)
+    auth = AuthService(mongo_repository)
+    digest = hashlib.sha256(b"reset-token").hexdigest()
+    await mongo_repository.store_password_reset_token(user.id, digest, utcnow()+timedelta(minutes=10))
+    with pytest.raises(ValueError, match="New password must be different"):
+        await auth.reset_password("reset-token", "original-password")
+    assert await mongo_repository.get_password_reset_user(digest) == user.id
+    passwords = ["first-new-password", "second-new-password"]
+    results = await asyncio.gather(*(auth.reset_password("reset-token", password) for password in passwords), return_exceptions=True)
+    assert sum(result is None for result in results) == 1
+    assert sum(isinstance(result, AuthenticationError) for result in results) == 1
+    reloaded = await mongo_repository.get_user(user.id)
+    assert password_hash.verify(passwords[results.index(None)], reloaded.password_hash)
+    assert await mongo_repository.get_password_reset_user(digest) is None
+    with pytest.raises(AuthenticationError):
+        await auth.reset_password("reset-token", "third-new-password")

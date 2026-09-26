@@ -257,6 +257,11 @@ class MongoRepository(Repository):
             {"user_id": user_id, "digest": digest, "expires_at": expires_at},
             upsert=True,
         )
+    async def get_password_reset_user(self, digest: str) -> UUID | None:
+        doc = await self.db.password_reset_tokens.find_one(
+            {"digest": digest, "expires_at": {"$gt": utcnow()}}
+        )
+        return doc["user_id"] if doc else None
     async def consume_password_reset_token(self, digest: str) -> UUID | None:
         doc = await self.db.password_reset_tokens.find_one_and_delete(
             {"digest": digest, "expires_at": {"$gt": utcnow()}}

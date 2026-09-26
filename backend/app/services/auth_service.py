@@ -105,7 +105,7 @@ class AuthService:
         )
     async def reset_password(self, raw_token: str, new_password: str) -> None:
         digest = hashlib.sha256(raw_token.encode()).hexdigest()
-        user_id = await self.repository.consume_password_reset_token(digest)
+        user_id = await self.repository.get_password_reset_user(digest)
         if not user_id:
             raise AuthenticationError("Invalid or expired password reset link")
         user = await self.repository.get_user(user_id)
@@ -113,7 +113,12 @@ class AuthService:
             raise AuthenticationError("Invalid or expired password reset link")
         if password_hash.verify(new_password, user.password_hash):
             raise ValueError("New password must be different")
-        user.password_hash = password_hash.hash(new_password)
+        replacement_hash = password_hash.hash(new_password)
+        # Validation must not consume the link. Claim it atomically only once
+        # the password is acceptable; another request may have used it meanwhile.
+        if await self.repository.consume_password_reset_token(digest) != user_id:
+            raise AuthenticationError("Invalid or expired password reset link")
+        user.password_hash = replacement_hash
         await self.repository.save_user(user)
         await self.repository.revoke_user_tokens(user.id)
     def access_token(self, user_id: UUID) -> str:

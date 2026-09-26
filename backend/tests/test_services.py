@@ -403,3 +403,55 @@ async def test_rewind_preserves_legacy_unlinked_evidence():
     with pytest.raises(ValueError, match="Practise again"):
         await service.rewind_roleplay(session.id, user.id)
     assert (await service.get_session(session.id, user.id)).model_dump() == snapshot
+
+
+@pytest.mark.asyncio
+async def test_reset_link_survives_rejected_password_but_not_success():
+    import hashlib
+
+    from app.services.auth_service import password_hash
+
+    repository = MemoryRepository()
+    user = User(email="reset-retry@example.com", password_hash=password_hash.hash("original-password"), consented_at=utcnow())
+    await repository.create_user(user)
+    auth = AuthService(repository)
+    digest = hashlib.sha256(b"reset-token").hexdigest()
+    await repository.store_password_reset_token(user.id, digest, utcnow() + timedelta(minutes=10))
+    for _ in range(2):
+        with pytest.raises(ValueError, match="New password must be different"):
+            await auth.reset_password("reset-token", "original-password")
+        assert await repository.get_password_reset_user(digest) == user.id
+    await auth.reset_password("reset-token", "corrected-password")
+    assert password_hash.verify("corrected-password", user.password_hash)
+    with pytest.raises(AuthenticationError):
+        await auth.reset_password("reset-token", "another-password")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("invalidate", ["expire", "replace", "consume"])
+async def test_reset_rechecks_token_after_password_validation(monkeypatch, invalidate):
+    import hashlib
+
+    from app.services.auth_service import password_hash
+
+    repository = MemoryRepository()
+    user = User(email="reset-race@example.com", password_hash=password_hash.hash("original-password"), consented_at=utcnow())
+    await repository.create_user(user)
+    auth = AuthService(repository)
+    digest = hashlib.sha256(b"reset-token").hexdigest()
+    await repository.store_password_reset_token(user.id, digest, utcnow() + timedelta(minutes=10))
+    original_get = repository.get_user
+
+    async def get_user_and_invalidate(user_id):
+        if invalidate == "expire":
+            await repository.store_password_reset_token(user.id, digest, utcnow() - timedelta(seconds=1))
+        elif invalidate == "replace":
+            await repository.store_password_reset_token(user.id, "new-token-digest", utcnow() + timedelta(minutes=10))
+        else:
+            await repository.consume_password_reset_token(digest)
+        return await original_get(user_id)
+
+    monkeypatch.setattr(repository, "get_user", get_user_and_invalidate)
+    with pytest.raises(AuthenticationError):
+        await auth.reset_password("reset-token", "corrected-password")
+    assert password_hash.verify("original-password", user.password_hash)
