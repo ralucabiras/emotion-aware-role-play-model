@@ -1,6 +1,6 @@
 # AffectLab product development plan
 
-Status: Steps 1-3 implemented, 27 September 2026. Step 3 is ready for interaction review; Step 4 remains planned. The frozen study protocol is unchanged.
+Status: Steps 1-4 implemented, 27 September 2026. Step 4 is ready for interaction review; Step 5 remains planned. The frozen study protocol is unchanged.
 
 ## Objective
 
@@ -175,6 +175,19 @@ A voice rehearsal with an inspectable explanation of whether multimodal evidence
 
 ## Step 4 - Interactive conversation replay
 
+### Implementation status - 27 September 2026
+
+Implemented. See [conversation replay: data boundaries, limitations and synthetic demonstration](conversation-replay.md).
+
+- Added a Replay workspace for completed and interrupted rehearsals, using saved sessions and their existing ownership/retention rules.
+- Added a selectable turn timeline, highlighted transcript pairs, keyboard-focusable utterance evidence links and linked feedback evidence. No exact spans are invented.
+- Separated observable language, controller actions/stages/strategy, and estimated affect/pacing. Expandable technical details expose saved states, reasons, distributions, uncertainty, disagreement, versions and generation/inference provenance.
+- Excluded later reflection using the recorded measurement boundary, preserved legacy closing replies and microsecond precision, and ignored decisions with discarded/missing turns.
+- Added honest legacy, missing-source, prediction failure, empty transcript and unknown-boundary states. Replay does not regenerate responses, predictions or feedback.
+- Kept existing questionnaire closure on leaving Feedback, refreshing the session version before replay opens. Inspecting replay itself is read-only; frozen study behavior is unchanged.
+
+Validation: 56 focused backend tests passed with real MongoDB enabled, covering saved decisions/predictions, reload, rewind and completion measurement boundaries. All 48 desktop/mobile replay and practice regression checks passed, including evidence navigation after reload, keyboard/accessibility, missing/failing predictions and questionnaire navigation. Frontend build/lint and diff checks passed. Browser fixtures are synthetic; this step does not claim live-model accuracy or a full-stack browser/backend restart demonstration.
+
 ### Purpose and experience
 
 Turn a completed rehearsal into something users can inspect and learn from. Show a transcript beside a turn timeline. Selecting a turn highlights the evidence, dialogue stage, strategy, model confidence and any adaptation at that moment.
@@ -279,4 +292,4 @@ Prepare architecture and sequence diagrams, policy tables, representative replay
 
 ## Next task to implement
 
-Steps 1-3 are implemented. Review the voice/pacing demonstration and stored exchange explanation in [affect-pacing-v1.md](affect-pacing-v1.md). The next implementation is Step 4: interactive conversation replay built from the persisted dialogue and affect decisions. Frozen required study tasks remain unchanged.
+Steps 1-4 are implemented. Review the replay demonstration and boundaries in [conversation-replay.md](conversation-replay.md). The next implementation is Step 5: branch and compare, preserving the original attempt and resuming alternatives from saved pre-turn snapshots. Frozen required study tasks remain unchanged.

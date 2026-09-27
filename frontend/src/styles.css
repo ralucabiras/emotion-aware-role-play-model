@@ -158,3 +158,15 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { border-color
 .pacing-controls { display:grid; gap:.7rem; margin:1rem 0; padding:1rem; border:1px solid #aabdb5; border-radius:10px; }
 .pacing-controls label { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; }
 .affect-decision { background:#f1f3ed; padding:1rem; margin:1rem 0; border-radius:12px; overflow-wrap:anywhere; }
+.replay-timeline ol { display:flex; flex-wrap:wrap; gap:.6rem; padding:0; list-style:none; }
+.replay-timeline button[aria-pressed="true"] { background:#234e49; color:white; }
+.replay-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1.5rem; align-items:start; }
+.replay-turn,.replay-details section,.replay-details details,.replay-feedback { padding:1rem; margin-bottom:1rem; border:1px solid #718982; border-radius:12px; background:white; overflow-wrap:anywhere; }
+.replay-turn p { white-space:pre-wrap; }
+.replay-turn.selected-exchange { border-left:5px solid #234e49; }
+.replay-turn.evidence-highlight { background:#edf4dc; }
+.conversation-replay :focus-visible,.replay-turn:focus { outline:3px solid #234e49; outline-offset:3px; }
+.replay-details pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:.8rem; }
+.replay-details dl>div { display:flex; justify-content:space-between; }
+.replay-details h2,.replay-transcript h2,.replay-feedback h2 { font-size:1.2rem; }
+@media(max-width:760px) { .replay-layout { grid-template-columns:1fr; } .replay-timeline button { min-height:44px; } }

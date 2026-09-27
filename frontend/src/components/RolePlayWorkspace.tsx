@@ -3,7 +3,7 @@ import { api } from '../services/api'
 import { PostRatings, RatingInput } from './StudyRatings'
 import type { CharacterProfile, Feedback, RolePlayState, Scenario } from '../types/api'
 
-export type WorkspaceMode = 'reflect' | 'roleplay' | 'feedback'
+export type WorkspaceMode = 'reflect' | 'roleplay' | 'feedback' | 'replay'
 
 const profileCopy: Record<CharacterProfile,string> = {
   cooperative: 'Open to your position and asks for a clear, practical response.',
@@ -23,6 +23,7 @@ export function ModeTabs({mode, roleplay, onChange, disabled=false}: {mode: Work
     <button disabled={disabled} className={mode === 'reflect' ? 'active' : ''} aria-current={mode==='reflect'?'page':undefined} onClick={() => onChange('reflect')}>Reflect</button>
     <button disabled={disabled} className={mode === 'roleplay' ? 'active' : ''} aria-current={mode==='roleplay'?'page':undefined} onClick={() => onChange('roleplay')}>{active ? 'Active role-play' : 'Role-play'}</button>
     {roleplay?.status === 'completed' && <button disabled={disabled} className={mode === 'feedback' ? 'active' : ''} aria-current={mode==='feedback'?'page':undefined} onClick={() => onChange('feedback')}>Feedback</button>}
+    {roleplay && ['completed','interrupted'].includes(roleplay.status) && <button disabled={disabled} className={mode==='replay'?'active':''} aria-current={mode==='replay'?'page':undefined} onClick={()=>onChange('replay')}>Replay</button>}
   </nav>
 }
 
