@@ -1,4 +1,4 @@
-import type { StudyProgress, AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, StudyWithdrawal, UserProfile } from '../types/api'
+import type { CharacterProfile, StudyProgress, AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, StudyWithdrawal, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -64,7 +64,7 @@ export const api = {
   scenarios: () => request<Scenario[]>('/roleplay/scenarios'),
   createScenario: (data: {title:string;character:string;situation:string;user_objective:string;opening_line:string;skills:string[]}) => request<Scenario>('/roleplay/scenarios', { method:'POST', body:JSON.stringify(data) }),
   deleteScenario: (id:string) => request<void>(`/roleplay/scenarios/${id}`, { method:'DELETE' }),
-  startRoleplay: (sessionId: string, scenarioId: string, difficulty: string, preRatings: {confidence:number;anxiety:number}|null, attemptPurpose: "required"|"additional"|"retry" = "additional", requiredTaskId: string|null = null) => request<{ session_id: string; emotion_state: EmotionState; scenario: Scenario; opening_turn: ChatResponse['turn']; state: ChatResponse['roleplay'] }>(`/sessions/${sessionId}/roleplay`, { method: 'POST', body: JSON.stringify({ scenario_id: scenarioId, difficulty, attempt_purpose:attemptPurpose, required_task_id:requiredTaskId, pre_ratings: preRatings, pre_skipped: preRatings===null }) }),
+  startRoleplay: (sessionId: string, scenarioId: string, difficulty: string, preRatings: {confidence:number;anxiety:number}|null, attemptPurpose: "required"|"additional"|"retry" = "additional", requiredTaskId: string|null = null, characterProfile: CharacterProfile|null = null) => request<{ session_id: string; emotion_state: EmotionState; scenario: Scenario; opening_turn: ChatResponse['turn']; state: ChatResponse['roleplay'] }>(`/sessions/${sessionId}/roleplay`, { method: 'POST', body: JSON.stringify({ scenario_id: scenarioId, difficulty, character_profile:characterProfile, attempt_purpose:attemptPurpose, required_task_id:requiredTaskId, pre_ratings: preRatings, pre_skipped: preRatings===null }) }),
   roleplayAction: (sessionId: string, action: string) => request<SessionResponse>(`/sessions/${sessionId}/roleplay/action`, { method: 'POST', body: JSON.stringify({ action }) }),
   rewindRoleplay: (sessionId:string) => request<{removed_message:string;session:SessionResponse}>(`/sessions/${sessionId}/roleplay/rewind`, {method:'POST'}),
   closePostQuestionnaire: (sessionId:string) => request<void>(`/sessions/${sessionId}/questionnaires/post/close`, {method:'POST',keepalive:true}),

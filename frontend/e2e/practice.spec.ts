@@ -211,3 +211,41 @@ test('restores enhanced workload progress on desktop and mobile', async ({ page 
   await expect(progress.locator('[aria-current="step"]')).toHaveText('2. Discuss constraints')
   await expectAccessible(page)
 })
+
+
+test('selects a character profile before starting practice', async ({page}) => {
+  await installApiMock(page)
+  await page.goto('/practice?mode=roleplay')
+  await page.getByRole('radio', {name:/sceptical/i}).check()
+  await expect(page.getByRole('note').filter({hasText:'Questions the proposal'})).toBeVisible()
+  const request = page.waitForRequest(request => request.url().endsWith('/roleplay') && request.method()==='POST')
+  await page.getByRole('button', {name:'Skip pre-ratings and begin'}).click()
+  expect((await request).postDataJSON().character_profile).toBe('sceptical')
+})
+
+test('restores boundary pressure and its fixed profile', async ({page}) => {
+  const state = await installApiMock(page, {existingSession:true})
+  state.roleplay = {scenario_id:'boundary',status:'active',difficulty_level:'difficult',turn:2,success_progress:1/3,
+    character_profile:'sceptical',profile_description:'Questions the proposal and repeats pressure.',
+    dialogue:{stage:'pressure',stage_labels:{refuse:'State your boundary',pressure:'Respond to pressure',close:'Close respectfully'},final_agreement:null},policy_version:'scenario-dialogue-v3'}
+  await page.goto('/practice?session=session-1')
+  await expect(page.getByRole('list', {name:'Conversation progress'}).locator('[aria-current="step"]')).toHaveText('2. Respond to pressure')
+  await expect(page.locator('.profile-summary')).toContainText('sceptical')
+  await page.getByRole('button', {name:'Pause',exact:true}).click()
+  await page.reload()
+  await expect(page.getByRole('button', {name:'Resume',exact:true})).toBeVisible()
+  await expect(page.locator('.profile-summary')).toContainText('sceptical')
+  await expectAccessible(page)
+})
+
+for (const ending of ['boundary_held','unresolved']) {
+  test(`shows honest ${ending} feedback`, async ({page}) => {
+    const state = await installApiMock(page, {existingSession:true})
+    state.roleplay = {scenario_id:ending==='boundary_held'?'boundary':'relationship',status:'completed',difficulty_level:'intermediate',turn:3,success_progress:ending==='boundary_held'?1:1/3,
+      character_profile:'sceptical',completion_reason:ending==='boundary_held'?'success':'unresolved',
+      dialogue:{stage:ending==='boundary_held'?'resolved':'unresolved',outcome:ending,final_agreement:null},policy_version:'scenario-dialogue-v3'}
+    await page.goto('/practice?session=session-1')
+    await page.getByRole('button', {name:'Feedback',exact:true}).click()
+    await expect(page.getByText(ending==='boundary_held'?'You held your boundary and closed respectfully. Agreement or a concession was not required.':'You ended with a recorded disagreement. There is no agreed next step; this is not a personal failure.')).toBeVisible()
+  })
+}

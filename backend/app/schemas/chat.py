@@ -216,6 +216,7 @@ class PreRehearsalRatings(BaseModel):
 
 
 class StartRolePlayRequest(BaseModel):
+    character_profile: Literal["cooperative", "rushed", "sceptical"] | None = None
     attempt_purpose: Literal["required", "additional", "retry"] = "additional"
     required_task_id: Literal["workload", "boundary", "relationship"] | None = None
     scenario_id: str

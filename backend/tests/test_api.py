@@ -798,3 +798,29 @@ def test_rewind_after_reflection_returns_conflict_without_changing_history() -> 
         assert response.status_code == 409
         assert "Practise again" in response.json()["detail"]
         assert client.get(base, headers=headers).json() == before
+
+
+def test_profiled_boundary_api_validation_persistence_and_ownership():
+    with TestClient(app) as client:
+        headers = auth(client, "profiled@example.com")
+        session_id = client.post("/api/sessions", headers=headers).json()["session_id"]
+        endpoint = f"/api/sessions/{session_id}/roleplay"
+        payload = {"scenario_id": "boundary", "difficulty": "intermediate", "pre_skipped": True, "character_profile": "sceptical"}
+        invalid = client.post(endpoint, headers=headers, json={**payload, "character_profile": "invented"})
+        assert invalid.status_code == 422
+        assert client.post(endpoint, headers=headers, json={**payload, "scenario_id": "deadline"}).status_code == 409
+        response = client.post(endpoint, headers=headers, json=payload)
+        assert response.status_code == 200
+        assert response.json()["state"]["character_profile"] == "sceptical"
+        assert response.json()["state"]["policy_version"] == "scenario-dialogue-v3"
+        for message in ["I cannot take this on.", "My answer is still no. Thank you.", "My answer is still no. Thank you."]:
+            result = client.post("/api/chat", headers=headers, json={"session_id": session_id, "message": message})
+            assert result.status_code == 200
+        state = result.json()["roleplay"]
+        assert state["completion_reason"] == "success"
+        assert state["dialogue"]["outcome"] == "boundary_held"
+        assert state["dialogue"]["final_agreement"] is None
+        restored = client.get(f"/api/sessions/{session_id}", headers=headers).json()
+        assert restored["roleplay"] == state
+        other_headers = auth(client, "profiled-other@example.com")
+        assert client.get(f"/api/sessions/{session_id}", headers=other_headers).status_code == 404

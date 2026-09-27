@@ -1,6 +1,6 @@
 # AffectLab product development plan
 
-Status: Step 1 first implementation slice implemented, 26 September 2026; interaction review pending before Step 2. The frozen study protocol is unchanged.
+Status: Steps 1 and 2 implemented, 26 September 2026. Step 2 is ready for interaction review; Step 3 remains planned. The frozen study protocol is unchanged.
 
 ## Objective
 
@@ -47,7 +47,7 @@ Implemented for new additional-practice workload attempts at intermediate diffic
 - Legacy sessions, required study tasks and study retries retain the original policy. Feedback comparisons require the same scoring version.
 - Offline wording and validated online fallback share the same authoritative controller. Free online paraphrasing is intentionally deferred until it can be validated.
 
-Validation: the full backend suite passed with real MongoDB enabled (159 tests); desktop/mobile progress and pause/reload accessibility checks passed (2 tests); frontend production build and lint passed. This includes the additional paraphrase and negation fixtures. Real MongoDB checks recreate repository and service instances; a full-stack browser/backend-process restart demonstration remains part of Step 7. The next product action is to review the synthetic three-exchange interaction before extending the engine to Step 2. Interactive replay and branching remain future steps.
+Validation: the full backend suite passed with real MongoDB enabled (159 tests); desktop/mobile progress and pause/reload accessibility checks passed (2 tests); frontend production build and lint passed. This includes the additional paraphrase and negation fixtures. Real MongoDB checks recreate repository and service instances; a full-stack browser/backend-process restart demonstration remains part of Step 7. Step 2 now extends this initial slice while preserving stored workload-v2 attempts. Interactive replay and branching remain future steps.
 
 ### Purpose and experience
 
@@ -86,6 +86,20 @@ Likely files: roleplay_service.py, conversation_service.py, domain.py, chat.py a
 A manager conversation that takes several meaningful exchanges and ends with an identifiable agreement supported by the transcript.
 
 ## Step 2 - Scenario-specific behaviour and believable characters
+
+### Implementation status - 26 September 2026
+
+Implemented. See [scenario dialogue v3: policy tables, limits and demonstration](scenario-dialogue-v3.md).
+
+- Added separate boundary and relationship stage policies, versioned definitions, allowed transitions/actions and scenario-specific feedback.
+- Added cooperative, rushed and sceptical profiles with visible setup descriptions and persisted selections. Difficult level changes evidence/pressure requirements independently of affect confidence.
+- Boundary completion requires refusal through renewed pressure and respectful closure, with no concession or character agreement required.
+- Relationship practice can reach a compatible next step or an explicitly unresolved disagreement; polite wording alone cannot obtain acceptance.
+- Extended workload with profile-specific constraints; retained the original workload-v2 policy for saved sessions and requests without a profile.
+- Reused Step 1 decisions, evidence, snapshots, rewind, ownership and persistence. Required tasks and study-associated retries remain on the frozen controller. Custom and other scenarios remain usable, with generic custom-flow limitations shown in setup.
+- The standard browser practice flow selects a profile; older API clients opt in using `character_profile`. Freely paraphrased online dialogue remains deferred under the existing authoritative-wording guard.
+
+Validation: 200 backend tests passed with real MongoDB enabled; after tightening the delivery-check rule, all 58 focused scenario/workload tests passed. Desktop/mobile profile selection, persisted pressure and outcome wording checks passed (8 checks); the broader practice/study browser regression exercised 40 cases, with the two boundary-wording failures corrected and verified by the focused rerun. Frontend build/lint, backend Ruff and diff checks passed. The browser tests use API fixtures; real MongoDB recovery is tested at the repository/service boundary. No Step 3 multimodal adaptation or Step 4 replay screen is included in this step.
 
 ### Purpose and experience
 
@@ -250,6 +264,6 @@ Prepare architecture and sequence diagrams, policy tables, representative replay
 - No UI reports fabricated scores, hidden filled-in ratings or guaranteed emotional understanding.
 - The application and documentation distinguish implemented behaviour from proposed future work.
 
-## First task to implement
+## Next task to implement
 
-Step 1 now provides the first reviewable milestone: a complete multi-stage manager conversation with persisted state, evidence-linked feedback and preserved required-task behavior. Review the synthetic interaction in [workload-dialogue-v2.md](workload-dialogue-v2.md) before extending it to other scenarios or adding multimodal adaptation.
+Steps 1 and 2 are implemented. Review the two-profile boundary demonstration and relationship unresolved ending in [scenario-dialogue-v3.md](scenario-dialogue-v3.md). The next implementation is Step 3: multimodal-informed interaction with user control; the frozen required study tasks remain unchanged.

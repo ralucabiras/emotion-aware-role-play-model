@@ -22,7 +22,7 @@ from app.models.domain import (
 )
 from app.repositories.base import Repository
 from app.safety.crisis import CRISIS_RESPONSE, contains_crisis_language
-from app.services import workload_dialogue
+from app.services import scenario_dialogue, workload_dialogue
 from app.services.affect_service import (
     ExponentialStateTracker,
     RuleBasedCognitiveAnalyzer,
@@ -233,6 +233,7 @@ class ConversationService:
         if before and (plan or crisis):
             roleplay = session.roleplay
             roleplay.decisions.append(DialogueDecision(
+                character_profile=roleplay.character_profile,
                 user_turn_id=session.turns[-2].id, assistant_turn_id=turn.id,
                 before=before, after=dialogue_snapshot(session),
                 action=plan.action if plan else "safety_interruption",
@@ -255,7 +256,7 @@ class ConversationService:
             session.roleplay.measurement_ended_at = utcnow()
         await self.save(session)
         return turn, AgentDecision(emotion_state=state, cognitive_assessment=assessment, strategy=strategy, strategy_scores=strategy_scores, decision_reasons=reasons, analyzer_version=getattr(self.analyzer, "version", "unknown")), session
-    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None, pre_ratings: dict | None = None, pre_skipped: bool = False, attempt_purpose: str = "additional", required_task_id: str | None = None):
+    async def start_roleplay(self, session_id: UUID, user_id: UUID, scenario_id: str, level: Difficulty, custom=None, pre_ratings: dict | None = None, pre_skipped: bool = False, attempt_purpose: str = "additional", required_task_id: str | None = None, character_profile: str | None = None):
         session = await self.get_session(session_id, user_id)
         state, scenario = self.roleplays.start(scenario_id, level, custom)
         if attempt_purpose not in {"required", "additional", "retry"}:
@@ -282,7 +283,12 @@ class ConversationService:
             if required_task_id in select_required_attempts(await self.repository.list_study_records(user_id)):
                 raise ValueError("This required task already has an attempt. Resume it or choose additional practice.")
         state.attempt_purpose, state.required_task_id = attempt_purpose, required_task_id
-        if attempt_purpose == "additional" and scenario_id == "workload" and level == Difficulty.INTERMEDIATE and custom is None:
+        if character_profile is not None:
+            if attempt_purpose == "required" or required_task_id is not None or custom is not None:
+                raise ValueError("Character profiles require ordinary additional practice or an unassociated retry")
+            scenario_dialogue.enable(state, character_profile)
+            scenario = state.scenario
+        elif attempt_purpose == "additional" and scenario_id == "workload" and level == Difficulty.INTERMEDIATE and custom is None:
             workload_dialogue.enable(state)
             scenario = state.scenario
         if pre_ratings is not None and pre_skipped:

@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react'
 import { api } from '../services/api'
 import { PostRatings, RatingInput } from './StudyRatings'
-import type { Feedback, RolePlayState, Scenario } from '../types/api'
+import type { CharacterProfile, Feedback, RolePlayState, Scenario } from '../types/api'
 
 export type WorkspaceMode = 'reflect' | 'roleplay' | 'feedback'
+
+const profileCopy: Record<CharacterProfile,string> = {
+  cooperative: 'Open to your position and asks for a clear, practical response.',
+  rushed: 'Short on time; asks for concise priorities and a workable time to talk.',
+  sceptical: 'Questions the proposal, repeats pressure, and asks how a plan will be checked.',
+}
 
 const difficultyCopy: Record<string, string> = {
   beginner: 'Supportive responses and gentle prompts',
@@ -22,7 +28,9 @@ export function ModeTabs({mode, roleplay, onChange, disabled=false}: {mode: Work
 
 const customSkills = ['clear request','specific detail','boundary maintenance','I-statements','non-blaming language']
 
-export function ScenarioSetup({studyTask,onFreePractice,scenarios, selected, difficulty, busy, onScenario, onDifficulty, onStart, onScenarios}: {studyTask?:string;onFreePractice?:()=>void;scenarios: Scenario[]; selected: string; difficulty: string; busy: boolean; onScenario: (id: string) => void; onDifficulty: (level: string) => void; onStart: (ratings: {confidence:number;anxiety:number}|null) => void; onScenarios:(items:Scenario[])=>void}) {
+export function ScenarioSetup({allowProfiles=true,studyTask,onFreePractice,scenarios, selected, difficulty, busy, onScenario, onDifficulty, onStart, onScenarios}: {allowProfiles?:boolean;studyTask?:string;onFreePractice?:()=>void;scenarios: Scenario[]; selected: string; difficulty: string; busy: boolean; onScenario: (id: string) => void; onDifficulty: (level: string) => void; onStart: (ratings: {confidence:number;anxiety:number}|null, profile:CharacterProfile|null) => void; onScenarios:(items:Scenario[])=>void}) {
+  const [profile,setProfile]=useState<CharacterProfile>('cooperative')
+  const profiled = allowProfiles && !studyTask && ['workload','boundary','relationship'].includes(selected)
   const [removing,setRemoving]=useState(false),[removeError,setRemoveError]=useState('')
   const [confidence, setConfidence] = useState<number|null>(null), [anxiety, setAnxiety] = useState<number|null>(null)
   const [building,setBuilding]=useState(false),[saving,setSaving]=useState(false),[builderError,setBuilderError]=useState('')
@@ -48,19 +56,24 @@ export function ScenarioSetup({studyTask,onFreePractice,scenarios, selected, dif
     {building&&!studyTask&&<section className="scenario-builder"><div><p className="eyebrow">Custom rehearsal</p><h3>Build a situation to practise</h3><p>The conversation wording adapts, while safety and scoring remain controlled by AffectLab.</p></div><div className="builder-fields"><label>Scenario title<input value={custom.title} maxLength={80} onChange={event=>field('title',event.target.value)} placeholder="Asking for flexible hours"/></label><label>Who are you speaking with?<input value={custom.character} maxLength={50} onChange={event=>field('character',event.target.value)} placeholder="team lead"/></label><label className="wide-field">Situation<textarea value={custom.situation} maxLength={500} onChange={event=>field('situation',event.target.value)} placeholder="Briefly describe the context…"/></label><label className="wide-field">Your objective<textarea value={custom.user_objective} maxLength={300} onChange={event=>field('user_objective',event.target.value)} placeholder="What would a useful outcome be?"/></label><label className="wide-field">Their opening line<input value={custom.opening_line} maxLength={300} onChange={event=>field('opening_line',event.target.value)} placeholder="You wanted to talk—what is this about?"/></label></div><fieldset className="builder-skills"><legend>Skills to practise <small>Choose 1–3</small></legend>{customSkills.map(item=><label key={item} className={custom.skills.includes(item)?'selected':''}><input type="checkbox" checked={custom.skills.includes(item)} onChange={()=>skill(item)}/>{item}</label>)}</fieldset>{builderError&&<p className="error" role="alert">{builderError}</p>}<button className="primary" disabled={saving||removing||!custom.title.trim()||!custom.character.trim()||custom.situation.trim().length<10||custom.user_objective.trim().length<10||custom.opening_line.trim().length<3||!custom.skills.length} onClick={()=>void create()}>{saving?'Saving…':'Save and select scenario'}</button></section>}
     <div className="scenario-brief"><div><span>Your objective</span><p>{scenario.user_objective}</p></div><div><span>Skills to practise</span><ul>{scenario.expected_skills.map(skill => <li key={skill}>{skill}</li>)}</ul></div></div>
     {!studyTask&&<fieldset className="difficulty-options"><legend>Difficulty</legend>{Object.entries(difficultyCopy).map(([level, copy]) => <label key={level} className={difficulty === level ? 'selected' : ''}><input type="radio" name="difficulty" value={level} checked={difficulty === level} onChange={() => onDifficulty(level)}/><strong>{level}</strong><small>{copy}</small></label>)}</fieldset>}
+    {profiled && <fieldset className="difficulty-options"><legend>Character profile</legend>{(Object.entries(profileCopy) as [CharacterProfile,string][]).map(([value,copy]) => <label key={value} className={profile === value ? 'selected' : ''}><input type="radio" name="character-profile" value={value} checked={profile===value} onChange={()=>setProfile(value)}/><strong>{value}</strong><small>{copy}</small></label>)}</fieldset>}
+    {profiled && <p role="note">{profileCopy[profile]} {difficulty==='difficult' ? 'Expect additional pushback or a request for a trial and review.' : 'You can pause or end the conversation at any point.'}</p>}
+    {scenario.id.startsWith('custom_') && <p role="note">Custom scenarios use a generic follow-up flow and check only the selected language features. They do not use the workload, boundary or relationship stages or character profiles.</p>}
     <fieldset className="study-ratings"><legend>Before you begin <small>Optional research measure</small></legend><RatingInput label="How confident do you feel about this conversation?" value={confidence} onChange={setConfidence}/><RatingInput label="How anxious do you feel about this conversation?" value={anxiety} onChange={setAnxiety}/></fieldset>
-    <button className="primary" disabled={busy||removing||confidence===null||anxiety===null} onClick={() => onStart({confidence:confidence!, anxiety:anxiety!})}>{busy ? 'Preparing...' : `Begin with the ${scenario.character}`}</button>
-    <button className="secondary" disabled={busy||removing} onClick={()=>onStart(null)}>Skip pre-ratings and begin</button>
+    <button className="primary" disabled={busy||removing||confidence===null||anxiety===null} onClick={() => onStart({confidence:confidence!, anxiety:anxiety!}, profiled?profile:null)}>{busy ? 'Preparing...' : `Begin with the ${scenario.character}`}</button>
+    <button className="secondary" disabled={busy||removing} onClick={()=>onStart(null, profiled?profile:null)}>Skip pre-ratings and begin</button>
   </section>
 }
 
 export function ActiveRolePlayHeader({scenario, state, busy, onAction, onRewind}: {scenario?: Scenario; state: RolePlayState; busy: boolean; onAction: (action: string) => void; onRewind:()=>void}) {
   const progress = Math.round(state.success_progress * 100)
+  const stages = state.dialogue?.stage_labels && Object.keys(state.dialogue.stage_labels).length ? state.dialogue.stage_labels : {explain:'Explain the situation',constraints:'Discuss constraints',agree:'Agree a plan'}
   return <section className="roleplay-header" aria-label="Active role-play information">
     <div className="character-avatar">{scenario?.character?.charAt(0).toUpperCase() ?? 'R'}</div>
     <div className="roleplay-identity"><p className="eyebrow">Speaking with your {scenario?.character ?? 'practice partner'}</p><h2>{scenario?.title ?? 'Role-play'}</h2><p>{scenario?.user_objective}</p></div>
     <div className="roleplay-status"><span>{state.difficulty_level}</span><strong>Turn {state.turn}</strong></div>
-    {state.dialogue && <ol className="dialogue-progress" aria-label="Conversation progress">{(['explain', 'constraints', 'agree'] as const).map((stage, index) => <li key={stage} aria-current={state.dialogue?.stage === stage ? 'step' : undefined}>{index + 1}. {({explain: 'Explain the situation', constraints: 'Discuss constraints', agree: 'Agree a plan'})[stage]}</li>)}</ol>}
+    {state.character_profile && <p className="profile-summary">{state.character_profile}: {state.profile_description}</p>}
+    {state.dialogue && <ol className="dialogue-progress" aria-label="Conversation progress">{Object.entries(stages).map(([stage,label], index) => <li key={stage} aria-current={state.dialogue?.stage === stage ? 'step' : undefined}>{index + 1}. {label}</li>)}</ol>}
     <div className="progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress} aria-label={state.dialogue ? `${progress}% of conversation stages completed` : `${progress}% of scenario skills demonstrated`}><i style={{width:`${progress}%`}}/></div>
     <div className="roleplay-actions"><button disabled={busy||state.turn===0} onClick={onRewind}>Retry last turn</button>{state.status === 'active' ? <button disabled={busy} onClick={() => onAction('pause')}>Pause</button> : <button disabled={busy} onClick={() => onAction('resume')}>Resume</button>}<button className="finish" disabled={busy} onClick={() => onAction('finish')}>Finish & review</button></div>
   </section>
@@ -71,7 +84,14 @@ export function FeedbackScreen({scenario, feedback, state, postToken, onRetry, o
   useEffect(()=>{if(!feedback.session_id)return;let active=true;void api.getSession(feedback.session_id).then(session=>active&&setNote(session.takeaway));return()=>{active=false}},[feedback.session_id])
 
   return <section className="feedback-screen">
-    <div className="feedback-hero"><span className="completion-mark">✓</span><p className="eyebrow">Rehearsal complete</p><h2>{scenario?.title ?? 'Role-play feedback'}</h2><p>{state?.completion_reason === 'success' ? 'You demonstrated the scenario’s target skills.' : state?.completion_reason === 'maximum_turns' ? 'You reached the final turn. Review what appeared and what to try next.' : 'You chose to finish the rehearsal. Here is the evidence collected so far.'}</p></div>
+    <div className="feedback-hero"><span className="completion-mark">✓</span><p className="eyebrow">Rehearsal complete</p><h2>{scenario?.title ?? 'Role-play feedback'}</h2><p>{state?.completion_reason === 'success'
+      ? (state.dialogue?.outcome === 'boundary_held' ? 'You held your boundary and closed respectfully. Agreement or a concession was not required.'
+        : state.dialogue?.outcome === 'next_step' ? 'You agreed a practical next step together.'
+        : state.dialogue ? 'You reached a confirmed agreement with the manager.' : 'You demonstrated the target skills for this scenario.')
+      : state?.completion_reason === 'unresolved' ? 'You ended with a recorded disagreement. There is no agreed next step; this is not a personal failure.'
+      : state?.completion_reason === 'maximum_turns' ? 'You reached the final turn. Review what appeared and what to try next.'
+      : 'You chose to finish the rehearsal. Here is the evidence collected so far.'}</p></div>
+    {state?.dialogue && <p>These checks describe observable language, not personal competence. {state.dialogue.final_agreement && <>Agreed proposal: {state.dialogue.final_agreement}</>}</p>}
     {state?.dialogue && <p>These checks describe observable language, not personal competence. {state.dialogue.final_agreement && <>Agreed proposal: {state.dialogue.final_agreement}</>}</p>}
     <div className="feedback-metrics">{feedback.metrics.map(metric => <article key={metric.name}><div><strong>{metric.name}</strong><span>{Math.round(metric.score * 100)}%</span></div><div className="metric-track"><i style={{width:`${metric.score * 100}%`}}/></div><small>{metric.evidence_turns?.length ? `Observed in turn${metric.evidence_turns.length > 1 ? 's' : ''} ${metric.evidence_turns.join(', ')}` : 'Not yet observed'}</small></article>)}</div>
     {feedback.comparisons.length>0&&<section className="feedback-comparison"><div><p className="eyebrow">Compared with your previous attempt</p><h3>What changed this time</h3><p>Same scenario, using the same observable skill measures.</p></div><div>{feedback.comparisons.map(item=>{const points=Math.round(item.change*100),direction=Math.abs(points)<5?'About the same':points>0?`${points} points higher`:`${Math.abs(points)} points lower`;return <article key={item.name}><strong>{item.name}</strong><div className="comparison-bars"><span>Previous <i><b style={{width:`${item.previous_score*100}%`}}/></i><em>{Math.round(item.previous_score*100)}%</em></span><span>This time <i><b style={{width:`${item.current_score*100}%`}}/></i><em>{Math.round(item.current_score*100)}%</em></span></div><small className={points>4?'up':points < -4?'down':'stable'}>{direction}</small></article>})}</div><small>Differences describe observed language in these two attempts. They do not measure personal or clinical improvement.</small></section>}

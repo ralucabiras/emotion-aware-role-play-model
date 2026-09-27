@@ -126,7 +126,10 @@ class TurnEvidence(BaseModel):
 
 
 class DialogueState(BaseModel):
-    stage: Literal["explain", "constraints", "agree", "resolved"] = "explain"
+    stage: Literal["explain", "constraints", "agree", "refuse", "pressure", "close", "perspective", "resolved", "unresolved"] = "explain"
+    stage_labels: dict[str, str] = Field(default_factory=dict)
+    pressure_rounds: int = 0
+    outcome: Literal["agreement", "boundary_held", "next_step", "unresolved"] | None = None
     objection: str | None = None
     addressed_constraints: list[str] = Field(default_factory=list)
     proposed_options: list[str] = Field(default_factory=list)
@@ -145,6 +148,7 @@ class DialogueSnapshot(BaseModel):
 
 
 class DialogueDecision(BaseModel):
+    character_profile: Literal["cooperative", "rushed", "sceptical"] | None = None
     user_turn_id: UUID
     assistant_turn_id: UUID
     before: DialogueSnapshot
@@ -172,6 +176,8 @@ class RolePlayScenario(BaseModel):
 
 
 class RolePlayState(BaseModel):
+    character_profile: Literal["cooperative", "rushed", "sceptical"] | None = None
+    profile_description: str | None = None
     scenario_version: str = "legacy-v1"
     policy_version: str = "legacy-v1"
     scoring_version: str = "legacy-v1"

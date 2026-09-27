@@ -152,3 +152,5 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { border-color
 
 .dialogue-progress { display:flex; flex-wrap:wrap; gap:1rem; list-style:none; padding:0; grid-column:1/-1; }
 .dialogue-progress [aria-current="step"] { font-weight:700; text-decoration:underline; text-underline-offset:.3em; }
+
+.profile-summary { grid-column:1/-1; margin:0; font-size:13px; line-height:1.5; color:#52675f; }

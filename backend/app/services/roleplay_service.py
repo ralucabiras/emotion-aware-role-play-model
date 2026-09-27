@@ -12,7 +12,7 @@ from app.models.domain import (
     TurnEvidence,
     utcnow,
 )
-from app.services import workload_dialogue
+from app.services import scenario_dialogue, workload_dialogue
 
 LEVELS = {Difficulty.BEGINNER: (0.25, 0.8), Difficulty.INTERMEDIATE: (0.5, 0.6), Difficulty.DIFFICULT: (0.75, 0.4)}
 SCENARIOS = {
@@ -61,15 +61,22 @@ class RolePlayService:
         item = observe(state.turn, message, emotion.arousal)
         state.evidence.append(item)
         if state.dialogue is not None:
-            item.language_features = workload_dialogue.features(message)
-            action, wording, reasons = workload_dialogue.advance(state, message)
-            state.success_progress = {"explain": 0, "constraints": 1/3, "agree": 2/3, "resolved": 1}[state.dialogue.stage]
+            if state.policy_version == scenario_dialogue.VERSION:
+                item.language_features = scenario_dialogue.features(state.scenario_id, message)
+                action, wording, reasons = scenario_dialogue.advance(state, message)
+                state.success_progress = scenario_dialogue.progress(state)
+            else:
+                item.language_features = workload_dialogue.features(message)
+                action, wording, reasons = workload_dialogue.advance(state, message)
+                state.success_progress = {"explain": 0, "constraints": 1/3, "agree": 2/3, "resolved": 1}[state.dialogue.stage]
             if state.dialogue.stage == "resolved":
                 self.finish(state, "success")
+            elif state.dialogue.stage == "unresolved":
+                self.finish(state, "unresolved")
             elif state.turn >= scenario.max_turns:
                 self.finish(state, "maximum_turns")
-                action, wording = "close_unresolved", "We have reached the end of this practice without a confirmed agreement."
-                reasons.append("turn_limit_without_agreement")
+                action, wording = "close_unresolved", "We have reached the end of this practice without a confirmed agreement." if state.scenario_id == "workload" else "We have reached the end of this practice. We can stop and review where the conversation reached."
+                reasons.append("turn_limit_without_resolution" if state.policy_version == scenario_dialogue.VERSION else "turn_limit_without_agreement")
             return RolePlayReplyPlan(action, wording, state.status == RolePlayStatus.COMPLETED, tuple(reasons))
         if emotion.arousal > 0.78:
             state.difficulty, state.cooperation = max(0.1, state.difficulty - 0.1), min(0.9, state.cooperation + 0.1)
@@ -108,6 +115,8 @@ class RolePlayService:
         state.status = RolePlayStatus.COMPLETED
         state.completion_reason, state.completed_at = reason, utcnow()
     def feedback(self, state: RolePlayState) -> SessionFeedback:
+        if state.policy_version == scenario_dialogue.VERSION:
+            return scenario_dialogue.feedback(state)
         if state.dialogue is not None:
             return workload_dialogue.feedback(state)
         evidence = state.evidence

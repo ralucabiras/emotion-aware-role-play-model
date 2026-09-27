@@ -904,7 +904,7 @@ async def start_roleplay(session_id: UUID, request: StartRolePlayRequest, user: 
         session, scenario, turn = await service.start_roleplay(
             session_id, user.id, request.scenario_id, request.difficulty, custom,
             request.pre_ratings.model_dump() if request.pre_ratings else None, request.pre_skipped,
-            request.attempt_purpose, request.required_task_id,
+            request.attempt_purpose, request.required_task_id, request.character_profile,
         )
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except KeyError: raise HTTPException(404, "Scenario not found") from None

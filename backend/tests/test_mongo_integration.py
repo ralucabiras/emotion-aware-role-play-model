@@ -202,3 +202,40 @@ async def test_enhanced_workload_state_survives_restart(mongo_repository):
         assert loaded.feedback.metrics[-1].score == 1
     finally:
         await restarted.client.close()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("scenario,opening,continuation,outcome", [
+    ("boundary", "I cannot take this on.", ["My answer is still no. Thank you.", "My answer is still no. Thank you."], "boundary_held"),
+    ("relationship", "When we spend evenings apart, I feel lonely and need time together.", ["I understand you are tired. Could we talk on Saturday as a trial and review it on Sunday?", "Agreed."], "next_step"),
+])
+async def test_profiled_dialogue_reload_continue_and_rewind(mongo_repository, scenario, opening, continuation, outcome):
+    from app.models.domain import Difficulty
+    from app.services.conversation_service import ConversationService
+    from app.services.llm_service import TemplateResponseGenerator
+
+    user = await mongo_repository.create_user(make_user())
+    service = ConversationService(mongo_repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id, user.id, scenario, Difficulty.INTERMEDIATE,
+        pre_skipped=True, character_profile="sceptical")
+    _, _, session = await service.chat(session.id, user.id, opening)
+    expected = session.roleplay.model_copy(deep=True)
+    restarted = MongoRepository(MONGO_URI, mongo_repository.db.name)
+    try:
+        await restarted.initialize()
+        service = ConversationService(restarted, generator=TemplateResponseGenerator())
+        restored = await service.get_session(session.id, user.id)
+        assert restored.roleplay.dialogue == expected.dialogue
+        assert restored.roleplay.character_profile == "sceptical"
+        assert restored.roleplay.decisions == expected.decisions
+        for message in continuation:
+            _, _, restored = await service.chat(session.id, user.id, message)
+        assert restored.roleplay.dialogue.outcome == outcome
+        _, restored = await service.rewind_roleplay(session.id, user.id)
+        assert restored.roleplay.dialogue.outcome is None
+        assert restored.roleplay.character_profile == "sceptical"
+        _, _, restored = await service.chat(session.id, user.id, continuation[-1])
+        assert restored.roleplay.dialogue.outcome == outcome
+    finally:
+        await restarted.client.close()
