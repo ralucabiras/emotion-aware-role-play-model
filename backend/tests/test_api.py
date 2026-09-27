@@ -824,3 +824,41 @@ def test_profiled_boundary_api_validation_persistence_and_ownership():
         assert restored["roleplay"] == state
         other_headers = auth(client, "profiled-other@example.com")
         assert client.get(f"/api/sessions/{session_id}", headers=other_headers).status_code == 404
+
+
+def test_orchestrated_voice_exchange_version_binding_and_no_client_scores():
+    from test_affect_pacing import FakeModel
+    model = FakeModel()
+    app.dependency_overrides[get_multimodal_service] = lambda: model
+    try:
+        with TestClient(app) as client:
+            headers = auth(client, "voice-binding@example.com")
+            created = client.post("/api/sessions", headers=headers).json()
+            session_id = created["session_id"]
+            started = client.post(f"/api/sessions/{session_id}/roleplay", headers=headers,
+                json={"scenario_id":"boundary", "character_profile":"cooperative", "pre_skipped":True}).json()
+            from uuid import uuid4
+            renamed = client.patch(f"/api/sessions/{session_id}/title", headers=headers, json={"title":"Voice rehearsal"}).json()
+            assert renamed["version"] > started["version"]
+            payload = dict(session_id=session_id, message="I cannot take this on.", expected_version=renamed["version"],
+                request_id=str(uuid4()), audio_wav_base64="AAAA", adaptation_enabled=True, pacing="gentler")
+            assert client.post("/api/chat", headers=headers, json={**payload, "prediction":{"label":"sadness"}}).status_code == 422
+            response = client.post("/api/chat", headers=headers, json=payload)
+            assert response.status_code == 200
+            result = response.json()
+            assert result["version"] > started["version"]
+            affect = result["turn"]["affect_decision"]
+            assert affect["user_turn_id"] == result["user_turn"]["id"]
+            assert affect["assistant_turn_id"] == result["turn"]["id"]
+            assert affect["action"] == "gentler" and affect["reason"] == "user_preference"
+            assert affect["source"] == "trained_multimodal"
+            assert len(model.calls) == 1
+            assert client.post("/api/chat", headers=headers, json=payload).status_code == 409
+            assert client.post("/api/chat", headers=headers, json={**payload,"request_id":str(uuid4()),"message":"Edited later"}).status_code == 409
+            assert len(model.calls) == 1
+            saved = client.get(f"/api/sessions/{session_id}", headers=headers).json()
+            assert saved["version"] == result["version"]
+            assert saved["turns"][-1]["affect_decision"] == affect
+            assert "audio_wav_base64" not in str(saved)
+    finally:
+        app.dependency_overrides.pop(get_multimodal_service, None)

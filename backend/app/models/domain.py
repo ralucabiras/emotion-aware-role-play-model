@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 def utcnow() -> datetime:
@@ -102,6 +102,61 @@ class GenerationMetadata(BaseModel):
     output_tokens: int | None = None
 
 
+class MultimodalEstimate(BaseModel):
+    label: str
+    confidence: float = Field(ge=0, le=1)
+    distribution: dict[str, float] = Field(max_length=16)
+    text_label: str
+    text_confidence: float = Field(ge=0, le=1)
+    text_distribution: dict[str, float] = Field(max_length=16)
+    audio_label: str
+    audio_confidence: float = Field(ge=0, le=1)
+    audio_distribution: dict[str, float] = Field(max_length=16)
+    modalities_agree: bool
+    confidence_level: str
+    low_confidence_threshold: float = Field(gt=0, lt=1)
+    model_version: str
+    latency_ms: int = Field(ge=0)
+    queue_ms: int = Field(default=0, ge=0)
+    audio_persisted: Literal[False] = False
+    disclaimer: str = "Research estimate; uncertain and not a diagnosis."
+
+    @model_validator(mode="after")
+    def validate_estimates(self):
+        import math
+        for prefix in ("", "text_", "audio_"):
+            values = getattr(self, prefix + "distribution")
+            label = getattr(self, prefix + "label")
+            confidence = getattr(self, prefix + "confidence")
+            if (not values or label not in values or any(not math.isfinite(v) or not 0 <= v <= 1 for v in values.values())
+                    or abs(sum(values.values()) - 1) > .001 or abs(values[label] - confidence) > .001
+                    or confidence + .001 < max(values.values())):
+                raise ValueError("Invalid model probability summary")
+        self.modalities_agree = self.text_label == self.audio_label
+        self.confidence_level = "low" if self.confidence < self.low_confidence_threshold else "moderate" if self.confidence < .75 else "high"
+        return self
+
+
+class AffectDecision(BaseModel):
+    policy_version: str = "affect-pacing-v1"
+    request_id: UUID
+    session_version: int
+    user_turn_id: UUID
+    assistant_turn_id: UUID
+    adaptation_enabled: bool = False
+    preference: Literal["auto", "keep_going", "gentler", "more_challenge"] = "auto"
+    text_available: bool = True
+    audio_submitted: bool = False
+    audio_available: bool = False
+    model_available: bool = False
+    source: Literal["trained_multimodal", "unavailable", "not_requested"] = "not_requested"
+    prediction: MultimodalEstimate | None = None
+    analysis_ms: int = 0
+    action: Literal["baseline", "acknowledge", "offer_pacing", "gentler", "more_challenge"] = "baseline"
+    reason: str = "adaptation_disabled"
+    fallback_reason: str | None = None
+
+
 class ConversationTurn(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     role: Role
@@ -110,6 +165,7 @@ class ConversationTurn(BaseModel):
     emotion_state: EmotionState | None = None
     strategy: SupportStrategy | None = None
     generation: GenerationMetadata | None = None
+    affect_decision: AffectDecision | None = None
 
 
 class TurnEvidence(BaseModel):
@@ -148,6 +204,7 @@ class DialogueSnapshot(BaseModel):
 
 
 class DialogueDecision(BaseModel):
+    affect_decision: AffectDecision | None = None
     character_profile: Literal["cooperative", "rushed", "sceptical"] | None = None
     user_turn_id: UUID
     assistant_turn_id: UUID
@@ -299,6 +356,7 @@ class User(BaseModel):
 
 
 class Session(BaseModel):
+    submission_ids: list[UUID] = Field(default_factory=list)
     id: UUID = Field(default_factory=uuid4)
     user_id: UUID
     version: int = Field(default=0, ge=0)

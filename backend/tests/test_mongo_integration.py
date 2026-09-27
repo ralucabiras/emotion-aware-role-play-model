@@ -239,3 +239,38 @@ async def test_profiled_dialogue_reload_continue_and_rewind(mongo_repository, sc
         assert restored.roleplay.dialogue.outcome == outcome
     finally:
         await restarted.client.close()
+
+
+@pytest.mark.asyncio
+async def test_exchange_bound_predictions_survive_restart_without_audio(mongo_repository):
+    from test_affect_pacing import FakeModel
+
+    from app.models.domain import Difficulty
+    from app.services.conversation_service import ConversationService
+    from app.services.llm_service import TemplateResponseGenerator
+
+    user = await mongo_repository.create_user(make_user())
+    service = ConversationService(mongo_repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id,user.id,"boundary",Difficulty.INTERMEDIATE,
+        pre_skipped=True,character_profile="cooperative")
+    request_id = uuid4()
+    turn, _, session = await service.chat(session.id,user.id,"I cannot take this on.", request_id=request_id,
+        expected_version=session.version,audio_wav_base64="AAAA",adaptation_enabled=True,multimodal=FakeModel())
+    restarted = MongoRepository(MONGO_URI,mongo_repository.db.name)
+    try:
+        await restarted.initialize()
+        fresh = ConversationService(restarted,generator=TemplateResponseGenerator())
+        restored = await fresh.get_session(session.id,user.id)
+        assert restored.turns[-1].affect_decision == turn.affect_decision
+        assert restored.roleplay.decisions[-1].affect_decision == turn.affect_decision
+        assert request_id in restored.submission_ids
+        document = await restarted.db.sessions.find_one({"id":session.id})
+        assert "audio_wav_base64" not in str(document) and "AAAA" not in str(document)
+        with pytest.raises(ValueError,match="already processed"):
+            await fresh.chat(session.id,user.id,"edited",request_id=request_id,expected_version=restored.version)
+        _, restored = await fresh.rewind_roleplay(session.id,user.id)
+        assert not restored.roleplay.decisions
+        assert all(t.affect_decision is None for t in restored.turns)
+    finally:
+        await restarted.client.close()

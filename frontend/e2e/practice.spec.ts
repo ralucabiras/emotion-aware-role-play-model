@@ -249,3 +249,61 @@ for (const ending of ['boundary_held','unresolved']) {
     await expect(page.getByText(ending==='boundary_held'?'You held your boundary and closed respectfully. Agreement or a concession was not required.':'You ended with a recorded disagreement. There is no agreed next step; this is not a personal failure.')).toBeVisible()
   })
 }
+
+
+test('submits reviewed voice text once with pacing and version binding', async ({page}) => {
+  const state = await installApiMock(page, {existingSession:true,transcription:'success'})
+  state.roleplay={scenario_id:'boundary',status:'active',difficulty_level:'intermediate',turn:0,success_progress:0,attempt_purpose:'additional',dialogue:{stage:'refuse',final_agreement:null}}
+  const detachedRequests:string[]=[]
+  page.on('request',request=>{if(request.url().includes('/affect/multimodal'))detachedRequests.push(request.url())})
+  await page.goto('/practice?session=session-1')
+  await page.getByRole('combobox',{name:'Pace',exact:true}).selectOption('gentler')
+  await page.getByLabel('Allow voice-informed acknowledgement and pacing suggestions').check()
+  await page.getByRole('button',{name:'Record voice sample'}).click()
+  await page.getByRole('button',{name:'Stop voice recording'}).click()
+  await expect(page.getByRole('textbox')).toHaveValue('I am nervous about tomorrow.')
+  await page.getByRole('textbox').fill('I cannot take this on. Thank you.')
+  const pending=page.waitForRequest(request=>request.url().endsWith('/chat')&&request.method()==='POST')
+  await page.getByLabel('Send message').click()
+  const payload=(await pending).postDataJSON()
+  expect(payload.message).toBe('I cannot take this on. Thank you.')
+  expect(payload.audio_wav_base64).toBeTruthy()
+  expect(payload.request_id).toMatch(/^[a-f0-9-]{36}$/)
+  expect(payload.expected_version).toBe(0)
+  expect(payload.pacing).toBe('gentler')
+  expect(payload.adaptation_enabled).toBe(true)
+  expect(detachedRequests).toEqual([])
+  await expectAccessible(page)
+})
+
+test('reloads a conflicted conversation while keeping the draft', async ({page}) => {
+  await installApiMock(page,{existingSession:true})
+  await page.route('**/api/chat',route=>route.fulfill({status:409,contentType:'application/json',body:JSON.stringify({detail:'Session changed. Reload before sending your draft.'})}))
+  await page.goto('/practice?session=session-1')
+  await page.getByRole('textbox').fill('My unsent draft.')
+  await page.getByLabel('Send message').click()
+  await page.getByRole('button',{name:'Reload saved conversation and keep draft'}).click()
+  await expect(page.getByRole('textbox')).toHaveValue('My unsent draft.')
+  await expect(page.getByRole('button',{name:'Reload saved conversation and keep draft'})).not.toBeVisible()
+})
+
+
+test('restores stored prediction provenance and pacing explanation', async ({page}) => {
+  const state=await installApiMock(page,{existingSession:true})
+  state.turns.push({id:'assistant-linked',role:'assistant',content:'Would you prefer to keep going or take a gentler pace?',created_at:'2026-09-27T00:00:00Z',
+    affect_decision:{policy_version:'affect-pacing-v1',request_id:'synthetic-request',session_version:2,user_turn_id:'turn-old',assistant_turn_id:'assistant-linked',
+      adaptation_enabled:true,preference:'auto',audio_submitted:true,audio_available:true,model_available:true,source:'trained_multimodal',analysis_ms:14,
+      action:'offer_pacing',reason:'modality_disagreement',fallback_reason:null,
+      prediction:{label:'anger',confidence:.6,distribution:{anger:.6,sadness:.4},text_label:'anger',text_confidence:.6,text_distribution:{anger:.6,sadness:.4},
+        audio_label:'sadness',audio_confidence:.6,audio_distribution:{anger:.4,sadness:.6},modalities_agree:false,confidence_level:'moderate',low_confidence_threshold:.55,
+        model_version:'synthetic-test-model',latency_ms:12,queue_ms:2,audio_persisted:false,disclaimer:'Synthetic research estimate.'}}})
+  await page.goto('/practice?session=session-1')
+  await page.getByText('Why this response?',{exact:true}).click()
+  await expect(page.getByText('Linked reply: assistant-linked',{exact:true})).toBeVisible()
+  await expect(page.getByText(/Reason: modality disagreement/)).toBeVisible()
+  await expect(page.getByText(/Model: synthetic-test-model/)).toBeVisible()
+  await expect(page.getByText(/Text and voice point to different leading labels/)).toBeVisible()
+  await page.reload()
+  await expect(page.getByRole('heading',{name:'Last submitted exchange'})).toBeVisible()
+  await expectAccessible(page)
+})

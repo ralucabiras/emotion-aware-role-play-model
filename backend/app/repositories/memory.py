@@ -59,6 +59,11 @@ class MemoryRepository(Repository):
             if record[0] != user_id
         }
     async def save_session(self, session: Session) -> Session:
+        from app.repositories.mongo import ConcurrentSessionUpdateError
+        current = self.sessions.get(session.id)
+        if (current is None and session.version != 0) or (current is not None and current.version != session.version):
+            raise ConcurrentSessionUpdateError("Session was updated by another request")
+        session.version += 1
         self.sessions[session.id] = session
         return session
     async def get_session(self, session_id: UUID, user_id: UUID) -> Session | None:

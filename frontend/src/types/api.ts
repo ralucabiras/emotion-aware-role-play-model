@@ -1,13 +1,13 @@
 export type CharacterProfile = 'cooperative'|'rushed'|'sceptical'
 export type Role = 'user' | 'assistant'
 export interface EmotionState { dominant_emotion: string; valence: number; arousal: number; confidence: number; trend: string }
-export interface ConversationTurn { id: string; role: Role; content: string; created_at: string }
+export interface ConversationTurn { affect_decision?:AffectDecision|null; id: string; role: Role; content: string; created_at: string }
 export interface RolePlayState { character_profile?: CharacterProfile|null; profile_description?: string|null; dialogue?: { stage: 'explain'|'constraints'|'agree'|'refuse'|'pressure'|'close'|'perspective'|'resolved'|'unresolved'; stage_labels?: Record<string,string>; outcome?: 'agreement'|'boundary_held'|'next_step'|'unresolved'|null; final_agreement: string|null } | null; scenario_version?: string; policy_version?: string; scoring_version?: string; attempt_purpose?: "required"|"additional"|"retry"|"legacy_unknown"; required_task_id?:string|null; scenario_id: string; scenario?: Scenario | null; status: string; difficulty_level: string; turn: number; success_progress: number; completion_reason?: string | null }
 export interface Feedback { session_id?: string|null; scenario_id: string; observed: string[]; strengths: string[]; suggestions: string[]; generation_source: string; metrics: { name: string; score: number; evidence_turns?: number[] }[]; compared_with_session_id?:string|null; comparisons:{name:string;current_score:number;previous_score:number;change:number}[] }
-export interface ChatResponse { post_questionnaire_token?:string|null; turn: ConversationTurn; decision: { emotion_state: EmotionState; strategy: string; cognitive_assessment: { possible_distortion: string|null; possible_cause: string|null; intent: string }; decision_reasons: string[]; analyzer_version: string }; roleplay: RolePlayState | null; feedback: Feedback | null }
+export interface ChatResponse { version?:number; user_turn?:ConversationTurn; post_questionnaire_token?:string|null; turn: ConversationTurn; decision: { emotion_state: EmotionState; strategy: string; cognitive_assessment: { possible_distortion: string|null; possible_cause: string|null; intent: string }; decision_reasons: string[]; analyzer_version: string }; roleplay: RolePlayState | null; feedback: Feedback | null }
 export interface Scenario { id: string; title: string; character: string; situation?: string; user_objective: string; opening_line?: string; expected_skills: string[] }
-export interface SessionResponse { questionnaires:Partial<Record<'pre'|'post',StudyQuestionnaire>>; questionnaire_skips:Partial<Record<'pre'|'post',string>>; post_questionnaire_token?:string|null; session_id: string; title: string; turns: ConversationTurn[]; emotion_state: EmotionState; roleplay: RolePlayState | null; feedback: Feedback | null; takeaway:string }
-export interface SessionSummary { session_id: string; title: string; created_at: string; updated_at: string; turn_count: number; roleplay?: RolePlayState | null; feedback?: Feedback | null; takeaway:string }
+export interface SessionResponse { version?:number; questionnaires:Partial<Record<'pre'|'post',StudyQuestionnaire>>; questionnaire_skips:Partial<Record<'pre'|'post',string>>; post_questionnaire_token?:string|null; session_id: string; title: string; turns: ConversationTurn[]; emotion_state: EmotionState; roleplay: RolePlayState | null; feedback: Feedback | null; takeaway:string }
+export interface SessionSummary { version?:number; session_id: string; title: string; created_at: string; updated_at: string; turn_count: number; roleplay?: RolePlayState | null; feedback?: Feedback | null; takeaway:string }
 export interface UserProfile { id: string; email: string; first_name: string; last_name: string; preferred_name: string; country: string; timezone: string; email_verified: boolean; practice_goals: string[]; onboarding_completed: boolean; onboarding_version?: string | null; researcher:boolean; pilot_enrolled:boolean; study_consent_version?:string|null; study_consented_at?:string|null; eligibility_version?:string|null; eligibility_confirmed_at?:string|null; study_withdrawn:boolean; study_withdrawn_at?:string|null; participant_id:string }
 export interface StudyWithdrawal { user:UserProfile; questionnaires_deleted:number; research_events_deleted:number; message:string; anonymized_analysis_notice:string }
 export interface StudyContact { name:string; email:string }
@@ -21,3 +21,11 @@ export interface ResearchDashboardData { study_label:string; protocol_version:st
 
 export interface StudyTask { order:number; scenario_id:string; title:string; difficulty:'intermediate'; status:'not_started'|'in_progress'|'awaiting_ratings'|'complete'|'incomplete'; session_id:string|null }
 export interface StudyProgress { protocol_version:string; tasks:StudyTask[]; completed_tasks:number; next_task_id:string|null; available:boolean }
+
+export type PacingPreference = 'auto'|'keep_going'|'gentler'|'more_challenge'
+export interface AffectDecision {
+  policy_version:string; request_id:string; session_version:number; user_turn_id:string; assistant_turn_id:string;
+  adaptation_enabled:boolean; preference:PacingPreference; audio_submitted:boolean; audio_available:boolean; model_available:boolean;
+  source:'trained_multimodal'|'unavailable'|'not_requested'; prediction:MultimodalAffect|null;
+  analysis_ms:number; action:string; reason:string; fallback_reason:string|null;
+}

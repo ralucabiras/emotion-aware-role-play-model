@@ -2,13 +2,14 @@ from datetime import date
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field, StrictBool
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictBool, model_validator
 
 from app.models.domain import (
     AgentDecision,
     ConversationTurn,
     Difficulty,
     EmotionState,
+    MultimodalEstimate,
     PracticeGoal,
     RolePlayScenario,
     RolePlayState,
@@ -158,18 +159,37 @@ class EmailVerificationRequest(BaseModel):
 class ResendVerificationRequest(BaseModel):
     email: EmailStr
 class CreateSessionResponse(BaseModel):
+    version: int = 0
     session_id: UUID
     emotion_state: EmotionState
 class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    request_id: UUID | None = None
+    expected_version: int | None = Field(default=None, ge=0)
+    audio_wav_base64: str | None = Field(default=None, min_length=1, max_length=7_000_000)
+    adaptation_enabled: StrictBool = False
+    pacing: Literal["auto", "keep_going", "gentler", "more_challenge"] = "auto"
+
+    @model_validator(mode="after")
+    def require_exchange_binding(self):
+        enhanced = self.audio_wav_base64 is not None or self.adaptation_enabled or self.pacing != "auto"
+        if enhanced or self.request_id is not None or self.expected_version is not None:
+            if self.request_id is None or self.expected_version is None:
+                raise ValueError("A request ID and expected session version are required")
+        return self
+
     session_id: UUID
     message: str = Field(min_length=1, max_length=5000)
 class ChatResponse(BaseModel):
+    user_turn: ConversationTurn | None = None
+    version: int = 0
     turn: ConversationTurn
     decision: AgentDecision
     roleplay: RolePlayState | None = None
     feedback: SessionFeedback | None = None
     post_questionnaire_token: str | None = None
 class SessionResponse(BaseModel):
+    version: int = 0
     questionnaires: dict[str, StudyQuestionnaire] = Field(default_factory=dict)
     questionnaire_skips: dict[str, str] = Field(default_factory=dict)
     session_id: UUID
@@ -181,6 +201,7 @@ class SessionResponse(BaseModel):
     post_questionnaire_token: str | None = None
     takeaway: str = ""
 class SessionSummary(BaseModel):
+    version: int = 0
     session_id: UUID
     title: str
     created_at: str
@@ -224,6 +245,7 @@ class StartRolePlayRequest(BaseModel):
     pre_ratings: PreRehearsalRatings | None = None
     pre_skipped: StrictBool = False
 class StartRolePlayResponse(BaseModel):
+    version: int = 0
     session_id: UUID
     emotion_state: EmotionState
     state: RolePlayState
@@ -253,24 +275,8 @@ class MultimodalAffectRequest(BaseModel):
     audio_wav_base64: str = Field(min_length=1, max_length=7_000_000)
 
 
-class MultimodalAffectResponse(BaseModel):
-    label: str
-    confidence: float = Field(ge=0, le=1)
-    distribution: dict[str, float]
-    text_label: str
-    text_confidence: float = Field(ge=0, le=1)
-    text_distribution: dict[str, float]
-    audio_label: str
-    audio_confidence: float = Field(ge=0, le=1)
-    audio_distribution: dict[str, float]
-    modalities_agree: bool
-    confidence_level: str
-    low_confidence_threshold: float = Field(ge=0, le=1)
-    model_version: str
-    latency_ms: int
-    queue_ms: int = 0
-    audio_persisted: bool = False
-    disclaimer: str = "Research estimate; uncertain and not a diagnosis."
+class MultimodalAffectResponse(MultimodalEstimate):
+    pass
 
 
 class AudioTranscriptionRequest(BaseModel):

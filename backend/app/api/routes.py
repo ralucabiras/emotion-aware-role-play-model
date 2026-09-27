@@ -427,6 +427,7 @@ async def study_information(user: User = Depends(current_user)):
             "Voice input is optional and requires an explicit action for each recording.",
             "Audio may be sent to OpenAI for transcription and processed in memory by the local research model.",
             "AffectLab does not persist raw audio. A transcript you approve can become part of the conversation session.",
+            "Enhanced optional practice stores prediction summaries, model provenance and pacing decisions with the exchange under the session retention and deletion policy.",
         ],
         retention=settings.study_retention_period,
         risks_and_limitations=[
@@ -817,33 +818,33 @@ async def delete_account(response: Response, user: User = Depends(current_user),
 @router.post("/sessions", response_model=CreateSessionResponse, status_code=201)
 async def create_session(user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     session = await service.create_session(user.id)
-    return CreateSessionResponse(session_id=session.id, emotion_state=session.emotion_state)
+    return CreateSessionResponse(version=session.version, session_id=session.id, emotion_state=session.emotion_state)
 
 
 @router.get("/sessions", response_model=list[SessionSummary])
 async def list_sessions(user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
-    return [SessionSummary(session_id=s.id, title=s.title, created_at=s.created_at.isoformat(), updated_at=s.updated_at.isoformat(), turn_count=len(s.turns), roleplay=s.roleplay, feedback=s.feedback, takeaway=s.takeaway) for s in await service.list_sessions(user.id)]
+    return [SessionSummary(version=s.version, session_id=s.id, title=s.title, created_at=s.created_at.isoformat(), updated_at=s.updated_at.isoformat(), turn_count=len(s.turns), roleplay=s.roleplay, feedback=s.feedback, takeaway=s.takeaway) for s in await service.list_sessions(user.id)]
 
 
 @router.get("/sessions/{session_id}", response_model=SessionResponse)
 async def get_session(session_id: UUID, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     try: session = await service.get_session(session_id, user.id)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
-    return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
+    return SessionResponse(version=session.version, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
 
 
 @router.patch("/sessions/{session_id}/title", response_model=SessionSummary)
 async def rename_session(session_id: UUID, request: SessionTitleRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     try: session = await service.rename_session(session_id, user.id, request.title)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
-    return SessionSummary(session_id=session.id, title=session.title, created_at=session.created_at.isoformat(), updated_at=session.updated_at.isoformat(), turn_count=len(session.turns), roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway)
+    return SessionSummary(version=session.version, session_id=session.id, title=session.title, created_at=session.created_at.isoformat(), updated_at=session.updated_at.isoformat(), turn_count=len(session.turns), roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway)
 
 
 @router.put("/sessions/{session_id}/takeaway", response_model=SessionResponse)
 async def save_takeaway(session_id: UUID, request: TakeawayRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     try: session = await service.save_takeaway(session_id, user.id, request.takeaway)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
-    return SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
+    return SessionResponse(version=session.version, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
 
 
 @router.delete("/sessions/{session_id}", status_code=204)
@@ -853,11 +854,15 @@ async def delete_session(session_id: UUID, user: User = Depends(current_user), s
 
 
 @router.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
-    try: turn, decision, session = await service.chat(request.session_id, user.id, request.message)
+async def chat(request: ChatRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service), multimodal: MultimodalAffectService = Depends(get_multimodal_service)):
+    try:
+        turn, decision, session = await service.chat(request.session_id, user.id, request.message,
+            request_id=request.request_id, expected_version=request.expected_version,
+            audio_wav_base64=request.audio_wav_base64, adaptation_enabled=request.adaptation_enabled,
+            pacing=request.pacing, multimodal=multimodal)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return ChatResponse(turn=turn, decision=decision, roleplay=session.roleplay, feedback=session.feedback, post_questionnaire_token=session.post_questionnaire_token)
+    return ChatResponse(version=session.version, user_turn=session.turns[-2], turn=turn, decision=decision, roleplay=session.roleplay, feedback=session.feedback, post_questionnaire_token=session.post_questionnaire_token)
 
 
 @router.get("/roleplay/scenarios")
@@ -909,7 +914,7 @@ async def start_roleplay(session_id: UUID, request: StartRolePlayRequest, user: 
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except KeyError: raise HTTPException(404, "Scenario not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return StartRolePlayResponse(session_id=session.id, emotion_state=session.emotion_state, state=session.roleplay, scenario=scenario, opening_turn=turn)
+    return StartRolePlayResponse(version=session.version, session_id=session.id, emotion_state=session.emotion_state, state=session.roleplay, scenario=scenario, opening_turn=turn)
 
 
 @router.post("/sessions/{session_id}/roleplay/action", response_model=SessionResponse)
@@ -917,7 +922,7 @@ async def roleplay_action(session_id: UUID, request: RolePlayActionRequest, user
     try: session = await service.set_roleplay_status(session_id, user.id, request.action)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return SessionResponse(post_questionnaire_token=session.post_questionnaire_token, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
+    return SessionResponse(version=session.version, post_questionnaire_token=session.post_questionnaire_token, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
 
 
 @router.post("/sessions/{session_id}/roleplay/rewind", response_model=RewindResponse)
@@ -925,7 +930,7 @@ async def rewind_roleplay(session_id: UUID, user: User = Depends(current_user), 
     try: removed, session = await service.rewind_roleplay(session_id, user.id)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return RewindResponse(removed_message=removed, session=SessionResponse(session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()}))
+    return RewindResponse(removed_message=removed, session=SessionResponse(version=session.version, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()}))
 
 
 @router.get("/sessions/{session_id}/feedback")

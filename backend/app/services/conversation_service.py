@@ -1,10 +1,13 @@
+import base64
 import secrets
 from collections import Counter
 from datetime import timedelta
-from uuid import UUID
+from time import perf_counter
+from uuid import UUID, uuid4
 
 from app.core.config import settings
 from app.models.domain import (
+    AffectDecision,
     AgentDecision,
     ConversationTurn,
     DialogueDecision,
@@ -12,6 +15,7 @@ from app.models.domain import (
     Difficulty,
     FeedbackComparison,
     GenerationMetadata,
+    MultimodalEstimate,
     ResearchEvent,
     Role,
     RolePlayStatus,
@@ -23,6 +27,7 @@ from app.models.domain import (
 from app.repositories.base import Repository
 from app.safety.crisis import CRISIS_RESPONSE, contains_crisis_language
 from app.services import scenario_dialogue, workload_dialogue
+from app.services.affect_pacing import select as select_pacing
 from app.services.affect_service import (
     ExponentialStateTracker,
     RuleBasedCognitiveAnalyzer,
@@ -183,8 +188,24 @@ class ConversationService:
             events=events,
             updated_at=utcnow(),
         ))
-    async def chat(self, session_id: UUID, user_id: UUID, message: str) -> tuple[ConversationTurn, AgentDecision, Session]:
+    async def chat(self, session_id: UUID, user_id: UUID, message: str, *, request_id: UUID | None = None,
+                   expected_version: int | None = None, audio_wav_base64: str | None = None,
+                   adaptation_enabled: bool = False, pacing: str = "auto", multimodal=None) -> tuple[ConversationTurn, AgentDecision, Session]:
         session = await self.get_session(session_id, user_id)
+        bound = request_id is not None or expected_version is not None
+        if bound or audio_wav_base64 is not None or adaptation_enabled or pacing != "auto":
+            if request_id is None or expected_version is None:
+                raise ValueError("A request ID and session version are required")
+            if request_id in session.submission_ids:
+                raise ValueError("This submission was already processed. Reload the session before sending again.")
+            if session.version != expected_version:
+                raise ValueError("Session changed. Reload before sending your draft.")
+            session = session.model_copy(deep=True)
+            session.submission_ids.append(request_id)
+        record = None
+        user_turn_id, assistant_turn_id = uuid4(), uuid4()
+        eligible = bool(session.roleplay and session.roleplay.dialogue and session.roleplay.status == RolePlayStatus.ACTIVE
+                        and session.roleplay.attempt_purpose != "required" and not session.roleplay.required_task_id)
         rehearsal_running = session.roleplay and session.roleplay.status in {RolePlayStatus.ACTIVE, RolePlayStatus.PAUSED}
         before = dialogue_snapshot(session) if rehearsal_running and session.roleplay.dialogue else None
         plan = None
@@ -196,6 +217,25 @@ class ConversationService:
             session.title = clean[:57].rstrip(" ,.;:-") + ("…" if len(clean) > 57 else "")
         crisis = contains_crisis_language(message)
         if not crisis and isinstance(self.generator, OpenAIResponseGenerator): crisis = await self.generator.moderate(message)
+        if bound:
+            record = AffectDecision(request_id=request_id, session_version=session.version,
+                user_turn_id=user_turn_id, assistant_turn_id=assistant_turn_id,
+                adaptation_enabled=adaptation_enabled, preference=pacing, audio_submitted=audio_wav_base64 is not None,
+                model_available=bool(multimodal and multimodal.available))
+            if audio_wav_base64 is not None and eligible and not crisis:
+                started = perf_counter()
+                try:
+                    if not record.model_available:
+                        record.source, record.fallback_reason = "unavailable", "model_unavailable"
+                    else:
+                        audio = base64.b64decode(audio_wav_base64, validate=True)
+                        record.prediction = MultimodalEstimate.model_validate(await multimodal.analyze(session, message, audio))
+                        record.audio_available = True
+                        record.source = "trained_multimodal"
+                except Exception:
+                    record.source, record.fallback_reason = "unavailable", "inference_failed"
+                finally:
+                    record.analysis_ms = int((perf_counter() - started) * 1000)
         state = self.state_tracker.update(session.emotion_state, self.analyzer.analyze(message))
         assessment, session.emotion_state = self.cognitive_analyzer.analyze(message, crisis), state
         state.resistance = assessment.resistance
@@ -204,7 +244,7 @@ class ConversationService:
             strategy, strategy_scores, reasons = strategy_decision.strategy, strategy_decision.scores, strategy_decision.reasons
         else:
             strategy, strategy_scores, reasons = self.selector.select(state, assessment), {}, []
-        session.turns.append(ConversationTurn(role=Role.USER, content=message, emotion_state=state))
+        session.turns.append(ConversationTurn(id=user_turn_id, role=Role.USER, content=message, emotion_state=state))
         roleplay_action = "none"
         if crisis:
             content, metadata = CRISIS_RESPONSE, GenerationMetadata(source="safety_response")
@@ -228,11 +268,14 @@ class ConversationService:
             else:
                 content, metadata = plan.fallback_text, GenerationMetadata(source="deterministic_roleplay")
         else: content, metadata = await self.generator.generate(session, message, strategy)
-        turn = ConversationTurn(role=Role.ASSISTANT, content=content, strategy=strategy, generation=metadata)
+        if record:
+            content = select_pacing(record, eligible, ended=bool(plan and plan.completed), crisis=crisis) + content
+        turn = ConversationTurn(id=assistant_turn_id, role=Role.ASSISTANT, content=content, strategy=strategy, generation=metadata, affect_decision=record)
         session.turns.append(turn)
         if before and (plan or crisis):
             roleplay = session.roleplay
             roleplay.decisions.append(DialogueDecision(
+                affect_decision=record.model_copy(deep=True) if record else None,
                 character_profile=roleplay.character_profile,
                 user_turn_id=session.turns[-2].id, assistant_turn_id=turn.id,
                 before=before, after=dialogue_snapshot(session),

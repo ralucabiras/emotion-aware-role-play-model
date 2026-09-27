@@ -1,6 +1,6 @@
 # AffectLab product development plan
 
-Status: Steps 1 and 2 implemented, 26 September 2026. Step 2 is ready for interaction review; Step 3 remains planned. The frozen study protocol is unchanged.
+Status: Steps 1-3 implemented, 27 September 2026. Step 3 is ready for interaction review; Step 4 remains planned. The frozen study protocol is unchanged.
 
 ## Objective
 
@@ -130,6 +130,19 @@ Custom scenarios initially use a documented generic flow with limited supported 
 Show the same situation with two character profiles and explain the controlled difference in behaviour.
 
 ## Step 3 - Connect multimodal predictions to interaction
+
+### Implementation status - 27 September 2026
+
+Implemented. See [exchange-linked multimodal pacing v1](affect-pacing-v1.md) for the policy table, API contract, privacy behavior, limitations and synthetic demonstration.
+
+- Unified optional audio, final reviewed text, server-owned inference and response selection into one versioned chat submission. Stale/duplicate writes are rejected; clients cannot supply authoritative predictions.
+- Added explicit keep-going, gentler-pace and more-challenge choices, plus opt-in automatic acknowledgement/pacing offers. The policy preserves benchmark labels and keeps them separate from lexical arousal, anxiety, resistance and intent.
+- Stored linked per-modality/fused prediction summaries, uncertainty/disagreement, provenance, actual timings, preference, action and fallback reasons. Raw audio remains transient.
+- Added a stored exchange explanation in the workspace, updated the audio/summary disclosure, and preserved independent transcription, text-only use, offline fallback and frozen required-task behavior.
+- Reused existing session ownership, optimistic writes, retention, deletion, decisions and rewind. The memory repository now applies version checks to the new submission path as well.
+- Pacing changes acknowledgement/prompts only; scenario difficulty, profile and completion rules stay fixed. Automatic adaptation is off by default. Interactive replay remains Step 4.
+
+Validation: 229 backend tests passed with real MongoDB enabled. After synchronizing version tokens for rename and feedback navigation, the focused API/policy checks and desktop/mobile feedback, voice and explanation checks passed. Twelve distinct desktop/mobile cases covered transcription without models, edited voice submission, draft recovery, saved explanations and feedback/rating navigation. Frontend build and lint, backend Ruff and diff checks passed. Tests use synthetic model outputs to evaluate application behavior, not live model accuracy or psychological benefit.
 
 ### Purpose and experience
 
@@ -266,4 +279,4 @@ Prepare architecture and sequence diagrams, policy tables, representative replay
 
 ## Next task to implement
 
-Steps 1 and 2 are implemented. Review the two-profile boundary demonstration and relationship unresolved ending in [scenario-dialogue-v3.md](scenario-dialogue-v3.md). The next implementation is Step 3: multimodal-informed interaction with user control; the frozen required study tasks remain unchanged.
+Steps 1-3 are implemented. Review the voice/pacing demonstration and stored exchange explanation in [affect-pacing-v1.md](affect-pacing-v1.md). The next implementation is Step 4: interactive conversation replay built from the persisted dialogue and affect decisions. Frozen required study tasks remain unchanged.
