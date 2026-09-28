@@ -3,7 +3,7 @@ import { api } from '../services/api'
 import { PostRatings, RatingInput } from './StudyRatings'
 import type { CharacterProfile, Feedback, RolePlayState, Scenario } from '../types/api'
 
-export type WorkspaceMode = 'reflect' | 'roleplay' | 'feedback' | 'replay'
+export type WorkspaceMode = 'reflect' | 'roleplay' | 'feedback' | 'replay' | 'compare'
 
 const profileCopy: Record<CharacterProfile,string> = {
   cooperative: 'Open to your position and asks for a clear, practical response.',
@@ -17,13 +17,14 @@ const difficultyCopy: Record<string, string> = {
   difficult: 'Stronger pushback while preserving safety',
 }
 
-export function ModeTabs({mode, roleplay, onChange, disabled=false}: {mode: WorkspaceMode; roleplay: RolePlayState | null; onChange: (mode: WorkspaceMode) => void; disabled?:boolean}) {
+export function ModeTabs({mode, roleplay, onChange, disabled=false, hasBranch=false}: {mode: WorkspaceMode; roleplay: RolePlayState | null; onChange: (mode: WorkspaceMode) => void; disabled?:boolean;hasBranch?:boolean}) {
   const active = roleplay && ['active', 'paused'].includes(roleplay.status)
   return <nav className="mode-tabs" aria-label="Workspace mode">
     <button disabled={disabled} className={mode === 'reflect' ? 'active' : ''} aria-current={mode==='reflect'?'page':undefined} onClick={() => onChange('reflect')}>Reflect</button>
     <button disabled={disabled} className={mode === 'roleplay' ? 'active' : ''} aria-current={mode==='roleplay'?'page':undefined} onClick={() => onChange('roleplay')}>{active ? 'Active role-play' : 'Role-play'}</button>
     {roleplay?.status === 'completed' && <button disabled={disabled} className={mode === 'feedback' ? 'active' : ''} aria-current={mode==='feedback'?'page':undefined} onClick={() => onChange('feedback')}>Feedback</button>}
     {roleplay && ['completed','interrupted'].includes(roleplay.status) && <button disabled={disabled} className={mode==='replay'?'active':''} aria-current={mode==='replay'?'page':undefined} onClick={()=>onChange('replay')}>Replay</button>}
+    {hasBranch&&<button disabled={disabled} className={mode==='compare'?'active':''} aria-current={mode==='compare'?'page':undefined} onClick={()=>onChange('compare')}>Compare</button>}
   </nav>
 }
 

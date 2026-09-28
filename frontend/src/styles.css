@@ -170,3 +170,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { border-color
 .replay-details dl>div { display:flex; justify-content:space-between; }
 .replay-details h2,.replay-transcript h2,.replay-feedback h2 { font-size:1.2rem; }
 @media(max-width:760px) { .replay-layout { grid-template-columns:1fr; } .replay-timeline button { min-height:44px; } }
+.branch-controls,.branch-comparison>details { padding:1rem; border:1px solid #718982; border-radius:12px; margin-bottom:1rem; }
+.comparison-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1.5rem; margin-top:1rem; }
+.comparison-columns>section { min-width:0; overflow-wrap:anywhere; }
+@media(max-width:760px) { .comparison-columns { grid-template-columns:1fr; } }

@@ -27,6 +27,40 @@ async def mongo_repository():
 def make_user() -> User:
     return User(email=f"test-{uuid4().hex}@example.com", password_hash="not-a-real-hash", consented_at=utcnow())
 
+
+@pytest.mark.asyncio
+async def test_branch_restart_concurrent_creation_and_parent_deletion(mongo_repository):
+    from test_branching import PROPOSAL, completed, fork
+
+    from app.services.branching import compare_branch
+    from app.services.conversation_service import ConversationService, dialogue_snapshot
+    from app.services.llm_service import TemplateResponseGenerator
+
+    service, parent = await completed(mongo_repository)
+    # Re-read the source so comparisons use Mongo's persisted timestamp precision.
+    parent = await service.get_session(parent.id, parent.user_id)
+    request_id = uuid4()
+    children = await asyncio.gather(*(fork(service, parent, request_id=request_id) for _ in range(2)))
+    assert children[0].id == children[1].id
+    assert len(await service.list_sessions(parent.user_id)) == 2
+    restarted = MongoRepository(MONGO_URI, mongo_repository.db.name)
+    try:
+        await restarted.initialize()
+        service = ConversationService(restarted, generator=TemplateResponseGenerator())
+        child = await service.get_session(children[0].id, parent.user_id)
+        assert dialogue_snapshot(child) == child.branch.before
+        assert (await compare_branch(service, child.id, child.user_id))["original"] is not None
+        await service.delete_session(parent.id, parent.user_id)
+        _, _, child = await service.chat(child.id, child.user_id, PROPOSAL)
+        comparison = await compare_branch(service, child.id, child.user_id)
+        assert comparison["original"] is None
+        assert len(comparison["alternative"]["turns"]) == 2
+        assert len(comparison["shared_context"]) == 3
+        await restarted.delete_user(child.user_id)
+        assert await restarted.get_session(child.id, child.user_id) is None
+    finally:
+        await restarted.client.close()
+
 def make_record(user: User, session: Session) -> StudyRecord:
     return StudyRecord(user_id=user.id, participant_id=user.participant_id, session_id=session.id, consent_version="2026.1", protocol_version="AL-FEAS-1.0", enrolled_at=utcnow(), session_created_at=session.created_at, last_activity_at=utcnow(), retention_expires_at=utcnow()+timedelta(days=365))
 

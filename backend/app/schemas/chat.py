@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictBool, model_v
 
 from app.models.domain import (
     AgentDecision,
+    BranchLineage,
     ConversationTurn,
     Difficulty,
     EmotionState,
@@ -189,6 +190,7 @@ class ChatResponse(BaseModel):
     feedback: SessionFeedback | None = None
     post_questionnaire_token: str | None = None
 class SessionResponse(BaseModel):
+    branch: BranchLineage | None = None
     version: int = 0
     questionnaires: dict[str, StudyQuestionnaire] = Field(default_factory=dict)
     questionnaire_skips: dict[str, str] = Field(default_factory=dict)
@@ -288,3 +290,10 @@ class AudioTranscriptionResponse(BaseModel):
     model: str
     latency_ms: int
     audio_persisted: bool = False
+
+
+class BranchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    turn_id: UUID
+    expected_version: int = Field(ge=0)
+    request_id: UUID

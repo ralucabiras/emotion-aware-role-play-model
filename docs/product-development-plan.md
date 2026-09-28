@@ -1,6 +1,6 @@
 # AffectLab product development plan
 
-Status: Steps 1-4 implemented, 27 September 2026. Step 4 is ready for interaction review; Step 5 remains planned. The frozen study protocol is unchanged.
+Status: Steps 1-5 implemented, 28 September 2026. Step 5 is ready for interaction review; Step 6 remains planned. The frozen study protocol is unchanged.
 
 ## Objective
 
@@ -214,6 +214,19 @@ Walk through an objection, explain the selected action, and show the evidence fo
 
 ## Step 5 - Branch and compare
 
+### Implementation status - 28 September 2026
+
+Implemented. See [branch and compare: contract, boundaries and synthetic demonstration](branch-and-compare.md).
+
+- Added ?Try a different response here? to supported replay turns and a separate saved retry restored from the exact pre-turn snapshot. Source sessions, evidence, ratings and takeaways are preserved.
+- Persisted parent/version, branch point, group, copied-context IDs, pre-turn state and deterministic generation mode. Scenario, profile, difficulty and supported policy versions remain fixed.
+- Added a two-continuation Compare view showing shared context once, actual responses, observable language, stages/actions, generation provenance and outcomes/agreements. Keyboard, mobile, loading, recovery and unavailable-parent states are covered.
+- Added owner-checked branch/comparison endpoints, version validation and idempotent request handling across concurrent requests/restart. Unsupported legacy, frozen required-task and shared-context branch points offer a fresh attempt. Rewind cannot remove inherited context.
+- Parent deletion leaves the child usable; account deletion removes all owned branches. Changed originals are not silently substituted in comparison.
+- Feedback for branches uses new response evidence only; copied messages/events are not counted as new research activity. Export v4 labels branch context and feedback scope while preserving historical frozen snapshots and required-attempt selection.
+
+Validation: the full backend suite passed with real MongoDB enabled (243 tests); all 14 final branching tests passed after adding the boundary/relationship demonstrations. All 66 desktop/mobile branching, replay, practice and workspace-recovery checks passed; the six focused branch cases passed again after the final retry-recovery adjustment. Frontend build/lint, backend Ruff and diff checks passed. Browser fixtures are synthetic; MongoDB tests reopen repository/service instances. No live-model accuracy or full-stack browser/backend-process restart claim is made.
+
 ### Purpose and experience
 
 Let a user choose 'Try a different response here' from replay. Preserve the original conversation and create an alternative continuation from just before the selected user turn. Compare what changed in language, character responses, stages and agreement.
@@ -292,4 +305,4 @@ Prepare architecture and sequence diagrams, policy tables, representative replay
 
 ## Next task to implement
 
-Steps 1-4 are implemented. Review the replay demonstration and boundaries in [conversation-replay.md](conversation-replay.md). The next implementation is Step 5: branch and compare, preserving the original attempt and resuming alternatives from saved pre-turn snapshots. Frozen required study tasks remain unchanged.
+Steps 1-5 are implemented. Review the branch demonstration and boundaries in [branch-and-compare.md](branch-and-compare.md). The next implementation is Step 6: personal conversation preparation and an editable action card. Frozen required study tasks remain unchanged.

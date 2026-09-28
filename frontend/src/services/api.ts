@@ -1,4 +1,4 @@
-import type { PacingPreference, CharacterProfile, StudyProgress, AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, StudyWithdrawal, UserProfile } from '../types/api'
+import type { BranchComparison, PacingPreference, CharacterProfile, StudyProgress, AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, StudyWithdrawal, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -56,6 +56,8 @@ export const api = {
   transcribe: (audioWavBase64: string) => request<AudioTranscription>('/audio/transcriptions', { method: 'POST', body: JSON.stringify({ audio_wav_base64: audioWavBase64 }) }),
   multimodalAffect: (sessionId: string, message: string, audioWavBase64: string) => request<MultimodalAffect>('/affect/multimodal', { method: 'POST', body: JSON.stringify({ session_id: sessionId, message, audio_wav_base64: audioWavBase64 }) }),
   createSession: () => request<{ version?:number; session_id: string; emotion_state: EmotionState }>('/sessions', { method: 'POST' }),
+  createBranch: (id:string,turnId:string,version:number,requestId:string) => request<SessionResponse>(`/sessions/${id}/branches`,{method:'POST',body:JSON.stringify({turn_id:turnId,expected_version:version,request_id:requestId})}),
+  compareBranch: (id:string) => request<BranchComparison>(`/sessions/${id}/comparison`),
   getSession: (id: string) => request<SessionResponse>(`/sessions/${id}`),
   listSessions: () => request<SessionSummary[]>('/sessions'),
   renameSession: (id: string, title: string) => request<SessionSummary>(`/sessions/${id}/title`, { method: 'PATCH', body: JSON.stringify({ title }) }),

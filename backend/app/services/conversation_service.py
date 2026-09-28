@@ -148,7 +148,8 @@ class ConversationService:
                   if event.created_at >= consented_at
                   and (measurement_end is None or event.created_at <= measurement_end
                        or event.name.startswith("questionnaire_"))]
-        measured_turns = [turn for turn in session.turns if turn.created_at >= consented_at
+        copied_ids = set(session.branch.copied_turn_ids) if session.branch else set()
+        measured_turns = [turn for turn in session.turns if turn.id not in copied_ids and turn.created_at >= consented_at
                           and (measurement_end is None or turn.created_at <= measurement_end)]
         post_consent_turn_count = len(measured_turns)
         last_activity = (max([measurement_end, *[event.created_at for event in events],
@@ -168,6 +169,9 @@ class ConversationService:
             last_activity_at=last_activity,
             retention_expires_at=last_activity + timedelta(days=settings.study_record_retention_days),
             turn_count=post_consent_turn_count,
+            is_branch=session.branch is not None,
+            copied_context_turn_count=len(copied_ids),
+            feedback_evidence_scope="continuation" if session.branch else "full_attempt",
             attempt_purpose=roleplay.attempt_purpose if roleplay else "additional",
             required_task_id=roleplay.required_task_id if roleplay else None,
             scenario_id=roleplay.scenario_id if roleplay else None,
@@ -192,6 +196,10 @@ class ConversationService:
                    expected_version: int | None = None, audio_wav_base64: str | None = None,
                    adaptation_enabled: bool = False, pacing: str = "auto", multimodal=None) -> tuple[ConversationTurn, AgentDecision, Session]:
         session = await self.get_session(session_id, user_id)
+        if session.branch and session.roleplay and session.roleplay.status == RolePlayStatus.ACTIVE:
+            from app.services.branching import supported
+            if not supported(session.roleplay):
+                raise ValueError("This alternative's saved policy is unavailable. Start a fresh attempt instead.")
         bound = request_id is not None or expected_version is not None
         if bound or audio_wav_base64 is not None or adaptation_enabled or pacing != "auto":
             if request_id is None or expected_version is None:
@@ -258,7 +266,7 @@ class ConversationService:
             if plan.completed:
                 content, metadata = plan.fallback_text, GenerationMetadata(source="deterministic_roleplay")
                 await self.complete_feedback(session)
-            elif isinstance(self.generator, OpenAIResponseGenerator):
+            elif isinstance(self.generator, OpenAIResponseGenerator) and not session.branch:
                 content, metadata = await self.generator.generate_roleplay(
                     session,
                     session.roleplay.scenario or SCENARIOS[session.roleplay.scenario_id],
@@ -398,6 +406,8 @@ class ConversationService:
                 "Your history has been kept. To start a new attempt, choose Finish & review "
                 "if the rehearsal is still active, then Practise again."
             )
+        if session.branch and session.turns[-2].id in session.branch.copied_turn_ids:
+            raise ValueError("Shared context cannot be rewound. Try a new response in this alternative.")
         session.post_questionnaire_token = None
         session.turns.pop()
         user_turn = session.turns.pop()
@@ -483,8 +493,14 @@ class ConversationService:
 
     async def complete_feedback(self, session: Session) -> None:
         if not session.roleplay: return
-        feedback = self.roleplays.feedback(session.roleplay)
-        previous = next((item for item in await self.repository.list_sessions(session.user_id) if item.id != session.id and item.feedback and item.feedback.scenario_id == session.roleplay.scenario_id and item.roleplay and item.roleplay.scoring_version == session.roleplay.scoring_version), None)
+        feedback_state = session.roleplay
+        if session.branch:
+            feedback_state = feedback_state.model_copy(deep=True)
+            copied_ids = set(session.branch.copied_turn_ids)
+            feedback_state.evidence = [item for item in feedback_state.evidence if item.conversation_turn_id not in copied_ids]
+        feedback = self.roleplays.feedback(feedback_state)
+        feedback.evidence_scope = "continuation" if session.branch else "full_attempt"
+        previous = next((item for item in await self.repository.list_sessions(session.user_id) if not session.branch and not item.branch and item.id != session.id and item.feedback and item.feedback.scenario_id == session.roleplay.scenario_id and item.roleplay and item.roleplay.scoring_version == session.roleplay.scoring_version), None)
         if previous and previous.feedback:
             old = {metric.name: metric.score for metric in previous.feedback.metrics}
             feedback.compared_with_session_id = previous.id

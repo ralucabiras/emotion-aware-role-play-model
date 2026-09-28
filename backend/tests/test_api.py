@@ -118,6 +118,42 @@ def auth(client: TestClient, email: str = "user@example.com") -> dict[str, str]:
     return {"Authorization": f"Bearer {login.json()['access_token']}"}
 
 
+def test_branch_api_validation_ownership_idempotency_and_deletion():
+    from uuid import uuid4
+
+    from test_branching import CONFIRM, OPENING, PROPOSAL
+
+    with TestClient(app) as client:
+        headers = auth(client, "branch-api@example.com")
+        sid = client.post("/api/sessions", headers=headers).json()["session_id"]
+        base = f"/api/sessions/{sid}"
+        assert client.post(f"{base}/roleplay", headers=headers, json={"scenario_id": "workload", "difficulty": "intermediate", "pre_skipped": True}).status_code == 200
+        for message in [OPENING, PROPOSAL, CONFIRM]:
+            assert client.post("/api/chat", headers=headers, json={"session_id": sid, "message": message}).status_code == 200
+        original = client.get(base, headers=headers).json()
+        payload = {"request_id": str(uuid4()), "expected_version": original["version"], "turn_id": original["roleplay"]["decisions"][1]["user_turn_id"]}
+        assert client.post(f"{base}/branches", headers=headers, json={**payload, "expected_version": 0}).status_code == 409
+        assert client.post(f"{base}/branches", headers=headers, json={**payload, "attempt_purpose": "required"}).status_code == 422
+        response = client.post(f"{base}/branches", headers=headers, json=payload)
+        assert response.status_code == 201
+        child = response.json()
+        assert child["branch"]["parent_session_id"] == sid
+        assert child["roleplay"]["attempt_purpose"] == "retry"
+        assert child["feedback"] is None and child["questionnaires"] == {}
+        assert client.post(f"{base}/branches", headers=headers, json=payload).json()["session_id"] == child["session_id"]
+        assert client.get(base, headers=headers).json() == original
+        child_base = f"/api/sessions/{child['session_id']}"
+        comparison = client.get(f"{child_base}/comparison", headers=headers).json()
+        assert comparison["original"]["session_id"] == sid
+        assert comparison["alternative"]["turns"] == []
+        other = auth(client, "other-branch-api@example.com")
+        assert client.post(f"{base}/branches", headers=other, json=payload).status_code == 404
+        assert client.get(f"{child_base}/comparison", headers=other).status_code == 404
+        assert client.delete(base, headers=headers).status_code == 204
+        assert client.get(f"{child_base}/comparison", headers=headers).json()["original"] is None
+        assert client.get(child_base, headers=headers).json()["branch"] == child["branch"]
+
+
 def test_auth_session_chat_and_feedback() -> None:
     with TestClient(app) as client:
         headers = auth(client)
@@ -519,7 +555,7 @@ def test_research_lifecycle_review_and_immutable_frozen_export() -> None:
             )
             assert frozen.status_code == 200
             manifest = frozen.json()
-            assert manifest["schema_version"] == "affectlab-frozen-dataset-v3"
+            assert manifest["schema_version"] == "affectlab-frozen-dataset-v4"
             assert manifest["record_count"] == 2
             assert manifest["participant_count"] == 2
             assert len(manifest["sha256"]) == 64

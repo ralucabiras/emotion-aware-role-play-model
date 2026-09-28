@@ -1,8 +1,9 @@
+import { BranchComparison } from './BranchComparison'
 import { ConversationReplay } from './ConversationReplay'
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { api } from '../services/api'
-import type { AffectDecision, PacingPreference, CharacterProfile, ConversationTurn, EmotionState, Feedback, MultimodalAffect, RolePlayState, Scenario, SessionResponse, SessionSummary, UserProfile } from '../types/api'
+import type { BranchLineage, AffectDecision, PacingPreference, CharacterProfile, ConversationTurn, EmotionState, Feedback, MultimodalAffect, RolePlayState, Scenario, SessionResponse, SessionSummary, UserProfile } from '../types/api'
 import { StudyChecklist } from './StudyChecklist'
 import { notifyStudyProgress } from '../services/studyProgress'
 import type { StudyTask } from '../types/api'
@@ -26,6 +27,8 @@ function AffectDecisionPanel({decision}: {decision:AffectDecision}) {
 
 export function Dashboard({user, initialSessionId, initialRoleplay=false, initialStudyTask, onLogout, onDashboard, onSettings}: {user: UserProfile; initialSessionId?:string; initialRoleplay?:boolean; initialStudyTask?:string; onLogout: () => void; onDashboard:()=>void; onSettings: () => void}) {
   const [sessionId, setSessionId] = useState<string>()
+  const [branch,setBranch]=useState<BranchLineage|null>(null)
+  const branchRequest=useRef<{key:string;id:string}|null>(null)
   const [sessions, setSessions] = useState<SessionSummary[]>([])
   const [sessionTitle, setSessionTitle] = useState('New reflection')
   const [turns, setTurns] = useState<ConversationTurn[]>([])
@@ -76,11 +79,12 @@ export function Dashboard({user, initialSessionId, initialRoleplay=false, initia
   const sendingBlocked = busy || !sessionId || transcriptionStatus === 'transcribing' || (inRoleplay && roleplay?.status === 'paused')
 
   function load(session: SessionResponse) {
+    setBranch(session.branch??null)
     setStudyTask(undefined); setRetryAttempt(false); setRetryTask(null)
     setSessionId(session.session_id); setSessionVersion(session.version??0); setSessionTitle(session.title); setTurns(session.turns); setEmotion(session.emotion_state); setRoleplay(session.roleplay); setFeedback(session.feedback); setPostToken(session.post_questionnaire_token??null)
     setMode(session.feedback ? 'feedback' : session.roleplay && ['active','paused'].includes(session.roleplay.status) ? 'roleplay' : 'reflect')
     storeVoiceSample(null); setTranscriptionStatus('idle'); setMultimodal(null); setVoiceNotice('')
-    const saved = [...session.turns].reverse().find(turn=>turn.affect_decision)?.affect_decision??null
+    const saved = [...session.turns].reverse().find(turn=>turn.affect_decision&&!session.branch?.copied_turn_ids.includes(turn.id))?.affect_decision??null
     setAffectDecision(saved); setMultimodal(saved?.prediction??null)
   }
   async function setVoiceSample(sample: VoiceSample | null) {
@@ -119,6 +123,26 @@ export function Dashboard({user, initialSessionId, initialRoleplay=false, initia
       setError(`${caught instanceof Error ? caught.message : 'Message could not be sent'}. Your draft is kept below. Reload the saved conversation before retrying if it changed.`)
     } finally { setBusy(false) }
   }
+  async function branchHere(turnId:string) {
+    if(!sessionId||busy)return
+    const key=`${sessionId}:${turnId}:${sessionVersion}`
+    if(branchRequest.current?.key!==key)branchRequest.current={key,id:crypto.randomUUID()}
+    setBusy(true);setError('')
+    try {
+      const draft=turns.find(turn=>turn.id===turnId)?.content??''
+      const child=await api.createBranch(sessionId,turnId,sessionVersion,branchRequest.current.id)
+      load(child);setNeedsReload(false);setMessage(child.turns.every(turn=>child.branch?.copied_turn_ids.includes(turn.id))?draft:'');branchRequest.current=null
+      history.replaceState({},'',`/practice?session=${child.session_id}`)
+      try {setSessions(await api.listSessions())} catch {setError('The alternative was created, but the session list could not be refreshed.')}
+    } catch(caught) {setError(caught instanceof Error?caught.message:'The alternative could not be created. Your original is unchanged.')}
+    finally {setBusy(false)}
+  }
+  async function openSaved(id:string) {
+    setBusy(true);setError('')
+    try {load(await api.getSession(id));setMessage('');history.replaceState({},'',`/practice?session=${id}`)}
+    catch {setError('The saved rehearsal could not be loaded. Please try again.')}
+    finally {setBusy(false)}
+  }
   async function leaveFeedback(next:WorkspaceMode) {
     if(!sessionId)return
     setBusy(true);setError('')
@@ -130,13 +154,13 @@ export function Dashboard({user, initialSessionId, initialRoleplay=false, initia
     setError('');setBusy(true)
     try{
       if(task.session_id){load(await api.getSession(task.session_id));history.replaceState({},'',`/practice?session=${task.session_id}`)}
-      else {setRetryAttempt(false);setRetryTask(null);setStudyTask(task.scenario_id);setSelected(task.scenario_id);setDifficulty('intermediate');setRoleplay(null);setFeedback(null);setPostToken(null);setMode('roleplay')}
+      else {setRetryAttempt(false);setRetryTask(null);setStudyTask(task.scenario_id);setSelected(task.scenario_id);setDifficulty('intermediate');setBranch(null);setRoleplay(null);setFeedback(null);setPostToken(null);setMode('roleplay')}
     }catch(caught){setError(caught instanceof Error?caught.message:'The study task could not be opened.')}
     finally{setBusy(false)}
   }
   async function start(ratings: {confidence:number;anxiety:number}|null, profile:CharacterProfile|null = null) {
     if (!sessionId) return; setBusy(true); setError('')
-    try { const response = await api.startRoleplay(sessionId, selected, difficulty, ratings, studyTask?"required":retryAttempt?"retry":"additional", studyTask??(retryTask===selected?retryTask:null), profile); setStudyTask(undefined); setRetryAttempt(false); setRetryTask(null); setSessionId(response.session_id); setSessionVersion(response.version??0); setAffectDecision(null); history.replaceState({}, '', `/practice?session=${response.session_id}`); setEmotion(response.emotion_state); setSessionTitle(response.scenario.title); setTurns([response.opening_turn]); setRoleplay(response.state); setFeedback(null); setMultimodal(null); storeVoiceSample(null); setMessage(''); setTranscriptionStatus('idle'); setMode('roleplay'); try { setSessions(await api.listSessions()) } catch { setError('The rehearsal started, but the saved-session list could not be refreshed.') } notifyStudyProgress() } catch(caught) { setError(caught instanceof Error?caught.message:'The rehearsal could not be started.') } finally { setBusy(false) }
+    try { const response = await api.startRoleplay(sessionId, selected, difficulty, ratings, studyTask?"required":retryAttempt?"retry":"additional", studyTask??(retryTask===selected?retryTask:null), profile); setStudyTask(undefined); setRetryAttempt(false); setRetryTask(null); setBranch(null); setSessionId(response.session_id); setSessionVersion(response.version??0); setAffectDecision(null); history.replaceState({}, '', `/practice?session=${response.session_id}`); setEmotion(response.emotion_state); setSessionTitle(response.scenario.title); setTurns([response.opening_turn]); setRoleplay(response.state); setFeedback(null); setMultimodal(null); storeVoiceSample(null); setMessage(''); setTranscriptionStatus('idle'); setMode('roleplay'); try { setSessions(await api.listSessions()) } catch { setError('The rehearsal started, but the saved-session list could not be refreshed.') } notifyStudyProgress() } catch(caught) { setError(caught instanceof Error?caught.message:'The rehearsal could not be started.') } finally { setBusy(false) }
   }
   async function action(name: string, nextMode: WorkspaceMode = 'roleplay') { if (!sessionId) return; setBusy(true); setError(''); try { const session = await api.roleplayAction(sessionId, name); load(session); setMode(session.feedback ? 'feedback' : nextMode); notifyStudyProgress() } catch(caught) { setError(caught instanceof Error?caught.message:'The role-play could not be updated.') } finally { setBusy(false) } }
   async function rewind() { if (!sessionId) return; setBusy(true); setError(''); try { const result=await api.rewindRoleplay(sessionId); load(result.session); setMessage(result.removed_message); setMode('roleplay') } catch(caught) { setError(caught instanceof Error?caught.message:'The last turn could not be restored.') } finally { setBusy(false) } }
@@ -145,7 +169,7 @@ export function Dashboard({user, initialSessionId, initialRoleplay=false, initia
     setBusy(true);setError('')
     try{
       if(sessionId){await api.deleteSession(sessionId);setSessions(current=>current.filter(item=>item.session_id!==sessionId))}
-      setSessionId(undefined);history.replaceState({},'', '/practice?new=1');setStudyTask(undefined);setRetryAttempt(false);setRetryTask(null)
+      setBranch(null);setSessionId(undefined);history.replaceState({},'', '/practice?new=1');setStudyTask(undefined);setRetryAttempt(false);setRetryTask(null)
       setAffectDecision(null);setNeedsReload(false);setSessionTitle('New reflection');setTurns([]);setEmotion(null);setRoleplay(null);setFeedback(null);setPostToken(null);setMode('reflect')
       storeVoiceSample(null);setMessage('');setTranscriptionStatus('idle');setMultimodal(null);setVoiceNotice('')
       try{
@@ -158,19 +182,20 @@ export function Dashboard({user, initialSessionId, initialRoleplay=false, initia
     }catch(caught){setError(caught instanceof Error?caught.message:'The session could not be deleted. Please try again.')}
     finally{setBusy(false)}
   }
-  function retry() { setStudyTask(undefined); setRetryAttempt(true); setRetryTask(roleplay?.required_task_id??null); setPostToken(null); setSelected(roleplay?.scenario_id ?? selected); setDifficulty(roleplay?.difficulty_level ?? difficulty); setFeedback(null); setRoleplay(null); setMode('roleplay') }
+  function retry() { setBranch(null); setStudyTask(undefined); setRetryAttempt(true); setRetryTask(roleplay?.required_task_id??null); setPostToken(null); setSelected(roleplay?.scenario_id ?? selected); setDifficulty(roleplay?.difficulty_level ?? difficulty); setFeedback(null); setRoleplay(null); setMode('roleplay') }
 
   const composer = <>{needsReload && <button type="button" disabled={busy} onClick={async()=>{if(!sessionId)return;setBusy(true);try{load(await api.getSession(sessionId));setNeedsReload(false);setError('')}catch{setError('Could not reload the conversation. Your draft is still kept.')}finally{setBusy(false)}}}>Reload saved conversation and keep draft</button>}{pacingAvailable && <fieldset disabled={busy} className="pacing-controls"><legend>Your pacing</legend><label>Pace<select value={pacing} onChange={event=>setPacing(event.target.value as PacingPreference)}><option value="auto">Use my adaptation setting</option><option value="keep_going">Keep going</option><option value="gentler">Gentler pace</option><option value="more_challenge">More challenge</option></select></label><label><input type="checkbox" checked={adaptationEnabled} onChange={event=>setAdaptationEnabled(event.target.checked)}/>Allow voice-informed acknowledgement and pacing suggestions</label><small>Your pace choice takes precedence. The scenario requirements stay the same.</small></fieldset>}<VoiceCapture enabled={(transcriptionAvailable || multimodalEnabled) && microphoneEnabled} disabled={busy || transcriptionStatus === 'transcribing'} sample={voiceSample} onChange={setVoiceSample}/><form onSubmit={submit}><textarea readOnly={busy} value={message} onChange={event => {setMessage(event.target.value);setMultimodal(null);setAffectDecision(null)}} placeholder={transcriptionStatus === 'transcribing' ? 'Transcribing your recording…' : transcriptionStatus === 'review' ? 'Review or edit the transcript before sending…' : inRoleplay ? `Respond to your ${activeScenario?.character ?? 'practice partner'}…` : 'Type a message or add your voice…'} rows={2}/><button className="send" disabled={!message.trim() || sendingBlocked} aria-label="Send message">↑</button></form><p className="privacy">Session text is retained locally for up to 30 days. Optional audio may be sent to OpenAI for transcription, processed in memory, and is not stored by AffectLab. Enhanced practice saves prediction summaries and pacing decisions with the session under its retention and deletion policy.</p></>
 
   return <main className="shell" aria-busy={busy}>
     <header><button className="brand-link" onClick={onDashboard}><span className="brand-mark">A</span><span className="brand">AffectLab</span></button><div className="header-actions"><button className="text-button" onClick={onDashboard}>Dashboard</button><select disabled={busy} value={sessionId} aria-label="Saved session" onChange={async event => load(await api.getSession(event.target.value))}>{sessions.map(session => <option key={session.session_id} value={session.session_id}>{session.title} · {session.turn_count} turns</option>)}</select><span>{user.preferred_name || user.first_name || user.email}</span><button className="text-button" onClick={onSettings}>Settings</button><button className="text-button" onClick={async () => { await api.logout(); onLogout() }}>Sign out</button></div></header>
     <div className="workspace-title"><span>{sessionTitle}</span><button onClick={async()=>{const next=prompt('Rename this session',sessionTitle)?.trim();if(!next||!sessionId)return;const updated=await api.renameSession(sessionId,next);setSessionTitle(updated.title);setSessionVersion(updated.version??sessionVersion);setSessions(await api.listSessions())}}>Rename</button></div>
-    <section className="intro"><p className="eyebrow">Reflect · Reframe · Rehearse</p><h1>{mode === 'roleplay' ? 'Practise the conversation.' : mode === 'replay' ? 'Replay your rehearsal.' : mode === 'feedback' ? 'Review your rehearsal.' : 'A calmer place to prepare.'}</h1><p>{mode === 'roleplay' ? 'Try the words, adjust your approach, and finish whenever you are ready.' : mode === 'replay' ? 'Explore the evidence and decisions saved with each exchange.' : mode === 'feedback' ? 'Use observable evidence to decide what to keep and what to try next.' : 'Share what is happening and explore the conversation at your pace.'}</p></section>
+    <section className="intro"><p className="eyebrow">Reflect · Reframe · Rehearse</p><h1>{mode === 'roleplay' ? 'Practise the conversation.' : mode === 'compare' ? 'Compare your approaches.' : mode === 'replay' ? 'Replay your rehearsal.' : mode === 'feedback' ? 'Review your rehearsal.' : 'A calmer place to prepare.'}</h1><p>{mode === 'roleplay' ? 'Try the words, adjust your approach, and finish whenever you are ready.' : mode === 'compare' ? 'Inspect what changed from the same starting point.' : mode === 'replay' ? 'Explore the evidence and decisions saved with each exchange.' : mode === 'feedback' ? 'Use observable evidence to decide what to keep and what to try next.' : 'Share what is happening and explore the conversation at your pace.'}</p></section>
     {mode === 'reflect' && user.practice_goals.length > 0 && <section className="practice-focus"><div><p className="eyebrow">Your practice focus</p><strong>{user.practice_goals.map(goalLabel).join(' · ')}</strong></div><button onClick={() => { setStudyTask(undefined); setRetryAttempt(false); setRetryTask(null); setSelected(recommendedScenario(user.practice_goals)); setMode('roleplay') }}>Try a recommended rehearsal</button></section>}
     {user.pilot_enrolled&&<StudyChecklist onContinue={continueStudy} disabled={busy||!sessionId} currentSessionId={sessionId} ratingsOpen={mode==='feedback'&&Boolean(postToken)}/>}
-    <ModeTabs disabled={busy} mode={mode} roleplay={roleplay} onChange={next => { if(mode==='feedback' && next!=='feedback'){void leaveFeedback(next);return} if(next!=='feedback')setPostToken(null); if (roleplayActive && next === 'reflect' && !confirm('Pause the active role-play and return to reflection?')) return; if (roleplayActive && next === 'reflect' && roleplay?.status === 'active') { void action('pause', 'reflect'); return } setMode(next) }}/>
-    {error && <p className="error" role="alert">{error}</p>}
+    <ModeTabs hasBranch={Boolean(branch)} disabled={busy} mode={mode} roleplay={roleplay} onChange={next => { if(mode==='feedback' && next!=='feedback'){void leaveFeedback(next);return} if(next!=='feedback')setPostToken(null); if (roleplayActive && next === 'reflect' && !confirm('Pause the active role-play and return to reflection?')) return; if (roleplayActive && next === 'reflect' && roleplay?.status === 'active') { void action('pause', 'reflect'); return } setMode(next) }}/>
+    {error && <div><p className="error" role="alert">{error}</p>{sessionId&&(mode==='replay'||mode==='compare')&&<button disabled={busy} onClick={()=>void openSaved(sessionId)}>Reload saved session</button>}</div>}
+    {branch&&<p className="voice-notice" role="note">Alternative practice ? {branch.copied_turn_ids.length} shared context messages. New responses use the saved scenario and deterministic wording. Feedback scores cover new responses; the outcome also depends on shared context.</p>}
     {retryAttempt&&user.pilot_enrolled&&<p role="note">This retry is additional practice and will not replace your required study attempt.</p>}
-    {mode === 'replay' && roleplay ? <ConversationReplay key={sessionId} turns={turns} state={roleplay} feedback={feedback}/> : mode === 'feedback' && feedback ? <FeedbackScreen scenario={activeScenario} feedback={feedback} state={roleplay} postToken={postToken} onRetry={retry} onRewind={()=>void rewind()} onConversation={() => {void leaveFeedback('reflect')}}/> : mode === 'roleplay' && !roleplayActive ? <ScenarioSetup allowProfiles={!studyTask && retryTask!==selected} key={studyTask??'practice'} studyTask={studyTask} onFreePractice={()=>setStudyTask(undefined)} scenarios={scenarios} selected={selected} difficulty={difficulty} busy={busy||!sessionId} onScenario={setSelected} onDifficulty={setDifficulty} onStart={start} onScenarios={setScenarios}/> : <div className="workspace"><section className={`chat-card ${inRoleplay ? 'roleplay-chat' : ''}`}>{inRoleplay && roleplay && <ActiveRolePlayHeader scenario={activeScenario} state={roleplay} busy={busy} onAction={action} onRewind={()=>void rewind()}/>}<div className="notice"><strong>{inRoleplay ? 'Role-play in progress' : 'Research prototype'}</strong><span>{inRoleplay ? `The assistant is responding as your ${activeScenario?.character ?? 'practice partner'}.` : 'Not a therapist or medical service. In an emergency, contact local emergency services.'}</span></div>{mode==='reflect'&&roleplay?.status==='paused'&&<p className="voice-notice" role="status">Your rehearsal is paused. You can reflect here, then return to Active role-play to resume.</p>}<div className="messages" aria-live="polite">{turns.length === 0 && <div className="empty"><span>✦</span><h2>What conversation is on your mind?</h2><p>Your affect estimate is uncertain and is never a diagnosis.</p></div>}{turns.map(turn => <div key={turn.id} className={`message ${turn.role}`}><span>{turn.content}</span></div>)}{busy && <div className="message assistant"><span>Thinking…</span></div>}<div ref={endRef}/></div>{voiceNotice && <p className="voice-notice" role="status">{voiceNotice}</p>}{composer}</section><aside><EmotionPanel state={emotion}/>{affectDecision && <AffectDecisionPanel decision={affectDecision}/ >}{multimodal && <MultimodalPanel result={multimodal}/>}<button className="new-session" disabled={busy} onClick={fresh}>Delete & start fresh</button></aside></div>}
+    {mode === 'compare' && sessionId && branch ? <BranchComparison key={sessionId} sessionId={sessionId} onOriginal={id=>void openSaved(id)}/> : mode === 'replay' && roleplay ? <ConversationReplay key={sessionId} turns={turns} state={roleplay} feedback={feedback} branch={branch} busy={busy} onBranch={id=>void branchHere(id)} onFresh={retry}/> : mode === 'feedback' && feedback ? <FeedbackScreen scenario={activeScenario} feedback={feedback} state={roleplay} postToken={postToken} onRetry={retry} onRewind={()=>void rewind()} onConversation={() => {void leaveFeedback('reflect')}}/> : mode === 'roleplay' && !roleplayActive ? <ScenarioSetup allowProfiles={!studyTask && retryTask!==selected} key={studyTask??'practice'} studyTask={studyTask} onFreePractice={()=>setStudyTask(undefined)} scenarios={scenarios} selected={selected} difficulty={difficulty} busy={busy||!sessionId} onScenario={setSelected} onDifficulty={setDifficulty} onStart={start} onScenarios={setScenarios}/> : <div className="workspace"><section className={`chat-card ${inRoleplay ? 'roleplay-chat' : ''}`}>{inRoleplay && roleplay && <ActiveRolePlayHeader scenario={activeScenario} state={roleplay} busy={busy} onAction={action} onRewind={()=>void rewind()}/>}<div className="notice"><strong>{inRoleplay ? 'Role-play in progress' : 'Research prototype'}</strong><span>{inRoleplay ? `The assistant is responding as your ${activeScenario?.character ?? 'practice partner'}.` : 'Not a therapist or medical service. In an emergency, contact local emergency services.'}</span></div>{mode==='reflect'&&roleplay?.status==='paused'&&<p className="voice-notice" role="status">Your rehearsal is paused. You can reflect here, then return to Active role-play to resume.</p>}<div className="messages" aria-live="polite">{turns.length === 0 && <div className="empty"><span>✦</span><h2>What conversation is on your mind?</h2><p>Your affect estimate is uncertain and is never a diagnosis.</p></div>}{turns.map(turn => <div key={turn.id} className={`message ${turn.role}`}><span>{branch?.copied_turn_ids.includes(turn.id)&&<small>Shared context ? </small>}{turn.content}</span></div>)}{busy && <div className="message assistant"><span>Thinking…</span></div>}<div ref={endRef}/></div>{voiceNotice && <p className="voice-notice" role="status">{voiceNotice}</p>}{composer}</section><aside><EmotionPanel state={emotion}/>{affectDecision && <AffectDecisionPanel decision={affectDecision}/ >}{multimodal && <MultimodalPanel result={multimodal}/>}<button className="new-session" disabled={busy} onClick={fresh}>Delete & start fresh</button></aside></div>}
   </main>
 }

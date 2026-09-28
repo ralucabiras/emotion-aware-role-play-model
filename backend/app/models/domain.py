@@ -280,6 +280,7 @@ class FeedbackComparison(BaseModel):
 
 
 class SessionFeedback(BaseModel):
+    evidence_scope: Literal["full_attempt", "continuation"] = "full_attempt"
     session_id: UUID | None = None
     scenario_id: str
     metrics: list[FeedbackMetric]
@@ -355,7 +356,22 @@ class User(BaseModel):
     created_at: datetime = Field(default_factory=utcnow)
 
 
+class BranchLineage(BaseModel):
+    parent_session_id: UUID
+    parent_version: int
+    branch_point_turn_id: UUID
+    branch_group_id: UUID
+    request_id: UUID
+    before: DialogueSnapshot
+    copied_turn_ids: list[UUID]
+    copied_evidence_turns: list[int]
+    source_digest: str
+    generation_mode: Literal["deterministic"] = "deterministic"
+    created_at: datetime = Field(default_factory=utcnow)
+
+
 class Session(BaseModel):
+    branch: BranchLineage | None = None
     submission_ids: list[UUID] = Field(default_factory=list)
     id: UUID = Field(default_factory=uuid4)
     user_id: UUID
@@ -376,6 +392,9 @@ class Session(BaseModel):
 
 
 class StudyRecord(BaseModel):
+    is_branch: bool = False
+    copied_context_turn_count: int = 0
+    feedback_evidence_scope: Literal["full_attempt", "continuation"] = "full_attempt"
     attempt_purpose: Literal["required", "additional", "retry", "legacy_unknown"] = "legacy_unknown"
     required_task_id: str | None = None
     id: UUID = Field(default_factory=uuid4)

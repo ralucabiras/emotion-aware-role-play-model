@@ -7,11 +7,12 @@ from collections import Counter
 from app.core.config import settings
 from app.services.study_tasks import is_completed_protocol_task, select_required_attempts
 
-CSV_SCHEMA_VERSION = "affectlab-frozen-dataset-v3"
+CSV_SCHEMA_VERSION = "affectlab-frozen-dataset-v4"
 CSV_FIELDS = [
     "schema_version", "row_type", "protocol_version", "participant_id", "enrolled_at",
     "consent_version", "consented_at", "eligibility_version", "eligibility_confirmed_at",
     "session_id", "created_at", "updated_at", "turn_count", "scenario_id", "difficulty",
+    "is_branch", "copied_context_turn_count", "feedback_evidence_scope",
     "attempt_purpose", "required_task_id", "primary_attempt", "primary_task_complete",
     "completion_reason", "roleplay_started_at", "roleplay_completed_at",
     "pre_confidence", "pre_anxiety", "pre_submitted_at",
@@ -64,6 +65,9 @@ async def export_research_rows(repository, users, deidentified=False):
                 "created_at": timestamp(record.session_created_at),
                 "updated_at": timestamp(record.last_activity_at),
                 "turn_count": record.turn_count,
+                "is_branch": record.is_branch,
+                "copied_context_turn_count": record.copied_context_turn_count,
+                "feedback_evidence_scope": record.feedback_evidence_scope,
                 "scenario_id": record.scenario_id or "",
                 "difficulty": record.difficulty.value if record.difficulty else "",
                 "attempt_purpose": record.attempt_purpose,

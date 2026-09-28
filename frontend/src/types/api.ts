@@ -1,4 +1,9 @@
 export type CharacterProfile = 'cooperative'|'rushed'|'sceptical'
+export interface BranchLineage { parent_session_id:string; parent_version:number; branch_point_turn_id:string; branch_group_id:string; request_id:string; before:DialogueSnapshot; copied_turn_ids:string[]; copied_evidence_turns:number[]; generation_mode:'deterministic'; created_at:string }
+export interface SessionResponse { branch?:BranchLineage|null }
+export interface Feedback { evidence_scope?:'full_attempt'|'continuation' }
+export interface BranchContinuation { session_id:string; title:string; status:string; outcome:string|null; agreement:string|null; completion_reason:string|null; turns:ConversationTurn[]; decisions:DialogueDecision[]; evidence:TurnEvidence[] }
+export interface BranchComparison { shared_context:ConversationTurn[]; original:BranchContinuation|null; alternative:BranchContinuation; unavailable_reason:string|null; branch:BranchLineage }
 export type Role = 'user' | 'assistant'
 export interface EmotionState { dominant_emotion: string; valence: number; arousal: number; confidence: number; trend: string }
 export interface ConversationTurn { strategy?:string|null; generation?:GenerationMetadata|null; affect_decision?:AffectDecision|null; id: string; role: Role; content: string; created_at: string }

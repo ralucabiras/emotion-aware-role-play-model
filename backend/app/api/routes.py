@@ -35,6 +35,7 @@ from app.schemas.chat import (
     AudioTranscriptionResponse,
     AuthRequest,
     AuthResponse,
+    BranchRequest,
     ChatRequest,
     ChatResponse,
     CreateSessionResponse,
@@ -73,6 +74,7 @@ from app.services.auth_service import (
     AuthService,
     EmailNotVerifiedError,
 )
+from app.services.branching import compare_branch, create_branch
 from app.services.conversation_service import (
     ConversationService,
     QuestionnaireConflictError,
@@ -362,7 +364,7 @@ async def research_export(
     records = await repository.list_study_records(user.id)
     primary_ids = {record.session_id for record in select_required_attempts(records).values()}
     return {
-        "schema_version": "affectlab-research-export-v3",
+        "schema_version": "affectlab-research-export-v4",
         "protocol_version": settings.study_protocol_version,
         "participant_id": str(user.participant_id),
         "account_privacy_acceptance": {"version": user.consent_version, "accepted_at": user.consented_at},
@@ -379,6 +381,9 @@ async def research_export(
                 "last_activity_at": record.last_activity_at,
                 "retention_expires_at": record.retention_expires_at,
                 "turn_count": record.turn_count,
+                "is_branch": record.is_branch,
+                "copied_context_turn_count": record.copied_context_turn_count,
+                "feedback_evidence_scope": record.feedback_evidence_scope,
                 "scenario_id": record.scenario_id,
                 "attempt_purpose": record.attempt_purpose,
                 "required_task_id": record.required_task_id,
@@ -830,7 +835,7 @@ async def list_sessions(user: User = Depends(current_user), service: Conversatio
 async def get_session(session_id: UUID, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     try: session = await service.get_session(session_id, user.id)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
-    return SessionResponse(version=session.version, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
+    return SessionResponse(branch=session.branch, version=session.version, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
 
 
 @router.patch("/sessions/{session_id}/title", response_model=SessionSummary)
@@ -844,7 +849,7 @@ async def rename_session(session_id: UUID, request: SessionTitleRequest, user: U
 async def save_takeaway(session_id: UUID, request: TakeawayRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
     try: session = await service.save_takeaway(session_id, user.id, request.takeaway)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
-    return SessionResponse(version=session.version, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
+    return SessionResponse(branch=session.branch, version=session.version, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
 
 
 @router.delete("/sessions/{session_id}", status_code=204)
@@ -922,7 +927,7 @@ async def roleplay_action(session_id: UUID, request: RolePlayActionRequest, user
     try: session = await service.set_roleplay_status(session_id, user.id, request.action)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return SessionResponse(version=session.version, post_questionnaire_token=session.post_questionnaire_token, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
+    return SessionResponse(branch=session.branch, version=session.version, post_questionnaire_token=session.post_questionnaire_token, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
 
 
 @router.post("/sessions/{session_id}/roleplay/rewind", response_model=RewindResponse)
@@ -930,7 +935,7 @@ async def rewind_roleplay(session_id: UUID, user: User = Depends(current_user), 
     try: removed, session = await service.rewind_roleplay(session_id, user.id)
     except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
     except ValueError as exc: raise HTTPException(409, str(exc)) from None
-    return RewindResponse(removed_message=removed, session=SessionResponse(version=session.version, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()}))
+    return RewindResponse(removed_message=removed, session=SessionResponse(branch=session.branch, version=session.version, session_id=session.id, title=session.title, turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback, takeaway=session.takeaway, questionnaires=session.questionnaires, questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()}))
 
 
 @router.get("/sessions/{session_id}/feedback")
@@ -970,3 +975,27 @@ async def close_post_questionnaire(session_id: UUID, user: User = Depends(curren
         await service.close_post_questionnaire(session_id, user.id)
     except SessionNotFoundError:
         raise HTTPException(404, "Session not found") from None
+
+
+@router.post("/sessions/{session_id}/branches", response_model=SessionResponse, status_code=201)
+async def branch_rehearsal(session_id: UUID, request: BranchRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
+    try:
+        session = await create_branch(service, session_id, user.id, request.turn_id, request.expected_version, request.request_id)
+    except SessionNotFoundError:
+        raise HTTPException(404, "Session not found") from None
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from None
+    return SessionResponse(branch=session.branch, version=session.version, session_id=session.id, title=session.title,
+        turns=session.turns, emotion_state=session.emotion_state, roleplay=session.roleplay, feedback=session.feedback,
+        takeaway=session.takeaway, questionnaires=session.questionnaires,
+        questionnaire_skips={key: value.isoformat() for key, value in session.questionnaire_skips.items()})
+
+
+@router.get("/sessions/{session_id}/comparison")
+async def compare_rehearsal(session_id: UUID, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
+    try:
+        return await compare_branch(service, session_id, user.id)
+    except SessionNotFoundError:
+        raise HTTPException(404, "Session not found") from None
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from None

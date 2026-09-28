@@ -1,6 +1,8 @@
 # Research CSV v3 and required-attempt selection
 
-New live exports and newly frozen datasets use `affectlab-frozen-dataset-v3`. Previously frozen files remain unchanged, retaining their original schema version and checksum. V3 retains the columns and privacy boundaries described in [CSV v2](research-export-v2.md) and adds the fields below. Personal research JSON is now `affectlab-research-export-v3` and exposes the same attempt classification and primary flags.
+Historical schema: new exports use [v4 with branch activity scope](research-export-v4.md). Existing frozen v3 files are unchanged.
+
+V3 live exports and newly frozen datasets used `affectlab-frozen-dataset-v3`. Previously frozen files remain unchanged, retaining their original schema version and checksum. V3 retains the columns and privacy boundaries described in [CSV v2](research-export-v2.md) and adds the fields below. Personal research JSON is now `affectlab-research-export-v3` and exposes the same attempt classification and primary flags.
 
 | Field | Meaning |
 |---|---|
