@@ -1,0 +1,594 @@
+{
+  "version": 1,
+  "recorded_at": "2026-09-28T14:40:39.203763+00:00",
+  "synthetic": true,
+  "scope": "authored fixtures; no participant data or model inference",
+  "environment": {
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "source_sha256": {
+    "backend/app/services/scenario_dialogue.py": "71bc6f1124fa37bccd8f86a18e0009a1c1940b68a1ca210cc9b64f1c3a3d5e65",
+    "backend/app/services/workload_dialogue.py": "0a51e43346ed5254a3090461a94293a3285b252858fed1e69ff2f7600e0ff833",
+    "backend/app/services/affect_pacing.py": "8aed7821363aa7d769ac2645bea1f7378c09b2986c4520b2f518005aebc2f65d",
+    "backend/app/services/roleplay_service.py": "b41a7117fe07824cf9a84010ed196a7fe419346bd1e2912b8bd8655be3c68ae6",
+    "scripts/evaluate_engineering.py": "f525cfca9585aedc4fc0c6064f9297723472a845774a803d525077afdcf3f3ae"
+  },
+  "dialogue": [
+    {
+      "case": 1,
+      "scenario": "workload",
+      "policy": "fixed",
+      "inputs": [
+        "I have too many tasks and 12 hours of work. Could you help me prioritise?",
+        "I understand the report must be ready by Friday. Could we move the other tasks to Monday?",
+        "Agreed, I will carry out that plan."
+      ],
+      "stages": [
+        "completed"
+      ],
+      "expected_enhanced_stages": [
+        "constraints",
+        "agree",
+        "resolved"
+      ],
+      "consumed_inputs": 1,
+      "status": "completed",
+      "completion_reason": "success",
+      "transition_match": null
+    },
+    {
+      "case": 1,
+      "scenario": "workload",
+      "policy": "enhanced",
+      "inputs": [
+        "I have too many tasks and 12 hours of work. Could you help me prioritise?",
+        "I understand the report must be ready by Friday. Could we move the other tasks to Monday?",
+        "Agreed, I will carry out that plan."
+      ],
+      "stages": [
+        "constraints",
+        "agree",
+        "resolved"
+      ],
+      "expected_enhanced_stages": [
+        "constraints",
+        "agree",
+        "resolved"
+      ],
+      "consumed_inputs": 3,
+      "status": "completed",
+      "completion_reason": "success",
+      "transition_match": true
+    },
+    {
+      "case": 2,
+      "scenario": "workload",
+      "policy": "fixed",
+      "inputs": [
+        "I have too many tasks and 12 hours of work. Could you help me prioritise?",
+        "I understand the report must be ready by Friday. Could we move the other tasks to Monday?",
+        "I cannot agree to that."
+      ],
+      "stages": [
+        "completed"
+      ],
+      "expected_enhanced_stages": [
+        "constraints",
+        "agree",
+        "agree"
+      ],
+      "consumed_inputs": 1,
+      "status": "completed",
+      "completion_reason": "success",
+      "transition_match": null
+    },
+    {
+      "case": 2,
+      "scenario": "workload",
+      "policy": "enhanced",
+      "inputs": [
+        "I have too many tasks and 12 hours of work. Could you help me prioritise?",
+        "I understand the report must be ready by Friday. Could we move the other tasks to Monday?",
+        "I cannot agree to that."
+      ],
+      "stages": [
+        "constraints",
+        "agree",
+        "agree"
+      ],
+      "expected_enhanced_stages": [
+        "constraints",
+        "agree",
+        "agree"
+      ],
+      "consumed_inputs": 3,
+      "status": "active",
+      "completion_reason": null,
+      "transition_match": true
+    },
+    {
+      "case": 3,
+      "scenario": "boundary",
+      "policy": "fixed",
+      "inputs": [
+        "I cannot take this on.",
+        "My answer is still no. Thank you for understanding."
+      ],
+      "stages": [
+        "active",
+        "active"
+      ],
+      "expected_enhanced_stages": [
+        "pressure",
+        "resolved"
+      ],
+      "consumed_inputs": 2,
+      "status": "active",
+      "completion_reason": null,
+      "transition_match": null
+    },
+    {
+      "case": 3,
+      "scenario": "boundary",
+      "policy": "enhanced",
+      "inputs": [
+        "I cannot take this on.",
+        "My answer is still no. Thank you for understanding."
+      ],
+      "stages": [
+        "pressure",
+        "resolved"
+      ],
+      "expected_enhanced_stages": [
+        "pressure",
+        "resolved"
+      ],
+      "consumed_inputs": 2,
+      "status": "completed",
+      "completion_reason": "success",
+      "transition_match": true
+    },
+    {
+      "case": 4,
+      "scenario": "relationship",
+      "policy": "fixed",
+      "inputs": [
+        "When we spend evenings apart, I feel lonely and I need time together.",
+        "I understand you are tired. Could we talk for 20 minutes on Saturday as a trial and review it on Sunday?",
+        "Agreed."
+      ],
+      "stages": [
+        "completed"
+      ],
+      "expected_enhanced_stages": [
+        "perspective",
+        "agree",
+        "resolved"
+      ],
+      "consumed_inputs": 1,
+      "status": "completed",
+      "completion_reason": "success",
+      "transition_match": null
+    },
+    {
+      "case": 4,
+      "scenario": "relationship",
+      "policy": "enhanced",
+      "inputs": [
+        "When we spend evenings apart, I feel lonely and I need time together.",
+        "I understand you are tired. Could we talk for 20 minutes on Saturday as a trial and review it on Sunday?",
+        "Agreed."
+      ],
+      "stages": [
+        "perspective",
+        "agree",
+        "resolved"
+      ],
+      "expected_enhanced_stages": [
+        "perspective",
+        "agree",
+        "resolved"
+      ],
+      "consumed_inputs": 3,
+      "status": "completed",
+      "completion_reason": "success",
+      "transition_match": true
+    },
+    {
+      "case": 5,
+      "scenario": "relationship",
+      "policy": "fixed",
+      "inputs": [
+        "When we spend evenings apart, I feel lonely and I need time together.",
+        "Let's agree to disagree and leave this unresolved."
+      ],
+      "stages": [
+        "completed"
+      ],
+      "expected_enhanced_stages": [
+        "perspective",
+        "unresolved"
+      ],
+      "consumed_inputs": 1,
+      "status": "completed",
+      "completion_reason": "success",
+      "transition_match": null
+    },
+    {
+      "case": 5,
+      "scenario": "relationship",
+      "policy": "enhanced",
+      "inputs": [
+        "When we spend evenings apart, I feel lonely and I need time together.",
+        "Let's agree to disagree and leave this unresolved."
+      ],
+      "stages": [
+        "perspective",
+        "unresolved"
+      ],
+      "expected_enhanced_stages": [
+        "perspective",
+        "unresolved"
+      ],
+      "consumed_inputs": 2,
+      "status": "completed",
+      "completion_reason": "unresolved",
+      "transition_match": true
+    }
+  ],
+  "evidence": [
+    {
+      "scenario": "boundary",
+      "feature": "refusal",
+      "text": "I cannot take this on.",
+      "expected": true,
+      "actual": true,
+      "result": "TP"
+    },
+    {
+      "scenario": "boundary",
+      "feature": "refusal",
+      "text": "My answer is still no.",
+      "expected": true,
+      "actual": true,
+      "result": "TP"
+    },
+    {
+      "scenario": "boundary",
+      "feature": "refusal",
+      "text": "I can take this on.",
+      "expected": false,
+      "actual": false,
+      "result": "TN"
+    },
+    {
+      "scenario": "boundary",
+      "feature": "refusal",
+      "text": "I cannot take this on, unless it is tomorrow.",
+      "expected": false,
+      "actual": false,
+      "result": "TN"
+    },
+    {
+      "scenario": "boundary",
+      "feature": "refusal",
+      "text": "That exceeds what I am available for.",
+      "expected": true,
+      "actual": false,
+      "result": "FN"
+    },
+    {
+      "scenario": "workload",
+      "feature": "workable_option",
+      "text": "Could we move the other tasks to Monday?",
+      "expected": true,
+      "actual": true,
+      "result": "TP"
+    },
+    {
+      "scenario": "workload",
+      "feature": "workable_option",
+      "text": "Could we shift the other tasks to Monday?",
+      "expected": true,
+      "actual": false,
+      "result": "FN"
+    },
+    {
+      "scenario": "workload",
+      "feature": "workable_option",
+      "text": "I cannot move the other tasks to Monday.",
+      "expected": false,
+      "actual": false,
+      "result": "TN"
+    },
+    {
+      "scenario": "relationship",
+      "feature": "need",
+      "text": "I need time together.",
+      "expected": true,
+      "actual": true,
+      "result": "TP"
+    },
+    {
+      "scenario": "relationship",
+      "feature": "need",
+      "text": "They said \"I need time together\".",
+      "expected": false,
+      "actual": true,
+      "result": "FP"
+    },
+    {
+      "scenario": "relationship",
+      "feature": "practical_request",
+      "text": "Could we talk on Saturday?",
+      "expected": true,
+      "actual": true,
+      "result": "TP"
+    },
+    {
+      "scenario": "relationship",
+      "feature": "practical_request",
+      "text": "The weather is nice.",
+      "expected": false,
+      "actual": false,
+      "result": "TN"
+    }
+  ],
+  "evidence_confusion": {
+    "TP": 5,
+    "TN": 4,
+    "FP": 1,
+    "FN": 2
+  },
+  "affect": [
+    {
+      "case": "matching",
+      "prediction": {
+        "label": "sadness",
+        "confidence": 0.8,
+        "distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "text_label": "sadness",
+        "text_confidence": 0.8,
+        "text_distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "audio_label": "sadness",
+        "audio_confidence": 0.8,
+        "audio_distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "modalities_agree": true,
+        "confidence_level": "high",
+        "low_confidence_threshold": 0.55,
+        "model_version": "synthetic-engineering-v1",
+        "latency_ms": 0,
+        "queue_ms": 0,
+        "audio_persisted": false,
+        "disclaimer": "Research estimate; uncertain and not a diagnosis."
+      },
+      "action": "acknowledge",
+      "reason": "supported_matching_estimates",
+      "expected_action": "acknowledge",
+      "passed": true
+    },
+    {
+      "case": "disagreement",
+      "prediction": {
+        "label": "sadness",
+        "confidence": 0.8,
+        "distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "text_label": "sadness",
+        "text_confidence": 0.8,
+        "text_distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "audio_label": "anger",
+        "audio_confidence": 0.8,
+        "audio_distribution": {
+          "anger": 0.8,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.06666666666666665
+        },
+        "modalities_agree": false,
+        "confidence_level": "high",
+        "low_confidence_threshold": 0.55,
+        "model_version": "synthetic-engineering-v1",
+        "latency_ms": 0,
+        "queue_ms": 0,
+        "audio_persisted": false,
+        "disclaimer": "Research estimate; uncertain and not a diagnosis."
+      },
+      "action": "offer_pacing",
+      "reason": "modality_disagreement",
+      "expected_action": "offer_pacing",
+      "passed": true
+    },
+    {
+      "case": "uncertain",
+      "prediction": {
+        "label": "sadness",
+        "confidence": 0.4,
+        "distribution": {
+          "anger": 0.19999999999999998,
+          "happiness": 0.19999999999999998,
+          "neutral": 0.19999999999999998,
+          "sadness": 0.4
+        },
+        "text_label": "sadness",
+        "text_confidence": 0.4,
+        "text_distribution": {
+          "anger": 0.19999999999999998,
+          "happiness": 0.19999999999999998,
+          "neutral": 0.19999999999999998,
+          "sadness": 0.4
+        },
+        "audio_label": "sadness",
+        "audio_confidence": 0.4,
+        "audio_distribution": {
+          "anger": 0.19999999999999998,
+          "happiness": 0.19999999999999998,
+          "neutral": 0.19999999999999998,
+          "sadness": 0.4
+        },
+        "modalities_agree": true,
+        "confidence_level": "low",
+        "low_confidence_threshold": 0.55,
+        "model_version": "synthetic-engineering-v1",
+        "latency_ms": 0,
+        "queue_ms": 0,
+        "audio_persisted": false,
+        "disclaimer": "Research estimate; uncertain and not a diagnosis."
+      },
+      "action": "offer_pacing",
+      "reason": "low_confidence",
+      "expected_action": "offer_pacing",
+      "passed": true
+    },
+    {
+      "case": "text_only",
+      "prediction": null,
+      "action": "baseline",
+      "reason": "missing_audio",
+      "expected_action": "baseline",
+      "passed": true
+    },
+    {
+      "case": "model_unavailable",
+      "prediction": null,
+      "action": "baseline",
+      "reason": "model_unavailable",
+      "expected_action": "baseline",
+      "passed": true
+    },
+    {
+      "case": "disabled",
+      "prediction": {
+        "label": "sadness",
+        "confidence": 0.8,
+        "distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "text_label": "sadness",
+        "text_confidence": 0.8,
+        "text_distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "audio_label": "sadness",
+        "audio_confidence": 0.8,
+        "audio_distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "modalities_agree": true,
+        "confidence_level": "high",
+        "low_confidence_threshold": 0.55,
+        "model_version": "synthetic-engineering-v1",
+        "latency_ms": 0,
+        "queue_ms": 0,
+        "audio_persisted": false,
+        "disclaimer": "Research estimate; uncertain and not a diagnosis."
+      },
+      "action": "baseline",
+      "reason": "adaptation_disabled",
+      "expected_action": "baseline",
+      "passed": true
+    },
+    {
+      "case": "explicit_choice",
+      "prediction": {
+        "label": "sadness",
+        "confidence": 0.8,
+        "distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "text_label": "sadness",
+        "text_confidence": 0.8,
+        "text_distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "audio_label": "sadness",
+        "audio_confidence": 0.8,
+        "audio_distribution": {
+          "anger": 0.06666666666666665,
+          "happiness": 0.06666666666666665,
+          "neutral": 0.06666666666666665,
+          "sadness": 0.8
+        },
+        "modalities_agree": true,
+        "confidence_level": "high",
+        "low_confidence_threshold": 0.55,
+        "model_version": "synthetic-engineering-v1",
+        "latency_ms": 0,
+        "queue_ms": 0,
+        "audio_persisted": false,
+        "disclaimer": "Research estimate; uncertain and not a diagnosis."
+      },
+      "action": "gentler",
+      "reason": "user_preference",
+      "expected_action": "gentler",
+      "passed": true
+    }
+  ],
+  "latency": {
+    "scope": "in-process deterministic service with MemoryRepository; excludes HTTP and trained inference",
+    "n": 19,
+    "p50_ms": 0.6413999944925308,
+    "p95_ms": 3.457200014963746,
+    "samples_ms": [
+      5.176000006031245,
+      3.457200014963746,
+      1.0803000186569989,
+      1.1011000024154782,
+      0.49080001190304756,
+      0.6281000096350908,
+      0.5824000108987093,
+      0.43540005572140217,
+      0.27190003311261535,
+      0.2720999764278531,
+      1.5450999489985406,
+      0.6615999736823142,
+      0.41579996468499303,
+      1.8718999926932156,
+      1.0925999958999455,
+      0.8715000003576279,
+      0.4849000251851976,
+      0.5618000286631286,
+      0.6413999944925308
+    ]
+  }
+}

@@ -19,3 +19,10 @@ Authentication uses Argon2 passwords, short access JWTs, rotated hashed refresh 
 ## Principal limitations
 
 Generated responses may be repetitive, overly agreeable, culturally inappropriate, or wrong. Rule-based feedback detects only observable lexical features. Affect models inherit IEMOCAP limitations described in the model card. The English lexical crisis layer is not a complete safety system. The application is research software, not a clinically validated intervention.
+
+
+## Enhanced practice engineering scope
+
+Optional enhanced practice uses versioned workload, boundary and relationship controllers with explicit stages, evidence and bounded voice-informed pacing. Saved replay and deterministic branches make these decisions inspectable. Prepared custom scenarios use a limited generic flow; action cards are editable suggestions separate from scoring. Frozen required study tasks keep their original policy and measurement boundaries.
+
+The [engineering evaluation](engineering-demonstration.md) uses authored synthetic cases and local integration checks. It establishes neither recognition accuracy on users nor communication improvement. Lexical evidence can miss paraphrases and misattribute quoted speech. Pacing is an application design choice, not a validated intervention. Private model artifacts were not rerun; supervisor/course approval of the final dissertation framing remains pending.

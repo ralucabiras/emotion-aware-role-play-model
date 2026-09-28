@@ -33,3 +33,8 @@ Start the frontend normally in a second terminal. Sign in with `demo@example.com
 6. Close on the canonical results table and the acted-English/four-class limitations.
 
 Record a short backup video following exactly this route after the interface is frozen. Store the recording outside Git with the slide deck, tested on the presentation laptop. Also keep screenshots of login, role-play, feedback, history, consent, and researcher export as a no-video fallback.
+
+
+## Integrated product demonstration
+
+Use [engineering demonstration v1](engineering-demonstration.md) for the complete rehearsal, replay, branch, comparison and action-card walkthrough. Its native smoke runner uses an isolated real MongoDB database and restarts the actual backend process. The memory-backed interactive demo above is for presentation only and loses sessions on restart. Synthetic uncertainty fixtures demonstrate policy behavior; they are not new trained-model measurements.

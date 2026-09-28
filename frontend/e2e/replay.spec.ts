@@ -1,3 +1,4 @@
+import { join } from 'node:path'
 import { expect, test } from '@playwright/test'
 import { expectAccessible, installApiMock } from './support'
 import { rehearsalReplay } from '../src/services/replay'
@@ -48,6 +49,7 @@ test('uncertain saved predictions display disagreement, pacing and provenance',a
   await expect(page.getByText(/Uncertain estimate;/)).toBeVisible()
   await expect(page.getByText(/Recorded pacing: offer pacing/)).toBeVisible()
   await page.getByText('Technical details',{exact:true}).click();await expect(page.getByText(/Model: synthetic-model-v1/)).toBeVisible()
+  if (process.env.AFFECTLAB_EVIDENCE_DIR && test.info().project.name === 'chromium') await page.screenshot({path:join(process.env.AFFECTLAB_EVIDENCE_DIR,'synthetic-uncertainty.png'),fullPage:true})
   await expectAccessible(page)
 })
 

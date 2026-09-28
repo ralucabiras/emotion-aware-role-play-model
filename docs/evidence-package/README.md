@@ -2,6 +2,8 @@
 
 This small package is the repository-level source for dissertation figures, tables, and demonstration claims. The dissertation itself should cite or adapt it rather than duplicate changing implementation notes.
 
+The [integrated engineering demonstration](engineering-demonstration.md) covers the completed product features, fixed-versus-enhanced policy fixtures, real persistence/restart checks, diagrams and screenshots. It is separate from held-out model evaluation and participant research.
+
 ## Architecture and data flow
 
 ```mermaid

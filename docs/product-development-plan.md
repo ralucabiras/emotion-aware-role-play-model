@@ -1,6 +1,6 @@
 # AffectLab product development plan
 
-Status: Steps 1-6 implemented, 28 September 2026. Step 6 is ready for interaction review; Step 7 remains planned. The frozen study protocol is unchanged.
+Status: Steps 1-7 engineering implementation complete, 28 September 2026. The integrated demonstration and evaluation package is ready for review; supervisor/course framing confirmation remains pending. The frozen study protocol is unchanged.
 
 ## Objective
 
@@ -293,6 +293,19 @@ Turn an ordinary work or household problem into a rehearsal and leave with a use
 
 ## Step 7 - Finish the experience and demonstrate the engineering
 
+### Implementation status - 28 September 2026
+
+Engineering implementation complete; external supervisor/course framing confirmation remains pending. See the [integrated demonstration and evaluation package](evidence-package/engineering-demonstration.md).
+
+- Added a clean-checkout runbook and guided synthetic demonstration spanning text-only/offline practice, saved multimodal uncertainty, replay, deterministic branching/comparison and action cards. Existing administrative controls remain in the separate researcher view.
+- Extended the compiled-app smoke journey to enhanced practice, network-failure draft recovery, replay, branching, comparison and saved action cards. Added a native runner with an isolated real MongoDB database, actual owned-backend process restarts and automatic cleanup; Docker remains optional.
+- Added versioned, reproducible authored engineering evaluation outputs with source hashes: fixed-versus-enhanced trajectories, semantic evidence annotations including false positives/negatives, matching/disagreeing/uncertain affect cases and measured local deterministic service latency.
+- Added architecture/sequence diagrams, policy and evidence tables, real full-stack replay/comparison screenshots, an explicitly synthetic uncertainty screenshot and limitations. Historical held-out model results retain their original provenance and are not presented as new measurements.
+- Kept synthetic engineering fixtures separate from participant outcomes and frozen required study tasks. No claims of usability improvement, communication transfer, live-model accuracy or supervisor approval are made.
+
+Validation: 253 backend tests passed with real MongoDB enabled. Both compiled-app browser smoke journeys passed, including two actual backend process restarts and preserved required-task/export behavior. The evaluation matched all five authored enhanced trajectories and all seven affect-policy expectations; the twelve semantic feature cases recorded 5 true positives, 4 true negatives, 1 false positive and 2 false negatives. All 76 focused desktop/mobile browser checks passed on the clean final run, including loading/error/empty recovery and accessibility. Frontend production build/lint, backend and script Ruff checks, and diff checks passed. Docker was unavailable; the native runner was validated on Windows with MongoDB 8.0.1.
+
+
 ### Purpose
 
 Present the completed features as one coherent application and verify the claims made about them. This is a technical evaluation package, not a requirement to recruit a large cohort.
@@ -317,4 +330,4 @@ Prepare architecture and sequence diagrams, policy tables, representative replay
 
 ## Next task to implement
 
-Steps 1-6 are implemented. Review the personal preparation and action-card demonstration in [conversation-preparation.md](conversation-preparation.md). The next implementation is Step 7: finish the integrated experience and produce the engineering demonstration and evaluation package. Frozen required study tasks remain unchanged.
+Steps 1-7 are implemented. Review the [integrated engineering demonstration](evidence-package/engineering-demonstration.md), reproduce its evaluation and confirm the final dissertation framing with the supervisor/course. That external confirmation remains pending. Live-model deployment measurements and participant usability/communication studies are future work, not completed evidence. Frozen required study tasks remain unchanged.

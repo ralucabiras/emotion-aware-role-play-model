@@ -2,6 +2,10 @@
 
 AffectLab is a text-first research prototype for emotion-aware coaching and adaptive social rehearsal. It is not a therapist, medical service, or diagnostic system.
 
+## Integrated product demonstration
+
+See the [engineering demonstration and evaluation package](docs/evidence-package/engineering-demonstration.md) for a synthetic guided walkthrough, reproducible policy results, replay screenshots, and a compiled-app smoke test using real MongoDB and actual backend restarts. Run `.venv/Scripts/python.exe scripts/engineering_smoke.py` from the repository root after installing the documented prerequisites.
+
 ## Complete MVP
 
 - Email/password accounts with email confirmation, Argon2 hashing, access JWTs, and rotating refresh cookies
