@@ -29,6 +29,41 @@ def make_user() -> User:
 
 
 @pytest.mark.asyncio
+async def test_prepared_brief_and_card_survive_restart_without_changing_feedback(mongo_repository):
+    from test_preparation import INPUT
+
+    from app.models.domain import Difficulty
+    from app.schemas.chat import ActionCardRequest, PreparationRequest
+    from app.services.conversation_service import ConversationService
+    from app.services.llm_service import TemplateResponseGenerator
+    from app.services.preparation import action_card_draft, custom_scenario, prepare_brief, save_action_card
+
+    user = await mongo_repository.create_user(make_user())
+    scenario = custom_scenario(prepare_brief(PreparationRequest(**INPUT)), "custom_prepared")
+    user.custom_scenarios.append(scenario)
+    await mongo_repository.save_user(user)
+    service = ConversationService(mongo_repository, generator=TemplateResponseGenerator())
+    session = await service.create_session(user.id)
+    session, _, _ = await service.start_roleplay(session.id, user.id, scenario.id, Difficulty.INTERMEDIATE, custom=scenario, pre_skipped=True)
+    for text in ["I need help with dishes this week.", "Could you take Monday?"]:
+        _, _, session = await service.chat(session.id, user.id, text)
+    session = await save_action_card(service, session.id, user.id, ActionCardRequest(expected_version=session.version,
+        opening_sentence="Can we talk tonight?", main_request="Could you take Monday?", boundary_or_fallback="I cannot cover every night.", reminder="Listen first."))
+    restarted = MongoRepository(MONGO_URI, mongo_repository.db.name)
+    try:
+        await restarted.initialize()
+        restored = await restarted.get_session(session.id, user.id)
+        assert action_card_draft(restored).main_request == "Could you take Monday?"
+        assert restored.feedback.model_dump(exclude={"created_at"}) == session.feedback.model_dump(exclude={"created_at"})
+        assert (await restarted.get_user(user.id)).custom_scenarios[0].preparation == scenario.preparation
+        assert restored.roleplay.scenario.preparation == scenario.preparation
+        await restarted.delete_user(user.id)
+        assert await restarted.get_session(session.id, user.id) is None
+    finally:
+        await restarted.client.close()
+
+
+@pytest.mark.asyncio
 async def test_branch_restart_concurrent_creation_and_parent_deletion(mongo_repository):
     from test_branching import PROPOSAL, completed, fork
 

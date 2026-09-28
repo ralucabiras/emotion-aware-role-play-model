@@ -174,3 +174,11 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { border-color
 .comparison-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1.5rem; margin-top:1rem; }
 .comparison-columns>section { min-width:0; overflow-wrap:anywhere; }
 @media(max-width:760px) { .comparison-columns { grid-template-columns:1fr; } }
+.preparation-form,.action-card { padding:1.5rem; background:white; border:1px solid #718982; border-radius:16px; }
+.preparation-form fieldset,.action-card fieldset { display:grid; gap:1rem; border:0; padding:1rem 0; }
+.preparation-form label,.action-card label { display:grid; gap:.4rem; }
+.preparation-form input,.preparation-form textarea,.preparation-form select,.action-card textarea { width:100%; box-sizing:border-box; padding:.75rem; border:1px solid #718982; border-radius:8px; font:inherit; }
+.preparation-form button,.action-card button { margin:.4rem .6rem .4rem 0; min-height:44px; }
+.edit-scenario { margin:.4rem; }
+.mode-tabs { max-width:100%; flex-wrap:wrap; justify-content:center; }
+@media(max-width:760px) { .mode-tabs button { flex:1 1 90px; } }

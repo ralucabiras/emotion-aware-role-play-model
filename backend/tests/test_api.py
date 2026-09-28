@@ -154,6 +154,49 @@ def test_branch_api_validation_ownership_idempotency_and_deletion():
         assert client.get(child_base, headers=headers).json()["branch"] == child["branch"]
 
 
+def test_preparation_edit_and_action_card_api():
+    from test_preparation import INPUT
+
+    with TestClient(app) as client:
+        headers = auth(client, "prepare-api@example.com")
+        draft = client.post("/api/roleplay/preparation", headers=headers, json=INPUT)
+        assert draft.status_code == 200
+        assert not any(s["id"].startswith("custom_") for s in client.get("/api/roleplay/scenarios", headers=headers).json())
+        data = draft.json()
+        data["preparation"]["likely_objection"] = "I also have a busy week. What do you suggest?"
+        scenario = client.post("/api/roleplay/scenarios", headers=headers, json=data).json()
+        sid = client.post("/api/sessions", headers=headers).json()["session_id"]
+        base = f"/api/sessions/{sid}"
+        result = client.post(f"{base}/roleplay", headers=headers, json={"scenario_id": scenario["id"], "pre_skipped": True})
+        assert result.status_code == 200
+        assert client.get(f"{base}/action-card", headers=headers).status_code == 409
+        updated = {**data, "title": "Edited household brief"}
+        assert client.put(f"/api/roleplay/scenarios/{scenario['id']}", headers=headers, json=updated).status_code == 200
+        assert client.get(base, headers=headers).json()["roleplay"]["scenario"]["title"] == scenario["title"]
+        for message in ["I need help with dishes this week.", "Could you take the dishes on Monday?"]:
+            response = client.post("/api/chat", headers=headers, json={"session_id": sid, "message": message})
+            assert response.status_code == 200
+        original = client.get(base, headers=headers).json()
+        card = client.get(f"{base}/action-card", headers=headers).json()
+        assert not card["saved"]
+        wording = {key: card["card"][key] for key in ("opening_sentence", "main_request", "boundary_or_fallback", "reminder")}
+        payload = {**wording, "expected_version": card["version"], "reminder": "One request at a time."}
+        result = client.put(f"{base}/action-card", headers=headers, json=payload)
+        assert result.status_code == 200 and result.json()["saved"]
+        assert client.put(f"{base}/action-card", headers=headers, json=payload).status_code == 409
+        reloaded = client.get(base, headers=headers).json()
+        for key in ["feedback", "roleplay", "questionnaires", "questionnaire_skips"]:
+            assert reloaded[key] == original[key]
+        exported = client.get("/api/auth/research-export", headers=headers).text
+        assert "One request at a time." not in exported
+        other = auth(client, "prepare-other@example.com")
+        assert client.get(f"{base}/action-card", headers=other).status_code == 404
+        assert client.put(f"{base}/action-card", headers=other, json=payload).status_code == 404
+        assert client.put(f"/api/roleplay/scenarios/{scenario['id']}", headers=other, json=updated).status_code == 404
+        assert client.delete(base, headers=headers).status_code == 204
+        assert client.get(f"{base}/action-card", headers=headers).status_code == 404
+
+
 def test_auth_session_chat_and_feedback() -> None:
     with TestClient(app) as client:
         headers = auth(client)

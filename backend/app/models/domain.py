@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 def utcnow() -> datetime:
@@ -219,7 +219,16 @@ class DialogueDecision(BaseModel):
     generation: GenerationMetadata
 
 
+class PreparationDetails(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    difficult_part: str = Field(min_length=1, max_length=500)
+    likely_objection: str = Field(min_length=3, max_length=300)
+    flow: Literal["request", "boundary", "need"] = "request"
+    source: Literal["template-v1", "user-edited"] = "template-v1"
+
+
 class RolePlayScenario(BaseModel):
+    preparation: PreparationDetails | None = None
     id: str
     title: str
     character: str
@@ -370,7 +379,18 @@ class BranchLineage(BaseModel):
     created_at: datetime = Field(default_factory=utcnow)
 
 
+class ActionCard(BaseModel):
+    opening_sentence: str = Field(min_length=1, max_length=500)
+    main_request: str = Field(min_length=1, max_length=500)
+    boundary_or_fallback: str = Field(min_length=1, max_length=500)
+    reminder: str = Field(min_length=1, max_length=300)
+    source: Literal["template-v1", "user-edited"] = "template-v1"
+    source_turn_ids: list[UUID] = Field(default_factory=list)
+    updated_at: datetime = Field(default_factory=utcnow)
+
+
 class Session(BaseModel):
+    action_card: ActionCard | None = None
     branch: BranchLineage | None = None
     submission_ids: list[UUID] = Field(default_factory=list)
     id: UUID = Field(default_factory=uuid4)

@@ -1,6 +1,6 @@
 # AffectLab product development plan
 
-Status: Steps 1-5 implemented, 28 September 2026. Step 5 is ready for interaction review; Step 6 remains planned. The frozen study protocol is unchanged.
+Status: Steps 1-6 implemented, 28 September 2026. Step 6 is ready for interaction review; Step 7 remains planned. The frozen study protocol is unchanged.
 
 ## Objective
 
@@ -255,6 +255,18 @@ Compare an apologetic response with a clear boundary from the same conversationa
 
 ## Step 6 - Personal conversation preparation and action card
 
+### Implementation status - 28 September 2026
+
+Implemented. See [personal preparation and action cards](conversation-preparation.md) for behavior, APIs, limitations and a synthetic household-conversation demonstration.
+
+- Added four-input preparation with an editable brief: role, situation, objective, opening, possible objection, practice focus and supported generic flow. Users explicitly confirm before saving or starting; offline templates and failure recovery preserve entered text.
+- Reused custom-scenario validation/storage and added owner-checked editing, including older custom records. Rehearsals retain independent scenario snapshots so later edits cannot rewrite history.
+- Added a versioned prepared generic flow with a reviewed objection before completion, deterministic wording and visible limits. Existing unprepared custom scenarios and frozen required study tasks retain their behavior; arbitrary scenario-specific simulation and online brief generation are not claimed.
+- Added editable opening/request/fallback/reminder cards, saved separately from scores with ownership and session-version checks. Copy and plain-text download work on current edits. Suggestions are labelled drafts and do not infer external commitments from assistant responses.
+- Excluded later reflection, inherited branch wording and crisis utterances from suggested excerpts. Rewind clears a stale card; branches start without one. Existing retention, deletion and research-export privacy boundaries are preserved.
+
+Validation: 252 backend tests passed with real MongoDB enabled; all six focused preparation/card tests passed after adding the missing-boundary case. All 56 desktop/mobile preparation, practice and study-flow checks passed, including keyboard/accessibility, legacy editing, offline/save recovery, reload, copy and download. Frontend build/lint, backend Ruff and diff checks passed. Browser tests use synthetic API fixtures; MongoDB tests reopen repository instances. Live-model accuracy, online brief generation and a full-stack browser/backend-process restart demonstration are outside this step.
+
 ### Purpose and experience
 
 Make everyday applicability explicit: 'I need to talk to my manager tomorrow' becomes a practical, editable rehearsal rather than requiring the user to complete a technical scenario builder.
@@ -305,4 +317,4 @@ Prepare architecture and sequence diagrams, policy tables, representative replay
 
 ## Next task to implement
 
-Steps 1-5 are implemented. Review the branch demonstration and boundaries in [branch-and-compare.md](branch-and-compare.md). The next implementation is Step 6: personal conversation preparation and an editable action card. Frozen required study tasks remain unchanged.
+Steps 1-6 are implemented. Review the personal preparation and action-card demonstration in [conversation-preparation.md](conversation-preparation.md). The next implementation is Step 7: finish the integrated experience and produce the engineering demonstration and evaluation package. Frozen required study tasks remain unchanged.

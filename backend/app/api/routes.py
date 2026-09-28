@@ -31,6 +31,8 @@ from app.models.domain import (
 )
 from app.repositories.base import RepositoryIndexesNotReadyError
 from app.schemas.chat import (
+    ActionCardRequest,
+    ActionCardResponse,
     AudioTranscriptionRequest,
     AudioTranscriptionResponse,
     AuthRequest,
@@ -50,6 +52,7 @@ from app.schemas.chat import (
     PasswordResetConfirmRequest,
     PasswordResetRequest,
     PilotEnrollmentRequest,
+    PreparationRequest,
     ProfileUpdateRequest,
     RegistrationResponse,
     ResendVerificationRequest,
@@ -86,6 +89,7 @@ from app.services.multimodal_service import (
     MultimodalAffectService,
     MultimodalInferenceUnavailable,
 )
+from app.services.preparation import action_card_draft, custom_scenario, prepare_brief, save_action_card
 from app.services.research_export import CSV_SCHEMA_VERSION, export_research_rows
 from app.services.roleplay_service import SCENARIOS
 from app.services.study_tasks import (
@@ -876,23 +880,8 @@ async def list_scenarios(user: User = Depends(current_user)): return [*SCENARIOS
 
 @router.post("/roleplay/scenarios", response_model=RolePlayScenario, status_code=201)
 async def create_custom_scenario(request: CustomScenarioRequest, user: User = Depends(current_user), repository=Depends(get_repository)):
-    allowed = {"clear request", "specific detail", "boundary maintenance", "I-statements", "non-blaming language"}
-    skills = list(dict.fromkeys(request.skills))
-    if any(skill not in allowed for skill in skills):
-        raise HTTPException(422, "Unsupported practice skill")
-    conditions = {
-        "clear request": "concrete_request", "specific detail": "specific_detail",
-        "boundary maintenance": "maintained_boundary", "I-statements": "i_statement",
-        "non-blaming language": "no_blame",
-    }
-    scenario = RolePlayScenario(
-        id=f"custom_{uuid4().hex}", title=" ".join(request.title.split()),
-        character=" ".join(request.character.split()), situation=request.situation.strip(),
-        user_objective=request.user_objective.strip(), opening_line=request.opening_line.strip(),
-        expected_skills=skills,
-        difficulty_behaviors={Difficulty.BEGINNER:"Supportive and curious", Difficulty.INTERMEDIATE:"Questions details and offers mild resistance", Difficulty.DIFFICULT:"Pushes back firmly while remaining respectful"},
-        success_conditions=list(dict.fromkeys(conditions[skill] for skill in skills)), max_turns=8,
-    )
+    try: scenario = custom_scenario(request, f"custom_{uuid4().hex}")
+    except ValueError as exc: raise HTTPException(422, str(exc)) from None
     user.custom_scenarios.append(scenario)
     await repository.save_user(user)
     return scenario
@@ -999,3 +988,37 @@ async def compare_rehearsal(session_id: UUID, user: User = Depends(current_user)
         raise HTTPException(404, "Session not found") from None
     except ValueError as exc:
         raise HTTPException(409, str(exc)) from None
+
+
+@router.post("/roleplay/preparation", response_model=CustomScenarioRequest)
+async def prepare_conversation(request: PreparationRequest, user: User = Depends(current_user)):
+    return prepare_brief(request)
+
+
+@router.put("/roleplay/scenarios/{scenario_id}", response_model=RolePlayScenario)
+async def edit_custom_scenario(scenario_id: str, request: CustomScenarioRequest, user: User = Depends(current_user), repository=Depends(get_repository)):
+    if not any(item.id == scenario_id for item in user.custom_scenarios):
+        raise HTTPException(404, "Custom scenario not found")
+    try: scenario = custom_scenario(request, scenario_id)
+    except ValueError as exc: raise HTTPException(422, str(exc)) from None
+    user.custom_scenarios = [scenario if item.id == scenario_id else item for item in user.custom_scenarios]
+    await repository.save_user(user)
+    return scenario
+
+
+@router.get("/sessions/{session_id}/action-card", response_model=ActionCardResponse)
+async def get_action_card(session_id: UUID, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
+    try:
+        session = await service.get_session(session_id, user.id)
+        card = action_card_draft(session)
+    except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
+    except ValueError as exc: raise HTTPException(409, str(exc)) from None
+    return ActionCardResponse(version=session.version, card=card, saved=session.action_card is not None)
+
+
+@router.put("/sessions/{session_id}/action-card", response_model=ActionCardResponse)
+async def put_action_card(session_id: UUID, request: ActionCardRequest, user: User = Depends(current_user), service: ConversationService = Depends(get_conversation_service)):
+    try: session = await save_action_card(service, session_id, user.id, request)
+    except SessionNotFoundError: raise HTTPException(404, "Session not found") from None
+    except ValueError as exc: raise HTTPException(409, str(exc)) from None
+    return ActionCardResponse(version=session.version, card=session.action_card, saved=True)

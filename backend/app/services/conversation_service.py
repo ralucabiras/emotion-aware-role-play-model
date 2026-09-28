@@ -266,7 +266,7 @@ class ConversationService:
             if plan.completed:
                 content, metadata = plan.fallback_text, GenerationMetadata(source="deterministic_roleplay")
                 await self.complete_feedback(session)
-            elif isinstance(self.generator, OpenAIResponseGenerator) and not session.branch:
+            elif isinstance(self.generator, OpenAIResponseGenerator) and not session.branch and not (session.roleplay.scenario and session.roleplay.scenario.preparation):
                 content, metadata = await self.generator.generate_roleplay(
                     session,
                     session.roleplay.scenario or SCENARIOS[session.roleplay.scenario_id],
@@ -334,6 +334,8 @@ class ConversationService:
             if required_task_id in select_required_attempts(await self.repository.list_study_records(user_id)):
                 raise ValueError("This required task already has an attempt. Resume it or choose additional practice.")
         state.attempt_purpose, state.required_task_id = attempt_purpose, required_task_id
+        if custom and custom.preparation:
+            state.scenario_version, state.policy_version, state.scoring_version = "prepared-brief-v1", "prepared-generic-v1", "prepared-features-v1"
         if character_profile is not None:
             if attempt_purpose == "required" or required_task_id is not None or custom is not None:
                 raise ValueError("Character profiles require ordinary additional practice or an unassociated retry")
@@ -409,6 +411,7 @@ class ConversationService:
         if session.branch and session.turns[-2].id in session.branch.copied_turn_ids:
             raise ValueError("Shared context cannot be rewound. Try a new response in this alternative.")
         session.post_questionnaire_token = None
+        session.action_card = None
         session.turns.pop()
         user_turn = session.turns.pop()
         if state.dialogue is not None:

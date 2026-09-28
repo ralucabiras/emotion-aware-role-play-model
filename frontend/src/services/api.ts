@@ -1,4 +1,4 @@
-import type { BranchComparison, PacingPreference, CharacterProfile, StudyProgress, AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, StudyWithdrawal, UserProfile } from '../types/api'
+import type { ActionCard, ActionCardResponse, PreparationInput, ScenarioDraft, BranchComparison, PacingPreference, CharacterProfile, StudyProgress, AudioTranscription, ChatResponse, EmotionState, ModelInfo, MultimodalAffect, ResearchDashboardData, ResearchExport, Scenario, SessionResponse, SessionSummary, StudyInformation, StudyQuestionnaire, StudyWithdrawal, UserProfile } from '../types/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 let accessToken = sessionStorage.getItem('access_token')
@@ -64,7 +64,11 @@ export const api = {
   saveTakeaway: (id:string, takeaway:string) => request<SessionResponse>(`/sessions/${id}/takeaway`, {method:'PUT',body:JSON.stringify({takeaway})}),
   sendMessage: (sessionId: string, message: string, exchange?: {request_id:string;expected_version:number;audio_wav_base64?:string;adaptation_enabled:boolean;pacing:PacingPreference}) => request<ChatResponse>('/chat', { method: 'POST', body: JSON.stringify({ session_id: sessionId, message, ...exchange }) }),
   scenarios: () => request<Scenario[]>('/roleplay/scenarios'),
-  createScenario: (data: {title:string;character:string;situation:string;user_objective:string;opening_line:string;skills:string[]}) => request<Scenario>('/roleplay/scenarios', { method:'POST', body:JSON.stringify(data) }),
+  prepareConversation: (data:PreparationInput) => request<ScenarioDraft>('/roleplay/preparation',{method:'POST',body:JSON.stringify(data)}),
+  updateScenario: (id:string,data:ScenarioDraft) => request<Scenario>(`/roleplay/scenarios/${id}`,{method:'PUT',body:JSON.stringify(data)}),
+  getActionCard: (id:string) => request<ActionCardResponse>(`/sessions/${id}/action-card`),
+  saveActionCard: (id:string,version:number,card:Pick<ActionCard,'opening_sentence'|'main_request'|'boundary_or_fallback'|'reminder'>) => request<ActionCardResponse>(`/sessions/${id}/action-card`,{method:'PUT',body:JSON.stringify({...card,expected_version:version})}),
+  createScenario: (data: ScenarioDraft) => request<Scenario>('/roleplay/scenarios', { method:'POST', body:JSON.stringify(data) }),
   deleteScenario: (id:string) => request<void>(`/roleplay/scenarios/${id}`, { method:'DELETE' }),
   startRoleplay: (sessionId: string, scenarioId: string, difficulty: string, preRatings: {confidence:number;anxiety:number}|null, attemptPurpose: "required"|"additional"|"retry" = "additional", requiredTaskId: string|null = null, characterProfile: CharacterProfile|null = null) => request<{ version?:number; session_id: string; emotion_state: EmotionState; scenario: Scenario; opening_turn: ChatResponse['turn']; state: ChatResponse['roleplay'] }>(`/sessions/${sessionId}/roleplay`, { method: 'POST', body: JSON.stringify({ scenario_id: scenarioId, difficulty, character_profile:characterProfile, attempt_purpose:attemptPurpose, required_task_id:requiredTaskId, pre_ratings: preRatings, pre_skipped: preRatings===null }) }),
   roleplayAction: (sessionId: string, action: string) => request<SessionResponse>(`/sessions/${sessionId}/roleplay/action`, { method: 'POST', body: JSON.stringify({ action }) }),

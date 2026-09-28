@@ -49,7 +49,7 @@ def observe(turn: int, text: str, arousal: float) -> TurnEvidence:
 
 class RolePlayService:
     def start(self, scenario_id: str, level: Difficulty, custom: RolePlayScenario | None = None) -> tuple[RolePlayState, RolePlayScenario]:
-        scenario = custom or SCENARIOS[scenario_id]
+        scenario = (custom or SCENARIOS[scenario_id]).model_copy(deep=True)
         difficulty, cooperation = LEVELS[level]
         return RolePlayState(scenario_id=scenario_id, scenario=scenario, difficulty_level=level, difficulty=difficulty, cooperation=cooperation), scenario
     def respond(self, state: RolePlayState, message: str, emotion: EmotionState) -> str:
@@ -95,6 +95,13 @@ class RolePlayService:
         else:
             state.success_progress = sum(checks.get(key, False) for key in scenario.success_conditions) / len(scenario.success_conditions)
             succeeded = state.success_progress == 1
+        if scenario.preparation and state.turn == 1:
+            state.success_progress = min(state.success_progress, 0.5)
+            return RolePlayReplyPlan("prepared_objection", scenario.preparation.likely_objection)
+        if scenario.preparation:
+            succeeded = succeeded and (item.concrete_request or item.maintained_boundary or item.i_statement or item.specific_detail)
+            if not succeeded:
+                state.success_progress = min(state.success_progress, 0.5)
         if succeeded or state.turn >= scenario.max_turns:
             self.finish(state, "success" if succeeded else "maximum_turns")
             return RolePlayReplyPlan("accept_and_close", "Thank you—that gives me a clear understanding of what you need.", True)

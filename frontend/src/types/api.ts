@@ -1,4 +1,10 @@
 export type CharacterProfile = 'cooperative'|'rushed'|'sceptical'
+export interface PreparationDetails { difficult_part:string; likely_objection:string; flow:'request'|'boundary'|'need'; source:'template-v1'|'user-edited' }
+export interface PreparationInput { who:string; happened:string; desired_outcome:string; difficult_part:string }
+export interface ScenarioDraft { title:string; character:string; situation:string; user_objective:string; opening_line:string; skills:string[]; preparation?:PreparationDetails|null }
+export interface Scenario { preparation?:PreparationDetails|null }
+export interface ActionCard { opening_sentence:string; main_request:string; boundary_or_fallback:string; reminder:string; source:'template-v1'|'user-edited'; source_turn_ids:string[]; updated_at:string }
+export interface ActionCardResponse { version:number; card:ActionCard; saved:boolean }
 export interface BranchLineage { parent_session_id:string; parent_version:number; branch_point_turn_id:string; branch_group_id:string; request_id:string; before:DialogueSnapshot; copied_turn_ids:string[]; copied_evidence_turns:number[]; generation_mode:'deterministic'; created_at:string }
 export interface SessionResponse { branch?:BranchLineage|null }
 export interface Feedback { evidence_scope?:'full_attempt'|'continuation' }

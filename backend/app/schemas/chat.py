@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictBool, model_validator
 
 from app.models.domain import (
+    ActionCard,
     AgentDecision,
     BranchLineage,
     ConversationTurn,
@@ -12,6 +13,7 @@ from app.models.domain import (
     EmotionState,
     MultimodalEstimate,
     PracticeGoal,
+    PreparationDetails,
     RolePlayScenario,
     RolePlayState,
     SessionFeedback,
@@ -258,6 +260,8 @@ class RolePlayActionRequest(BaseModel):
 
 
 class CustomScenarioRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    preparation: PreparationDetails | None = None
     title: str = Field(min_length=3, max_length=80)
     character: str = Field(min_length=2, max_length=50)
     situation: str = Field(min_length=10, max_length=500)
@@ -297,3 +301,26 @@ class BranchRequest(BaseModel):
     turn_id: UUID
     expected_version: int = Field(ge=0)
     request_id: UUID
+
+
+class PreparationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    who: str = Field(min_length=2, max_length=50)
+    happened: str = Field(min_length=10, max_length=500)
+    desired_outcome: str = Field(min_length=10, max_length=300)
+    difficult_part: str = Field(min_length=1, max_length=500)
+
+
+class ActionCardRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    expected_version: int = Field(ge=0)
+    opening_sentence: str = Field(min_length=1, max_length=500)
+    main_request: str = Field(min_length=1, max_length=500)
+    boundary_or_fallback: str = Field(min_length=1, max_length=500)
+    reminder: str = Field(min_length=1, max_length=300)
+
+
+class ActionCardResponse(BaseModel):
+    version: int
+    card: ActionCard
+    saved: bool
