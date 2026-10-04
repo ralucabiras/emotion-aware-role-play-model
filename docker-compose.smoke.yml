@@ -11,6 +11,8 @@ services:
       OFFLINE_DEMO_PASSWORD: full-stack-smoke-password
       RESEARCHER_EMAILS: smoke-researcher@example.com
       PILOT_ACCESS_CODE: smoke-pilot-code
+      STUDY_PARTICIPANT_TARGET: "1"
+      STUDY_COMPLETER_TARGET: "1"
       OPENAI_API_KEY: ""
       OPENAI_ROLEPLAY_ENABLED: "false"
       TRANSCRIPTION_ENABLED: "false"

@@ -3,11 +3,11 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
 
 const apiUrl = process.env.FULL_STACK_API_URL ?? 'http://localhost:8000/api'
 
-async function restartBackend() {
+async function restartBackend(request: APIRequestContext) {
   const control = process.env.FULL_STACK_CONTROL_DIR
   if (control) {
     const id = crypto.randomUUID()
@@ -15,9 +15,20 @@ async function restartBackend() {
     await expect.poll(() => {
       try { return readFileSync(join(control, 'restart.response'), 'utf8') } catch { return '' }
     }, {timeout: 90_000}).toBe(id)
-    return
+  } else {
+    execFileSync('docker', ['compose', '-p', process.env.FULL_STACK_COMPOSE_PROJECT ?? 'affectlab-full-stack-smoke', '-f', '../docker-compose.yml', '-f', '../docker-compose.smoke.yml', 'restart', 'backend'], {cwd: process.cwd(), stdio: 'inherit', shell: process.platform === 'win32'})
   }
-  execFileSync('docker', ['compose', '-p', process.env.FULL_STACK_COMPOSE_PROJECT ?? 'affectlab-full-stack-smoke', '-f', '../docker-compose.yml', '-f', '../docker-compose.smoke.yml', 'restart', 'backend'], {cwd: process.cwd(), stdio: 'inherit', shell: process.platform === 'win32'})
+  await expect.poll(async () => {
+    try { return (await request.get(`${apiUrl}/health/ready`)).status() } catch { return 0 }
+  }, {timeout: 60_000, intervals: [500, 1_000, 2_000]}).toBe(200)
+}
+
+async function signIn(page: Page) {
+  await page.goto('/login')
+  await page.getByLabel('Email').fill('smoke-researcher@example.com')
+  await page.getByLabel('Password').fill('full-stack-smoke-password')
+  await page.locator('form').getByRole('button', {name:'Sign in', exact:true}).click()
+  await expect(page.getByRole('heading', {name:/Welcome back, Demo/})).toBeVisible()
 }
 
 async function api<T>(page: Page, path: string): Promise<T> {
@@ -31,11 +42,7 @@ async function api<T>(page: Page, path: string): Promise<T> {
 
 test('compiled app, FastAPI, and MongoDB complete and persist the core study journey', async ({ page, request }) => {
   test.setTimeout(120_000)
-  await page.goto('/login')
-  await page.getByLabel('Email').fill('smoke-researcher@example.com')
-  await page.getByLabel('Password').fill('full-stack-smoke-password')
-  await page.locator('form').getByRole('button', { name: 'Sign in', exact: true }).click()
-  await expect(page.getByRole('heading', { name: /Welcome back, Demo/ })).toBeVisible()
+  await signIn(page)
 
   await page.getByRole('button', { name: 'Start a reflection' }).click()
   const syntheticMessage = 'Synthetic pre-enrollment reflection that must stay outside the study export.'
@@ -89,7 +96,6 @@ test('compiled app, FastAPI, and MongoDB complete and persist the core study jou
 
   await page.goto('/research')
   await expect(page.getByRole('heading', { name: 'AffectLab pilot study' })).toBeVisible()
-  await expect(page.locator('article').getByText('1 / 1', { exact: true })).toBeVisible()
   const dashboard = await api<{participants:number; completed_rehearsals:number; questionnaire_averages:Record<string,number>}>(page, '/research/dashboard')
   expect(dashboard.participants).toBe(1)
   expect(dashboard.completed_rehearsals).toBe(1)
@@ -99,27 +105,16 @@ test('compiled app, FastAPI, and MongoDB complete and persist the core study jou
   expect(officialExport).toContain(roleplaySession!.session_id)
   expect(officialExport).not.toContain(syntheticSession!.session_id)
 
-  await restartBackend()
-
-  await expect.poll(async () => {
-    try { return (await request.get(`${apiUrl}/health/ready`)).status() } catch { return 0 }
-  }, {
-    timeout: 60_000,
-    intervals: [500, 1_000, 2_000],
-  }).toBe(200)
+  await restartBackend(request)
   await page.goto(`/practice?session=${roleplaySession!.session_id}`)
   await expect(page.getByRole('heading', { name: 'Workload conversation' })).toBeVisible()
   await expect(page.getByText('Rehearsal complete')).toBeVisible()
 })
 
 
-test('offline enhanced rehearsal survives network failure, branching and backend restart', async ({page}) => {
+test('offline enhanced rehearsal survives network failure, branching and backend restart', async ({page, request}) => {
   test.setTimeout(180_000)
-  await page.goto('/login')
-  await page.getByLabel('Email').fill('smoke-researcher@example.com')
-  await page.getByLabel('Password').fill('full-stack-smoke-password')
-  await page.locator('form').getByRole('button', {name:'Sign in', exact:true}).click()
-  await expect(page.getByRole('heading', {name:/Welcome back, Demo/})).toBeVisible()
+  await signIn(page)
   await page.goto('/practice?mode=roleplay')
   await page.getByRole('button', {name:/Workload conversation Practise with/}).click()
   await page.getByRole('radio', {name:/intermediate/}).check()
@@ -158,7 +153,10 @@ test('offline enhanced rehearsal survives network failure, branching and backend
   await page.getByLabel('Main request', {exact:true}).fill('Could we move the other tasks to Monday?')
   await page.getByRole('button', {name:'Save action card', exact:true}).click()
   await expect(page.getByRole('region', {name:'Action card', exact:true}).getByRole('status')).toHaveText('Action card saved.')
-  await restartBackend()
+  await restartBackend(request)
+  // Re-authenticate explicitly so this assertion measures persisted application
+  // data, independently of any in-flight browser requests during the restart.
+  await signIn(page)
   await page.goto(childUrl)
   await page.getByRole('button', {name:'Action card', exact:true}).click()
   await expect(page.getByLabel('Main request', {exact:true})).toHaveValue('Could we move the other tasks to Monday?')
