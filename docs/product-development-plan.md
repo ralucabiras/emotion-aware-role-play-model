@@ -2,6 +2,8 @@
 
 Status: Steps 1-7 engineering implementation complete, 28 September 2026. The integrated demonstration and evaluation package is ready for review; supervisor/course framing confirmation remains pending. The frozen study protocol is unchanged.
 
+Audit - 4 October 2026: rechecked every acceptance item against the current services, UI, persistence boundaries, documentation and automated coverage. The full backend suite passed with real MongoDB (253 tests), all 114 desktop/mobile browser cases reached their passing assertions, the two native compiled-app smoke journeys passed with actual backend restarts, and the authored engineering evaluation still covers all five enhanced trajectories and seven affect-policy cases. Corrected corrupted separators/quotation marks in branch provenance, copied-context labels, replay and prepared-brief guidance, with 16 focused desktop/mobile checks passing afterward. The Playwright-owned Vite process required manual shutdown after the broad browser run despite all assertions finishing; the focused run with a separately managed Vite process exited normally. A Docker/GitHub Actions rerun and external supervisor/course framing confirmation remain external follow-ups, not implementation claims.
+
 ## Objective
 
 Develop AffectLab into an explainable, adaptive conversation simulator for preparing for difficult everyday conversations. The central demonstration should be: prepare a situation, rehearse, handle pushback, inspect the interaction, try another approach, and leave with a practical plan.
@@ -218,7 +220,7 @@ Walk through an objection, explain the selected action, and show the evidence fo
 
 Implemented. See [branch and compare: contract, boundaries and synthetic demonstration](branch-and-compare.md).
 
-- Added ?Try a different response here? to supported replay turns and a separate saved retry restored from the exact pre-turn snapshot. Source sessions, evidence, ratings and takeaways are preserved.
+- Added “Try a different response here” to supported replay turns and a separate saved retry restored from the exact pre-turn snapshot. Source sessions, evidence, ratings and takeaways are preserved.
 - Persisted parent/version, branch point, group, copied-context IDs, pre-turn state and deterministic generation mode. Scenario, profile, difficulty and supported policy versions remain fixed.
 - Added a two-continuation Compare view showing shared context once, actual responses, observable language, stages/actions, generation provenance and outcomes/agreements. Keyboard, mobile, loading, recovery and unavailable-parent states are covered.
 - Added owner-checked branch/comparison endpoints, version validation and idempotent request handling across concurrent requests/restart. Unsupported legacy, frozen required-task and shared-context branch points offer a fresh attempt. Rewind cannot remove inherited context.

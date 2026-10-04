@@ -50,6 +50,8 @@ test('branches selected replay turn, submits alternative and compares after relo
   await page.getByRole('button',{name:'Turn 2'}).click()
   await page.getByRole('button',{name:'Try a different response here'}).focus();await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/session=child-1/)
+  await expect(page.getByText('Alternative practice · 3 shared context messages.',{exact:false})).toBeVisible()
+  await expect(page.getByText('Shared context ·',{exact:false})).toHaveCount(3)
   await expect(page.getByRole('textbox')).toHaveValue('Sorry, sorry, perhaps I can do everything.')
   expect(fixtureState.requests[0]).toMatchObject({turn_id:'apology',expected_version:0})
   await page.getByRole('textbox').fill('I can keep Friday if we move the other tasks to Monday.')

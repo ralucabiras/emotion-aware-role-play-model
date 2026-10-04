@@ -47,6 +47,7 @@ test('reviews and edits a brief before starting, then edits it after reload',asy
   await expect(page.getByLabel('A possible objection')).toHaveValue('How would Monday work for you?')
   await page.getByLabel('Brief title').fill('Sharing chores')
   await page.getByRole('button',{name:'Save brief changes'}).click()
+  await expect(page.getByText('respond to “How would Monday work for you?”',{exact:false})).toBeVisible()
   await page.getByRole('button',{name:'Skip pre-ratings and begin'}).click()
   await expect(page.getByText('What would help us share the work?',{exact:true})).toBeVisible()
   expect(state.writes).toHaveLength(2)
