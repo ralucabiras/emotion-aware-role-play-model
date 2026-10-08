@@ -1,0 +1,199 @@
+\documentclass[12pt,a4paper]{book}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+\usepackage{amsmath,amsthm,amssymb,graphicx}
+\usepackage[left=1.2in,right=1.2in,top=1in,bottom=1in]{geometry}
+\usepackage{listings}
+\usepackage[table]{xcolor}
+\usepackage{multirow}
+%\usepackage[romanian]{babel}
+\usepackage[english]{babel}
+\usepackage{paralist}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{pdflscape}
+\RequirePackage{hyphenat}
+\usepackage{algorithm, algpseudocode}%algorithmic
+\usepackage[inline]{enumitem}
+\usepackage{hyperref}
+%\usepackage{...insert other packages here...}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+\theoremstyle{remark}
+\newtheorem{rem}{Remark}[section]
+\newtheorem{exmp}{Example}[section]
+
+
+\begin{document}
+\sloppy
+
+\thispagestyle{empty}
+\begin{center}
+\begin{figure}[h!]
+\vspace{-20pt}
+\begin{center}
+\includegraphics[width=100pt]{FI.png}
+\end{center}
+\end{figure}
+
+
+{\large{\bf WEST UNIVERSITY OF TIMI\c SOARA
+
+FACULTY OF COMPUTER SCIENCE
+
+MASTER STUDY PROGRAM:  INTELLIGENT SOFTWARE ROBOTICS 
+}}
+
+\vspace{120pt}
+{\huge {\bf MASTER THESIS}}
+
+\vspace{160pt}
+\end{center}
+
+{\large\noindent{\bf SUPERVISOR:
+\hspace{172pt} GRADUATE: }
+
+\noindent Lect. Dr. Todor Ivașcu \hfill 
+\noindent  Raluca-Bianca Biraș
+}
+
+\vfill
+\begin{center}
+{\bf TIMI\c SOARA
+
+2026}
+\end{center}
+\newpage
+\thispagestyle{empty}
+\begin{center}
+{\large{\bf WEST UNIVERSITY OF TIMI\c SOARA
+		
+FACULTY OF  COMPUTER SCIENCE
+		
+MASTER STUDY PROGRAM:  INTELLIGENT SOFTWARE ROBOTICS }}
+
+\vspace{200pt}
+{\huge {\bf AffectLab: Design and Evaluation of an Emotion-Aware Multimodal System for Adaptive Difficult-Conversation Rehearsal}}
+
+\vspace{153pt}
+\end{center}
+
+{\large\noindent{\bf SUPERVISOR:\hfill GRADUATE:}
+
+\noindent Lect. Dr. Todor  Ivașcu\hfill
+\noindent Raluca-Bianca  Biraș}
+ 
+
+\vfill
+\begin{center}
+{\bf TIMI\c SOARA
+
+2026}
+\end{center}
+
+\newpage
+\normalsize{}
+
+\section*{Abstract} 
+A concise presentation of the report content (100–250 words).
+
+
+\noindent Includes the purpose, methodology, main results, and conclusion.
+
+
+\newpage
+
+\section*{Statement of Scientific integrity} 
+
+I declare that this MSc thesis is an original report and represents my own work, conducted under supervision of Lect. Dr. Todor Ivașcu. All research methods, data collection, analysis and interpretation presented in this thesis are accurately reported and all sources have been cited appropriately where I have made use of ideas and/or visuals of others.
+
+I used generative AI during the writing and research process. The details are in the Appendix \ref{genAIUsage}.
+
+
+
+
+\newpage
+\normalsize{}
+
+\tableofcontents
+\input{cap1}
+\input{cap2}
+\input{cap3}
+\input{cap4}
+\input{cap5}
+\input{cap6}
+
+
+\bibliography{myBib}
+\bibliographystyle{alpha}
+\addcontentsline{toc}{chapter}{Bibliography}
+
+
+\appendix
+\chapter{Generative AI Tools Usage}
+\label{genAIUsage}
+
+An overview how  generative AI Tools are used in this thesis is presented in Table \ref{tab:genAIOverview}.
+
+\rowcolors{2}{gray!15}{white}
+\begin{table}[h!]
+    \centering
+    \begin{tabularx}{\textwidth}{|l|X|X|X|}
+            \hline \rowcolor{blue!20}
+         AI Tool& Use case & Used in & Remarks \\\hline
+         \multirow{2}{*}{ChatGPT 5.0} & Generate functionality list & Chapter 1, section 1.3& Prompts in section \ref{sectionGhatGPT}\\ \cline{2-4}
+          
+          & Generate initial state of the art bibliography list & Chapter 2 & Prompts in section \ref{sectionGhatGPT}\\ \hline
+         
+         Microsoft Copilot & Code generation & Chapter 4 pp.2-21  & Details in section \ref{sectionCopilot}\\ \hline
+         Deep L &  Translation of text pages & Chapter 2 & Prompts in section \ref{sectionDeepL} \\ \hline
+         Grammarly & Correct grammar and style mistakes & Entire work & Free version\\ \hline
+         ... &  & & \\\hline
+    \end{tabularx}
+    \caption{Overview of generative AI Usage}
+    \label{tab:genAIOverview}
+\end{table}
+
+
+
+
+    
+\section{ChatGPT Details} 
+\label{sectionGhatGPT}
+
+Specify for each usage the following:
+
+\begin{enumerate}
+    \item Purpose of use
+    \item Method (which promts and for which parts of the thesis)
+    \item How the output has been examined/verified (has the generated output been examined for accuracy and reliability?)
+    \item How the output is implemented/used
+    %\item Add the prompts and output as an attachment or separated file (mandatory)
+\end{enumerate}
+
+\section{Deep L Details}
+\label{sectionDeepL}
+\section{Microsoft Copilot}
+\label{sectionCopilot}
+
+\chapter{Support Scenarios}
+
+All test scenarios used in evaluation.
+
+\chapter{Evaluation Questionnaire}
+
+User satisfaction and cognitive workload questions.
+
+\chapter{Example Conversations}
+
+Baseline vs adaptive examples.
+
+\chapter{Additional Results}
+
+Extra charts or raw metric tables.
+
+\chapter{Source Code / Repository Structure}
+
+
+\end{document} 

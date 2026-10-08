@@ -1,0 +1,185 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{\numberline {1}Introduction}{11}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Context and Motivation}{11}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Problem Statement}{14}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Aim of the Dissertation}{17}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Objectives}{17}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Research Questions}{19}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Proposed Approach}{20}{section.1.6}%
+\contentsline {subsection}{\numberline {1.6.1}Multimodal Emotion Recognition}{20}{subsection.1.6.1}%
+\contentsline {subsection}{\numberline {1.6.2}Structured Conversational Role-Play}{21}{subsection.1.6.2}%
+\contentsline {subsection}{\numberline {1.6.3}Uncertainty-Aware Affect Adaptation}{21}{subsection.1.6.3}%
+\contentsline {subsection}{\numberline {1.6.4}Evidence-Grounded Feedback and Reflection}{22}{subsection.1.6.4}%
+\contentsline {subsection}{\numberline {1.6.5}System and Research Evaluation}{22}{subsection.1.6.5}%
+\contentsline {section}{\numberline {1.7}Expected Contributions}{23}{section.1.7}%
+\contentsline {section}{\numberline {1.8}Scope and Limitations}{25}{section.1.8}%
+\contentsline {subsection}{\numberline {1.8.1}System Scope}{25}{subsection.1.8.1}%
+\contentsline {subsection}{\numberline {1.8.2}Machine-Learning Scope}{25}{subsection.1.8.2}%
+\contentsline {subsection}{\numberline {1.8.3}Role-Play and Feedback Scope}{26}{subsection.1.8.3}%
+\contentsline {subsection}{\numberline {1.8.4}Dataset and Generalisation Limitations}{27}{subsection.1.8.4}%
+\contentsline {subsection}{\numberline {1.8.5}Uncertainty and Calibration Limitations}{27}{subsection.1.8.5}%
+\contentsline {subsection}{\numberline {1.8.6}Generative Artificial Intelligence Limitations}{27}{subsection.1.8.6}%
+\contentsline {subsection}{\numberline {1.8.7}Safety and Clinical Limitations}{28}{subsection.1.8.7}%
+\contentsline {subsection}{\numberline {1.8.8}Privacy and Security Limitations}{28}{subsection.1.8.8}%
+\contentsline {subsection}{\numberline {1.8.9}Evaluation Limitations}{29}{subsection.1.8.9}%
+\contentsline {subsection}{\numberline {1.8.10}Delimitations}{29}{subsection.1.8.10}%
+\contentsline {section}{\numberline {1.9}Dissertation Structure}{30}{section.1.9}%
+\contentsline {chapter}{\numberline {2}State of the Art}{33}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Introduction}{33}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Role-Play and Simulation for Communication-Skills Development}{33}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Role-play as a practice-based learning method}{33}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Simulation realism, repeatability, and transfer}{34}{subsection.2.2.2}%
+\contentsline {section}{\numberline {2.3}Feedback and Reflection}{35}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}From conversational experience to actionable feedback}{35}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Reviewing alternatives instead of rewarding one script}{36}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Conversational Agents for Structured and Generative Role-Play}{36}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Deterministic dialogue management}{36}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Language-model simulation and its limits}{36}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}Affective Computing and Emotion Labels}{37}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Categorical and dimensional representations}{37}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Expression, interpretation, and uncertainty}{38}{subsection.2.5.2}%
+\contentsline {section}{\numberline {2.6}Emotion-Recognition Datasets and Protocols}{38}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}IEMOCAP and the four-class benchmark}{38}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Other datasets and domain differences}{39}{subsection.2.6.2}%
+\contentsline {subsection}{\numberline {2.6.3}Evaluation splits and information leakage}{39}{subsection.2.6.3}%
+\contentsline {section}{\numberline {2.7}Textual Emotion Recognition and Conversational Context}{40}{section.2.7}%
+\contentsline {subsection}{\numberline {2.7.1}Pre-trained language representations}{40}{subsection.2.7.1}%
+\contentsline {subsection}{\numberline {2.7.2}Speaker and dialogue-context modelling}{40}{subsection.2.7.2}%
+\contentsline {subsection}{\numberline {2.7.3}Causal context and deployment compatibility}{41}{subsection.2.7.3}%
+\contentsline {section}{\numberline {2.8}Speech Emotion Recognition}{41}{section.2.8}%
+\contentsline {subsection}{\numberline {2.8.1}Acoustic cues and conventional representations}{41}{subsection.2.8.1}%
+\contentsline {subsection}{\numberline {2.8.2}Self-supervised speech representations}{42}{subsection.2.8.2}%
+\contentsline {subsection}{\numberline {2.8.3}Operational constraints of speech input}{42}{subsection.2.8.3}%
+\contentsline {section}{\numberline {2.9}Multimodal Emotion Recognition and Fusion}{42}{section.2.9}%
+\contentsline {subsection}{\numberline {2.9.1}Complementarity of text and speech}{42}{subsection.2.9.1}%
+\contentsline {subsection}{\numberline {2.9.2}Decision-level fusion and its trade-offs}{43}{subsection.2.9.2}%
+\contentsline {section}{\numberline {2.10}Confidence Calibration, Uncertainty, and Generalisation}{44}{section.2.10}%
+\contentsline {subsection}{\numberline {2.10.1}Accuracy does not establish trustworthy probabilities}{44}{subsection.2.10.1}%
+\contentsline {subsection}{\numberline {2.10.2}Evaluating classification and calibration separately}{44}{subsection.2.10.2}%
+\contentsline {subsection}{\numberline {2.10.3}Distribution shift and restrained use of predictions}{45}{subsection.2.10.3}%
+\contentsline {section}{\numberline {2.11}Affective and Empathetic Conversational Agents}{45}{section.2.11}%
+\contentsline {subsection}{\numberline {2.11.1}Generating emotion-sensitive responses}{45}{subsection.2.11.1}%
+\contentsline {subsection}{\numberline {2.11.2}Bounded adaptation rather than emotion-driven control}{45}{subsection.2.11.2}%
+\contentsline {section}{\numberline {2.12}Trust, Safety, Privacy, and Human Oversight}{46}{section.2.12}%
+\contentsline {subsection}{\numberline {2.12.1}Boundaries between rehearsal and psychological support}{46}{subsection.2.12.1}%
+\contentsline {subsection}{\numberline {2.12.2}Data minimisation and legal context}{46}{subsection.2.12.2}%
+\contentsline {section}{\numberline {2.13}Model, System, and Participant Evaluation}{47}{section.2.13}%
+\contentsline {section}{\numberline {2.14}Synthesis of Existing Research}{47}{section.2.14}%
+\contentsline {section}{\numberline {2.15}Research Gap and Positioning of AffectLab}{49}{section.2.15}%
+\contentsline {section}{\numberline {2.16}Chapter Summary}{49}{section.2.16}%
+\contentsline {chapter}{\numberline {3}Proposed System Architecture}{51}{chapter.3}%
+\contentsline {section}{\numberline {3.1}System Overview}{51}{section.3.1}%
+\contentsline {section}{\numberline {3.2}System Requirements and Scope}{54}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Overview}{54}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Scope of the System}{54}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Functional Requirements}{55}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Non-Functional Requirements}{58}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}Assumptions}{59}{subsection.3.2.5}%
+\contentsline {subsection}{\numberline {3.2.6}System Boundaries}{60}{subsection.3.2.6}%
+\contentsline {subsection}{\numberline {3.2.7}Summary}{62}{subsection.3.2.7}%
+\contentsline {section}{\numberline {3.3}Ethical Considerations and Limitations}{62}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Ethical Approach and Intended Use}{62}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Ethical Use of Affect Recognition}{62}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}User Autonomy, Transparency, and Avoidance of Dependency}{63}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Safety and Non-Clinical Boundaries}{64}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.3.5}Privacy, Data Protection, and Data Governance}{64}{subsection.3.3.5}%
+\contentsline {subsection}{\numberline {3.3.6}Fairness, Representation, and Accessibility}{65}{subsection.3.3.6}%
+\contentsline {subsection}{\numberline {3.3.7}Generative Artificial Intelligence and Feedback Integrity}{66}{subsection.3.3.7}%
+\contentsline {subsection}{\numberline {3.3.8}Research Ethics and Participant Protection}{66}{subsection.3.3.8}%
+\contentsline {subsection}{\numberline {3.3.9}Legal and Regulatory Context}{67}{subsection.3.3.9}%
+\contentsline {subsection}{\numberline {3.3.10}Limitations of the Proposed System}{68}{subsection.3.3.10}%
+\contentsline {subsubsection}{Construct and model limitations}{68}{section*.4}%
+\contentsline {subsubsection}{Dialogue and feedback limitations}{68}{section*.5}%
+\contentsline {subsubsection}{Safety limitations}{68}{section*.6}%
+\contentsline {subsubsection}{Privacy and security limitations}{68}{section*.7}%
+\contentsline {subsubsection}{Evaluation limitations}{69}{section*.8}%
+\contentsline {subsubsection}{Operational and regulatory limitations}{69}{section*.9}%
+\contentsline {subsection}{\numberline {3.3.11}Summary}{69}{subsection.3.3.11}%
+\contentsline {chapter}{\numberline {4}Implementation}{71}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Chapter Overview}{71}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Technology Stack and Project Organisation}{72}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Frontend Technologies}{72}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Backend Technologies}{73}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Persistence and External Services}{74}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Repository Structure and Configuration}{75}{subsection.4.2.4}%
+\contentsline {section}{\numberline {4.3}Emotion-Recognition Pipeline}{76}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Dataset Preparation and Label Mapping}{76}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Contextual Text-Emotion Model}{77}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Speech-Emotion Model}{78}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Multimodal Late Fusion}{79}{subsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Confidence Calibration and Uncertainty Handling}{80}{subsection.4.3.5}%
+\contentsline {subsection}{\numberline {4.3.6}Model Artefacts, Provenance, and Inference Loading}{80}{subsection.4.3.6}%
+\contentsline {section}{\numberline {4.4}Backend Application}{81}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Application and Service Architecture}{82}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Domain Models and API Schemas}{82}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Authentication and Account Management}{83}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Session Persistence and Ownership Controls}{84}{subsection.4.4.4}%
+\contentsline {subsection}{\numberline {4.4.5}Conversation Request Processing}{85}{subsection.4.4.5}%
+\contentsline {subsection}{\numberline {4.4.6}Optional Services and Deterministic Fallbacks}{86}{subsection.4.4.6}%
+\contentsline {section}{\numberline {4.5}Role-Play and Adaptation Engine}{86}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Scenario Representation and Configuration}{87}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Dialogue State and Transition Logic}{87}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Communication-Evidence Extraction}{88}{subsection.4.5.3}%
+\contentsline {subsection}{\numberline {4.5.4}Affect-Aware Pacing Policy}{89}{subsection.4.5.4}%
+\contentsline {subsection}{\numberline {4.5.5}Response Realisation}{89}{subsection.4.5.5}%
+\contentsline {subsection}{\numberline {4.5.6}Safety Precedence and Crisis Interruption}{90}{subsection.4.5.6}%
+\contentsline {section}{\numberline {4.6}Feedback and Reflection Features}{90}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Evidence-Grounded Feedback Generation}{90}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Conversation Replay}{91}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Rewind, Branching, and Comparison}{91}{subsection.4.6.3}%
+\contentsline {subsection}{\numberline {4.6.4}Takeaways and Action Cards}{92}{subsection.4.6.4}%
+\contentsline {section}{\numberline {4.7}Frontend Application}{92}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Application Navigation and User Workflow}{92}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Conversation Preparation}{93}{subsection.4.7.2}%
+\contentsline {subsection}{\numberline {4.7.3}Role-Play Workspace}{93}{subsection.4.7.3}%
+\contentsline {subsection}{\numberline {4.7.4}Voice Capture and Multimodal Interaction}{94}{subsection.4.7.4}%
+\contentsline {subsection}{\numberline {4.7.5}Presentation of Affect and Uncertainty}{94}{subsection.4.7.5}%
+\contentsline {subsection}{\numberline {4.7.6}Feedback, Replay, and Comparison Interfaces}{95}{subsection.4.7.6}%
+\contentsline {subsection}{\numberline {4.7.7}Researcher and Participant Interfaces}{95}{subsection.4.7.7}%
+\contentsline {section}{\numberline {4.8}Research Workflow Implementation}{96}{section.4.8}%
+\contentsline {subsection}{\numberline {4.8.1}Participant Enrolment and Consent}{96}{subsection.4.8.1}%
+\contentsline {subsection}{\numberline {4.8.2}Study Progress and Questionnaires}{96}{subsection.4.8.2}%
+\contentsline {subsection}{\numberline {4.8.3}Pseudonymous Research Records}{97}{subsection.4.8.3}%
+\contentsline {subsection}{\numberline {4.8.4}Research Dashboard and Data Export}{97}{subsection.4.8.4}%
+\contentsline {section}{\numberline {4.9}Security, Privacy, and Data Protection}{98}{section.4.9}%
+\contentsline {subsection}{\numberline {4.9.1}Authentication and Token Management}{98}{subsection.4.9.1}%
+\contentsline {subsection}{\numberline {4.9.2}Authorisation and Resource Isolation}{99}{subsection.4.9.2}%
+\contentsline {subsection}{\numberline {4.9.3}Audio and Conversation Data Handling}{99}{subsection.4.9.3}%
+\contentsline {subsection}{\numberline {4.9.4}Retention, Withdrawal, and Account Deletion}{99}{subsection.4.9.4}%
+\contentsline {subsection}{\numberline {4.9.5}Deployment Security Controls}{100}{subsection.4.9.5}%
+\contentsline {section}{\numberline {4.10}Deployment and Configuration}{100}{section.4.10}%
+\contentsline {subsection}{\numberline {4.10.1}Local and Containerised Deployment}{101}{subsection.4.10.1}%
+\contentsline {subsection}{\numberline {4.10.2}Offline Demonstration Mode}{101}{subsection.4.10.2}%
+\contentsline {subsection}{\numberline {4.10.3}Environment-Based Configuration}{101}{subsection.4.10.3}%
+\contentsline {subsection}{\numberline {4.10.4}Health Checks and Operational Failure Handling}{102}{subsection.4.10.4}%
+\contentsline {section}{\numberline {4.11}Implementation Verification}{102}{section.4.11}%
+\contentsline {subsection}{\numberline {4.11.1}Backend Unit and Integration Testing}{102}{subsection.4.11.1}%
+\contentsline {subsection}{\numberline {4.11.2}Frontend End-to-End Testing}{103}{subsection.4.11.2}%
+\contentsline {subsection}{\numberline {4.11.3}Full-Stack Smoke Testing}{103}{subsection.4.11.3}%
+\contentsline {subsection}{\numberline {4.11.4}Reproducibility and Model-Provenance Checks}{104}{subsection.4.11.4}%
+\contentsline {section}{\numberline {4.12}Chapter Summary}{105}{section.4.12}%
+\contentsline {chapter}{\numberline {5}Evaluation and Results}{107}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Overview}{107}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Evaluation Objectives}{107}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Compared Systems}{108}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Non-Adaptive Baseline Agent}{108}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Adaptive Emotion-Aware Agent}{108}{subsection.5.3.2}%
+\contentsline {section}{\numberline {5.4}Test Scenarios}{109}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Objective Metrics}{109}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Subjective Metrics}{110}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Questionnaire Design}{110}{section.5.7}%
+\contentsline {section}{\numberline {5.8}Experimental Procedure}{111}{section.5.8}%
+\contentsline {section}{\numberline {5.9}Data Analysis}{112}{section.5.9}%
+\contentsline {section}{\numberline {5.10}Threats to Validity and Limitations}{112}{section.5.10}%
+\contentsline {section}{\numberline {5.11}Summary}{113}{section.5.11}%
+\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{115}{chapter.6}%
+\contentsline {chapter}{Bibliography}{121}{chapter*.10}%
+\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{123}{appendix.A}%
+\contentsline {section}{\numberline {A.1}ChatGPT Details}{123}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Deep L Details}{123}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Microsoft Copilot}{123}{section.A.3}%
+\contentsline {chapter}{\numberline {B}Support Scenarios}{125}{appendix.B}%
+\contentsline {chapter}{\numberline {C}Evaluation Questionnaire}{127}{appendix.C}%
+\contentsline {chapter}{\numberline {D}Example Conversations}{129}{appendix.D}%
+\contentsline {chapter}{\numberline {E}Additional Results}{131}{appendix.E}%
+\contentsline {chapter}{\numberline {F}Source Code / Repository Structure}{133}{appendix.F}%

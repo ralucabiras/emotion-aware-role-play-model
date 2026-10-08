@@ -1,0 +1,297 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{KPNK{\etalchar{+}}19}
+
+\bibitem[BAM19a]{baltrusaitis2019multimodal}
+Tadas Baltru{\v{s}}aitis, Chaitanya Ahuja, and Louis-Philippe Morency.
+\newblock Multimodal machine learning: A survey and taxonomy.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  41(2):423--443, 2019.
+
+\bibitem[BAM{\etalchar{+}}19b]{barrett2019expressions}
+Lisa~Feldman Barrett, Ralph Adolphs, Stacy Marsella, Aleix~M. Martinez, and
+  Seth~D. Pollak.
+\newblock Emotional expressions reconsidered: Challenges to inferring emotion
+  from human facial movements.
+\newblock {\em Psychological Science in the Public Interest}, 20(1):1--68,
+  2019.
+
+\bibitem[BBL{\etalchar{+}}08]{busso2008iemocap}
+Carlos Busso, Murtaza Bulut, Chi-Chun Lee, Abe Kazemzadeh, Emily Mower, Samuel
+  Kim, Jeannette~N. Chang, Sungbok Lee, and Shrikanth~S. Narayanan.
+\newblock {IEMOCAP}: Interactive emotional dyadic motion capture database.
+\newblock {\em Language Resources and Evaluation}, 42(4):335--359, December
+  2008.
+
+\bibitem[BR09]{bohus2009ravenclaw}
+Dan Bohus and Alexander~I. Rudnicky.
+\newblock The {RavenClaw} dialog management framework: Architecture and
+  systems.
+\newblock {\em Computer Speech \& Language}, 23(3):332--361, 2009.
+
+\bibitem[BSN{\etalchar{+}}12]{bosse2012roleplay}
+Hans~Martin Bosse, Jobst-Hendrik Schultz, Martin Nickel, Thomas Lutz, Andreas
+  M{\"o}ltner, Jana J{\"u}nger, S{\"o}ren Huwendiek, and Christoph Nikendei.
+\newblock The effect of using standardized patients or peer role play on
+  ratings of undergraduate communication training: A randomized controlled
+  trial.
+\newblock {\em Patient Education and Counseling}, 87(3):300--306, June 2012.
+
+\bibitem[BZMA20]{baevski2020wav2vec}
+Alexei Baevski, Yuhao Zhou, Abdelrahman Mohamed, and Michael Auli.
+\newblock wav2vec 2.0: A framework for self-supervised learning of speech
+  representations.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~33, 2020.
+
+\bibitem[CWC{\etalchar{+}}22]{chen2022wavlm}
+Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu~Wu, Shujie Liu, Zhuo Chen, Jinyu
+  Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, Jian Wu, Long Zhou, Shuo Ren,
+  Yanmin Qian, Yao Qian, Jian Wu, Michael Zeng, Xiangzhan Yu, and Furu Wei.
+\newblock {WavLM}: Large-scale self-supervised pre-training for full stack
+  speech processing.
+\newblock {\em IEEE Journal of Selected Topics in Signal Processing},
+  16(6):1505--1518, 2022.
+
+\bibitem[DCLT19]{devlin2019bert}
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
+\newblock {BERT}: Pre-training of deep bidirectional transformers for language
+  understanding.
+\newblock In {\em Proceedings of the 2019 Conference of the North American
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies}, pages 4171--4186. Association for Computational Linguistics,
+  2019.
+
+\bibitem[DFC24]{defreitas2024wellness}
+Julian De~Freitas and I.~Glenn Cohen.
+\newblock The health risks of generative {AI}-based wellness apps.
+\newblock {\em Nature Medicine}, 30:1269--1275, 2024.
+
+\bibitem[EAKK11]{elayadi2011ser}
+Moataz El~Ayadi, Mohamed~S. Kamel, and Fakhri Karray.
+\newblock Survey on speech emotion recognition: Features, classification
+  schemes, and databases.
+\newblock {\em Pattern Recognition}, 44(3):572--587, 2011.
+
+\bibitem[Ekm92]{ekman1992basic}
+Paul Ekman.
+\newblock An argument for basic emotions.
+\newblock {\em Cognition and Emotion}, 6(3--4):169--200, 1992.
+
+\bibitem[ESS{\etalchar{+}}16]{eyben2016gemaps}
+Florian Eyben, Klaus~R. Scherer, Bj{\"o}rn~W. Schuller, Johan Sundberg,
+  Elisabeth Andr{\'e}, Carlos Busso, Laurence~Y. Devillers, Julien Epps, Petri
+  Laukka, Shrikanth~S. Narayanan, and Khiet~P. Truong.
+\newblock The geneva minimalistic acoustic parameter set ({GeMAPS}) for voice
+  research and affective computing.
+\newblock {\em IEEE Transactions on Affective Computing}, 7(2):190--202, 2016.
+
+\bibitem[{Eur}16]{eu2016gdpr}
+{European Parliament and Council of the European Union}.
+\newblock Regulation (eu) 2016/679 on the protection of natural persons with
+  regard to the processing of personal data and on the free movement of such
+  data (general data protection regulation).
+\newblock Official Journal of the European Union, L 119, 2016.
+\newblock Accessed 6 October 2026.
+
+\bibitem[{Eur}24]{eu2024aiact}
+{European Parliament and Council of the European Union}.
+\newblock Regulation ({EU}) 2024/1689 laying down harmonised rules on
+  artificial intelligence ({Artificial Intelligence Act}).
+\newblock Official Journal of the European Union, 2024.
+
+\bibitem[GMG{\etalchar{+}}20]{ghosal2020cosmic}
+Deepanway Ghosal, Navonil Majumder, Alexander Gelbukh, Rada Mihalcea, and
+  Soujanya Poria.
+\newblock {COSMIC}: {CO}mmon{S}ense knowledge for e{M}otion identification in
+  conversations.
+\newblock In {\em Findings of the Association for Computational Linguistics:
+  EMNLP 2020}, pages 2470--2481. Association for Computational Linguistics,
+  2020.
+
+\bibitem[GMP{\etalchar{+}}19]{ghosal2019dialoguegcn}
+Deepanway Ghosal, Navonil Majumder, Soujanya Poria, Niyati Chhaya, and
+  Alexander Gelbukh.
+\newblock {DialogueGCN}: A graph convolutional neural network for emotion
+  recognition in conversation.
+\newblock In {\em Proceedings of the 2019 Conference on Empirical Methods in
+  Natural Language Processing and the 9th International Joint Conference on
+  Natural Language Processing}, pages 154--164. Association for Computational
+  Linguistics, 2019.
+
+\bibitem[GPSW17]{guo2017calibration}
+Chuan Guo, Geoff Pleiss, Yu~Sun, and Kilian~Q. Weinberger.
+\newblock On calibration of modern neural networks.
+\newblock In {\em Proceedings of the 34th International Conference on Machine
+  Learning}, volume~70 of {\em Proceedings of Machine Learning Research}, pages
+  1321--1330. PMLR, 2017.
+
+\bibitem[HBT{\etalchar{+}}21]{hsu2021hubert}
+Wei-Ning Hsu, Benjamin Bolte, Yao-Hung~Hubert Tsai, Kushal Lakhotia, Ruslan
+  Salakhutdinov, and Abdelrahman Mohamed.
+\newblock {HuBERT}: Self-supervised speech representation learning by masked
+  prediction of hidden units.
+\newblock {\em IEEE/ACM Transactions on Audio, Speech, and Language
+  Processing}, 29:3451--3460, 2021.
+
+\bibitem[HGC21]{he2021debertav3}
+Pengcheng He, Jianfeng Gao, and Weizhu Chen.
+\newblock {DeBERTaV3}: Improving {DeBERTa} using {ELECTRA}-style pre-training
+  with gradient-disentangled embedding sharing.
+\newblock arXiv preprint arXiv:2111.09543, 2021.
+
+\bibitem[HS88]{hart1988nasatlx}
+Sandra~G. Hart and Lowell~E. Staveland.
+\newblock Development of {NASA-TLX} (task load index): Results of empirical and
+  theoretical research.
+\newblock In Peter~A. Hancock and Najmedin Meshkati, editors, {\em Human Mental
+  Workload}, volume~52 of {\em Advances in Psychology}, pages 139--183.
+  North-Holland, Amsterdam, 1988.
+
+\bibitem[HT07]{hattie2007feedback}
+John Hattie and Helen Timperley.
+\newblock The power of feedback.
+\newblock {\em Review of Educational Research}, 77(1):81--112, 2007.
+
+\bibitem[KPNK{\etalchar{+}}19]{kull2019dirichlet}
+Meelis Kull, Miquel Perello-Nieto, Markus K{\"a}ngsepp, Telmo Silva~Filho, Hao
+  Song, and Peter Flach.
+\newblock Beyond temperature scaling: Obtaining well-calibrated multi-class
+  probabilities with dirichlet calibration.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~32, pages 12316--12326, 2019.
+
+\bibitem[LJG25]{lu2025roleplay}
+Dongxu Lu, Johan Jeuring, and Albert Gatt.
+\newblock Evaluating {LLM}-generated versus human-authored responses in
+  role-play dialogues.
+\newblock In {\em Proceedings of the 18th International Natural Language
+  Generation Conference}, pages 20--40. Association for Computational
+  Linguistics, 2025.
+
+\bibitem[LKK{\etalchar{+}}20]{lee2020virtualpatients}
+Juhye Lee, Haerim Kim, Kyoung~Hwa Kim, Daesung Jung, Tanisha Jowsey, and
+  Craig~S. Webster.
+\newblock Effective virtual patient simulators for medical communication
+  training: A systematic review.
+\newblock {\em Medical Education}, 54(9):786--795, September 2020.
+
+\bibitem[LL22]{lee2022compm}
+Joosung Lee and Wooin Lee.
+\newblock {CoMPM}: Context modeling with speaker's pre-trained memory tracking
+  for emotion recognition in conversation.
+\newblock In {\em Proceedings of the 2022 Conference of the North American
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies}, pages 5669--5679. Association for Computational Linguistics,
+  2022.
+
+\bibitem[LOG{\etalchar{+}}19]{liu2019roberta}
+Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer
+  Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov.
+\newblock {RoBERTa}: A robustly optimized {BERT} pretraining approach.
+\newblock arXiv preprint, arXiv:1907.11692, 2019.
+
+\bibitem[LSR{\etalchar{+}}24]{lin2024imbue}
+Inna Lin, Ashish Sharma, Christopher Rytting, Adam Miner, Jina Suh, and Tim
+  Althoff.
+\newblock {IMBUE}: Improving interpersonal effectiveness through simulation and
+  just-in-time feedback with human-language model interaction.
+\newblock In {\em Proceedings of the 62nd Annual Meeting of the Association for
+  Computational Linguistics (Volume 1: Long Papers)}, pages 810--840, Bangkok,
+  Thailand, August 2024. Association for Computational Linguistics.
+
+\bibitem[LSS{\etalchar{+}}17]{li2017dailydialog}
+Yanran Li, Hui Su, Xiaoyu Shen, Wenjie Li, Ziqiang Cao, and Shuzi Niu.
+\newblock {DailyDialog}: A manually labelled multi-turn dialogue dataset.
+\newblock In {\em Proceedings of the Eighth International Joint Conference on
+  Natural Language Processing (Volume 1: Long Papers)}, pages 986--995. Asian
+  Federation of Natural Language Processing, 2017.
+
+\bibitem[LWC{\etalchar{+}}22]{li2022contextaware}
+Jinchao Li, Shuai Wang, Yang Chao, Xunying Liu, and Helen Meng.
+\newblock Context-aware multimodal fusion for emotion recognition.
+\newblock In {\em Proceedings of Interspeech 2022}, pages 2013--2017, Incheon,
+  Republic of Korea, September 2022. International Speech Communication
+  Association.
+
+\bibitem[MPH{\etalchar{+}}19]{majumder2019dialoguernn}
+Navonil Majumder, Soujanya Poria, Devamanyu Hazarika, Rada Mihalcea, Alexander
+  Gelbukh, and Erik Cambria.
+\newblock {DialogueRNN}: An attentive {RNN} for emotion detection in
+  conversations.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial
+  Intelligence}, volume~33, pages 6818--6825, 2019.
+
+\bibitem[OFR{\etalchar{+}}19]{ovadia2019shift}
+Yaniv Ovadia, Emily Fertig, Jie Ren, Zachary Nado, D.~Sculley, Sebastian
+  Nowozin, Joshua Dillon, Balaji Lakshminarayanan, and Jasper Snoek.
+\newblock Can you trust your model's uncertainty? evaluating predictive
+  uncertainty under dataset shift.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~32, 2019.
+
+\bibitem[PHM{\etalchar{+}}19]{poria2019meld}
+Soujanya Poria, Devamanyu Hazarika, Navonil Majumder, Gautam Naik, Erik
+  Cambria, and Rada Mihalcea.
+\newblock {MELD}: A multimodal multi-party dataset for emotion recognition in
+  conversations.
+\newblock In {\em Proceedings of the 57th Annual Meeting of the Association for
+  Computational Linguistics}, pages 527--536. Association for Computational
+  Linguistics, 2019.
+
+\bibitem[RSLB19]{rashkin2019empathetic}
+Hannah Rashkin, Eric~Michael Smith, Margaret Li, and Y-Lan Boureau.
+\newblock Towards empathetic open-domain conversation models: A new benchmark
+  and dataset.
+\newblock In {\em Proceedings of the 57th Annual Meeting of the Association for
+  Computational Linguistics}, pages 5370--5381. Association for Computational
+  Linguistics, 2019.
+
+\bibitem[Rus80]{russell1980circumplex}
+James~A. Russell.
+\newblock A circumplex model of affect.
+\newblock {\em Journal of Personality and Social Psychology}, 39(6):1161--1178,
+  1980.
+
+\bibitem[Sch05]{scherer2005emotions}
+Klaus~R. Scherer.
+\newblock What are emotions? and how can they be measured?
+\newblock {\em Social Science Information}, 44(4):695--729, 2005.
+
+\bibitem[SZB{\etalchar{+}}21]{sun2021simulatingSatisfaction}
+Weiwei Sun, Shuo Zhang, Krisztian Balog, Zhaochun Ren, Pengjie Ren, Zhumin
+  Chen, and Maarten de~Rijke.
+\newblock Simulating user satisfaction for the evaluation of task-oriented
+  dialogue systems.
+\newblock In {\em Proceedings of the 44th International ACM SIGIR Conference on
+  Research and Development in Information Retrieval}, pages 2499--2506.
+  Association for Computing Machinery, 2021.
+
+\bibitem[TBL{\etalchar{+}}19]{tsai2019mult}
+Yao-Hung~Hubert Tsai, Shaojie Bai, Paul~Pu Liang, J.~Zico Kolter,
+  Louis-Philippe Morency, and Ruslan Salakhutdinov.
+\newblock Multimodal transformer for unaligned multimodal language sequences.
+\newblock In {\em Proceedings of the 57th Annual Meeting of the Association for
+  Computational Linguistics}, pages 6558--6569. Association for Computational
+  Linguistics, 2019.
+
+\bibitem[TSG25]{tamoyan2025roleplay}
+Hovhannes Tamoyan, Hendrik Schuff, and Iryna Gurevych.
+\newblock {LLM} roleplay: Simulating human-chatbot interaction.
+\newblock In {\em Proceedings of the Third Workshop on Social Influence in
+  Conversations}, pages 1--26. Association for Computational Linguistics, 2025.
+
+\bibitem[{Wor}25]{who2025socialconnection}
+{World Health Organization}.
+\newblock From loneliness to social connection: Charting a path to healthier
+  societies.
+\newblock Technical report, World Health Organization, Geneva, Switzerland,
+  June 2025.
+
+\bibitem[ZHZ{\etalchar{+}}18]{zhou2018ecm}
+Hao Zhou, Minlie Huang, Tianyang Zhang, Xiaoyan Zhu, and Bing Liu.
+\newblock Emotional chatting machine: Emotional conversation generation with
+  internal and external memory.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial
+  Intelligence}, volume~32, 2018.
+
+\end{thebibliography}

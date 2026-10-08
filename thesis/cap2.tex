@@ -1,0 +1,281 @@
+\chapter{State of the Art}\label{chap2}
+
+\section{Introduction}\label{sec:sota-intro}
+
+The design of an emotion-aware communication-rehearsal system lies at the intersection of communication-skills education, conversational artificial intelligence, affective computing, and human--computer interaction. Progress in any one of these areas does not, by itself, establish that an integrated application will be useful, reliable, or safe. A classifier may perform well on annotated recordings without being reliable for a new speaker; a dialogue generator may produce plausible replies without consistently following a scenario; and a realistic simulation may be enjoyable without producing a measurable learning benefit. A state-of-the-art review must therefore examine both the capabilities of existing techniques and the evidence that supports their intended use.
+
+This chapter first reviews role-play, digital simulation, feedback, and the design of conversational agents. It then examines the theoretical and empirical foundations of affect recognition, with particular attention to the IEMOCAP benchmark, emotion recognition in conversation, contextual text modelling, speech-based methods, and multimodal fusion. The subsequent sections discuss uncertainty calibration, affect-conditioned dialogue, generative systems, interpretability, safety, privacy, and evaluation. Finally, the literature is synthesised to identify what has already been demonstrated, which questions remain open, and how the proposed AffectLab system is positioned with respect to prior work. Throughout, a distinction is maintained between \emph{predicting a dataset label}, \emph{controlling an application}, and \emph{improving a person's communication skills}. These are different tasks and require different forms of evidence.
+
+\section{Role-Play and Simulation for Communication-Skills Development}\label{sec:sota-rehearsal}
+
+\subsection{Role-play as a practice-based learning method}
+
+Interpersonal communication requires more than knowledge of recommended expressions or communication rules. A speaker must formulate a message, respond to objections, clarify intentions, and sometimes sustain a position without controlling the other person's reaction. Role-play makes these decisions observable by placing the learner in a simulated exchange with an interlocutor. It permits errors and alternative responses in a setting with lower consequences than the corresponding real-world interaction. However, the educational value of role-play is not inherent in the mere presence of a simulation: the target skills, the quality of the interaction, and the opportunity to receive and use feedback also matter.
+
+Evidence for structured communication rehearsal is available in professional education. Bosse et al.\ conducted a randomised controlled trial with 103 medical students assigned to peer role-play, training with standardised patients, or a control group. Both active training approaches improved measures of communication performance and self-efficacy relative to the control condition, with some outcomes favouring peer role-play \cite{bosse2012roleplay}. The findings support the value of active and repeatable practice, but the participants, clinical tasks, and assessment environment were specific. They do not establish that a software-based rehearsal system will produce equivalent improvements in everyday workplace or relationship conversations.
+
+A systematic review by Lee et al.\ examined 14 studies of virtual-patient systems for medical communication training \cite{lee2020virtualpatients}. The review associated more effective systems with sound instructional features, such as preparation, scaffolding, debriefing, reflection, and feedback, rather than with technological sophistication alone. Importantly, the evidence was heterogeneous, and only some comparative evaluations found significant advantages for virtual patients. The review also distinguished human feedback from automated feedback; it did not establish that automatically generated comments are sufficient to produce learning. These qualifications matter for the design of non-clinical practice tools because conversational realism must not be confused with educational effectiveness.
+
+\subsection{Simulation realism, repeatability, and transfer}
+
+Digital simulations offer properties that conventional role-play cannot always guarantee: the same initial situation can be replayed, different responses can be tried from a common starting point, and an interaction can be reviewed without the presence of another person. Consistent scenarios also permit defined learning objectives and repeatable assessment. Their limitations are equally important. Simulated interlocutors cannot reproduce every social cue, personal history, consequence, or unpredictable response of real people. A user may learn to satisfy the rules of the simulation rather than improve performance in an unfamiliar situation.
+
+A particularly relevant contemporary system is \emph{IMBUE}, proposed by Lin et al., which uses language models to simulate personalised interpersonal situations and provide just-in-time feedback based on an established interpersonal-effectiveness framework \cite{lin2024imbue}. In a randomised study involving 86 participants, the authors reported improvements in measures including self-efficacy, negative emotion, and communication-skill mastery. They also found that transfer to new and more difficult situations was more limited than improvements within the trained situations. IMBUE provides evidence that language-model-based rehearsal can be organised as a learning activity rather than as an open-ended chatbot, but its results depend on the specific instructional framework, outcome measures, and study design. They should not be interpreted as proof of general or long-term transfer for unrelated applications.
+
+Taken together, these studies support a practice environment with clear scenarios, observable communication goals, structured resistance, multiple attempts, and opportunities for reflection \cite{bosse2012roleplay,lee2020virtualpatients,lin2024imbue}. For AffectLab, this literature motivates separate scenario definitions for workload negotiation, personal boundary-setting, and the expression of relationship needs. It also suggests that successful rehearsal should not be equated with persuading the simulated character: stating and maintaining a boundary, agreeing on a feasible next step, or documenting an unresolved disagreement may all be legitimate conversational outcomes.
+
+\section[Feedback and Reflection]{Feedback, Reflection, and Evidence in Rehearsal Systems}\label{sec:sota-feedback}
+
+\subsection{From conversational experience to actionable feedback}
+
+Practice becomes more useful when users can relate an assessment to something they actually said and identify a feasible improvement for their next attempt. Hattie and Timperley's synthesis of educational feedback research distinguishes several functions of feedback, including clarification of the learning goal, information about current performance, and guidance about what to do next \cite{hattie2007feedback}. This provides a useful rationale for moving beyond a generic score or an approving response. In a communication rehearsal, feedback can refer to explicit behaviours, such as stating a concrete request, giving a relevant reason, using non-accusatory language, acknowledging another perspective, or maintaining an expressed boundary.
+
+An important design distinction concerns \emph{feedback evidence} and \emph{feedback presentation}. Evidence may be extracted using observable language features, annotations, or human assessment, whereas presentation determines how that evidence is explained to the learner. IMBUE combines domain-informed assessment and just-in-time guidance within its training process \cite{lin2024imbue}. By contrast, the virtual-patient review by Lee et al.\ found stronger support for the overall instructional design, including guided reflection and human facilitation, than for the intrinsic effectiveness of automated feedback \cite{lee2020virtualpatients}. Consequently, an application should not assume that fluent or detailed comments generated by a language model are necessarily valid.
+
+For automated rehearsal systems, this motivates traceable assessments in which each recorded feature points to the turn that activated it. If a message is credited for providing a specific request, the system should identify the relevant text rather than merely assert that the user was assertive. Rule-based detection makes these decisions relatively reproducible, but it is not synonymous with semantic understanding. A rule can miss a perfectly acceptable paraphrase or incorrectly detect a feature in negated text, quotation, sarcasm, or reported speech. Transparent feedback therefore requires both inspectable evidence and explicit acknowledgement that its measures are partial proxies for communication behaviour, not validated measures of an individual's competence.
+
+\subsection{Reviewing alternatives instead of rewarding one script}
+
+Replay, retry, and branch-based review allow users to examine the consequences of a wording choice while preserving the common conversational context. These mechanisms are consistent with the emphasis on reflection and post-simulation activities in effective virtual-patient designs \cite{lee2020virtualpatients}. Comparing alternative continuations can highlight differences between a vague request and a specific one, or between a boundary that is repeated and one that is abandoned under resistance. This remains an instructional design rationale rather than evidence that branching, by itself, causes real-world improvement.
+
+The evaluation of such tools should also avoid a narrow definition of success. A simulation with deterministic scoring can inadvertently train users to repeat the phrases that trigger its rules. Accordingly, evidence about improvement inside a system must be separated from assessment by independent human raters or behaviour in new settings. This distinction also limits what can be inferred from changes in turn counts, rule-based scores, or self-reported confidence \cite{hattie2007feedback,lin2024imbue}.
+
+\section{Conversational Agents for Structured and Generative Role-Play}\label{sec:sota-dialogue}
+
+\subsection{Deterministic dialogue management}
+
+Classical task-oriented dialogue systems use explicit representations of conversational state and action selection. Their main advantage is not that they reproduce spontaneous conversation perfectly, but that state transitions and permissible outcomes can be specified and tested. For example, the RavenClaw framework described by Bohus and Rudnicky separates domain-specific task logic from reusable dialogue-management capabilities such as error handling and turn-taking \cite{bohus2009ravenclaw}. This separation provides a precedent for keeping dialogue control distinct from the surface wording of an utterance.
+
+In communication rehearsal, explicit dialogue states can represent stages such as opening an issue, clarifying a concern, responding to resistance, and agreeing on a next step. Scenario-specific rules can define both completed and unresolved outcomes. Such a design facilitates regression tests and makes it possible to explain why a scenario advanced or terminated. Its disadvantages include the cost of authoring policies and the difficulty of anticipating diverse linguistic expressions. A fully templated system may also appear repetitive. These limitations create a reasonable motivation for adding generative wording while retaining explicit state transitions.
+
+\subsection{Language-model simulation and its limits}
+
+Large language models extend conversational flexibility because they can paraphrase, preserve aspects of a character profile, and respond to inputs not anticipated in a fixed script. IMBUE demonstrates one use of this capability for personalised interpersonal-skills training \cite{lin2024imbue}. Tamoyan et al.\ subsequently investigated LLM-based role-play as a method for simulating multi-turn human--chatbot interaction, including persona construction, dialogue goals, and recovery from conversational failures \cite{tamoyan2025roleplay}. These studies are useful evidence that explicit roles and goals can structure generation, even though their evaluation tasks are not identical to everyday communication rehearsal.
+
+Generative flexibility comes with risks. Lu et al.\ compared LLM-generated with human-authored responses in multi-turn professional role-play dialogues and reported that, in their evaluated setting, human judgements of generated-response quality deteriorated across turns, particularly for naturalness and context maintenance \cite{lu2025roleplay}. This result cautions against evaluating a role-playing agent using only isolated responses. A simulated character may respond convincingly at the beginning of an exchange yet lose track of a constraint or become overly accommodating later. Likewise, a response that sounds supportive can undermine the exercise if it removes intended resistance or declares a difficult situation resolved prematurely.
+
+The literature thus suggests a distinction between a \emph{dialogue decision} and its \emph{linguistic realisation}. In a hybrid design, the application determines the current stage, whether a communication feature has been observed, which outcomes are allowed, and how strongly the simulated character should resist. Optional generation then realises a bounded response plan; the generated text is checked against the plan and can be replaced by a deterministic template when necessary. This design is motivated by dialogue-management principles and observed weaknesses of multi-turn generation, rather than by a claim that prompting can eliminate all generative failures \cite{bohus2009ravenclaw,lu2025roleplay}.
+
+\section[Affective Computing and Emotion Labels]{Affective Computing and the Meaning of Emotion Labels}\label{sec:sota-affect-theory}
+
+\subsection{Categorical and dimensional representations}
+
+Affective computing investigates computational systems that model or respond to affect-related signals, but the underlying concept of emotion is not universally defined. Ekman's work argues for distinguishing a set of basic emotions with characteristic features \cite{ekman1992basic}. An alternative tradition represents affect using continuous dimensions. Russell's circumplex model, for example, describes affective concepts in terms of related dimensions conventionally interpreted as pleasantness or valence and activation or arousal \cite{russell1980circumplex}. Scherer emphasises the importance of distinguishing emotion from related constructs such as mood, feeling, and other affective processes, and of making the operational definition explicit \cite{scherer2005emotions}.
+
+These approaches lead to different machine-learning targets. A categorical classifier may predict \emph{anger}, \emph{happiness}, \emph{sadness}, or \emph{neutral}, whereas a dimensional predictor may estimate valence and arousal. Neither representation captures every relevant aspect of lived emotional experience. Categorical labels are convenient for benchmarking and error analysis, but require a finite label vocabulary, sometimes collapse distinct experiences into one class, and may impose a single answer on an ambiguous utterance. Dimensional representations can express degrees of affect, but introduce their own annotation and interpretation difficulties. Therefore, selecting a classification taxonomy is a modelling decision, not a demonstration that emotion naturally consists of the selected labels.
+
+\subsection{Expression, interpretation, and uncertainty}
+
+The observable relationship between an expression and a person's internal state is imperfect. Barrett et al.\ reviewed evidence challenging a simple one-to-one inference from facial movements to discrete emotional states \cite{barrett2019expressions}. Their analysis specifically concerns faces and should not be misrepresented as an experimental result about text or speech. Nevertheless, its broader methodological warning is pertinent: observed behaviour and annotator interpretations are not direct access to subjective experience. Linguistic statements and vocal characteristics can likewise be shaped by social setting, personal speaking style, acting, irony, and the demands of a particular conversation \cite{scherer2005emotions}.
+
+For this reason, the term \emph{emotion recognition} is used in the conventional machine-learning sense of predicting operational labels, not as proof that a system understands the individual. The result of a classifier can be useful as a contextual signal even when its label is uncertain, provided that its effects remain modest and reversible. An application that uses uncertain predictions to diagnose distress, infer intention, or judge a person's competence would require a substantially stronger evidential basis than ordinary benchmark classification.
+
+\section[Emotion-Recognition Datasets and Protocols]{Datasets and Evaluation Protocols for Emotion Recognition}\label{sec:sota-datasets}
+
+\subsection{IEMOCAP and the four-class benchmark}
+
+The Interactive Emotional Dyadic Motion Capture database (IEMOCAP) was introduced by Busso et al.\ to study expressive communication through multiple channels \cite{busso2008iemocap}. It contains approximately twelve hours of scripted and improvised dyadic interactions by ten actors arranged into five recording sessions, together with textual, acoustic, visual, and annotation information. Because participants engage in exchanges rather than isolated monologues, the corpus permits investigations of conversational context and of how speech and text complement each other. Its availability has made it a common reference point for text-only, audio-only, and multimodal emotion-recognition work.
+
+IEMOCAP experiments do not all use an identical classification problem. A frequently adopted configuration includes four categories: anger, happiness, sadness, and neutral. In this configuration, \emph{excitement} may be merged into \emph{happiness} \cite{li2022contextaware}. Papers may instead use different subsets, annotation aggregation rules, segmentation procedures, or label mappings. Such differences can change class prevalence and reported performance. Consequently, results should only be compared quantitatively when the data, labels, folds, and metrics are compatible. The primary experiments in this dissertation adopt the four-class definition specified in Chapter~\ref{chap1}; the exact label mapping and preprocessing are documented in Chapter~3.
+
+\subsection{Other datasets and domain differences}
+
+MELD was introduced by Poria et al.\ as a multimodal, multi-party conversational dataset derived from the television programme \emph{Friends} \cite{poria2019meld}. It contains approximately 13,000 annotated utterances from 1,433 dialogues and includes textual, acoustic, and visual information. Unlike IEMOCAP's paired actor sessions, MELD contains multi-speaker television interactions, with different production, editing, and linguistic characteristics. DailyDialog, developed by Li et al., instead consists of human-written everyday dialogues with manually assigned emotion and communicative-intention labels \cite{li2017dailydialog}. It is useful for text-based conversational studies, but it does not provide a directly equivalent speech-recording benchmark.
+
+\begin{table}[htbp]
+\centering
+\caption{Representative conversational datasets and implications for AffectLab.}
+\label{tab:sota-datasets}
+\small
+\begingroup
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{|p{0.17\linewidth}|p{0.33\linewidth}|p{0.41\linewidth}|}
+\hline
+\textbf{Corpus} & \textbf{Main characteristics} & \textbf{Relevance and limitations} \\ \hline
+IEMOCAP \cite{busso2008iemocap} & Five dyadic sessions with ten actors; dialogue transcripts, recorded speech, additional modalities, and emotion annotations. & Supports matched text--audio experiments and held-out-session testing; acted/improvised English speech and a small speaker pool constrain generalisation. \\ \hline
+MELD \cite{poria2019meld} & Multi-party television dialogues with text, audio, visual information, and emotion labels. & Useful for studying multi-speaker context; sitcom interactions, production conditions, and label definitions differ from IEMOCAP. \\ \hline
+DailyDialog \cite{li2017dailydialog} & Human-written multi-turn everyday dialogues labelled for emotion and communicative intention. & Relevant to dialogue semantics and context but cannot support the same matched audio--text inference task. \\ \hline
+\end{tabular}
+\endgroup
+\end{table}
+
+A benchmark corpus should be evaluated according to the claims it can support. High accuracy on acted English-language interactions does not demonstrate equivalent performance with spontaneous speech, different microphones, background noise, unfamiliar accents, other languages, or speakers whose expressive styles differ from the training actors. These discrepancies are especially consequential when an application makes use of a model's confidence to change its behaviour. Although additional datasets could be valuable for external validation, incompatible corpora cannot simply be pooled without addressing annotation and domain differences \cite{busso2008iemocap,poria2019meld,li2017dailydialog}.
+
+\subsection{Evaluation splits and information leakage}
+
+Conversational emotion-recognition samples are not independent in the same way as unrelated text documents. Consecutive utterances share speakers, recording conditions, scenario content, and emotional trajectories. Randomly assigning individual utterances to training and test sets can create substantial overlap in the information observed during development and evaluation. IEMOCAP's five sessions enable a more conservative protocol in which a complete session is held out and the remaining sessions are used for training and validation. Li et al.\ explicitly evaluate their model under a five-fold, leave-one-session-out configuration, as well as a separate Session~5 setting \cite{li2022contextaware}.
+
+Holding out a session limits direct overlap between training and test speakers, but it does not guarantee generalisation beyond IEMOCAP. The model may still benefit from the same recording studio, language, task structure, and annotation conventions. Validation and hyperparameter selection must also respect group boundaries, and conversational features for a held-out utterance must not contain annotation labels or future information unavailable at the moment of inference. Such precautions are central to a meaningful comparison of utterance-only, contextual, and multimodal systems.
+
+\section{Textual Emotion Recognition and Conversational Context}\label{sec:sota-text}
+
+\subsection{Pre-trained language representations}
+
+Textual emotion classification has progressed from handcrafted lexical indicators towards contextual neural representations. BERT demonstrates how a transformer can learn general-purpose bidirectional language representations through pre-training and then be adapted to downstream classification tasks \cite{devlin2019bert}. RoBERTa revisits the training procedure and scale of BERT, showing that pre-training choices strongly influence performance \cite{liu2019roberta}. For affective tasks, such encoders offer representations of sentence meaning and local word context that are more flexible than matching isolated emotional keywords. Their representations are nevertheless optimised for the training objectives and examples they have encountered; apparent emotional understanding must be assessed through downstream labels and held-out cases.
+
+An utterance-only classifier predicts a label from the current utterance $u_t$:
+\begin{equation}
+\hat{y}_t = f(u_t).
+\label{eq:sota-utterance}
+\end{equation}
+This formulation is reproducible and computationally convenient, but an utterance such as ``That's fine'' can express agreement, disappointment, anger, or sarcasm depending on earlier dialogue and delivery. An isolated classifier cannot infer those relationships from the transcript alone. This motivates emotion recognition in conversation (ERC), where the sequence and speakers of the preceding utterances are treated as relevant context.
+
+\subsection{Speaker and dialogue-context modelling}
+
+DialogueRNN, proposed by Majumder et al., models the evolving states of the speakers and uses attention over the conversation for emotion classification \cite{majumder2019dialoguernn}. DialogueGCN, proposed by Ghosal et al., represents utterances and intra- and inter-speaker relations using graph convolution, allowing information to propagate between connected turns \cite{ghosal2019dialoguegcn}. COSMIC extends context modelling by incorporating commonsense representations of events, mental states, and social interactions \cite{ghosal2020cosmic}. These studies demonstrate that the relevant unit of analysis is frequently a sequence of social exchanges rather than an isolated text string.
+
+CoMPM, developed by Lee and Lee, combines a context model with representations derived from a speaker's preceding utterances, avoiding dependence on a structured commonsense knowledge base \cite{lee2022compm}. This work is particularly relevant to live interaction because it focuses on information available from conversational history. More sophisticated contextual architectures can represent additional relations, but their extra components may impose larger training, inference, and reproducibility costs. For an application-oriented dissertation, a simpler controlled comparison between context-free and context-aware representations may therefore provide a more interpretable empirical question than an attempt to reproduce every contemporary ERC architecture.
+
+\subsection{Causal context and deployment compatibility}
+
+Not every offline ERC configuration is directly usable in an interactive agent. A model that attends to the full dialogue, including utterances after the target turn, may be valid for retrospective transcript annotation but cannot be deployed unchanged to classify a live user's current message. Similarly, a pipeline that provides the gold emotion labels of neighbouring utterances during testing would rely on information unavailable to the application. For real-time adaptation, the model should use only the current message and permitted history:
+\begin{equation}
+\hat{y}_t = f(u_t, u_{t-1}, \ldots, u_{t-k}),
+\label{eq:sota-causal}
+\end{equation}
+where $k$ is the context-window length and no future user or character turns are visible. Previous utterances can be separated by role markers, preserving the distinction between the user and simulated character. It is important that a bidirectional \emph{token encoder} such as BERT not be confused with bidirectional access to the \emph{conversation timeline}: the encoder can attend to all tokens inside a causally assembled input while the input still excludes future turns.
+
+The literature establishes that context can be useful, but its specific contribution depends on how context is selected, which model is trained, and how the experiment is split \cite{majumder2019dialoguernn,ghosal2019dialoguegcn,lee2022compm}. For AffectLab, this motivates a matched evaluation of utterance-only and history-conditioned text models with the same session-held-out test items. The aim is to measure a reproducible difference rather than to claim that all contextual methods must outperform simpler approaches.
+
+\section{Speech Emotion Recognition}\label{sec:sota-speech}
+
+\subsection{Acoustic cues and conventional representations}
+
+Speech conveys properties that transcripts discard, including pitch movement, timing, intensity, speaking rate, vocal quality, and pauses. These may provide evidence about expressive delivery, although they are also affected by individual voice characteristics, linguistic content, microphone distance, health, and environment. The survey by El Ayadi et al.\ identifies feature selection, classification strategies, and database design as core problems in speech emotion recognition (SER) \cite{elayadi2011ser}. This perspective is important because improving the architecture alone cannot remove measurement problems in the recording or weaknesses in the labels.
+
+The Geneva Minimalistic Acoustic Parameter Set (GeMAPS) was proposed by Eyben et al.\ to standardise a compact group of theoretically motivated descriptors for affective voice research \cite{eyben2016gemaps}. Such handcrafted descriptors provide interpretable baseline features and can be suitable for smaller datasets. However, their predefined statistics may not capture all temporal and contextual properties relevant to a classification task, prompting the development of learned representations based on large-scale speech pre-training.
+
+\subsection{Self-supervised speech representations}
+
+Self-supervised learning makes it possible to develop acoustic representations using substantial amounts of unlabelled or weakly labelled speech. wav2vec~2.0 learns speech representations using masking and contrastive prediction in a latent representation space \cite{baevski2020wav2vec}. HuBERT instead uses masked prediction of hidden units produced by an iterative clustering process \cite{hsu2021hubert}. WavLM extends speech pre-training to support a wider range of tasks through denoising and representation learning that capture multiple properties of the signal \cite{chen2022wavlm}. These papers establish the general value of pre-trained speech representations; their original improvements are not all results on emotion classification, so reported speech-recognition error rates must not be presented as SER accuracy.
+
+For an emotion classifier, learned acoustic representations can be pooled or otherwise summarised before applying a task-specific classification head. The choice to freeze or fine-tune the encoder depends on data quantity, available compute, and overfitting risk. Li et al.\ provide a more directly relevant affective example by combining pre-trained textual and speech representations on IEMOCAP and examining how feature adaptation changes performance \cite{li2022contextaware}. Even with strong pre-training, an SER model may learn speaker identity, lexical content, or recording artefacts correlated with benchmark labels. Held-out-speaker evaluation and careful interpretation are therefore essential.
+
+\subsection{Operational constraints of speech input}
+
+Audio has additional application-level costs that may not appear in offline classification results. Microphone quality, permissions, ambient noise, sampling-rate conversion, silence, and short or incomplete recordings all affect the inference pathway. Voice recordings may also contain identifying information. A research application should therefore process audio only when the user explicitly chooses it, minimise retained raw recordings, and make unsuccessful audio inference a recoverable condition. For AffectLab, speech provides a supplementary signal rather than a requirement for completing a text-based rehearsal; the implementation of this behaviour is described in Chapter~4.
+
+\section{Multimodal Emotion Recognition and Fusion}\label{sec:sota-fusion}
+
+\subsection{Complementarity of text and speech}
+
+Text and speech are not interchangeable observations. A transcript can clarify what a user explicitly says, while acoustic features may capture emphasis, tension, or delivery. Combining the two is a multimodal learning problem because their representations have different time scales, noise patterns, and failure modes. Baltru\v{s}aitis et al.\ classify multimodal challenges in terms of representation, alignment, fusion, and related processes, showing why the task is more complex than concatenating measurements \cite{baltrusaitis2019multimodal}. In particular, acoustic frames and word tokens do not automatically correspond one-to-one.
+
+Broadly, \emph{early} or feature-level fusion combines modality representations before classification, while \emph{late} or decision-level fusion combines outputs from separately trained classifiers. Intermediate cross-modal architectures permit richer interactions between modalities. The Multimodal Transformer (MulT) developed by Tsai et al.\ applies directional cross-modal attention to potentially unaligned multimodal sequences \cite{tsai2019mult}. Li et al.\ apply context-aware pre-trained representations and investigate several fusion approaches for IEMOCAP, obtaining reported weighted accuracies of 84.45\% in a Session~5 evaluation and 80.36\% under their five-fold cross-validation configuration \cite{li2022contextaware}. These are results under the authors' particular protocols, not performance guarantees for other implementations or datasets.
+
+\subsection{Decision-level fusion and its trade-offs}
+
+A decision-level approach retains two independent class-probability distributions, $p_T(y)$ for the text model and $p_A(y)$ for the audio model. A simple mixture is
+\begin{equation}
+ p_F(y) = \lambda p_T(y) + (1-\lambda)p_A(y), \qquad 0\leq\lambda\leq 1,
+ \label{eq:sota-fusion}
+\end{equation}
+where $\lambda$ determines the relative contribution of text. Equal-weight fusion fixes $\lambda=0.5$; a fitted configuration estimates the weight from appropriate validation data. The resulting prediction can be inspected alongside both modality outputs. This is useful for determining whether a change in classification is attributable to text, audio, or their combination, and for recognising disagreement between the predictors.
+
+Decision-level fusion is less expressive than cross-modal attention because one classifier does not directly inspect low-level features from the other modality. Its advantages are modularity, relatively modest computational coupling, explicit missing-modality handling, and an auditable fusion rule. It also avoids the need for word-to-frame alignment at fusion time. These properties suit a prototype whose primary research question is whether adding audio improves over a contextual text model, rather than whether a particular complex cross-modal architecture establishes a new benchmark \cite{baltrusaitis2019multimodal,tsai2019mult,li2022contextaware}.
+
+The limitations remain important. A fused model may be confidently incorrect if both modalities rely on the same misleading cue. It can also underperform the stronger modality when one source is especially noisy or domain-shifted. Weights chosen on the test set inflate apparent performance, while weights fitted on validation data may not transfer to new microphones or speakers. Therefore, the fusion method and its selection procedure must be predeclared and evaluated separately from the final held-out test data.
+
+\section{Confidence Calibration, Uncertainty, and Generalisation}\label{sec:sota-calibration}
+
+\subsection{Accuracy does not establish trustworthy probabilities}
+
+A classifier's predicted probability is not automatically a calibrated statement about correctness. For example, among samples assigned confidence near 0.8, a well-calibrated model should be correct approximately 80\% of the time under the evaluated distribution. Guo et al.\ found that modern neural networks often produce miscalibrated confidence estimates and showed that temperature scaling is a practical post-processing approach \cite{guo2017calibration}. Temperature scaling transforms classifier logits using a positive validation-fitted temperature before applying softmax; it changes confidence magnitudes while preserving the top-class ranking for a given model under the usual single-temperature formulation.
+
+For a model with logit vector $z$ and temperature $T>0$, the calibrated class probability is
+\begin{equation}
+ p_T(y=c\mid z)=\frac{\exp(z_c/T)}{\sum_{j=1}^{C}\exp(z_j/T)}.
+ \label{eq:sota-temperature}
+\end{equation}
+Temperature scaling is relatively simple, but other approaches are possible. Kull et al.\ introduced Dirichlet calibration as a more flexible multiclass mapping and compared it using metrics including log-loss and the Brier score \cite{kull2019dirichlet}. More flexible calibration models may require more validation data and can overfit, so complexity is not necessarily beneficial for a small, speaker-grouped dataset.
+
+\subsection{Evaluating classification and calibration separately}
+
+Classification measures describe the labels predicted; calibration measures describe the probabilities used to express confidence. Accuracy can obscure class imbalance, and a high weighted score can coexist with weak recognition of a less frequent emotion. Macro-averaged F1, per-class precision and recall, confusion matrices, and support counts are therefore useful complements. Probability quality can be examined using negative log-likelihood, the multiclass Brier score, and reliability diagrams. Expected calibration error (ECE) summarises differences between binned confidence and observed accuracy, but depends on the chosen bins and does not completely characterise multiclass calibration \cite{guo2017calibration,kull2019dirichlet}.
+
+The distinction is especially relevant to fusion. Equal weighting may obtain the best classification score while a validation-fitted or post-calibrated configuration produces more meaningful confidence estimates. Selecting whichever configuration scores highest on the final test set would invalidate the comparison. Instead, training, model selection, calibration fitting, and testing should remain separate within each session-held-out experiment. Differences should be accompanied by uncertainty estimates and class-sensitive analysis rather than presented only as a single benchmark number.
+
+\subsection{Distribution shift and restrained use of predictions}
+
+Calibration is a property of a model relative to a data distribution. Ovadia et al.\ demonstrated that methods that produce useful probabilities under ordinary benchmark conditions can deteriorate when the input distribution changes \cite{ovadia2019shift}. This is directly relevant when moving from studio-recorded English conversations to speech captured through personal devices. Even a calibrated IEMOCAP probability must not be interpreted as a guarantee that a user's private emotional experience has been correctly identified.
+
+For an adaptive application, a threshold on maximum probability should consequently be viewed as an operational policy choice rather than a validated psychological boundary. Agreement between text and audio can be informative but is not proof of correctness. A suitable conservative policy may default to baseline dialogue, offer the user an explicit pacing choice, or suppress automated emotional claims when inference is uncertain, conflicting, or unavailable. Importantly, such policies can be evaluated for predictable behaviour even without establishing that the classifier correctly identifies the user's actual feelings \cite{guo2017calibration,ovadia2019shift}.
+
+\section{Affective and Empathetic Conversational Agents}\label{sec:sota-affective-dialogue}
+
+\subsection{Generating emotion-sensitive responses}
+
+Prior work on affective conversational agents has studied both the expression of emotion and responses to another speaker's expressed experiences. Zhou et al.\ proposed an Emotional Chatting Machine that conditions response generation on emotional categories and mechanisms representing emotional state and vocabulary \cite{zhou2018ecm}. Rashkin et al.\ introduced the EmpatheticDialogues dataset and found that models trained with emotionally situated conversations were judged more empathetic than comparison systems trained only on broad conversational data \cite{rashkin2019empathetic}. These contributions show that affect-related signals can shape dialogue-generation objectives and perceived response quality.
+
+However, generating an apparently empathetic response is not identical to correctly recognising a speaker's emotional state, and neither result establishes safe adaptation in a learning system. Empathy can be perceived through wording even when the model's assumptions are wrong. Furthermore, in a role-play exercise the simulated character's purpose is not always to be maximally agreeable or reassuring: a productive practice scenario may involve scepticism, delay, or refusal. Therefore, an affective mechanism must be subordinated to the scenario's instructional purpose and the user's control over the interaction.
+
+\subsection{Bounded adaptation rather than emotion-driven control}
+
+AffectLab adopts an application-oriented interpretation of emotion awareness. Model predictions can provide context for a small set of allowable adjustments, such as optional acknowledgement or a choice to slow the exchange. They do not define what the user really feels, determine character compliance, or modify success and safety criteria. If modalities disagree or confidence is low, asking the user to choose a pace is less presumptive than asserting an emotional state. If inference fails, the normal dialogue remains available. This division of responsibilities is informed by the uncertainty literature and the distinction between affective response generation and validated educational action \cite{ovadia2019shift,rashkin2019empathetic,lin2024imbue}.
+
+This approach also limits the meaning of \emph{adaptivity}. A system may be adaptive because it changes an interface decision in response to input, but this does not automatically make the change beneficial. A valid engineering evaluation can establish that the intended branch was selected under specified inputs. Demonstrating educational benefit from affect adaptation would require a controlled user study comparing otherwise similar adaptive and non-adaptive versions. The proposed feasibility study cannot, on its own, establish that causal effect.
+
+\section{Trust, Safety, Privacy, and Human Oversight}\label{sec:sota-ethics}
+
+\subsection{Boundaries between rehearsal and psychological support}
+
+Difficult interpersonal conversations may contain disappointment, conflict, or serious distress. This makes the interpretation and presentation of automated responses particularly consequential. De Freitas and Cohen describe health risks associated with generative AI wellness applications, including occasions when users bring crisis-related concerns to systems not adequately prepared to respond \cite{defreitas2024wellness}. AffectLab is not presented as a mental-health intervention, and these risks do not imply that rehearsal and treatment are equivalent. They do, however, justify clear scope limits, emergency-service guidance when appropriate, and independence between safety decisions and optional probabilistic emotion inference.
+
+Separating safety handling from the classifier prevents a four-category benchmark model from becoming an unvalidated crisis detector. Similarly, a generator should not be allowed to override a safety interruption or invent authoritative assessments of a participant. Independently inspectable dialogue controls, deterministic fallbacks, and the ability to pause or finish a scenario are therefore part of responsible system design rather than merely conveniences. The need for such boundaries is reinforced by concerns over long-running generated role-play and context preservation \cite{lu2025roleplay,defreitas2024wellness}.
+
+\subsection{Data minimisation and legal context}
+
+Voice recordings and personal conversations can reveal identifying or sensitive information beyond the narrow task of emotion classification. Appropriate safeguards include informed participation, explicit microphone activation, transient audio handling when possible, restricted access to saved conversations, pseudonymous research identifiers, retention limits, and withdrawal procedures. These are design requirements whose adequacy must also be examined against the actual deployment environment; code-level safeguards alone cannot establish regulatory compliance.
+
+In the European context, Regulation (EU) 2024/1689, the Artificial Intelligence Act, includes restrictions on certain uses of emotion inference, notably its prohibition concerning emotion inference in workplace and educational settings subject to the regulation's stated exceptions \cite{eu2024aiact}. This legal provision should not be simplified into a universal ban on all emotion-aware software, nor does a non-clinical label remove obligations relating to personal data. AffectLab is intended for voluntary individual rehearsal rather than employer or institutional assessment, surveillance, or consequential decisions about other people. Its applicable obligations would still require case-specific legal and ethical assessment before real-world deployment.
+
+\section{Model, System, and Participant Evaluation}\label{sec:sota-evaluation}
+
+An integrated research prototype requires evidence at multiple levels. \emph{Model evaluation} asks whether a classifier predicts predefined labels for held-out examples and whether its probabilities are calibrated. \emph{Engineering evaluation} asks whether dialogue stages, feedback evidence, safety overrides, permissions, persistence, and failure-handling rules behave as specified. \emph{Participant evaluation} asks whether the workflow is usable and acceptable, and whether exploratory outcomes support further research. Confusing these levels produces exaggerated conclusions: passing application tests does not validate emotion recognition, while model accuracy does not establish that a rehearsal experience is helpful.
+
+For the modelling component, the surveyed literature motivates five session-held-out IEMOCAP experiments with consistent examples across text-only, audio-only, contextual, and fused configurations. Results should include accuracy, macro-F1, weighted F1, class-level error patterns, and calibration measures. Because utterances from one conversation are dependent, paired comparisons should respect conversational grouping rather than treating every turn as an independent participant. The precise statistical procedure and development-data separation belong in Chapter~3 \cite{busso2008iemocap,li2022contextaware,guo2017calibration}.
+
+For dialogue and feedback, controlled test cases should include normal progression and failure paths: lack of a required communication feature, an unresolved conflict, model disagreement, low confidence, missing audio, unavailable language-model generation, a safety-triggering phrase, and an interrupted session. Their outcome is evidence of policy conformance, not human learning. For participant research, completion rates, technical reliability, feedback usefulness, perceived scenario realism, and self-reported confidence offer initial indicators of feasibility. Outcomes based on deterministic features must be described as proxies, and any observed change must not be interpreted as a causal effect without an appropriate comparison group. This reflects the distinction between the evaluation of a simulation's learning design and the evaluation of its technical representation \cite{lee2020virtualpatients,lin2024imbue}.
+
+\section{Synthesis of Existing Research}\label{sec:sota-synthesis}
+
+The studies reviewed above address complementary parts of the overall problem. Research on communication training supports structured practice and reflection. ERC research develops contextual models and multimodal features that can improve benchmark predictions. Calibration research warns against treating predictive confidence as self-validating. Dialogue research shows both the flexibility of generated responses and the need to test their consistency over multiple turns. None of these results, considered independently, validates the complete chain from emotion inference to safe rehearsal behaviour and meaningful user feedback.
+
+\begin{table}[htbp]
+\centering
+\caption{Selected research approaches, demonstrated contributions, and limitations for communication rehearsal.}
+\label{tab:sota-comparison}
+\footnotesize
+\begingroup
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{|p{0.22\linewidth}|p{0.33\linewidth}|p{0.36\linewidth}|}
+\hline
+\textbf{Work} & \textbf{Main contribution or evidence} & \textbf{Limit for AffectLab's problem} \\ \hline
+Bosse et al.\ \cite{bosse2012roleplay} and Lee et al.\ \cite{lee2020virtualpatients} & Controlled role-play evidence and synthesis of virtual-patient instructional designs. & Mostly clinical training; do not evaluate the proposed multimodal, uncertainty-aware individual rehearsal workflow. \\ \hline
+IMBUE \cite{lin2024imbue} & Personalised LLM-assisted interpersonal simulation with expert-informed feedback and participant evaluation. & Transfer varies across outcomes and situations; it does not establish the correctness of AffectLab's separate text--audio inference policy. \\ \hline
+DialogueRNN, DialogueGCN, COSMIC, CoMPM \cite{majumder2019dialoguernn,ghosal2019dialoguegcn,ghosal2020cosmic,lee2022compm} & Speaker-aware, contextual, graph-based, and commonsense-informed ERC modelling. & Classification architectures are not themselves instructional or safety-controlled rehearsal systems. \\ \hline
+Li et al.\ \cite{li2022contextaware} & Context-sensitive text--audio emotion classification with IEMOCAP session-aware experiments. & Benchmark classification does not establish calibrated behaviour or reliable deployment inference in an interactive role-play application. \\ \hline
+Tsai et al.\ \cite{tsai2019mult} and Baltru\v{s}aitis et al.\ \cite{baltrusaitis2019multimodal} & Cross-modal modelling and a taxonomy of multimodal learning problems. & Rich fusion architectures do not automatically address missing inputs, transparent decisions, or learning outcomes. \\ \hline
+Guo et al.\ \cite{guo2017calibration} and Ovadia et al.\ \cite{ovadia2019shift} & Confidence calibration methods and evidence of degradation under distribution shift. & General findings require task-specific validation and cannot guarantee calibration on AffectLab participants. \\ \hline
+Lu et al.\ \cite{lu2025roleplay} & Multi-turn comparison exposing quality degradation in generated professional role-play dialogue. & Evaluates dialogue quality rather than the effect of a bounded hybrid controller on participants' learning. \\ \hline
+\end{tabular}
+\endgroup
+\end{table}
+
+Three conclusions are particularly important. First, \emph{performance measures are not interchangeable}. Weighted emotion-classification accuracy, perceived empathy, realistic dialogue, acceptability, and communication-skill scores describe different phenomena. Second, \emph{context and multimodality create opportunities as well as vulnerabilities}: adding information can improve a benchmark result but increases dependence on data quality, compatible inputs, and the assumed distribution. Third, \emph{reliable application behaviour requires explicit policies}, especially when machine-learning results are uncertain or generative services are unavailable. A coherent system should therefore preserve provenance from model output to adaptation decision and from observed utterances to feedback.
+
+\section{Research Gap and Positioning of AffectLab}\label{sec:sota-gap}
+
+The identified research gap is not that conversational role-play, emotion recognition, multimodal fusion, or feedback generation have never been studied. Each has an extensive literature. Rather, the literature motivates a need for a carefully bounded, reproducibly evaluated integration in which (i) a live-compatible textual context model is compared with an utterance-only baseline; (ii) independent text and speech models are compared with a transparent fusion mechanism; (iii) classification performance is distinguished from calibrated operational confidence; and (iv) affect predictions are allowed to influence only explicit, low-consequence role-play actions. This is an \emph{integration and evaluation gap}, not a claim of universal novelty or proof that no similar application exists.
+
+AffectLab addresses this gap through the following linked decisions. Its machine-learning study uses a four-category IEMOCAP task with five held-out sessions, a causal history window for text, an independent audio branch, and late fusion. Equal-weight and validation-fitted configurations are distinguished, and calibration is examined separately from classification. This is intended to provide controlled evidence for RQ1 and RQ2 without claiming real-world emotion understanding \cite{busso2008iemocap,li2022contextaware,guo2017calibration}.
+
+Its conversational component uses scenario-specific, deterministic stages and completion rules, while optional language-model generation provides bounded linguistic variation. Confidence, agreement, modality availability, and the user's stated pacing preference are interpreted by a versioned, inspectable adaptation policy. Missing or disputed emotion evidence leads to baseline interaction or an explicit user choice rather than an imposed psychological interpretation. Safety and feedback are independent of the affect classifier, and generation failures have deterministic fallbacks. Together, these choices turn RQ3 into a question about verifiable application behaviour rather than an untestable claim of machine empathy \cite{bohus2009ravenclaw,lu2025roleplay,ovadia2019shift}.
+
+Finally, AffectLab treats communication rehearsal as a reflective activity. Users practise workload negotiation, boundary maintenance, and the expression of relationship needs, then inspect evidence-linked feedback, repeat or branch an exchange, and record an actionable takeaway. A small feasibility and usability evaluation is intended to investigate RQ4 through completion, acceptability, perceived realism, feedback usefulness, technical events, and exploratory communication measures. Unlike an adequately powered randomised comparison, this design cannot demonstrate that affect adaptation causes better communication or that simulated improvements transfer outside the application \cite{lee2020virtualpatients,lin2024imbue}.
+
+\section{Chapter Summary}\label{sec:sota-summary}
+
+Previous research provides substantial evidence for the value of structured communication practice, the usefulness of instructional feedback and reflection, the contribution of conversational context to emotion classification, the availability of strong pre-trained acoustic and textual representations, and the potential of multimodal fusion. It also reveals important limitations: benchmarks are domain-specific, labels do not directly measure private emotion, model confidence can be unreliable, generated dialogue can lose consistency, and apparently helpful simulations do not necessarily produce transferable learning \cite{lee2020virtualpatients,lin2024imbue,li2022contextaware,ovadia2019shift,lu2025roleplay}.
+
+The work undertaken in this dissertation is consequently different from simply training another emotion classifier or constructing an unconstrained role-playing chatbot. AffectLab combines controlled context-aware text and speech experiments with a deliberately modest affect-adaptation policy, structured dialogue management, evidence-linked feedback, optional generation, reproducible fallbacks, and separate technical and feasibility evaluations. Its contribution is to study whether these parts can be joined into a transparent research prototype while keeping conclusions within the available evidence. Chapter~3 formalises the experimental and evaluation methodology; Chapter~4 then documents the implementation of the integrated system.

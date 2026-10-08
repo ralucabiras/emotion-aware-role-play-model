@@ -1,0 +1,143 @@
+\chapter{Evaluation and Results}\label{chap5}
+
+\section{Overview}
+
+The purpose of the evaluation is to determine whether an emotion-aware adaptive technical support agent provides measurable benefits compared to a non-adaptive baseline agent. The proposed system is designed to adapt its troubleshooting strategy according to the estimated affective state of the user, particularly frustration and urgency. Therefore, the evaluation must consider not only task completion, but also user experience, perceived clarity, cognitive workload, and the agent’s ability to handle difficult or emotionally charged interactions.
+
+The evaluation follows a comparative design. Two versions of the technical support agent are compared under similar conditions. The first version is a non-adaptive baseline agent that follows a predefined troubleshooting flow without using affective information for strategy selection. The second version is the proposed adaptive agent, which uses estimated affective state and interaction context to select between different support strategies, such as normal troubleshooting, guided step-by-step support, fast-track support, and recovery behaviour.
+
+This comparison makes it possible to isolate the effect of affect-driven strategy adaptation. Both agents are intended to use the same general troubleshooting knowledge and solve the same types of technical issues. The main difference is that the adaptive agent modifies its interaction behaviour based on the user’s estimated emotional state, while the baseline agent follows a fixed interaction style.
+
+\section{Evaluation Objectives}
+
+The evaluation aims to answer the research questions defined in the introduction. More specifically, it investigates whether affect-driven strategy adaptation improves the effectiveness and perceived quality of technical support interactions.
+
+The first objective is to compare the adaptive agent and the non-adaptive baseline in terms of task-level performance. This includes whether the technical issue is resolved, how many conversation turns are required, and whether the agent avoids unnecessary repetition.
+
+The second objective is to evaluate the user experience produced by the two agents. Since technical support interactions are often influenced by frustration, uncertainty, and time pressure, subjective measures such as satisfaction, perceived helpfulness, clarity, and cognitive workload are important. Prior research on task-oriented dialogue evaluation emphasizes the importance of user satisfaction in addition to task success \cite{sun2021simulatingSatisfaction}, while workload assessment methods such as NASA-TLX provide a way to estimate perceived cognitive effort \cite{hart1988nasatlx}.
+
+The third objective is to analyze the behaviour of the adaptive agent in difficult scenarios. These include situations where the first proposed solution fails, where the user expresses frustration, where the user appears urgent, or where escalation may be needed. These cases are especially relevant because the advantage of an adaptive support agent is expected to be most visible when the interaction becomes problematic.
+
+\section{Compared Systems}
+
+The evaluation compares two versions of the same technical support system.
+
+\subsection{Non-Adaptive Baseline Agent}
+
+The baseline agent follows the same general troubleshooting flow as the proposed system, but it does not adapt its strategy based on affective state. It can ask clarifying questions, provide troubleshooting steps, verify whether the solution worked, and escalate if necessary. However, its interaction style remains fixed throughout the conversation.
+
+For example, if a user expresses frustration after a failed solution, the baseline agent may continue with the next troubleshooting step in the same format. It does not explicitly switch to shorter responses, guided mode, recovery mode, or fast-track mode based on emotional cues. This version represents a standard structured support chatbot.
+
+\subsection{Adaptive Emotion-Aware Agent}
+
+The adaptive agent uses the same troubleshooting logic as the baseline agent, but it also estimates the user’s affective state and uses it as input for strategy selection. The affective state may include frustration, urgency or arousal, and confidence in the affect prediction.
+
+Based on this information, the agent can select one of several interaction modes. In normal mode, it follows standard troubleshooting behaviour. In guided mode, it provides shorter instructions and one step at a time, which is useful when the user appears frustrated or overwhelmed. In fast-track mode, it prioritizes direct solutions and reduces unnecessary explanation, which is useful when the user appears urgent but not highly frustrated. In recovery mode, it summarizes previous attempts, avoids repeating failed steps, and proposes an alternative route or escalation when repeated failures occur.
+
+The adaptive agent therefore differs from the baseline not in the technical knowledge available to it, but in how it chooses to interact with the user during the troubleshooting process.
+
+\section{Test Scenarios}
+
+The evaluation will use a set of predefined technical support scenarios. Each scenario represents a common support problem and includes an expected resolution path. The use of predefined scenarios allows the two agents to be evaluated under comparable conditions.
+
+The scenarios should include both simple and difficult interactions. Simple scenarios are useful for testing whether the agent can complete standard troubleshooting tasks efficiently. Difficult scenarios are more important for evaluating affect-aware adaptation because they include frustration, urgency, repeated failure, ambiguity, or conversational breakdown.
+
+Examples of possible scenario categories include login problems, access or permission errors, installation issues, configuration problems, connectivity issues, and performance-related complaints. For each category, one or more scenario variants can be created. A basic variant may involve a calm user and a direct solution path. A more difficult variant may include a failed first solution, unclear user input, or an explicit expression of frustration.
+
+For example, a login issue scenario may begin with the user saying that they cannot access their account. In the simple version, the correct path may involve resetting the password. In the difficult version, the user may say that they already tried resetting the password and that the system still does not work. This allows the evaluation to observe whether the adaptive agent enters recovery or guided mode instead of repeating standard instructions.
+
+The scenario set should be balanced so that both agents are tested on the same types of problems. If human participants are used, the order of the agents and scenarios should be varied where possible to reduce ordering effects.
+
+\section{Objective Metrics}
+
+Objective metrics are used to measure the task-level performance of the two agents. These metrics are based on observable interaction outcomes and can be collected automatically from conversation logs.
+
+The first objective metric is the resolution rate, which measures the percentage of scenarios in which the agent successfully guides the user to a solution. This is a central metric for task-oriented dialogue systems because the primary goal of the agent is to solve the user’s technical issue.
+
+The second metric is the number of dialogue turns required to reach resolution. A lower number of turns may indicate a more efficient interaction, although this must be interpreted carefully. In some cases, an adaptive agent may intentionally use more turns in guided mode in order to reduce user confusion. Therefore, turn count should be considered together with satisfaction and cognitive workload.
+
+The third metric is the number of repeated or failed troubleshooting steps. This is especially relevant for technical support because repeating already-failed solutions can increase frustration and reduce trust. An adaptive system should ideally avoid unnecessary repetition, especially after the user signals that a step has already failed.
+
+The fourth metric is escalation rate. Escalation occurs when the agent determines that the issue cannot be resolved within the current interaction and recommends contacting a human support agent or collecting additional diagnostic information. A very high escalation rate may indicate that the system is ineffective, while a very low escalation rate may indicate that it fails to recognize when escalation is necessary.
+
+Additional metrics may include average interaction length, number of recovery mode activations, number of guided mode activations, and affect trajectory over the conversation. For the adaptive agent, these logs can help analyze whether emotional signals actually influenced the policy decisions.
+
+\section{Subjective Metrics}
+
+Subjective metrics are used to evaluate the user’s perception of the interaction. These metrics are important because a technical support agent can complete a task while still being perceived as confusing, frustrating, or unhelpful. Since the proposed system aims to improve both efficiency and user experience, subjective evaluation is necessary.
+
+User satisfaction can be measured using a short questionnaire after each interaction. Participants can be asked to rate how satisfied they were with the support received, how helpful the agent was, how clear the instructions were, and whether they felt the agent responded appropriately to their situation.
+
+Perceived clarity is particularly important in troubleshooting. The user should be able to understand what the agent is asking them to do and why. Guided mode is expected to improve clarity in difficult interactions by reducing the amount of information presented at once.
+
+Perceived empathy or emotional awareness can also be measured, but it should be phrased carefully. Since the agent does not truly know the user’s emotional state, the questionnaire should focus on whether the participant felt that the system responded appropriately, not whether the system “understood their emotions” with certainty.
+
+Cognitive workload can be measured using a simplified NASA-TLX-inspired questionnaire. NASA-TLX is commonly used to assess perceived workload in human-machine interaction \cite{hart1988nasatlx}. For this dissertation, a short version may include questions about mental effort, frustration, time pressure, and overall difficulty.
+
+\section{Questionnaire Design}
+
+After interacting with each agent, participants can complete a short questionnaire using a Likert scale, for example from 1 to 5, where 1 means strongly disagree and 5 means strongly agree. The questionnaire should be short enough to avoid participant fatigue, especially if each participant tests multiple scenarios.
+
+Possible questionnaire statements include:
+
+\begin{enumerate}
+    \item The agent's instructions were clear.
+    \item The agent helped me progress toward solving the problem.
+    \item The agent avoided repeating unnecessary steps.
+    \item The agent responded appropriately when the interaction became difficult.
+    \item I was satisfied with the support provided by the agent.
+    \item The interaction required a low amount of mental effort.
+    \item I would prefer using this agent for similar technical support problems.
+\end{enumerate}
+
+For a NASA-TLX-inspired workload evaluation, participants may be asked to rate the following dimensions:
+
+\begin{enumerate}
+    \item Mental demand: How mentally demanding was the interaction?
+    \item Effort: How much effort was required to complete the interaction?
+    \item Frustration: How frustrated did you feel during the interaction?
+    \item Temporal demand: How rushed did you feel during the interaction?
+    \item Performance: How successful did you feel in completing the task?
+\end{enumerate}
+
+The questionnaire can also include one or two open-ended questions. For example, participants may be asked what they liked about the interaction and what they found confusing or frustrating. These qualitative responses can provide useful explanations for the numerical results.
+
+\section{Experimental Procedure}
+
+The evaluation can be conducted using a controlled user study. Participants are asked to interact with both the adaptive and non-adaptive agents using predefined technical support scenarios. The agents should be presented in a way that does not reveal which one is adaptive, in order to reduce bias.
+
+Each participant may be assigned a small number of scenarios. To reduce ordering effects, the order of the agents can be counterbalanced. For example, half of the participants interact with the baseline agent first, while the other half interact with the adaptive agent first. Similarly, scenario order can be varied.
+
+During each interaction, the system logs relevant data such as the selected support mode, estimated affective values, number of turns, failed attempts, recovery activations, escalation decisions, and final outcome. After each interaction, the participant completes the questionnaire.
+
+If a full user study is not feasible, an initial evaluation can be performed using scripted user simulations. In this case, predefined user responses are used to test whether the adaptive agent reacts correctly to frustration, urgency, failed steps, or ambiguous input. However, a human user study is preferable for evaluating perceived satisfaction, clarity, and workload.
+
+\section{Data Analysis}
+
+The collected data will be analyzed by comparing the adaptive agent and the baseline agent across the selected metrics. For objective metrics, the analysis can include average resolution rate, average number of turns, average number of failed repeated steps, and escalation frequency. For subjective metrics, the analysis can include mean questionnaire scores for satisfaction, clarity, helpfulness, and workload.
+
+If the number of participants is sufficient, simple statistical tests may be applied to determine whether observed differences are meaningful. For example, paired comparisons can be used if the same participants interact with both agents. However, even if the sample size is limited, descriptive statistics and qualitative analysis can still provide useful insight into the behaviour of the system.
+
+The analysis should also examine specific difficult scenarios. Since the adaptive agent is expected to be most useful when frustration, urgency, or repeated failure occurs, it is important to compare performance separately for simple and difficult scenarios. This can show whether affect-aware adaptation provides particular benefits under challenging interaction conditions.
+
+For the adaptive agent, logs of selected strategies can be analyzed to determine how often each mode was activated and whether the activations were appropriate. For example, guided mode should occur more often in interactions with high frustration, while fast-track mode should occur more often in urgent but cooperative interactions. Recovery mode should occur primarily after repeated failed attempts or conversational breakdown.
+
+\section{Threats to Validity and Limitations}
+
+Several limitations may affect the evaluation. First, the number of participants may be limited, especially in a master’s dissertation context. A small sample size may reduce the generalizability of the results. To address this, the evaluation should include both quantitative metrics and qualitative observations.
+
+Second, the scenarios may be predefined and may not fully represent the complexity of real technical support interactions. Real users may describe problems unclearly, omit important information, or behave unpredictably. However, predefined scenarios are useful for controlled comparison because they allow both agents to be tested under similar conditions.
+
+Third, affective state estimation is uncertain. The system may incorrectly estimate frustration or urgency, especially when user messages are short, ambiguous, sarcastic, or emotionally neutral. This limitation should be acknowledged, and the system should use confidence scores or conservative adaptation rules to reduce the risk of inappropriate strategy switching.
+
+Fourth, participant behaviour in an evaluation setting may differ from real support interactions. Participants may not feel genuine frustration or urgency when acting through scenarios. To reduce this issue, scenarios can include realistic prompts and failure conditions, but the evaluation should still acknowledge that simulated interactions cannot fully reproduce real emotional states.
+
+Fifth, the comparison between adaptive and non-adaptive agents must be carefully designed to ensure fairness. Both agents should have access to the same troubleshooting knowledge and issue-resolution paths. Otherwise, improvements may be caused by better technical content rather than affect-aware adaptation.
+
+Despite these limitations, the proposed evaluation methodology is suitable for studying whether affect-driven strategy adaptation can improve the performance and perceived quality of a technical support dialogue agent.
+
+\section{Summary}
+
+This chapter section defined the planned evaluation methodology for the proposed emotion-aware technical support agent. The evaluation compares an adaptive agent with a non-adaptive baseline using predefined support scenarios. Objective metrics such as resolution rate, number of turns, failed repeated steps, and escalation rate are combined with subjective metrics such as satisfaction, clarity, perceived helpfulness, and cognitive workload.
+
+The methodology is designed to evaluate both task performance and user experience. This is important because the proposed contribution is not only a technical troubleshooting flow, but an affect-aware decision mechanism that adapts the agent’s strategy based on frustration, urgency, and interaction difficulty. By comparing the adaptive and non-adaptive versions under controlled conditions, the dissertation can assess whether using affective state as a policy-level control signal improves technical support interactions.

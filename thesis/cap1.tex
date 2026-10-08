@@ -1,0 +1,402 @@
+\chapter{Introduction}\label{chap1}
+
+\section{Context and Motivation}
+\label{sec:context-motivation}
+
+Interpersonal communication is central to everyday life. People routinely need to negotiate workloads, communicate personal needs, establish boundaries, respond to disagreement, and discuss sensitive subjects with colleagues, managers, friends, or family members. Although these conversations are common, they can be difficult to navigate when the outcome matters or when strong emotions are involved. A person may know what they wish to communicate but struggle to express it clearly, maintain an appropriate tone, or respond constructively to resistance. Unsuccessful communication may contribute to unresolved conflict, damaged relationships, avoidable stress, and a reduced willingness to address similar situations in the future.
+
+The broader importance of interpersonal relationships is reinforced by growing attention to social connection and relational well-being. The World Health Organization identifies social connection as an important contributor to individual and societal well-being and reports that social isolation and loneliness are widespread problems with consequences for both physical and mental health \cite{who2025socialconnection}. Technology alone cannot resolve these complex social problems. Nevertheless, accessible tools that help people prepare for and practise challenging interactions may provide one way of supporting more deliberate and confident communication.
+
+Communication is a practical skill and therefore cannot be developed through theoretical instruction alone. Role-play and simulation provide opportunities to practise language, experience conversational resistance, make mistakes, and consider alternative responses without facing the full consequences of a real interaction. Evidence from communication education suggests that role-play can improve communication performance and self-efficacy. For example, Bosse et al.\ found that both peer role-play and training with standardised patients improved medical students' communication performance and self-efficacy compared with a control condition \cite{bosse2012roleplay}. Similarly, a systematic review of virtual-patient simulators concluded that appropriately designed simulations can provide a safe and comparatively affordable environment for communication-skills training \cite{lee2020virtualpatients}.
+
+Much of the existing evidence originates from healthcare education and cannot automatically be generalised to ordinary interpersonal conversations. Nevertheless, it supports the underlying principle that realistic and repeatable simulation can be a useful method of practising communication. The systematic review by Lee et al.\ also found that effective instructional design was more important than technological sophistication alone \cite{lee2020virtualpatients}. This indicates that a useful digital rehearsal system requires explicit learning objectives, structured activities, opportunities for reflection, and meaningful feedback rather than merely a technically advanced conversational interface.
+
+Conventional role-play has several practical limitations. It may require another person, a trained facilitator, scheduled sessions, or a participant who is comfortable practising in front of others. These requirements can restrict privacy, repeatability, consistency, and accessibility. A computer-based conversational system can instead make rehearsal available on demand, allow the same interaction to be repeated, and give users an opportunity to explore alternative wording from the same conversational point.
+
+Recent research has begun to examine the use of language models for interpersonal-skills training. Lin et al.\ developed IMBUE, an interactive system that uses language models to simulate personalised communication situations and provide just-in-time feedback \cite{lin2024imbue}. In a randomised study, the system demonstrated improvements in measures including skill mastery and self-efficacy, although the transfer of outcomes varied between situation-specific and novel scenarios \cite{lin2024imbue}. This work illustrates the potential of language-model-based role-play while also demonstrating that conversational generation should be situated within a structured learning framework.
+
+Large language models can produce flexible and natural dialogue, but unrestricted generation is not sufficient for a dependable rehearsal system. A general-purpose model may be inconsistent, overly agreeable, repetitive, or unable to preserve the intended role and difficulty of a scenario. It may also generate feedback that sounds persuasive without being grounded in what the user actually communicated. These problems are particularly important in sensitive conversations, where an apparently empathic response could be mistaken for reliable psychological understanding.
+
+Consequently, an effective practice system requires a balance between generative flexibility and deterministic control. Scenario stages, success conditions, safety rules, evidence collection, and feedback metrics should remain governed by explicit application logic. A generative model may then be used to increase linguistic variety and improve the naturalness of responses without becoming the authoritative source of safety or assessment decisions. This requirement motivates the hybrid architecture adopted in AffectLab.
+
+A further limitation of many conversational systems is that they respond primarily to the literal content of the most recent message. Human communication, however, conveys information through several channels. Word choice communicates semantic meaning, while vocal characteristics such as intonation, rhythm, energy, and emphasis may provide additional affective cues. Emotional interpretation also depends on conversational context. An isolated sentence can be ambiguous, sarcastic, or misleading when separated from the preceding exchange. Research in affective computing therefore increasingly treats emotion recognition as a contextual and multimodal task rather than solely as the classification of isolated utterances.
+
+The Interactive Emotional Dyadic Motion Capture database, commonly known as IEMOCAP, was created to support research into multimodal and expressive human communication \cite{busso2008iemocap}. It contains approximately twelve hours of scripted and improvised dyadic interactions recorded from ten actors. The dataset includes speech, text transcriptions, visual information, and annotations describing emotional expression \cite{busso2008iemocap}. Its design reflects the understanding that expressive communication is conveyed through interacting verbal and non-verbal channels. IEMOCAP has consequently become a widely used benchmark for studying emotion recognition from text, speech, and multimodal data.
+
+Using both text and audio offers a potential advantage because the two modalities provide different but complementary information. Text represents the explicit semantic content of an utterance, whereas audio can represent aspects of delivery that are not preserved in a transcript. Context from preceding dialogue can additionally help distinguish the intended meaning of an utterance within an unfolding interaction. Research on context-aware multimodal emotion recognition has demonstrated the relevance of combining conversational context with audio and textual information \cite{li2022contextaware}. These findings motivated AffectLab's use of a context-aware text model, an audio model, and a late-fusion mechanism for combining their predictions.
+
+However, automatic emotion recognition must be treated with considerable caution. Emotion is complex, dynamic, culturally influenced, and not always externally observable. A model trained to classify a limited set of benchmark categories cannot determine a person's true internal emotional state. Furthermore, IEMOCAP is a relatively small dataset composed of acted and improvised English-language interactions recorded under controlled conditions \cite{busso2008iemocap}. Performance measured on this dataset does not establish reliable operation across different cultures, accents, age groups, disabilities, recording environments, conversational settings, or spontaneous emotional experiences.
+
+Models can also produce incorrect predictions with high confidence, particularly when they are applied to data that differ from their training distribution. Consequently, calibrated confidence and explicit uncertainty handling are important when affective predictions are incorporated into an interactive application. An emotion-aware system should not present every prediction as a fact or allow a low-confidence classification to determine a consequential decision. Instead, affective predictions can be treated as bounded contextual signals that inform modest and reversible interaction choices.
+
+In AffectLab, uncertainty, disagreement between the textual and audio models, or unavailable inference can result in a neutral response or an explicit pacing choice rather than a psychological claim. Crisis and safety decisions remain separate from the trained affect model, and users retain the ability to pause, continue, or end a rehearsal. The system is therefore described as \emph{emotion-aware} rather than emotionally intelligent: it uses modelled affective cues as limited contextual information but does not claim to understand the user's internal experience.
+
+These considerations motivated the development of AffectLab, a research prototype for preparing for and rehearsing difficult interpersonal conversations. The system combines structured role-play scenarios with contextual text analysis, optional speech information, uncertainty-aware adaptation, deterministic communication-skill feedback, conversation replay, and branch-and-compare functionality. Its scenarios address communication tasks such as discussing workload, maintaining a personal boundary, and expressing a relationship need without blame. Users can repeat complete attempts, retry an individual exchange, compare alternative responses, and review the conversational evidence used to produce feedback.
+
+The principal motivation for AffectLab is not to automate human relationships or provide psychological treatment. Rather, it is to investigate how multimodal affective computing and controlled conversational artificial intelligence can be integrated into an accessible environment for reflective communication practice. The project addresses both a technical and a human-computer interaction problem: how to combine context-aware emotion recognition with an adaptive role-play experience while preserving transparency, user control, privacy, safety, and appropriate limits on what the system claims to know. Accordingly, the system is evaluated in terms of model performance, application behaviour, feasibility, usability, and observable communication features, rather than diagnosis, therapeutic effectiveness, or the accurate inference of a person's private emotional state.
+
+\section{Problem Statement}
+\label{sec:problem-statement}
+
+Digital conversational systems provide a potentially accessible method for practising difficult interpersonal conversations. They can offer repeatable scenarios, immediate responses, and private access without requiring another participant or a trained facilitator. Previous research has shown that role-play and virtual simulation can support communication-skills training \cite{bosse2012roleplay,lee2020virtualpatients}, while more recent work has demonstrated the potential of language models to generate personalised interpersonal-skills simulations and feedback \cite{lin2024imbue}. However, transforming these capabilities into a coherent and responsible communication-practice system presents several interconnected problems.
+
+The first problem concerns the tension between conversational flexibility and behavioural control. A fully scripted system can provide predictable progression and reproducible assessment, but its responses may appear repetitive or fail to accommodate the variety of language that users employ. Conversely, a system based entirely on a large language model may generate more natural dialogue but can behave inconsistently, abandon the assigned role, alter the intended difficulty of a scenario, or provide feedback that is not supported by observable evidence. Generative flexibility is therefore valuable for producing varied dialogue, but it is insufficient as the sole mechanism for controlling the rehearsal.
+
+A useful role-play system must preserve a stable relationship between the user's communication, the simulated character's response, the progression of the scenario, and the feedback presented at the end of the interaction. For example, a workload conversation should not be considered successfully completed merely because the user has made an initial request. The simulated conversation may also need to explore constraints, respond to resistance, and establish whether a practical next step has been agreed. Similarly, success in a boundary-setting scenario should not depend on persuading the other character to agree. A user may successfully express and maintain a boundary even if the simulated character remains dissatisfied. These distinctions require scenario-specific dialogue rules and explicit definitions of conversational outcomes.
+
+The second problem concerns the use of affective information during an interaction. Conventional conversational systems generally respond to the semantic content of the current message but may not account for affective cues conveyed through vocal delivery or previous turns. Research into context-aware multimodal emotion recognition suggests that combining dialogue context, textual information, and audio features can improve performance on benchmark emotion-classification tasks \cite{li2022contextaware}. The IEMOCAP corpus provides a widely used basis for investigating this problem because it contains annotated, multimodal dyadic interactions \cite{busso2008iemocap}.
+
+Nevertheless, benchmark emotion recognition and responsible application behaviour are separate problems. A model can produce a statistically valid classification within a predefined benchmark while still being unsuitable for making strong claims about an individual user. The emotional categories available in IEMOCAP represent a simplified classification task and do not encompass the full range, ambiguity, or cultural variability of human emotional experience \cite{busso2008iemocap}. Furthermore, predictions can be uncertain, and textual and acoustic models may disagree. A system must therefore determine not only how to generate an affective prediction, but also when and how that prediction may appropriately influence the interaction.
+
+Directly presenting an inferred emotion as a fact could misrepresent the user's internal state. Similarly, automatically increasing or reducing scenario difficulty based on a single uncertain prediction could remove user control and produce an inappropriate interaction. The technical problem is consequently one of bounded adaptation: affective predictions should inform only limited, transparent, and reversible conversational actions. Low confidence, disagreement between modalities, unavailable inference, or explicit user preferences must be handled without interrupting the core role-play workflow.
+
+The third problem relates to feedback and explainability. Communication feedback is useful only when users can understand how it was produced and relate it to their own language. Feedback generated exclusively by a large language model may be fluent but can introduce observations that are not supported by the conversation. A purely numerical score, on the other hand, may provide insufficient guidance about what the user did effectively or what could be changed. The system must therefore connect feedback metrics to explicit and observable features, such as whether the user made a clear request, provided a specific detail, used non-blaming language, maintained a boundary, or proposed a practical next step.
+
+This creates a requirement for evidence-grounded feedback. The authoritative assessment should be produced from deterministic and inspectable communication features, while a language model may optionally improve the wording without inventing new evidence. Users should also be able to review the relevant turns, retry an exchange, and compare alternative responses. This is consistent with findings that effective simulation depends on instructional design, reflection, and feedback rather than technological sophistication alone \cite{lee2020virtualpatients}.
+
+The fourth problem concerns safety, privacy, and appropriate scope. Difficult conversations may involve distress, conflict, or crisis-related language. An adaptive rehearsal system must recognise that it is not a therapist, diagnostic instrument, or emergency service. Safety handling cannot depend on a probabilistic emotion classifier because such a model may fail, be unavailable, or misclassify an utterance. Crisis detection and safety interruption must therefore remain independent of optional affective inference and generative dialogue. Users must also retain the ability to pause, finish, or leave a scenario without being penalised.
+
+Audio introduces additional privacy considerations because a voice recording can contain sensitive and identifying information. A multimodal system should minimise audio collection, require an explicit user action, limit recording duration, and avoid retaining the recording when persistence is unnecessary. The text-based workflow must remain operational when microphone access is denied, when the user chooses not to provide audio, or when the trained models are unavailable. Multimodal processing should therefore enhance the experience without becoming a requirement for participation.
+
+The fifth problem is evaluation. A complete system combines machine-learning models, deterministic dialogue policies, optional generative services, safety controls, persistent data, and a user interface. Evaluating only the emotion-classification model would not demonstrate that the application behaves correctly. Conversely, a usability demonstration would not establish the validity of the machine-learning component. The different contributions require separate forms of evidence.
+
+The emotion-recognition models must be evaluated using speaker-independent data partitions, appropriate class-sensitive metrics, and calibration measures. Comparisons between text-only, audio-only, contextual, and fused systems must use consistent held-out examples. The application policies must be evaluated through reproducible scenarios that test dialogue transitions, uncertainty handling, fallback behaviour, evidence detection, replay, branching, and persistence. Finally, participant research must distinguish feasibility and usability from therapeutic effectiveness or real-world behavioural change. Positive benchmark performance cannot be treated as evidence that the system accurately understands its users, and successful engineering tests cannot establish that communication skills transfer to real conversations.
+
+Accordingly, the central problem addressed by this dissertation can be stated as follows:
+
+\begin{quote}
+\emph{How can contextual text and audio-based affect recognition be integrated into a structured conversational role-play system that provides adaptive, evidence-grounded communication practice while preserving predictable dialogue behaviour, calibrated uncertainty, user control, privacy, safety, and transparent evaluation?}
+\end{quote}
+
+To address this problem, AffectLab adopts a hybrid design. Deterministic policies control scenario progression, safety decisions, observable-skill assessment, and the permitted effects of affective predictions. Trained models provide contextual text, audio, and fused emotion distributions as exploratory signals. Generative artificial intelligence is used only within constrained boundaries and is accompanied by a deterministic fallback. The interface supports repeated practice, conversation replay, alternative branches, evidence-linked feedback, and user-authored takeaways.
+
+The resulting research problem is therefore not limited to improving the accuracy of an emotion classifier or producing realistic generated dialogue. It concerns the integration of machine learning, controlled conversational behaviour, uncertainty management, and human-centred safeguards into a coherent research prototype. The aim is to establish whether these components can operate together in a technically reproducible and usable system without overstating the system's ability to interpret emotion or improve users' real-world relationships.
+
+
+\section{Aim of the Dissertation}
+\label{sec:dissertation-aim}
+
+The aim of this dissertation is to design, implement, and evaluate AffectLab, an emotion-aware conversational system for rehearsing difficult interpersonal conversations. The system integrates structured role-play with contextual text and audio-based emotion recognition, uncertainty-aware adaptation, and evidence-grounded feedback.
+
+The dissertation investigates how affective machine-learning models and generative artificial intelligence can be incorporated into a communication-practice application while maintaining predictable behaviour, transparency, privacy, safety, and user control. Rather than treating model predictions as direct measurements of a person's internal emotional state, AffectLab uses them as uncertain and bounded contextual signals that may support modest adaptations to the interaction.
+
+The work also aims to bridge the gap between emotion-recognition research and its responsible use within an interactive application. Consequently, the dissertation considers not only the predictive performance and calibration of the trained models, but also how their outputs influence role-play dialogue, how uncertainty and inference failures are handled, how feedback is connected to observable evidence, and how the complete system behaves under realistic usage conditions.
+
+The purpose of AffectLab is not to provide diagnosis, therapy, crisis care, or an objective assessment of personal competence. Its intended role is to provide a controlled and repeatable environment in which users can prepare for, practise, review, and compare different approaches to challenging conversations. Accordingly, the dissertation evaluates the system as a research prototype for communication rehearsal and does not assume that successful interaction with the application necessarily transfers to improved real-world communication.
+
+Overall, the dissertation aims to demonstrate a technically reproducible and human-centred approach to emotion-aware role-play in which trained models, deterministic dialogue policies, optional generative components, and safety mechanisms have clearly defined and appropriately limited responsibilities.
+
+
+
+\section{Objectives}
+\label{sec:dissertation-objectives}
+
+To achieve the aim of the dissertation, the following objectives were defined:
+
+\begin{enumerate}
+    \item To review relevant research concerning communication-skills rehearsal, conversational agents, affective computing, emotion recognition in conversation, multimodal learning, and responsible human--AI interaction.
+
+    \item To prepare and document an experimental workflow based on the IEMOCAP dataset, using speaker-independent partitions to reduce the risk of evaluating the models on speakers observed during training.
+
+    \item To develop an utterance-level textual emotion-recognition baseline and a context-aware text model that incorporates preceding conversational turns.
+
+    \item To evaluate whether conversational context improves textual emotion recognition compared with the utterance-only baseline.
+
+    \item To develop an audio-based emotion-recognition model capable of extracting affective information from speech while operating independently of the textual model.
+
+    \item To combine the context-aware textual and audio models through late fusion and determine whether the multimodal system improves classification performance over the individual modalities.
+
+    \item To calibrate the textual, audio, and fused predictions so that model confidence can be interpreted more cautiously when used by the application.
+
+    \item To design and implement structured role-play scenarios for difficult interpersonal conversations, including workload negotiation, personal boundary-setting, and the expression of relationship needs.
+
+    \item To define explicit dialogue stages, character profiles, difficulty levels, completion conditions, and unresolved outcomes so that scenario progression remains predictable and reproducible.
+
+    \item To develop a bounded adaptation policy that determines whether affective predictions may influence the interaction based on confidence, agreement between modalities, model availability, user preferences, and safety conditions.
+
+    \item To ensure that trained emotion-recognition models do not determine crisis handling, scenario success, feedback scores, participant eligibility, or other consequential application decisions.
+
+    \item To produce communication feedback from deterministic and observable language features, with each metric linked to evidence from specific conversational turns.
+
+    \item To support reflective and repeated practice through conversation replay, retrying individual exchanges, alternative conversation branches, comparison between attempts, personal scenario preparation, and action-card creation.
+
+    \item To implement appropriate security, privacy, and research-data controls, including authentication, ownership-protected sessions, optional and transient voice processing, pseudonymous research records, withdrawal support, and data-retention mechanisms.
+
+    \item To provide deterministic fallbacks for optional external services so that the core text-based workflow remains operational when generative, transcription, or multimodal inference services are unavailable.
+
+    \item To evaluate the machine-learning components using accuracy, macro-averaged F1, weighted F1, per-class measures, calibration metrics, and paired statistical comparisons where appropriate.
+
+    \item To evaluate the application through automated unit, integration, browser, persistence, recovery, accessibility, and end-to-end tests, together with reproducible authored engineering cases.
+
+    \item To define a feasibility and usability study protocol that measures completion, acceptability, feedback usefulness, scenario realism, self-reported confidence, technical failures, and observable communication features without making therapeutic or causal-effectiveness claims.
+
+    \item To document the limitations of the dataset, trained models, dialogue policies, evaluation procedures, and intended use so that the conclusions remain proportionate to the evidence collected.
+\end{enumerate}
+
+\section{Research Questions}
+\label{sec:research-questions}
+
+This dissertation examines both the performance of the multimodal emotion-recognition models and their responsible integration into an adaptive communication-practice application. It also considers the behaviour of the complete system and its feasibility as a tool for rehearsing difficult interpersonal conversations. The dissertation is therefore guided by the following research questions:
+
+\begin{description}
+    \item[\textbf{RQ1.}] \textbf{Does incorporating preceding conversational turns improve text-based emotion recognition compared with classifying each utterance independently?}
+
+    This question investigates whether a context-aware textual model can represent the development of emotion across a conversation more effectively than an utterance-only baseline. The comparison is based on speaker-independent evaluation using the same held-out IEMOCAP sessions.
+
+    \item[\textbf{RQ2.}] \textbf{Does combining contextual textual information with acoustic information improve emotion-classification performance compared with the individual text and audio modalities, and what trade-off exists between classification performance and confidence calibration?}
+
+    This question evaluates whether text and speech provide complementary affective information. It also distinguishes between predictive performance and probability calibration, since a fusion method may improve classification while producing confidence estimates that require additional calibration before operational use.
+
+    \item[\textbf{RQ3.}] \textbf{How can uncertain multimodal affect predictions be integrated into a structured role-play dialogue policy while keeping the system's behaviour explainable, controllable, safe, and robust to disagreement or inference failure?}
+
+    This question concerns the integration of affective computing into the application. It examines how confidence, modality agreement, model availability, explicit user preferences, and safety conditions can be translated into bounded conversational actions without allowing an emotion prediction to determine safety decisions, feedback scores, or scenario success.
+
+    \item[\textbf{RQ4.}] \textbf{Is an emotion-aware role-play system feasible and acceptable for the rehearsal of difficult interpersonal conversations, and what preliminary changes can be observed in self-reported confidence and deterministic communication-skill measures across the rehearsals?}
+
+    This question concerns the complete AffectLab workflow. Feasibility is considered through completion, technical reliability, fallback use, and missing data, while acceptability is considered through participant ratings of realism and feedback usefulness. Changes in confidence and observable communication features are exploratory and are not interpreted as evidence of therapeutic effectiveness or guaranteed transfer to real-world conversations.
+\end{description}
+
+\section{Proposed Approach}
+\label{sec:proposed-approach}
+
+To address the research questions, this dissertation proposes AffectLab, a full-stack research prototype that combines multimodal emotion recognition with structured and adaptive conversational role-play. The proposed approach separates emotion inference, dialogue control, response generation, feedback, and safety into distinct components. This separation is intended to preserve predictable application behaviour while still allowing trained models and generative artificial intelligence to contribute to the interaction.
+
+The work is organised into four connected areas: multimodal emotion recognition, structured role-play, uncertainty-aware adaptation, and multi-level evaluation.
+
+\subsection{Multimodal Emotion Recognition}
+
+The first part of the approach concerns the development of models for recognising affective information from text and speech. The models are trained and evaluated using the IEMOCAP dataset, which contains annotated dyadic interactions with textual and acoustic information.
+
+An utterance-only text classifier is established as the initial baseline. A context-aware text model is then developed by combining the current utterance with a fixed number of preceding conversational turns. Comparing these models makes it possible to evaluate whether causal dialogue context improves emotion classification without using future information that would be unavailable during a live interaction.
+
+A separate audio model is trained using the speech signal associated with each utterance. The audio model captures characteristics of vocal delivery that are not represented in the transcript. Textual and acoustic outputs are retained separately so that the contribution, confidence, and possible disagreement of each modality can be inspected.
+
+Late fusion is used to combine the probability distributions produced by the contextual text and audio models. Both a predeclared equal-weight fusion and validation-fitted fusion configurations are considered. Temperature scaling and validation-derived modality weights are used to investigate confidence calibration. This separates the question of which configuration achieves the strongest classification performance from the question of which configuration produces the most reliable confidence estimates for operational use.
+
+The models are evaluated using five speaker-independent folds corresponding to the five IEMOCAP sessions. This prevents the speakers used for testing from appearing in the corresponding training data. Evaluation includes accuracy, macro-averaged F1, weighted F1, per-class measures, expected calibration error, negative log-likelihood, and the multiclass Brier score. Paired dialogue-level bootstrap comparisons are used to estimate the uncertainty surrounding differences between selected model configurations.
+
+\subsection{Structured Conversational Role-Play}
+
+The second part of the approach concerns the design of a structured environment for rehearsing difficult interpersonal conversations. AffectLab provides scenarios involving workload negotiation, personal boundary-setting, and the expression of relationship needs. Each scenario defines an objective, expected communication features, difficulty-dependent behaviour, conversational stages, and explicit completion conditions.
+
+Scenario progression is controlled by deterministic dialogue policies rather than by an unconstrained language model. The policies inspect observable features in the user's message and determine the next dialogue stage, the simulated character's intended action, and whether the scenario has reached a resolved, boundary-held, next-step, unresolved, manually completed, or maximum-turn outcome.
+
+The deterministic policy produces a response plan that constrains the simulated character's role and intended behaviour. An optional generative model may phrase the response more naturally, but it cannot change the recorded dialogue decision or determine whether the user has satisfied a scenario requirement. If generation is unavailable, rejected, or inconsistent with the required role, the system uses a deterministic template response.
+
+The role-play design also includes different difficulty levels and character profiles. These vary the amount of resistance, time pressure, scepticism, or cooperation expressed by the simulated character while preserving the scenario's safety and completion rules. Users remain able to pause, resume, or finish a rehearsal regardless of the selected difficulty.
+
+\subsection{Uncertainty-Aware Affect Adaptation}
+
+The third part of the approach connects multimodal inference to the role-play experience through a bounded and versioned adaptation policy. The purpose of this policy is not to declare how the user feels, but to determine whether the current evidence supports a modest change in conversational pacing.
+
+The policy considers the confidence of the fused prediction, agreement between the textual and acoustic models, the availability of inference, the current scenario state, and any explicit pacing preference selected by the user. Supported high-confidence and matching predictions may permit a brief acknowledgement. Low confidence or disagreement between modalities results in an offer of user choice rather than an automatic interpretation. Missing or failed inference results in baseline dialogue behaviour.
+
+The adaptation policy does not determine crisis handling, scenario completion, communication-skill scores, participant eligibility, or research outcomes. Crisis-related language is processed through a separate text-first safety mechanism that takes precedence over ordinary generation and affect adaptation. This separation ensures that a trained emotion model is not treated as a safety-critical component.
+
+Voice use is optional. When enabled, a short recording is converted into the required audio format and submitted with the user's text for the current inference request. Raw audio is not required for the text-based workflow and is not retained as part of the conversation record. If microphone access is denied or multimodal inference is unavailable, the user can continue through the standard text-based experience.
+
+\subsection{Evidence-Grounded Feedback and Reflection}
+
+The fourth part of the proposed system concerns feedback and reflective practice. AffectLab evaluates observable communication features rather than inferring personality, general competence, or psychological characteristics. Depending on the scenario, these features may include a clear request, a specific detail, boundary maintenance, non-blaming language, an ``I'' statement, acknowledgement of another perspective, or a practical next step.
+
+Each feedback metric is connected to the conversational turns in which the relevant evidence was detected. Deterministic metrics remain the authoritative feedback source. A generative model may optionally improve the wording of strengths and suggestions, but it cannot introduce evidence that was not recorded by the application.
+
+After a rehearsal, the user can review the conversation, inspect recorded dialogue and adaptation decisions, retry the most recent exchange, or create an alternative branch from an earlier point. Branch comparison separates copied context from the newly attempted continuation and compares only the relevant evidence. Users can also record a personal takeaway and produce an action card summarising the wording or next step that they wish to remember.
+
+\subsection{System and Research Evaluation}
+
+The proposed evaluation follows a multi-level design because the trained models and the complete application support different types of claims.
+
+First, the machine-learning evaluation compares utterance-only text, contextual text, audio-only, and multimodal configurations using held-out speaker-independent data. This addresses the first two research questions concerning conversational context, multimodal fusion, and confidence calibration.
+
+Second, an engineering evaluation examines dialogue transitions, scenario outcomes, affect-policy decisions, evidence detection, fallback behaviour, persistence, replay, branching, and recovery. Authored cases are used to test specific expected behaviours and known failure modes. Automated backend, frontend, database, accessibility, and end-to-end tests provide additional evidence that the integrated system behaves consistently.
+
+Third, a single-arm feasibility and usability pilot is defined for adult English-speaking participants. Participants complete three standardised scenarios at intermediate difficulty. The primary feasibility outcome is completion of all required scenarios and their post-rehearsal questionnaires. Secondary exploratory outcomes include feedback usefulness, scenario realism, changes in self-reported conversation confidence, turn counts, fallback use, technical failures, completion reasons, and deterministic communication-skill measures.
+
+The participant evaluation is not designed as a clinical trial or as evidence that AffectLab causes lasting improvement in communication. It instead examines whether the workflow can be completed, whether it is acceptable to participants, and whether the collected measures are suitable for informing future research.
+
+\section{Expected Contributions}
+\label{sec:expected-contributions}
+
+The expected contribution of this dissertation is a reproducible demonstration of how multimodal affect recognition can be integrated into a structured communication-rehearsal system without allowing uncertain predictions or unconstrained generation to control consequential decisions. This overall contribution is divided into the following technical, methodological, and applied contributions:
+
+\begin{enumerate}
+    \item \textbf{An empirical evaluation of conversational context for textual emotion recognition.}
+
+    The dissertation provides a controlled comparison between an utterance-only text classifier and a context-aware model that incorporates preceding conversational turns. The comparison uses identical speaker-independent test partitions and dialogue-level statistical analysis, contributing evidence about the value of causal conversational context in emotion recognition.
+
+    \item \textbf{A comparative multimodal emotion-recognition pipeline.}
+
+    The work develops text-only, audio-only, and late-fusion configurations using a consistent four-class IEMOCAP benchmark. This makes it possible to examine the complementary contribution of linguistic and acoustic information rather than reporting only the performance of a final combined model.
+
+    \item \textbf{A distinction between classification performance and operational confidence.}
+
+    The dissertation evaluates both a predeclared equal-weight fusion configuration and validation-fitted calibration configurations. This distinguishes the strongest confirmatory classification result from the model configuration selected for presenting or thresholding confidence within the application. The distinction helps avoid choosing an operational model solely according to its test-set classification score.
+
+    \item \textbf{An uncertainty-aware affect adaptation policy.}
+
+    AffectLab contributes a versioned policy that translates confidence, modality agreement, inference availability, and user preference into a restricted set of conversational actions. The policy explicitly defines situations in which the system should acknowledge a signal, offer a pacing choice, use baseline behaviour, or defer to safety handling.
+
+    \item \textbf{A hybrid architecture for controllable generative role-play.}
+
+    The system separates deterministic dialogue decisions from optional generative wording. Scenario progression, outcomes, safety, and assessment remain controlled by inspectable application logic, while generative artificial intelligence is used within constrained boundaries to improve conversational variety. Deterministic fallbacks preserve the core workflow when external generation is unavailable.
+
+    \item \textbf{Scenario-specific models of difficult conversations.}
+
+    The dissertation defines multi-stage dialogue policies for workload negotiation, personal boundary-setting, and the expression of relationship needs. These policies distinguish different successful and unresolved outcomes, including agreement, practical next steps, respectfully maintained boundaries, and recorded disagreement. This avoids defining success only as compliance by the simulated character.
+
+    \item \textbf{Evidence-grounded communication feedback.}
+
+    AffectLab links feedback metrics to observable language features and specific conversational turns. This provides a more transparent alternative to ungrounded natural-language assessment and allows users to inspect why a particular strength or suggestion was produced.
+
+    \item \textbf{Support for counterfactual and reflective practice.}
+
+    The system enables users to replay conversations, retry individual exchanges, create alternative branches, and compare continuations from the same conversational context. This contribution turns a completed dialogue into an inspectable practice record rather than presenting only a final score or summary.
+
+    \item \textbf{A privacy- and safety-conscious multimodal workflow.}
+
+    The proposed implementation keeps voice input optional and transient, separates affect inference from crisis handling, and maintains the usability of the text-based system when multimodal services fail. It also includes ownership-protected sessions, explicit retention behaviour, research consent, pseudonymous exports, and withdrawal mechanisms.
+
+    \item \textbf{A reproducible multi-level evaluation framework.}
+
+    The dissertation separates model evaluation, engineering evaluation, and participant evaluation. Speaker-independent experiments and statistical comparisons support claims about emotion classification; authored cases and automated tests support claims about application behaviour; and the feasibility protocol supports limited claims about completion and acceptability. This separation helps keep conclusions proportionate to the evidence available.
+
+    \item \textbf{An integrated research prototype for future study.}
+
+    AffectLab provides an end-to-end platform containing participant workflows, research administration, model integration, safety controls, structured data collection, and reproducible exports. The prototype can therefore support future research into communication rehearsal, affect-aware interaction, model generalisation, and comparative evaluation, subject to appropriate ethical approval and external validation.
+\end{enumerate}
+
+These contributions are expected to demonstrate that emotion-aware adaptation can be incorporated into a role-play application in a limited and inspectable manner. The contribution does not consist of a claim that AffectLab understands a user's true emotions or that practising with the system necessarily improves real-world relationships. Instead, it lies in the design, implementation, and evaluation of a transparent architecture that connects multimodal affective models to controlled conversational behaviour while preserving uncertainty, user agency, and clearly defined system boundaries.
+
+
+
+\section{Scope and Limitations}
+\label{sec:scope-limitations}
+
+This dissertation investigates the design, implementation, and evaluation of AffectLab as a research prototype for emotion-aware communication rehearsal. Its scope includes multimodal emotion recognition, structured role-play, uncertainty-aware adaptation, evidence-grounded feedback, reflective practice, and the technical infrastructure required to support a feasibility and usability study. The conclusions are restricted to these areas and to the evidence produced by the model experiments, engineering evaluation, and participant-study design.
+
+\subsection{System Scope}
+
+AffectLab is intended for adults who wish to rehearse ordinary but potentially difficult interpersonal conversations. The implemented scenarios focus on three categories: discussing workload with a manager, maintaining a personal boundary, and expressing a relationship need without blame. Users may also prepare custom scenarios within the communication features supported by the application.
+
+The system provides text-based role-play with optional voice input. It supports scenario selection, difficulty levels, character profiles, pausing, manual completion, conversation replay, retrying an exchange, branching from an earlier conversational point, comparison between attempts, personal takeaways, and action-card creation. These functions are intended to support preparation and reflection rather than reproduce every aspect of a real interpersonal interaction.
+
+The application includes optional language-model-based response generation, feedback phrasing, moderation, and transcription. These services are placed behind deterministic interfaces and fallbacks so that the core workflow remains available when an external service is disabled or unavailable. The system does not attempt to provide unrestricted open-domain conversation. Its adaptive role-play functions are limited to the scenarios, dialogue stages, character behaviours, and communication features explicitly represented by the application.
+
+\subsection{Machine-Learning Scope}
+
+The machine-learning component focuses on supervised categorical emotion recognition from text and audio. The primary experimental task uses four IEMOCAP classes: anger, happiness, sadness, and neutral. Excitement is merged with happiness in accordance with the selected benchmark configuration. The models do not represent the complete range of human affect and do not identify complex or mixed states such as anxiety, guilt, shame, uncertainty, embarrassment, or frustration as independent operational classes.
+
+The textual model uses the current utterance and a limited number of preceding conversational turns. The context is causal because future utterances are excluded from application inference. The audio model processes short speech recordings, while late fusion combines the textual and acoustic probability distributions. Facial expressions, physiological signals, body posture, gaze, and video are outside the scope of the implemented multimodal system.
+
+Model evaluation is performed using five session-held-out IEMOCAP folds. This reduces direct speaker overlap between training and testing, but it does not constitute cross-dataset or real-world validation. The final full-data models are deployment artifacts trained after the cross-validation design was completed. Their training performance is not treated as independent evaluation evidence.
+
+The trained models are used only as exploratory affective components. Their outputs do not determine participant eligibility, crisis handling, safety interruption, scenario success, feedback scores, or research-study completion. The application can operate without the multimodal models, and optional voice input is not required for participation.
+
+\subsection{Role-Play and Feedback Scope}
+
+AffectLab evaluates observable features of the user's language rather than underlying intentions, personality, emotional health, or general communication ability. Depending on the scenario, the system may identify features such as a clear request, a specific detail, an ``I'' statement, non-blaming wording, acknowledgement of another perspective, boundary maintenance, or a proposed next step.
+
+These features are detected through deterministic rules. They provide reproducible evidence but cannot capture every valid form of communication. Indirect expressions, paraphrases, sarcasm, reported speech, unusual vocabulary, grammatical errors, and culturally specific communication styles may be interpreted incorrectly. A detected feature may therefore be a false positive, while an appropriate response may fail to activate the relevant rule.
+
+Feedback scores describe only the language observed during a particular attempt. They are not validated measures of personal competence and should not be used to compare individuals, make employment or educational decisions, or assess psychological improvement. The system may help users inspect and revise their wording, but it cannot determine whether a response would be effective in a real relationship or workplace.
+
+The simulated character is necessarily a simplification. Real people may react unpredictably, misunderstand a request, introduce new information, refuse to cooperate, or behave in ways not represented by the dialogue policy. Reaching a successful outcome in AffectLab does not guarantee that the same wording will produce a similar result in a real conversation. Conversely, an unresolved simulated outcome does not imply that the user communicated poorly.
+
+\subsection{Dataset and Generalisation Limitations}
+
+IEMOCAP is a comparatively small dataset recorded from ten actors in controlled dyadic sessions. Its scripted and improvised interactions do not fully represent spontaneous everyday communication. The speakers, recording equipment, acoustic environment, conversational tasks, and annotation procedures differ from those encountered in deployment.
+
+The dataset is English-language and does not establish generalisation across languages, cultures, accents, dialects, age groups, disabilities, or communication styles. Emotional expression and interpretation can vary across individuals and social contexts. Consequently, performance on IEMOCAP cannot be interpreted as evidence that the models will recognise emotion with equivalent accuracy in AffectLab users.
+
+The four-class benchmark imposes a single categorical label even when an utterance may be ambiguous or express several affective states. The ground-truth annotations represent the judgements produced through the dataset's annotation process rather than direct measurements of a speaker's internal experience. A prediction may therefore match a benchmark label without accurately representing how the speaker understood their own emotional state.
+
+Class performance is also uneven. Aggregate accuracy or macro-averaged F1 can conceal weaker recognition for an individual category. Model results must therefore be interpreted together with per-class metrics, confusion patterns, statistical uncertainty, and the limitations of the evaluation corpus.
+
+\subsection{Uncertainty and Calibration Limitations}
+
+Confidence calibration estimates how model probabilities correspond to correctness within the available validation and test distributions. Good calibration on IEMOCAP does not guarantee calibrated behaviour in AffectLab conversations, where language, microphones, recording conditions, and user populations may differ.
+
+The low-confidence threshold used by the interface is a presentation and adaptation policy rather than a scientifically validated boundary between reliable and unreliable emotion inference. Similarly, agreement between the text and audio models does not prove that the resulting prediction is correct. Both models may agree on the same incorrect category.
+
+Late fusion also introduces a trade-off between classification performance and calibration. A configuration that produces the highest classification score may not produce the most reliable probability estimates. The dissertation therefore distinguishes the confirmatory classification configuration from the calibrated operational configuration rather than treating one result as optimal for every purpose.
+
+\subsection{Generative Artificial Intelligence Limitations}
+
+Optional generative services can improve the variety and naturalness of role-play responses, but they remain probabilistic. Generated wording may be repetitive, overly agreeable, culturally inappropriate, inconsistent with the intended character, or factually incorrect. External model behaviour may also change between provider versions.
+
+The application constrains generation through structured prompts, response plans, validation, and deterministic fallbacks. These measures reduce but do not eliminate inappropriate output. A generated response must not be interpreted as professional advice, and the availability of a language model does not make AffectLab a therapist, mediator, counsellor, or authoritative communication expert.
+
+The system may send conversation content to an external provider when the relevant services are configured and the user has accepted the disclosure. This creates a different privacy boundary from fully offline operation. Although the application avoids placing raw prompts and model responses in ordinary application logs, use of an external provider remains subject to the provider's infrastructure and applicable data-handling terms.
+
+\subsection{Safety and Clinical Limitations}
+
+AffectLab is not a medical device, mental-health intervention, diagnostic system, or emergency service. It is not intended to diagnose emotion, anxiety, depression, cognitive distortion, relationship problems, or any other psychological condition. Its affective outputs are model predictions over predefined labels and must not be interpreted as clinical assessments.
+
+The application includes a conservative text-based crisis-phrase check and optional provider moderation. These mechanisms cannot detect every expression of risk, particularly when language is indirect, ambiguous, culturally specific, misspelled, or expressed through audio characteristics rather than explicit text. The safety layer therefore reduces specific foreseeable risks but does not provide complete crisis detection or clinical triage.
+
+Safety decisions remain text-first and independent of the multimodal model. This prevents uncertain emotion predictions from overriding explicit crisis-related language, but it also means that distress expressed only through tone of voice may not activate the safety mechanism. Users requiring urgent or professional support must be directed to appropriate human and emergency services.
+
+\subsection{Privacy and Security Limitations}
+
+The system applies authentication, ownership checks, password hashing, session expiry, pseudonymous research records, and restricted researcher exports. Optional audio is processed transiently and is not intentionally retained as part of the conversation record. These controls reduce privacy and security risks but cannot guarantee absolute protection.
+
+AffectLab stores conversation text for the configured retention period because replay, feedback, branching, and session recovery depend on it. Conversation text may contain sensitive personal information entered by the user. Participants must therefore receive clear information about what is collected, why it is required, how long it is retained, and when it may be transmitted to an external service.
+
+The security controls implemented in the prototype require deployment-specific configuration and independent review before remote or public use. Secure hosting, transport encryption, secret management, database backups, dependency monitoring, rate limiting, incident response, and regulatory compliance depend partly on the environment in which the application is deployed and cannot be established solely by the source code.
+
+\subsection{Evaluation Limitations}
+
+The model experiments evaluate classification on IEMOCAP rather than on recordings collected from AffectLab participants. No claim is made that the reported benchmark accuracy represents recognition accuracy during application use. Participant affect predictions cannot be evaluated for correctness without appropriate ground-truth labels and a separately approved validation procedure.
+
+The engineering evaluation uses authored synthetic cases to exercise known dialogue, evidence, adaptation, persistence, and fallback behaviours. These cases are useful for testing whether the implementation follows its declared rules, but they are not an independent sample of human conversations. Passing the authored cases demonstrates policy conformance rather than improved communication outcomes.
+
+The feasibility study uses a single-arm, within-participant design with a limited target sample. It can examine completion, acceptability, technical reliability, feedback usefulness, scenario realism, self-reported confidence, and exploratory communication metrics. Without a randomised non-adaptive control group, it cannot establish that affect-aware adaptation causes better outcomes than a non-adaptive system.
+
+Self-reported confidence may be influenced by familiarity with the application, demand characteristics, or repeated exposure to a scenario. Deterministic skill measures may change because users learn how the application detects particular language features. Neither type of change establishes that participants communicate more effectively outside the system.
+
+The study is not powered to demonstrate clinical effectiveness, long-term behaviour change, or differences between demographic subgroups. Any observed changes are exploratory and should be interpreted as preliminary evidence for future research rather than as confirmatory proof of effectiveness.
+
+\subsection{Delimitations}
+
+The following areas are intentionally outside the scope of this dissertation:
+
+\begin{itemize}
+    \item clinical diagnosis, treatment, counselling, or therapeutic intervention;
+    \item autonomous crisis assessment or emergency response;
+    \item emotion inference for employment, education, surveillance, or decisions about another person;
+    \item use by children or individuals unable to provide informed consent;
+    \item multilingual emotion recognition or multilingual role-play;
+    \item video, facial-expression, gaze, gesture, or physiological-signal analysis;
+    \item unrestricted simulation of arbitrary real people;
+    \item claims of long-term improvement or transfer to real-world relationships;
+    \item population-level validation across cultures, accents, ages, or clinical groups;
+    \item production-scale performance, high-availability hosting, or public clinical deployment; and
+    \item replacing communication professionals, mediators, counsellors, or other forms of human support.
+\end{itemize}
+
+Within these boundaries, the dissertation evaluates AffectLab as an integrated research and engineering contribution. Its findings concern the performance of the selected models on the defined benchmark, the behaviour of the implemented policies, and the feasibility of the specified rehearsal workflow. Conclusions beyond these boundaries require additional datasets, comparative studies, participant populations, and independent ethical and technical validation.
+
+
+
+\section{Dissertation Structure}
+\label{sec:dissertation-structure}
+
+The dissertation is organised into six chapters.
+
+Chapter 1 introduces the research context and motivation for developing an emotion-aware system for difficult-conversation rehearsal. It defines the problem statement, aim, objectives, and research questions before outlining the proposed approach, expected contributions, scope, and limitations of the dissertation.
+
+Chapter 2 presents the state of the art. It reviews communication-skills rehearsal and conversational simulation, affective computing, textual and speech emotion recognition, emotion recognition in conversation, contextual modelling, multimodal fusion, confidence calibration, conversational agents, large language models, adaptive dialogue systems, evidence-grounded feedback, and the safety and ethical limitations of emotion-aware technologies.
+
+Chapter 3 presents the research methodology and design of the proposed system. It describes the IEMOCAP dataset, data preprocessing, speaker-independent experimental protocol, contextual text and audio modelling, late fusion, confidence calibration, statistical evaluation, and the methodology used to evaluate the integrated application. It also presents the feasibility and usability study design, research measures, data-management procedures, and ethical boundaries.
+
+Chapter 4 describes the architecture and implementation of AffectLab. It presents the frontend, backend, persistence layer, trained-model inference pipeline, structured role-play policies, scenario-specific dialogue progression, uncertainty-aware affect adaptation, constrained response generation, deterministic feedback, replay and branching functionality, safety mechanisms, privacy controls, research-data collection, and fallback behaviour.
+
+Chapter 5 presents the evaluation and results. It reports the comparison between utterance-only and context-aware text models, the audio-only baseline, multimodal fusion performance, confidence-calibration results, and statistical comparisons. It also presents the engineering evaluation of dialogue behaviour, affect-policy decisions, evidence detection, fallback handling, persistence, replay, branching, accessibility, and end-to-end workflows. Where participant data are available, the chapter additionally reports feasibility, acceptability, self-reported confidence, and exploratory communication-skill outcomes.
+
+Chapter 6 concludes the dissertation by summarising the main findings and contributions in relation to the research questions. It discusses the limitations of the models, dataset, system design, and evaluation, and identifies directions for future work, including broader validation, comparative user studies, multilingual support, improved communication-feature detection, and further research into responsible affect-aware adaptation.
+
+
+
+
+

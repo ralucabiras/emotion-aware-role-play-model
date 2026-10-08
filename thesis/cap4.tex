@@ -1,0 +1,671 @@
+\chapter{Implementation}
+\label{chap:implementation}
+
+\section{Chapter Overview}
+\label{sec:implementation-overview}
+
+This chapter describes the implementation of AffectLab, translating the architecture, requirements, and safeguards defined in Chapter~\ref{chap:proposed-system-architecture} into an operational research prototype. The implementation combines a React and TypeScript browser interface, a Python and FastAPI backend, MongoDB persistence, trained text and speech emotion-recognition models, and optional external services for language generation, transcription, moderation, and email delivery. These elements are integrated as replaceable components rather than as a single end-to-end model, preserving the separation between affect inference, deterministic application control, response realisation, and presentation established in the system design.
+
+The prototype follows a text-first and failure-tolerant implementation strategy. Structured role-play, dialogue progression, safety handling, evidence collection, feedback, and session management remain available without voice input or network-dependent artificial-intelligence services. When configured, the trained models add contextual textual and acoustic affect estimates, which are calibrated and combined through late fusion. Their outputs are interpreted by a bounded pacing policy and cannot determine crisis handling, dialogue success, or feedback scores. Similarly, a language model may improve the wording of a response or feedback item, but deterministic policies and recorded evidence remain authoritative. This arrangement makes component failures explicit and allows the core rehearsal workflow to fall back to reproducible local behaviour.
+
+The chapter first presents the technology stack, repository organisation, and configuration approach. It then explains the emotion-recognition pipeline, including dataset preparation, contextual text modelling, speech modelling, multimodal fusion, calibration, and model provenance. The subsequent sections describe the backend services and persistence layer, the scenario-based role-play engine, affect-aware pacing, safety precedence, and the feedback and reflection mechanisms. The browser interface is then considered from the perspective of the participant and researcher workflows, including conversation preparation, voice interaction, uncertainty presentation, replay, branching, questionnaires, and research export.
+
+The final sections describe the security and privacy controls, deployment modes, and verification strategy used during development. This chapter is concerned with how the system was constructed and how its implementation was checked through unit, integration, end-to-end, and smoke tests. Quantitative model performance, comparisons between system conditions, participant measures, and the interpretation of evaluation results are reported separately in Chapter~\ref{chap5}.
+
+
+\section{Technology Stack and Project Organisation}
+\label{sec:technology-stack}
+
+AffectLab is implemented as a modular full-stack application rather than as a single machine-learning program. The implementation separates the participant-facing interface, application and dialogue logic, persistence, optional external integrations, and model-development code. This separation reflects the architectural boundaries introduced in Chapter~\ref{chap:proposed-system-architecture}: a trained classifier supplies evidence to the application, but it is not responsible for authentication, dialogue progression, safety handling, or feedback scoring. It also permits the core text-based rehearsal workflow to run when model artefacts, a graphics-processing unit, or a network-backed provider are unavailable.
+
+Table~\ref{tab:implementation-stack} summarises the principal technologies in the implemented system. Exact Python application dependencies are pinned in the backend requirements file, while the frontend lock file records the resolved JavaScript dependency graph. Machine-learning dependencies use bounded version ranges because training and inference may be executed in different managed environments, including local installations and notebook runtimes.
+
+\begin{table}[htbp]
+\centering
+\caption{Principal technologies used in the AffectLab implementation.}
+\label{tab:implementation-stack}
+\footnotesize
+\begingroup
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.18\textwidth}|>{\raggedright\arraybackslash}p{0.32\textwidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Area} & \textbf{Technologies} & \textbf{Implementation role} \\ \hline
+
+Browser application &
+React 19, TypeScript, Vite, HTML, and CSS &
+Implements account, rehearsal, feedback, reflection, and research interfaces as a responsive single-page application. \\ \hline
+
+Application programming interface &
+Python 3.12, FastAPI, Uvicorn, and Pydantic &
+Validates requests, coordinates services, exposes authenticated HTTP endpoints, and serialises typed response objects. \\ \hline
+
+Persistence &
+MongoDB 8 and PyMongo &
+Stores users, account-owned sessions, research records, token digests, lifecycle state, and frozen research exports. \\ \hline
+
+Machine learning &
+PyTorch, Hugging Face Transformers, DeBERTa-v3, and wav2vec~2.0 &
+Supports text and speech model training, calibration, evaluation, and optional local multimodal inference. \\ \hline
+
+Optional integrations &
+OpenAI Python client and SMTP &
+Provide constrained response wording, feedback phrasing, moderation, transcription, and transactional email when configured. \\ \hline
+
+Verification &
+pytest, Ruff, Playwright, axe-core, ESLint, and the TypeScript compiler &
+Checks backend behaviour, code quality, browser workflows, accessibility, type consistency, and integrated operation. \\ \hline
+
+Packaging and serving &
+Docker Compose, Docker, and Nginx &
+Builds the services, coordinates local deployment, serves the compiled frontend, and provides service health checks. \\ \hline
+\end{tabularx}
+\endgroup
+\end{table}
+
+\subsection{Frontend Technologies}
+\label{subsec:frontend-technologies}
+
+The participant and researcher interfaces are implemented in React with TypeScript. At the time of the documented build, the lock file resolves React and React DOM to version 19.2.8, TypeScript to version 6.0.3, and Vite to version 8.2.0. The TypeScript configuration enables strict checking and targets the ES2022 and browser document-object-model libraries. This provides compile-time checking across component properties, application state, and the HTTP data structures shared by the interface and backend schemas.
+
+The frontend is a single-page application with a small application shell in \texttt{App.tsx}. It uses the browser History API to select public, authentication, onboarding, participant, settings, practice, and researcher views. Feature code is divided into components such as the role-play workspace, conversation preparation, voice capture, emotion panel, replay view, branch comparison, study checklist, and researcher dashboard. State that belongs to an individual workflow remains close to the corresponding component, avoiding a global state-management dependency for the prototype.
+
+Communication with the backend is centralised in a typed client under \texttt{frontend/src/services}. The client defines the API base address through \texttt{VITE\_API\_URL}, attaches the current access token, includes the refresh cookie, performs one controlled refresh after an authentication failure, and converts non-successful responses into interface errors. Request and response types are declared separately under \texttt{frontend/src/types}; this makes mismatches between components and backend response shapes visible during the TypeScript build. Browser session storage contains the short-lived access token, whereas refresh-token handling remains behind the backend-issued cookie boundary.
+
+Vite provides the local development server and the production bundling step. The production container performs the TypeScript build before creating the optimised browser bundle, so type errors prevent an invalid image from being produced. The compiled static files are served by Nginx. Its configuration supports client-side routes by returning \texttt{index.html} when no static resource matches, prevents stale caching of the application entry point, and assigns long-lived immutable caching to content-hashed assets. Styling is implemented in the repository's CSS rather than through a component framework, allowing the responsive layouts, keyboard focus states, reduced-motion behaviour, status announcements, and touch-oriented controls to remain directly inspectable.
+
+\subsection{Backend Technologies}
+\label{subsec:backend-technologies}
+
+The backend is implemented in Python and is packaged with a Python 3.12 base image. FastAPI 0.141.1 provides the HTTP application and automatic request routing, Uvicorn 0.52.1 supplies the application server, and Pydantic-based schemas validate incoming data and serialise responses. The API is exposed below the \texttt{/api} prefix. Its endpoints cover authentication, user settings, session management, role-play actions, feedback, branching, multimodal inference, transcription, participant-study operations, and restricted researcher functions. FastAPI dependency injection supplies authenticated users and the configured services to these endpoint functions.
+
+Backend code is divided by responsibility. The \texttt{api} package contains the HTTP boundary; \texttt{schemas} defines transport objects; \texttt{models} contains domain entities and enumerations; \texttt{services} implements application, dialogue, feedback, research, and external-provider behaviour; \texttt{repositories} defines persistence operations; \texttt{safety} contains the independent crisis-text checks; and \texttt{core} contains configuration, security middleware, and service construction. Consequently, an HTTP route coordinates validated inputs and outputs without also containing the complete dialogue or persistence implementation.
+
+Explicit interfaces further reduce coupling between these packages. The repository abstraction defines account, session, research-record, token, and dataset-freeze operations, with separate in-memory and MongoDB implementations. Interfaces for emotion analysis, cognitive analysis, strategy selection, and response generation similarly allow deterministic implementations, trained models, and provider-backed generators to be substituted without changing the conversation service's public contract. The application container selects the repository from configuration and constructs the authentication, conversation, multimodal, and transcription services once for the process.
+
+The backend uses separate dependency files for the core runtime, optional local inference, and development tooling. The main \texttt{requirements.txt} file contains the web application, database, authentication, validation, and provider clients. The larger PyTorch, Transformers, audio, and numerical packages are added only through \texttt{requirements-inference.txt} when local trained-model inference is required. Test and static-analysis tools are isolated in \texttt{requirements-dev.txt}. This prevents a normal text-only backend installation from acquiring the substantially larger machine-learning runtime and makes the optional nature of multimodal inference concrete at the packaging level.
+
+\subsection{Persistence and External Services}
+\label{subsec:persistence-external-services}
+
+MongoDB is the configured durable store for the integrated application. Its document representation accommodates a session containing ordered conversational turns together with dialogue states, policy decisions, feedback evidence, model metadata, and questionnaire records. The PyMongo-based repository adds ownership conditions to session operations so that a session identifier alone is insufficient to access another user's data. It also creates the indexes required for uniqueness, expiry, and research operations. Session and study-record retention are represented by separate expiry fields because the application workflow and the consented research dataset have different lifecycles.
+
+An in-memory repository implements the same abstract interface. It is used by the normal automated backend suite and can support isolated development without a database process. The purpose of this implementation is behavioural substitution rather than durable storage: tests can exercise service logic quickly, while MongoDB-specific tests separately verify persistence across process restarts, index creation, expiry behaviour, cascade deletion, and concurrent-update protection. Selecting between the implementations through \texttt{PERSISTENCE\_BACKEND} avoids conditional database logic throughout the services.
+
+Network-backed functionality is accessed through narrow service boundaries. The OpenAI client may be configured for response realisation, feedback phrasing, moderation, and audio transcription. These calls are subject to timeouts and are not required for the deterministic role-play path. If credentials are absent, a service is disabled, a request fails, or an output does not satisfy the expected constraints, the relevant service reports the failure and the application uses its local response path. The email service follows the same configuration approach: SMTP enables account verification and password-recovery messages, while credentials and transport settings remain outside the source code.
+
+The browser and API communicate through JSON over HTTP, with short voice samples represented only for the request that requires them. Local model inference loads private text and audio artefacts from configured directories rather than packaging those artefacts into the public repository. This arrangement keeps licensed data, model weights, credentials, and transient user audio outside version-controlled application code. The detailed persistence, privacy, and failure-handling controls are discussed later in this chapter.
+
+\subsection{Repository Structure and Configuration}
+\label{subsec:repository-structure-configuration}
+
+The repository is organised around independently executable concerns. The \texttt{frontend} directory contains the React application, browser tests, and production web-server configuration. The \texttt{backend} directory contains the FastAPI application, dependency specifications, container definition, seed utilities, and backend tests. Model work is located under \texttt{ml}, with distinct packages for preprocessing, training, evaluation, and reproducible notebooks. Declarative experiment, fusion, baseline, and study-protocol settings are stored under \texttt{configs}. Supporting design records and data dictionaries are maintained under \texttt{docs}, repeatable command-line workflows are placed under \texttt{scripts}, and the dissertation sources are isolated under \texttt{thesis}.
+
+This organisation separates source code from generated and restricted material. Raw datasets, checkpoints, experiment runs, local database material, virtual environments, Node modules, compiled frontend files, and environment files are excluded from version control. In contrast, model hyperparameters, label order, context length, audio limits, calibration parameters, protocol versions, and evaluation procedures are retained as configuration or documentation. A developer can therefore inspect the declared experimental and application settings without the repository distributing licensed datasets or private trained weights.
+
+Application configuration is read through a typed Pydantic settings object. Values may be supplied through the process environment or through repository-level and backend-level \texttt{.env} files. The settings cover database selection, permitted origins and hosts, token lifetimes, retention periods, optional model paths, inference thresholds, provider timeouts, email delivery, study versions, researcher access, offline demonstration, and rate limits. Production-like environments additionally reject a weak signing secret, wildcard or non-HTTPS origins, wildcard hosts, disabled HTTPS enforcement, and disabled rate limiting. These checks cause unsafe deployment configuration to fail during application start-up rather than silently weakening the intended controls.
+
+Two execution arrangements are supported. During local development, the frontend development server, backend server, and an existing MongoDB installation can be run independently. Alternatively, Docker Compose builds the frontend and backend and starts them with MongoDB 8, named database storage, dependency ordering, and health checks. The frontend image uses a Node.js 22 build stage followed by a small Nginx runtime image; the backend image exposes a readiness-based container health check. An offline demonstration configuration disables network-backed functions and provides deterministic behaviour for environments in which external credentials or connectivity are inappropriate.
+
+Together, the directory boundaries, dependency separation, lock files, declarative configuration, and container definitions make the implemented prototype inspectable and repeatable. They also preserve a practical distinction between the core application, optional probabilistic services, research-only model development, and deployment-specific secrets. The following section describes the emotion-recognition pipeline that produces the local model artefacts consumed through this structure.
+%
+\section{Emotion-Recognition Pipeline}
+\label{sec:emotion-recognition-pipeline}
+
+The emotion-recognition implementation transforms the private IEMOCAP release into separate text and audio classifiers. It calibrates their outputs without using held-out test labels and packages the final artefacts for optional local inference. The pipeline is isolated from the conversational application under the \texttt{ml} directory. Preprocessing, fold training, calibration, fusion, statistical comparison, final-model packaging, and integrity checks can therefore be executed without involving participant accounts or application sessions.
+
+Two stages must be distinguished. First, model choices are assessed through five speaker-independent folds. Each fold produces validation and held-out test predictions, and only these fold results are suitable for reporting performance. Second, after the experimental configuration and calibration parameters have been frozen, one text model and one audio model are trained on all eligible examples for application inference. These final full-data artefacts have no independent test split and their training metrics are not treated as evaluation evidence.
+
+\subsection{Dataset Preparation and Label Mapping}
+\label{subsec:dataset-preparation-label-mapping}
+
+IEMOCAP contains dyadic scripted and improvised sessions with aligned transcripts, sentence-level audio, categorical annotations, and dimensional ratings \,\cite{busso2008iemocap}. Access to the release is restricted, so the preprocessing code operates on a privately obtained archive and does not place raw media or row-level derived data in the repository. The text preparation command can extract only annotation and transcription files from the archive. It rejects absolute paths and parent-directory traversal before extraction, and the audio preparation command applies equivalent path validation when creating the private task-specific audio bundle.
+
+Annotation and transcript lines are joined by the IEMOCAP utterance identifier. For every usable row, preprocessing records the session, speaker, dialogue, timing, original categorical label, valence, arousal, dominance, transcript, and the expected location of the corresponding sentence-level waveform. Duplicate categorical annotations and missing transcripts cause preprocessing to stop. The resulting manifest records the source archive metadata, source-label counts, task definitions, split composition, per-class counts, and a SHA-256 digest of the manifest contents.
+
+Table~\ref{tab:iemocap-label-mapping} shows the implemented label mappings. The deployed pipeline uses the conventional four-class task: happiness and excitement are merged, while anger, neutrality, and sadness remain separate. This produces 5,531 unique paired utterances. The code also retains an exploratory six-class task aligned more closely with the application vocabulary. That task preserves frustration, maps IEMOCAP fear to the operational label \emph{anxiety}, and renames the merged happiness/excitement class as \emph{joy}. It is not used by the deployed multimodal service, in part because the source corpus contains too few fear examples to support a stable application-facing anxiety model.
+
+\begin{table}[htbp]
+\centering
+\caption{IEMOCAP source-label mappings implemented for the two experimental tasks.}
+\label{tab:iemocap-label-mapping}
+\footnotesize
+\begingroup
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{IEMOCAP label} & \textbf{Four-class benchmark} & \textbf{Exploratory six-class task} \\ \hline
+\texttt{ang} (anger) & anger & anger \\ \hline
+\texttt{hap} (happiness) & happiness & joy \\ \hline
+\texttt{exc} (excitement) & happiness & joy \\ \hline
+\texttt{neu} (neutral) & neutral & neutral \\ \hline
+\texttt{sad} (sadness) & sadness & sadness \\ \hline
+\texttt{fea} (fear) & excluded & anxiety \\ \hline
+\texttt{fru} (frustration) & excluded & frustration \\ \hline
+\end{tabular}
+\endgroup
+\end{table}
+
+The fold construction uses complete recording sessions rather than randomly partitioning utterances. For test session $s \in \{1,\ldots,5\}$, the preceding session is used for validation, with Session~5 preceding Session~1 cyclically, and the remaining three sessions form the training split. Because each of the ten actors belongs to exactly one IEMOCAP session, this arrangement keeps speakers disjoint across training, validation, and test data. Preprocessing explicitly computes the speaker sets and aborts if any overlap is detected. Across the five folds, each session appears once as held-out test data.
+
+The private audio bundle contains exactly the sentence-level waveforms referenced by the four-class rows and names them only by utterance identifier. During creation, every expected file must be found. The script audits sample rates, channel counts, sample widths, durations, byte totals, source-archive identity, and the final bundle hash. The recorded corpus audit confirms that all 5,531 packaged files are mono 16~kHz, 16-bit PCM. Raw and processed data remain outside Git and the OneDrive-backed repository, and the bundle manifest is retained beside the private archive for integrity checking.
+
+\subsection{Contextual Text-Emotion Model}
+\label{subsec:contextual-text-emotion-model}
+
+The textual classifier uses \texttt{microsoft/deberta-v3-small}, a compact DeBERTaV3 encoder whose pre-training combines disentangled representations with replaced-token detection and gradient-disentangled embedding sharing \,\cite{he2021debertav3}. A classification head maps the encoded input to logits in the fixed order anger, happiness, neutral, and sadness. The same training program also supports the exploratory six-class label order through configuration rather than a separate model implementation.
+
+Two input formats are implemented. The utterance-only baseline receives the target transcript with a maximum token length of 128. The contextual model receives at most the preceding three turns from the same dialogue followed by the target utterance, with a maximum length of 256 tokens. Previous turns are ordered by their annotated start time and are marked relative to the target speaker:
+
+\begin{equation}
+x_i = [r_{i-k}]\,u_{i-k} \; \Vert \; \cdots \; \Vert \; [r_{i-1}]\,u_{i-1} \; \Vert \; [\mathrm{target}]\,u_i,
+\label{eq:implementation-context-input}
+\end{equation}
+
+where $k=\min(3,i-1)$, $u_i$ is the target utterance, $r_j$ is either \texttt{same speaker} or \texttt{other speaker}, and $\Vert$ denotes concatenation with a line separator. Future turns, affect labels, dimensional annotations, and dialogue outcomes are never included. The backend reproduces this format from the last three available session turns so that training and deployment use the same causal information boundary.
+
+For each fold, the encoder and classification head are fine-tuned with seed 42. The primary configuration uses a learning rate of $2\times10^{-5}$, weight decay of 0.01, a 10\% warm-up period, training batches of 16, evaluation batches of 32, and at most eight epochs. Validation occurs after each epoch, the checkpoint with the highest validation macro F1 is restored, and training stops after two consecutive epochs without improvement. Trainable weights begin in 32-bit floating point; mixed 16-bit computation is enabled when a compatible graphics processor is available. The four-class task uses ordinary cross-entropy, whereas the optional six-class configuration supports inverse-frequency weights clipped to a declared maximum of 10 to constrain the effect of rare categories.
+
+Each run stores the selected model and tokenizer together with its task, label order, seed, split sessions, class weights, training history, software environment, validation and test metrics, calibrated probabilities, per-class measurements, row-level prediction files, and confusion matrix. The utterance-only and contextual experiments use the same fold membership and identifiers, permitting paired comparison by complete dialogue rather than treating correlated turns as independent samples. Quantitative comparisons between these configurations are reported in Chapter~\ref{chap5}.
+
+After the fold experiments were frozen, the final contextual text artefact was trained for seven epochs on all 5,531 unique benchmark rows. The epoch count was derived from the completed cross-validation training behaviour rather than selected from the final full-data loss. Before training, the packaging code reconstructs the complete dataset from one fold, rejects duplicate identifiers, and requires the expected row count. The resulting artefact is intended only for inference; its training metrics do not replace the speaker-independent fold evaluation.
+
+\subsection{Speech-Emotion Model}
+\label{subsec:speech-emotion-model}
+
+The acoustic classifier fine-tunes \texttt{facebook/wav2vec2-base}, which learns speech representations from raw waveform input through self-supervised pre-training \,\cite{baevski2020wav2vec}. The same four-class output order is used as for text so that probability vectors can be paired without remapping. Training and inference load audio from memory or private local storage; the application database never provides audio as model-training data.
+
+Waveforms are read as 32-bit floating-point samples. A multi-channel recording, if encountered, is averaged to mono. Audio with a different sampling rate is converted to 16~kHz by polyphase resampling, and only the first 20 seconds are supplied to the model. Shorter examples are padded dynamically within each batch by the model's feature extractor. Before a fold begins, an audio audit verifies that every metadata row has a matching waveform and records the observed sample rates, maximum duration, and number of examples requiring truncation.
+
+The convolutional feature encoder is frozen during fine-tuning, while the transformer and classification layers remain trainable. The configured learning rate is $1\times10^{-5}$ with weight decay 0.01, 10\% warm-up, a per-device batch size of four, and four gradient-accumulation steps, producing an effective batch of 16 before distributed effects. Gradient checkpointing reduces memory use. Training runs for at most ten epochs, evaluates once per epoch, restores the checkpoint with the highest validation macro F1, and applies the same two-epoch early-stopping patience as the text experiment. GPU execution uses mixed precision when available.
+
+Audio runs write the trained feature extractor and classifier along with the fold, label order, seed, split sessions, audio audit, environment versions, training history, validation-calibration parameters, test distributions, per-class measurements, and confusion matrix. Validation and test identifiers must match those of the contextual text run before fusion can proceed. Following the fold experiments, the deployable audio artefact is trained for ten epochs on the same 5,531 unique examples used by the final text model. As with the final text artefact, this is a packaging run rather than a new evaluation.
+
+\subsection{Multimodal Late Fusion}
+\label{subsec:multimodal-late-fusion}
+
+Text and speech are combined through decision-level late fusion rather than by joining their hidden representations. This choice keeps each modality independently trainable, inspectable, and usable in ablation analysis, and it avoids retraining a joint network when the fusion policy changes \,\cite{baltrusaitis2019multimodal}. Before any distributions are combined, the fusion program verifies the label order, exact utterance-identifier set, expected label, recorded fold number, and reconstruction of the saved single-modality metrics. It also rejects an utterance that appears in the test output of more than one fold.
+
+Let $z_t$ and $z_a$ denote text and audio logits, and let $T_t$ and $T_a$ be their validation-fitted temperatures. The calibrated modality distributions are
+
+\begin{equation}
+p_t = \operatorname{softmax}\!\left(\frac{z_t}{T_t}\right), \qquad
+p_a = \operatorname{softmax}\!\left(\frac{z_a}{T_a}\right).
+\label{eq:implementation-modality-calibration}
+\end{equation}
+
+Given text weight $w$, the intermediate fusion is a convex combination,
+
+\begin{equation}
+p_m = w p_t + (1-w)p_a.
+\label{eq:implementation-late-fusion}
+\end{equation}
+
+The research comparison uses a predeclared equal-weight setting, $w=0.5$, so that the hypothesis that audio contributes complementary information is not assessed using a weight selected from the held-out test predictions. A separate deployment-calibration path fits $w$ over the fixed grid $\{0.00,0.01,\ldots,1.00\}$ using paired validation predictions and validation negative log-likelihood only. After choosing the weight, it fits a final scalar temperature $T_f$ and calculates
+
+\begin{equation}
+p_f = \operatorname{softmax}\!\left(\frac{\log(\max(p_m,10^{-12}))}{T_f}\right).
+\label{eq:implementation-fusion-calibration}
+\end{equation}
+
+For the packaged full-data models, the deployable parameters were fitted from 5,531 unique pooled out-of-fold validation predictions. The frozen configuration contains $T_t=1.8268$, $T_a=1.3357$, $w=0.59$ for text, $1-w=0.41$ for audio, and $T_f=0.5989$. These values are applied unchanged by the backend. The held-out fold predictions are used to evaluate the frozen chain, not to choose its parameters. This preserves a distinction between the equal-weight confirmatory experiment and the calibrated configuration used when the application exposes or thresholds confidence.
+
+\subsection{Confidence Calibration and Uncertainty Handling}
+\label{subsec:confidence-calibration-uncertainty}
+
+For each single-modality fold, temperature scaling fits one positive scalar on validation logits by minimising negative log-likelihood \,\cite{guo2017calibration}. The implementation searches in log-temperature space and never uses the test session during fitting. Dividing every class logit by the same temperature changes the probability concentration without changing the class with maximum logit. Calibration is consequently evaluated separately from classification performance.
+
+The evaluation utilities compute accuracy, macro F1, weighted F1, per-class precision, recall and F1, negative log-likelihood, multiclass Brier score, and expected calibration error. Expected calibration error partitions maximum confidence into fixed bins and accumulates the sample-weighted difference between mean confidence and empirical accuracy. Row-level outputs retain the complete probability vector rather than only the winning label, enabling later reliability analysis and exact pairing between modalities. Statistical comparisons use paired percentile bootstrap samples at dialogue level so that multiple turns from one conversation remain in the same resampled unit; those results belong to the evaluation chapter rather than the implementation account.
+
+At inference time, the backend returns the calibrated text, audio, and fused distributions, each modality's selected label and confidence, and an explicit indicator of whether the two modalities agree. Fused confidence below 0.55 is labelled \emph{low}, confidence from 0.55 up to 0.75 is labelled \emph{moderate}, and confidence at or above 0.75 is labelled \emph{high}. The 0.55 boundary is configurable and controls presentation and adaptation policy only: it does not modify the model probabilities, turn a prediction into a verified emotion, or establish that estimates above the threshold are correct.
+
+Missing, invalid, conflicting, or low-confidence evidence is represented explicitly rather than converted into a stronger claim. The role-play workflow remains usable without audio or trained inference, and the dialogue policy and crisis checks do not depend on the predicted category. Calibration measured on IEMOCAP may deteriorate under changes in speakers, microphones, language, interaction style, or context \,\cite{ovadia2019shift}. The application therefore treats confidence and cross-modal agreement as bounded operational signals, not as guarantees of correctness.
+
+\subsection{Model Artefacts, Provenance, and Inference Loading}
+\label{subsec:model-artefacts-provenance}
+
+The final private package contains one contextual-text model directory and one audio-model directory. Each directory includes the saved classifier and the associated tokenizer or feature extractor. The versioned multimodal JSON configuration stores the label order, input field, maximum text length, sample rate, waveform-duration limit, model names, optimisation settings, and complete calibration chain. Model weights and licensed data are excluded from Git; a synchronisation script retrieves the final directories from private cloud storage into a user-selected local destination and prints the corresponding environment settings.
+
+Provenance is captured after the private models are downloaded. The provenance command records the current source-control commit, SHA-256 of the multimodal configuration, Python platform, relevant library versions, and, for every file in both model directories, its relative path, size, and SHA-256 digest. It also calculates an aggregate directory digest from the ordered file entries. This manifest binds an inference result to specific model contents and code configuration without publishing the restricted artefacts themselves.
+
+The backend keeps multimodal inference disabled by default. When enabled, it checks that both model directories and the configuration exist, then loads the tokenizer, feature extractor, and classifiers lazily on the first request. Device selection uses an available CUDA device when configured as automatic and otherwise uses the requested device or CPU. Models are placed in evaluation mode and executed under the framework's inference-only context. A process-level asynchronous lock serialises multimodal requests so that simultaneous users do not compete unpredictably for model memory; model execution is moved to a worker thread so that the asynchronous web loop remains responsive. Queue and inference times are returned separately.
+
+Before inference, the service checks the configured byte limit, parses the in-memory WAV payload, requires a duration between 0.25 and 35 seconds, converts multi-channel audio to mono, resamples when required, and truncates model input to the configured 20-second maximum. Text context is constructed from the latest three causal turns using the same speaker-relative markers as training. The service then applies the stored modality temperatures, weighted fusion, and fusion temperature exactly as defined in Equations~\ref{eq:implementation-modality-calibration}--\ref{eq:implementation-fusion-calibration}. Its response includes the distributions, agreement, confidence level, model version, latency, queue time, and an explicit statement that audio was not persisted.
+
+Two forms of validation protect the packaged artefacts. Unit tests check causal context construction, confidence boundaries, disabled-service behaviour, and serialisation of concurrent requests without importing machine-learning libraries when inference is disabled. A private integrity smoke test selects an equal number of examples from each class, loads both final models, verifies finite logits and probabilities, runs the frozen fusion chain, and requires each component to predict more than one class. Any accuracy calculated on this balanced training sample is labelled as an integrity diagnostic and is not reported as evaluation performance. If loading or inference fails in the application, the failure remains contained within the optional service and the text-first rehearsal workflow continues through its deterministic path.
+%
+\section{Backend Application}
+\label{sec:backend-application}
+
+The backend application is the authoritative coordination layer between the browser, persistence store, dialogue policies, safety checks, trained models, and optional external providers. It exposes a JSON API below the \texttt{/api} prefix, but keeps transport concerns separate from the rules that govern a rehearsal. Consequently, neither the frontend nor a language-model response can directly alter dialogue state, feedback evidence, study status, or resource ownership. These changes are performed by typed backend services and persisted through a repository interface.
+
+This section describes the general backend infrastructure and the lifecycle of a conversation request. The implementation of the role-play policy, feedback calculations, research workflow, and detailed security controls is developed in the subsequent sections.
+
+\subsection{Application and Service Architecture}
+\label{subsec:backend-service-architecture}
+
+The FastAPI application is assembled from four principal layers. API routes form the HTTP boundary and translate expected service failures into suitable status codes. Pydantic schemas validate transport data and constrain the response shape. Application services implement authentication, conversation coordination, transcription, multimodal analysis, preparation, branching, and research operations. Finally, repositories encapsulate all mutable storage. The domain models are shared between the service and repository layers, while external-provider clients remain behind dedicated service classes. This arrangement prevents route functions from becoming an alternative location for dialogue or persistence logic.
+
+Service construction is centralised in a small application container. At process start, configuration selects either the MongoDB repository or its in-memory substitute, after which one authentication service, conversation service, multimodal service, transcription service, and email service is constructed. FastAPI dependencies provide these instances and the authenticated user to individual routes. The conversation service itself depends on interfaces for emotion analysis, cognitive analysis, strategy selection, response generation, and persistence. Default deterministic implementations can therefore be replaced without changing the route contract or the stored session representation.
+
+The application lifespan initialises repository indexes before accepting normal work. In offline demonstration mode it also creates the local demonstration account if required; this mode is rejected by production configuration. Existing eligible sessions are then used to backfill any missing study records. A separate liveness endpoint confirms that the process is running, whereas the readiness endpoint validates configuration, checks the persistence connection and required indexes, and reports the availability of optional transcription and multimodal services. A missing optional model does not make the text-first application unready.
+
+Cross-cutting HTTP behaviour is installed as middleware. Configured origins control credentialled cross-origin requests, trusted-host validation rejects unexpected host headers, and production deployments redirect HTTP traffic to HTTPS. Response middleware adds restrictive framing, content-type, referrer, permissions, caching, and content-security headers, together with HTTP Strict Transport Security in production. A configurable rate limiter applies separate windows to authentication, email, transcription, and model-backed operations. It is intentionally a single-process implementation for the prototype; a multi-instance deployment would require a shared limiter at a gateway or distributed store.
+
+\subsection{Domain Models and API Schemas}
+\label{subsec:backend-domain-models}
+
+The domain layer represents application state as nested Pydantic models rather than unstructured dictionaries. Its enumerations constrain concepts such as speaker role, difficulty, practice goal, role-play status, support strategy, and user intent. A \texttt{Session} owns its ordered turns, current emotion state, optional role-play state, feedback, action card, questionnaires, research events, version, and expiry time. Each \texttt{ConversationTurn} may retain the emotion state observed at that point, selected strategy, response-generation metadata, and the bounded affect-pacing decision. More detailed role-play models preserve dialogue snapshots, evidence linked to source turns, reason codes, policy versions, branch lineage, and feedback comparisons. This makes the recorded session an auditable account of state transitions rather than only a transcript.
+
+Transport schemas are deliberately distinct from these persistent entities. Request models impose limits before data reaches a service: messages are non-empty and limited to 5,000 characters, session titles to 80 characters, takeaways to 500 characters, and encoded audio to 7,000,000 characters. Enumerated fields constrain pacing preferences and difficulty settings, strict Boolean fields prevent ambiguous coercion for decisions such as eligibility confirmation, and selected request objects reject unknown properties. Responses expose only the fields needed by the relevant interface; for example, the public user response omits the password hash and token records held by the domain and repository layers.
+
+Validation also protects relationships between fields. An enhanced chat exchange that requests audio analysis, affect adaptation, or non-default pacing must supply both a unique request identifier and the version of the session displayed by the client. Questionnaire schemas restrict ratings to their declared scales, and service validation checks that all required answers are submitted together or explicitly skipped. A multimodal estimate is accepted only when every probability is finite and within the unit interval, each distribution sums to approximately one, and the declared label and confidence agree with its maximum entry. Agreement and confidence-band fields are then derived again on the backend instead of being trusted from an external payload.
+
+The domain models also distinguish operational metadata from user-facing content. Generated responses record their source, model, latency, token counts, and any fallback reason. Affect decisions record availability, user preference, inference timing, confidence, and the selected pacing action. Study records contain pseudonymous participant and protocol identifiers rather than copying the complete account. These explicit fields allow later analysis to separate deterministic and provider-backed behaviour, while preventing absent measurements from being interpreted as observed zero values.
+
+\subsection{Authentication and Account Management}
+\label{subsec:backend-authentication}
+
+Registration requires acceptance of the current privacy terms. Email addresses are normalised before storage and a unique database index prevents duplicate accounts. Passwords are processed by the password library's recommended one-way hashing scheme; plaintext passwords are never stored. A cryptographically random verification value is sent by email, while only its SHA-256 digest and expiry time are retained. Normal login and protected routes require a verified email address. Registration, verification resend, and password-recovery endpoints return deliberately generic messages so that their responses do not reveal whether a supplied address belongs to an account.
+
+Successful authentication issues two tokens with different handling. The short-lived JSON Web Token used for API authorisation is returned to the browser and presented as a bearer credential. The longer-lived refresh token is placed in an HTTP-only, same-site cookie scoped to the authentication routes and marked secure in production. Its identifier and digest are stored server-side. Refreshing atomically removes the presented record and creates a replacement, so a token cannot be successfully rotated twice. Logout, password change, password reset, and account deletion revoke the user's outstanding refresh tokens; password-reset links are likewise digest-only, expiring, and consumed atomically after the replacement password has passed validation.
+
+The dependency that resolves the current user decodes the access token, reloads the account, and checks email verification on every protected request. This means deletion or loss of eligibility is observed by later calls rather than being determined solely by claims in an old access token. Researcher routes add a second dependency that compares the verified account email with the configured researcher allow-list. Participant study enrolment is a separate state transition and does not implicitly grant researcher privileges.
+
+Profile and lifecycle operations are handled through the same authenticated service boundary. Users can update the constrained profile fields, choose between one and three distinct practice goals during onboarding, change their password, sign out, or delete their account. Account deletion cascades through sessions, study records, refresh tokens, and outstanding verification and recovery records in both repository implementations. Study withdrawal has a narrower, protocol-specific meaning and is therefore implemented independently from deletion; the later research-workflow section describes this distinction in detail.
+
+\subsection{Session Persistence and Ownership Controls}
+\label{subsec:backend-session-persistence}
+
+The repository contract supplies identical account, session, token, study-record, lifecycle, and frozen-export operations for the in-memory and MongoDB implementations. The in-memory implementation supports isolated development and fast unit tests; the MongoDB implementation supplies durable storage for the integrated application. Services depend only on this contract, so choosing a persistence backend does not introduce database-specific branches into conversation processing.
+
+Session ownership is enforced as part of repository queries. Reading or deleting a session requires both its identifier and the authenticated user's identifier, and session listings are filtered by the same user key. Expired sessions are excluded from reads, while a MongoDB time-to-live index removes them according to their \texttt{expires\_at} value. Thus, knowing another session's universally unique identifier is insufficient to retrieve or mutate it. Service methods translate a failed owned lookup into the same not-found result, avoiding a distinction between a missing resource and one owned by somebody else.
+
+Every session also carries a monotonically increasing version. When the enhanced chat interface submits an exchange, it includes the displayed version and a request identifier. The conversation service rejects a repeated request identifier or stale version before modifying a deep copy of the session. At the storage boundary, MongoDB replaces a document only when its stored version equals the service's expected version, then increments it; an insert collision or failed conditional replacement becomes a concurrent-update error. The in-memory repository implements the same comparison. The global exception handler returns HTTP status 409 with instructions to reload, preventing two tabs or overlapping requests from silently overwriting one another.
+
+MongoDB indexes additionally enforce unique email, session, study-record, protocol, and frozen-export identifiers, support per-user chronological queries, and expire session, token, and study records at their respective deadlines. Readiness checks verify these indexes rather than assuming they were created. Conversation and consented research data remain separate: a session contains the complete interaction needed by the application, whereas the synchronised study record contains protocol-bounded events, measures, generation counts, and feedback metrics under its own retention rule. The later research-workflow and data-protection sections describe the detailed minimisation and withdrawal behaviour.
+
+\subsection{Conversation Request Processing}
+\label{subsec:backend-conversation-processing}
+
+The \texttt{/api/chat} endpoint is intentionally a thin coordinator. After schema validation and authentication, it delegates the message, account identity, optional audio, affect preference, request identifier, and expected session version to the conversation service. The service first performs the owned session lookup and the duplicate and stale-version checks described above. If necessary, the first message supplies a shortened default title; beginning a new exchange also closes an unused immediate post-questionnaire opportunity so that questionnaire timing cannot drift into later conversation.
+
+Safety evaluation precedes affect adaptation and response generation. A local crisis-language check always runs, and provider moderation may add a flag when the provider is configured. If a crisis is detected, optional multimodal inference is skipped, the fixed safety response takes precedence, and an active or paused rehearsal is marked as interrupted. The trained affect model is therefore neither a prerequisite nor an authority for crisis handling.
+
+For a non-crisis exchange, multimodal inference is attempted only when the request is bound to a version and request identifier, audio is present, a configured model is available, and the rehearsal is eligible for experimental adaptation. It is deliberately excluded from required study tasks so that the required protocol path is not altered by this optional condition. Decoding, validation, or inference failure is caught and recorded as unavailable rather than aborting the message. Independently, the local text analyser updates the smoothed emotion state, the cognitive analyser derives tentative intent and readiness features, and the scored selector chooses a support strategy with its component scores and reason codes.
+
+The user turn is appended before reply selection. During an active rehearsal, the deterministic role-play engine advances the dialogue state, links observed evidence to that turn, and supplies both a required character action and safe fallback wording. Outside role-play, the selected support strategy guides the general response generator. An affect-pacing prefix may be added only through the bounded pacing policy and only under its eligibility conditions. The resulting assistant turn stores generation and affect-decision metadata; role-play decisions additionally store before-and-after snapshots, evidence identifiers, policy versions, and reason codes.
+
+Finally, the service records a minimised completion event, updates measurement boundaries when a rehearsal ends, persists the incremented session, and synchronises an eligible study record. The response returns the committed version together with the user and assistant turns, decision summary, current role-play state, any completed feedback, and the one-use opportunity token required for an immediate post-rehearsal questionnaire. This single service path keeps the dialogue shown by the client aligned with the state and evidence retained by the backend.
+
+\subsection{Optional Services and Deterministic Fallbacks}
+\label{subsec:backend-fallbacks}
+
+Network-dependent and model-dependent functions are implemented as enhancements rather than foundations of the rehearsal workflow. When an OpenAI API key is present, the response generator can realise a selected support strategy in natural language, moderate text, phrase evidence-based feedback, or render a role-play action. Requests use a configured timeout and disable provider-side response storage. If credentials are absent, the service is disabled, a call raises an exception, or a response is empty, refused, or structurally invalid, generation returns the corresponding deterministic template and records the fallback reason.
+
+Provider output is constrained differently according to its purpose. General support generation receives the authoritative emotion state and selected strategy together with instructions against diagnosis, medication advice, certainty claims, and dependency. Role-play realisation receives the authoritative scenario, difficulty behaviour, state, and required action, and must return a typed action and a short in-character utterance. Outputs that expose coaching language or disagree with the required action are discarded. Where the enhanced dialogue policy contains a concrete negotiated constraint or proposal, exact deterministic wording remains in force until semantic validation can reliably establish that a rephrasing preserves it. Feedback generation is limited to rewording strengths and suggestions that have already been calculated from recorded evidence; it cannot create new observations or scores.
+
+Transcription and trained multimodal inference use separate authenticated endpoints and report explicit unavailability when invoked directly without configuration. In the integrated chat path, multimodal failure is contained and the deterministic exchange continues. Audio is size-checked and decoded in memory for the immediate operation, and service responses state that it was not persisted. Email delivery is similarly isolated behind its service boundary; generic account responses remain stable when delivery fails, without falsely granting verification or recovery access.
+
+Each generated turn records whether its content came from a template, safety response, deterministic role-play path, or configured provider, together with latency and fallback information where available. Health and model-information endpoints expose capability status without treating an optional dependency as a core outage. These choices preserve an operational baseline in offline demonstrations, tests, and provider failures, while making the provenance of enhanced behaviour visible for debugging and later evaluation.
+%
+\section{Role-Play and Adaptation Engine}
+\label{sec:roleplay-adaptation}
+
+The role-play engine implements the central distinction established in the system architecture: deterministic code selects the permitted conversational action, while a generator may only realise that action in words. It therefore treats scenario progress, evidence, completion, safety, and feedback as application state rather than delegating them to a language model. The same state can be serialised, restored, replayed, rewound, and tested without a network connection.
+
+\subsection{Scenario Representation and Configuration}
+\label{subsec:scenario-representation}
+
+A role-play scenario is represented by an identifier, title, character, situation, user objective, opening line, expected skills, difficulty-specific behaviour, success conditions, and a maximum number of turns. The repository contains six standard scenarios: workload prioritisation, maintaining a personal boundary, expressing a relationship need, giving feedback to a colleague, negotiating a deadline, and sharing household responsibilities. The first three form the standardised study sequence; the remaining scenarios broaden ordinary practice without changing the study protocol.
+
+Difficulty is an explicit enumeration with beginner, intermediate, and difficult levels. At initialisation these levels map to increasing challenge and decreasing cooperation values, but the selected level does not change the meaning of a recorded communication feature. For standard unprofiled practice, difficulty primarily controls how much resistance the character provides and, for the boundary scenario, how many clear refusals must be maintained. Every new attempt stores its scenario, policy, and scoring versions so that later feedback and comparisons are interpreted under the rules that produced them.
+
+Additional practice in the workload, boundary, and relationship scenarios may also use one of three authored character profiles. The cooperative profile asks for a clear practical response, the rushed profile prioritises concise decisions and a workable time, and the sceptical profile questions the proposal and may repeat pressure. These profiles select versioned deterministic policies rather than psychological personalities. They are unavailable for required study tasks and custom scenarios, preventing an optional experimental path from modifying the frozen protocol.
+
+Users can create account-owned custom scenarios directly or through the preparation workflow. Custom inputs are normalised and limited in length, and their target skills must come from the supported observable set: clear request, specific detail, boundary maintenance, I-statements, and non-blaming language. A prepared scenario additionally stores the difficult part identified by the user and a tentative likely objection produced by a bounded local template. The template is presented for review and editing; it is not claimed to predict another person's response.
+
+\subsection{Dialogue State and Transition Logic}
+\label{subsec:dialogue-transitions}
+
+The role-play state stores status, current stage, turn count, difficulty, cooperation, accumulated evidence, decisions, outcome, completion reason, and timestamps. It supports active, paused, completed, and interrupted states. Pausing permits reflection without advancing the rehearsal, resuming returns to the existing controller state, and manual completion remains distinct from automatic success. The maximum of eight user turns prevents an unresolved simulation from continuing indefinitely.
+
+The enhanced scenario policy represents each supported conversation as a small state graph. Workload practice advances from explaining the problem, through addressing constraints, to agreeing a plan. Boundary practice progresses from an initial refusal, through pressure, to respectful closure. Relationship practice moves from describing the situation and need, through acknowledging the other perspective, to selecting a practical next step. A transition occurs only when the observable evidence required at the current stage has appeared; unsupported or contradictory input leaves the controller in place and produces a targeted follow-up.
+
+The three graphs contain scenario-specific checks. For example, the workload path requires the user to acknowledge the stated delivery constraint while proposing a supported trade-off before agreement can be confirmed. The boundary path distinguishes a maintained refusal from a reversal or conditional acceptance and varies the permitted pressure rounds by difficulty and profile. The relationship path requires a specific personal need, acknowledgement of perspective, and a feasible request; unsupported or explicitly unresolved endings remain recorded as such. These rules model the authored practice exercise, not the probable behaviour of a real manager, friend, or partner.
+
+Each processed rehearsal message produces a decision record containing the before-and-after dialogue snapshots, selected character action, reason codes, linked user and assistant turns, supporting evidence identifiers, generation metadata, character profile, and scenario, policy, and scoring versions. Completion reasons distinguish success, the turn limit, manual completion, and safety interruption. Persisting these transitions makes recovery exact: a restored session does not need to infer its stage again from the transcript.
+
+\subsection{Communication-Evidence Extraction}
+\label{subsec:communication-evidence}
+
+Evidence extraction operates on the submitted text and records bounded, inspectable language features. The common extractor identifies patterns associated with a concrete request, repeated apology, maintained boundary, blame phrasing, specific detail, and I-statements. Versioned scenario extractors add features such as a problem description, workable option, check-in, clear refusal after pressure, respectful closure, acknowledgement of perspective, and practical request. Negation, conditional language, reported speech, and contradictory clauses are handled for the specific patterns required by the authored dialogue paths.
+
+Each evidence item records its rehearsal number and source-turn identifier. It also contains the extracted feature names and the text analyser's arousal value. It does not store an invented quotation span. The original utterance remains the authoritative source, and replay highlights the complete linked turn when exact spans were not recorded. Features may accumulate across exchanges where a scenario permits this, but completion is still controlled by stage order; mentioning an agreement before the character has raised its constraint cannot skip the intervening dialogue.
+
+The rules intentionally favour auditability over unrestricted semantic coverage. Indirect refusals, sarcasm, unusual paraphrases, and complex multi-clause statements may be missed. A detected phrase is therefore reported as observable evidence in this rehearsal, not as proof of communication competence, intention, personality, or likely real-world success. The deterministic test fixtures include supported, negated, reversed, irrelevant, and ambiguous examples to keep this boundary visible.
+
+\subsection{Affect-Aware Pacing Policy}
+\label{subsec:affect-pacing}
+
+The affect-pacing policy is a separate versioned layer applied after the dialogue controller has selected its response. It never changes the scenario stage, profile, difficulty, success conditions, evidence, or feedback score. Automatic use is disabled by default, and the participant may instead request that the exchange keep going unchanged, use a gentler pace, or add more challenge. An explicit choice takes precedence over automatic inference and can operate without audio.
+
+Automatic adaptation is restricted to active, enhanced, non-required rehearsals. Required study tasks, associated retries, ordinary reflection, legacy sessions, paused or completed attempts, and ineligible scenarios use the baseline response. Safety and completed-exchange conditions take precedence. The policy also refuses to translate model categories into anxiety, readiness, resistance, or other psychological constructs; the existing lexical state tracker remains independent.
+
+When automatic adaptation is eligible, missing audio, unavailable models, inference failure, or unsupported categories produce no addition. If any fused or component confidence is below the stored threshold, or if text and audio disagree, the response neutrally offers a pacing choice. Confident agreement on anger or sadness adds only the phrase ``I hear you.''; supported agreement on happiness or neutral produces no addition. The user-selected gentler and more-challenge modes use fixed prompts. The full decision, reason, source, model version, timings, preference, and probability summaries are stored with the assistant turn, allowing the interface to explain the exact action without reconstructing it later.
+
+\subsection{Response Realisation}
+\label{subsec:response-realisation}
+
+Response realisation begins with the authoritative action and deterministic wording returned by the controller. In offline operation this wording is sent directly. When provider generation is enabled for a supported unbranched practice flow, the language model receives the saved scenario, difficulty behaviour, current role-play state, affect estimate, required action, and fallback wording. Its structured response must repeat the required action exactly, remain in character, avoid coaching and hidden-system language, and stay within a short response limit.
+
+Failure to parse the response, an action mismatch, disallowed coaching language, an exception, or unavailable credentials returns the deterministic wording. For enhanced dialogue states containing a concrete constraint or proposal, even a plausible paraphrase is rejected unless it matches the authoritative wording; this conservative rule avoids treating a correct action label as evidence that a generated sentence preserved the negotiation facts. Branches likewise use deterministic wording so their differences arise from the participant's alternative response rather than an uncontrolled regeneration.
+
+Outside role-play, the strategy selector scores validation, reflection, clarification, reframing, practical suggestion, invitation to rehearse, de-escalation, and safety escalation from the local affect and cognitive assessments. The response generator receives the selected strategy but cannot select it. Generation metadata records whether wording came from a template, deterministic role play, the provider, or a safety response, ensuring that later study summaries can count response sources and fallbacks without retaining provider internals.
+
+\subsection{Safety Precedence and Crisis Interruption}
+\label{subsec:safety-precedence}
+
+A local crisis-language detector executes before model inference and response generation. Its bounded patterns cover direct self-harm and immediate-danger statements while applying exclusions for common negations, hypothetical or quoted material, and known false-positive phrases. When an external moderation service is configured, it can add a safety flag but cannot suppress a local match. This remains a conservative engineering safeguard rather than a validated clinical risk assessment.
+
+On a detected safety condition, the backend skips multimodal inference and pacing, emits the fixed crisis response, and changes an active or paused role play to interrupted with the completion reason \texttt{safety\_interruption}. The decision trail preserves the preceding dialogue state and records the interruption action. Safety-interrupted wording is never reused as a suggested action-card phrase, and the research workflow does not count the attempt as a completed protocol task.
+
+The response states the prototype's limitations and directs the user to emergency or crisis support without claiming to know the user's location or contacting services on their behalf. Because the deterministic safety path precedes provider and classifier output, failure of either optional component cannot remove the interruption. False negatives and ambiguous statements remain possible, which is why the interface consistently states that AffectLab is not monitored care, diagnosis, or emergency support.
+%
+\section{Feedback and Reflection Features}
+\label{sec:feedback-reflection}
+
+Feedback features are constructed from the evidence and decisions already stored during a rehearsal. They do not rerun an affect model, infer hidden reasoning, or ask a generator to judge the participant after completion. This design permits the user to move from a summary into the exact conversation evidence, try a bounded alternative, and prepare personal wording while preserving the original attempt.
+
+\subsection{Evidence-Grounded Feedback Generation}
+\label{subsec:evidence-feedback}
+
+At completion, the role-play service calculates scenario-specific metrics from Boolean evidence attached to the participant's turns. Examples include clear request, specific evidence, maintained boundary, concise delivery, I-statements, and non-blaming language. A metric score is the proportion of relevant turns in which its condition was observed, and its evidence list contains the corresponding turn numbers. Versioned dialogue policies add stage-specific feedback while retaining the same link to stored evidence.
+
+Deterministic templates turn these measurements into observed statements, strengths, and suggestions. A feature at or above the configured descriptive boundary becomes a strength; an absent or infrequent feature becomes a next-attempt suggestion. The completion reason and controller outcome remain separate from individual language metrics: reaching the turn limit is not relabelled as success, and a safety interruption is not scored as a skill failure. Custom scenarios receive metrics only for their selected supported skills.
+
+If provider phrasing is enabled, it receives only the completed evidence-based feedback object and may reword its strengths and suggestions. The numeric scores, evidence links, and observations remain authoritative, and generation metadata distinguishes deterministic feedback from provider wording. Comparative feedback is added only when an earlier ordinary attempt uses the same scenario and scoring version; changes are described as differences in observed language rather than personal or clinical improvement.
+
+\subsection{Conversation Replay}
+\label{subsec:conversation-replay}
+
+Replay is a read-only projection of the stored session rather than a second analysis pass. Its timeline is bounded by the role-play start and measurement-end timestamps, with a compatibility rule for older sessions that recorded only completion time. Later reflection is excluded, while reflection entered during a pause remains visible but has no controller decision and is not shown as a scored exchange. Missing boundaries, legacy decisions, unavailable feedback, and inference failures are displayed as gaps instead of being reconstructed.
+
+Selecting an exchange highlights the paired user and assistant turns. Separate panels show observable language features, controller action and stage transition, generation source, and any saved affect-pacing decision. Technical details expose reason codes, before-and-after state, policy versions, modality distributions, confidence and agreement, availability, and timings. Feedback evidence buttons resolve stored evidence numbers back to their conversation-turn identifiers. Since exact phrase spans are unavailable, the complete source utterance is highlighted rather than presenting a guessed substring.
+
+The browser constructs this view from the normal ownership-protected session response; replay has no new endpoint and makes no writes. It does not reload audio, regenerate explanations, or mutate recorded decisions. Navigation away from an unanswered immediate post-questionnaire may close that questionnaire window under the study rules, but inspection of the replay itself remains read-only.
+
+\subsection{Rewind, Branching, and Comparison}
+\label{subsec:rewind-branching}
+
+Rewind removes only the most recent linked user--assistant rehearsal exchange. For versioned dialogue it restores the exact preceding snapshot, truncates the matching evidence and decision lists, clears completion and feedback, restores the previous affect state, and removes later research events. It is refused when the latest messages cannot be linked safely, when they belong to copied branch context, or after post-ratings or an explicit skip have fixed the measured attempt. The removed user text is returned to the composer for editing.
+
+Branching provides a copy-on-write alternative without modifying the original. It is available only for completed or interrupted attempts whose stored policy and pre-turn snapshot are supported. The server validates ownership, source version, branch-point turn, linked decision, policy versions, and intact evidence. It then creates a deterministic child identifier from the user and request identifiers, copies only the context before the selected response, restores the saved pre-turn state, and records lineage including the parent version, copied turn identifiers, branch group, and SHA-256 digest of the source rehearsal.
+
+The child is labelled as a retry with no required-study association. Its feedback covers only newly authored continuation evidence; copied context is not counted again in turn totals, events, or generation statistics. Comparison presents the shared context once and the original and alternative continuations side by side, including actions, evidence, sources, and outcomes. If the parent has been deleted, expired, or changed since the branch was created, the saved alternative remains usable but the original continuation is explicitly marked unavailable. This prevents a silently altered source from being presented as a controlled comparison.
+
+\subsection{Takeaways and Action Cards}
+\label{subsec:takeaways-action-cards}
+
+The feedback screen provides a 500-character personal takeaway that is stored with the session and surfaced on the home dashboard. It is entirely user-authored and remains distinct from measured feedback. The dashboard also aggregates prior feedback metrics as a practice history, accompanied by language that these are averages of observed rehearsal features rather than a clinical assessment.
+
+After a completed or interrupted rehearsal, the application can draft an action card containing an opening sentence, main request, boundary or fallback, and reminder. The draft draws only from eligible participant turns within the rehearsal measurement boundary and stores the identifiers of any reused source turns. It uses a maintained-boundary utterance where available, otherwise supplies neutral fallback wording. Safety-interrupted utterances and later reflection are excluded from suggested real-world phrasing.
+
+The user can edit every card field before saving. Saving requires the expected session version, marks the card as user-edited, and updates neither feedback, questionnaires, research events, nor measurement boundaries. Cards can be copied or downloaded by the browser and survive normal session reloads. In a branch they use new continuation turns rather than silently recycling shared context, preserving the distinction between the original and alternative plans.
+%
+\section{Frontend Application}
+\label{sec:frontend-application}
+
+The frontend presents the backend's typed state as a sequence of participant and researcher workflows. It does not calculate authoritative dialogue transitions, affect decisions, or study completion in the browser. Instead, components retain editable local state, submit constrained requests, and replace their view with the version returned by the server. This keeps recovery behaviour and uncertainty disclosures as important as the successful path.
+
+\subsection{Application Navigation and User Workflow}
+\label{subsec:frontend-navigation}
+
+The React application uses the browser History API to provide public landing and information pages, registration, sign-in, email verification and recovery, onboarding, the authenticated home dashboard, the practice workspace, settings, and the restricted researcher dashboard. On initial load it attempts to restore the access session and then performs one refresh-token exchange if necessary. Unauthenticated access to a protected route returns to sign-in, while a verified user who has not completed the current onboarding version is directed through onboarding before reaching the workspace.
+
+Onboarding explains that the prototype is not therapy or diagnosis, that affect estimates can be wrong, that voice is optional, and that emergency support is outside the service. The participant selects between one and three practice goals, which are stored on the account and used to recommend a starting scenario without restricting the available scenarios. The home dashboard then offers reflection, guided role play, recent sessions, saved takeaways, and a descriptive history of observed skills. Sessions can be resumed, renamed, or deleted.
+
+The application shell includes explicit loading, empty, success, and failure states. An error boundary provides a recoverable sign-in path if a component cannot render. Network operations disable only the relevant control, expose errors through alert or status regions, and generally retain the user's input for retry. Responsive CSS changes the multi-column workspace and comparisons into single-column layouts, while visible keyboard focus, semantic controls, reduced-motion rules, live regions, and touch-sized actions support accessible desktop and mobile use.
+
+\subsection{Conversation Preparation}
+\label{subsec:frontend-preparation}
+
+Participants can begin with a standard scenario or prepare a conversation in their own terms. The preparation form asks who the conversation is with, what happened, the desired outcome, and the difficult part. These answers are sent to the bounded preparation endpoint, which returns an editable scenario draft with an opening line, supported skills, and a tentative objection. The interface labels this output as a rehearsal plan rather than a prediction.
+
+The participant reviews and may edit the title, character, situation, objective, opening line, expected skills, difficult part, and likely objection before saving the custom scenario. Validation errors remain attached to the draft so an outage or rejected save does not discard their work. Previously stored custom scenarios can be edited or deleted only through the account that owns them; older scenarios without preparation metadata remain compatible with the editor.
+
+Before every attempt, the setup screen displays the selected character, objective, supported skill targets, difficulty description, and, where eligible, character profile. Pre-rehearsal confidence and anxiety ratings require an explicit complete response or an explicit skip. Starting from a populated session creates a new attempt rather than replacing prior reflection, feedback, or research history.
+
+\subsection{Role-Play Workspace}
+\label{subsec:frontend-roleplay-workspace}
+
+The main workspace contains modes for reflection, active role play, feedback, replay, comparison, and the action card. A transcript panel presents ordered user and assistant turns, while the composer holds typed or reviewed transcribed text. During role play, a header shows the scenario, character, stage, progress, difficulty or profile, and controls for pause, resume, finish, and eligible rewind. Moving to reflection pauses an active rehearsal after confirmation; text entered while paused does not advance the role-play controller.
+
+The browser includes the current session version and a newly generated request identifier with enhanced chat submissions. It clears the composer only after the server confirms the saved exchange. If a request fails, the typed draft and any voice attachment remain available; if the server reports a conflict, the interface offers to reload the committed conversation while retaining the draft. This avoids displaying a message bubble that was never persisted and lets the participant decide whether an uncertain submission should be sent again.
+
+The workspace replaces its state from each response, including the saved user turn, assistant turn, emotion state, role-play status, feedback, and post-questionnaire opportunity. Busy indicators and an \texttt{aria-live} transcript communicate progress without inventing an optimistic response. Deleting and starting afresh requires a deliberate action and uses the backend deletion path rather than only clearing local display state.
+
+\subsection{Voice Capture and Multimodal Interaction}
+\label{subsec:frontend-voice}
+
+Voice input is opt-in at both the settings and exchange levels. The browser requests microphone permission only after the participant selects the voice control, records for at most 20 seconds, and exposes recording and stop states. The captured signal is decoded through the browser audio context, mixed to mono, resampled to 16~kHz, encoded as PCM WAV, and kept only in component memory. Denied permission, unsupported recording, and conversion failure leave the text composer available.
+
+When transcription is configured, stopping a recording sends the transient WAV to the authenticated transcription endpoint. The returned text is inserted into the composer for explicit review and editing; it does not become a conversation turn until Send is selected. A new recording or text edit clears any stale display associated with the previous draft. The reviewed text and optional WAV are then submitted together in one version-bound chat request so the affect estimate, pacing decision, and stored wording refer to the same exchange.
+
+The interface permits a user to disable the microphone preference locally, enable automatic voice-informed pacing, or select keep going, gentler pace, or more challenge. It does not calculate predictions or send client-authored confidence values. After completion or failure, the component releases its media stream and object references. Raw audio is not added to browser session history or backend session objects.
+
+\subsection{Presentation of Affect and Uncertainty}
+\label{subsec:frontend-affect-presentation}
+
+The standard emotion panel displays the backend's tentative lexical state using a distribution, valence, arousal, intensity, trend, and confidence. Its language consistently presents these values as estimates. The panel is secondary to the conversation and is accompanied by the prototype disclaimer rather than being used as an authoritative description of how the participant feels.
+
+When a valid multimodal result is available, a separate panel presents the fused confidence, text and voice leaders, modality agreement, full distribution, latency, queue time, and the statement that audio was not stored. A fused label below the configured display threshold is headed as an uncertain estimate rather than as the predicted category. Disagreement receives an explicit explanation, and the full probabilities remain visible so that the leading label is not separated from its uncertainty.
+
+For exchange-linked pacing, the ``Why this response?'' view uses the persisted \texttt{AffectDecision}. It shows whether analysis was requested and available, the selected action and reason, user preference, fallback code, model and policy versions, timings, and distributions. Reloading displays the same record and does not run inference again. Missing or failed inference is represented as an availability gap, not silently replaced by the lexical estimate.
+
+\subsection{Feedback, Replay, and Comparison Interfaces}
+\label{subsec:frontend-feedback-interfaces}
+
+The feedback screen distinguishes the controller outcome from the individual metrics. It renders evidence scores, supporting turn numbers, strengths, suggestions, observed features, generation source, and any same-version comparison with a prior attempt. Difference labels explicitly refer to observed language in two rehearsals and avoid claims of personal improvement. The same screen hosts the personal takeaway and the immediate post-rehearsal ratings when their server-issued opportunity token is still valid.
+
+Replay presents a selectable exchange timeline with linked evidence, controller state, generation provenance, and affect-pacing details. Buttons move focus to the source turn for keyboard as well as pointer users. Missing legacy data and unavailable measurement boundaries have dedicated explanations. From a supported user turn, the participant can create a branch; the original remains unchanged and the new workspace opens with copied context and the old response as an editable draft.
+
+The comparison view separates shared context from two labelled continuation regions and stacks them on narrow screens. It reports utterances, evidence, actions, sources, outcomes, and agreements without ranking one branch as globally better. The action-card view provides editable, character-limited fields with save, retry, copy, and download controls. Save failures preserve edits, and version conflicts ask the user to refresh rather than overwriting a newer card.
+
+\subsection{Researcher and Participant Interfaces}
+\label{subsec:frontend-research-interfaces}
+
+Participant research controls live in settings and the authenticated dashboard rather than in public registration. The settings page fetches the current server-provided information sheet, displays eligibility criteria, data categories, processors, audio handling, retention, risks, withdrawal terms, and contacts, and requires separate confirmations plus the access code. Enrolled participants can see their pseudonymous identifier and consent versions, download a text-free personal research JSON file, or enter a two-step withdrawal flow without deleting the ordinary account.
+
+An enrolled participant also receives a three-task checklist. It obtains progress from durable study records, labels tasks as not started, in progress, awaiting ratings, incomplete, or complete, and directs the next eligible action to workload, boundary, and relationship practice in order at intermediate difficulty. Required-task selection is fixed by the server; additional practice remains visibly separate. Closing or skipping a post-questionnaire advances the interface without calling the task complete.
+
+The allow-listed researcher dashboard presents descriptive recruitment and completion counts, protocol status, scenario and difficulty summaries, questionnaire averages, skill summaries, generation sources, and pseudonymous participant activity. Researchers may set the collection dates, record a bounded exclusion reason and data-quality note, download the versioned CSV, and initiate the final dataset freeze when eligible. Names, email addresses, transcripts, audio, custom wording, and takeaways are not rendered. A non-researcher cannot reach this view merely by navigating to its route because the API applies the independent researcher dependency.
+%
+\section{Research Workflow Implementation}
+\label{sec:research-workflow-implementation}
+
+The research workflow implements the frozen feasibility protocol as versioned application state. Account privacy acceptance and study participation are separate, and ordinary use of AffectLab does not imply research consent. The protocol identifier, consent version, eligibility version, attempt purpose, task association, and measurement timestamps are carried into the records needed to reconstruct the study flow.
+
+\subsection{Participant Enrolment and Consent}
+\label{subsec:participant-enrolment}
+
+The participant information endpoint supplies the current study title, protocol and consent versions, eligibility scope, collected data, external processors, audio handling, retention statement, risks, limitations, withdrawal terms, and research contacts. Enrolment requires an authenticated, verified account, a configured access code, an open collection window, and explicit confirmation that the information was read, participation is voluntary, and the stated processing is accepted. The access code is compared using a constant-time operation.
+
+Eligibility is confirmed separately for minimum age, approved geography, English use, and the additional frozen inclusion and exclusion criteria. The backend stores the criteria fingerprint, protocol version, and confirmation time, but not date of birth, precise address, health details, or a reason for ineligibility. If the configured criteria, consent version, or protocol changes, the old confirmation is not silently treated as current. Withdrawn or researcher-excluded accounts cannot re-enrol, and enrolment closes once dataset freezing begins.
+
+Successful enrolment creates a pseudonymous participant identifier independent of email and records the exact consent and eligibility versions. These fields are evaluated again when starting a required task or accessing progress; possession of an access token from an earlier state is insufficient. The protocol is a single-arm feasibility and usability pilot, and the application does not expose efficacy or clinical-effectiveness claims.
+
+\subsection{Study Progress and Questionnaires}
+\label{subsec:study-progress-questionnaires}
+
+The required procedure contains workload, boundary, and relationship scenarios in that order, each at intermediate difficulty. Only an attempt explicitly marked required and associated with the matching scenario can become the primary attempt for a task. The first such attempt is selected deterministically by start time and session identifier; an additional practice, retry, custom scenario, branch, or later successful attempt cannot replace it. This prevents outcome-driven reassignment of the protocol record.
+
+Before an attempt begins, confidence and anxiety use integer ratings from 1 to 7. After an eligible completed rehearsal, confidence, realism, and usefulness use the same scale. Each phase requires either all declared items or an explicit skip. Pre-ratings cannot be added after the role play starts, and post-ratings require the one-use token issued at completion. Leaving the immediate feedback opportunity closes it; a saved response or skip cannot be edited, and the attempt cannot then be rewound.
+
+A required task is complete only when the required scenario and difficulty match, its completion reason is success, maximum turns, or manual finish, and a complete post-questionnaire exists. A safety interruption, omitted post-ratings, closed window, or abandoned task remains incomplete. Progress nevertheless permits the participant to continue to later tasks, preserving observable missingness rather than forcing or fabricating a score. Collection dates and dataset-freeze state can disable new required activity while leaving ordinary practice available.
+
+\subsection{Pseudonymous Research Records}
+\label{subsec:pseudonymous-records}
+
+Eligible post-consent session activity is projected into a separate \texttt{StudyRecord}. It contains participant and session pseudonyms, protocol and consent versions, enrolment and activity times, retention deadline, turn count, attempt and branch classification, scenario, difficulty, completion reason, measurement times, numeric feedback metrics, questionnaire values, generation and fallback counts, and text-minimised event records. Pre-consent events are excluded, and branch copies are not counted as new participant activity.
+
+The record excludes account names, email, password material, conversation text, raw audio, custom scenario wording, feedback prose, saved takeaways, action cards, and dialogue snapshots. Event export further reduces properties to counts because even a nominally structured property could contain custom wording. A participant with no retained sessions still receives a participant-level export row so the enrolment denominator is not silently reduced.
+
+Study-record retention is independent of the shorter application-session lifecycle. Each eligible activity refreshes the configured research deadline, and MongoDB applies a separate time-to-live index. Startup backfilling projects missing records only for currently eligible, post-consent material. A protocol freeze blocks further durable study-record changes, preserving the final analysis boundary.
+
+\subsection{Research Dashboard and Data Export}
+\label{subsec:research-dashboard-export}
+
+The researcher dashboard constructs aggregates from the current protocol cohort while excluding withdrawn and researcher-excluded participants from analysis. It reports enrolment and completer targets, protocol completion, completed rehearsals, scenario and difficulty counts, questionnaire averages, deterministic skill averages, generation sources, and participant-level lifecycle status. These are descriptive monitoring values; the inferential analyses and substantive results belong to Chapter~\ref{chap5}.
+
+The live CSV uses the versioned \texttt{affectlab-frozen-dataset-v4} schema. Its rows include pseudonymous identifiers, consent and eligibility versions, timestamps, task classification, branch and feedback scope, questionnaire values, numeric feedback, generation and fallback counts, and event counts. Missing values remain empty rather than imputed. Branch rows explicitly report copied-context counts and continuation-only feedback so that they are not pooled unknowingly with full attempts. The participant's personal JSON export follows the same exclusion of identity and conversation text while retaining their own participant identifier.
+
+Once the configured study end date is reached, an authorised researcher may start the freeze operation. The repository uses a freeze token to prevent concurrent freezes, generates a de-identified CSV with new sequential participant and session labels, stores its schema, protocol, time, row and participant counts, and SHA-256 digest, and then marks the lifecycle frozen. Subsequent CSV downloads return this immutable stored content with its checksum. Date changes, participant-review edits, enrolment, and research-record updates are blocked after freezing; withdrawal remains available, although an irreversibly de-identified frozen row can no longer be linked for removal.
+%
+\section{Security, Privacy, and Data Protection}
+\label{sec:security-privacy-data-protection}
+
+Security and privacy controls are distributed across configuration validation, middleware, authentication services, ownership-aware repositories, data minimisation, and user-facing lifecycle operations. They define a research prototype boundary rather than a guarantee of confidentiality. The repository includes a separate remote-pilot baseline because a local demonstration configuration is not sufficient for participant-facing deployment.
+
+\subsection{Authentication and Token Management}
+\label{subsec:security-token-management}
+
+Account passwords are accepted only over the API's protected transport boundary in a deployed environment and are converted immediately to recommended adaptive hashes. Verification and password-reset values are generated with a cryptographic random source; the database receives only SHA-256 digests and expiry times. Password reset validates the new password before atomically consuming the stored record, so an invalid new password does not destroy the recovery opportunity while two successful requests cannot reuse it.
+
+Access tokens are signed, typed JSON Web Tokens with configurable short lifetimes. Refresh tokens have separate type claims and unique identifiers, and their digests permit server-side rotation and revocation. The browser keeps the access token in session storage, whereas the refresh credential is an HTTP-only, same-site cookie restricted to the authentication path and marked secure in production. Changing or resetting a password revokes all refresh records and signs the current browser out.
+
+Generic registration, verification-resend, and password-recovery responses reduce account enumeration. Email verification is checked after reloading the user on protected requests. Authentication and email endpoints have dedicated rate-limit categories, and production start-up rejects a disabled limiter. These controls reduce common automated misuse but do not replace monitoring, secret rotation, or infrastructure-level abuse protection.
+
+\subsection{Authorisation and Resource Isolation}
+\label{subsec:authorisation-isolation}
+
+Authorisation begins with the authenticated account identifier and is repeated at the persistence boundary. Session read, list, update, delete, multimodal analysis, branching, comparison, questionnaire, feedback, and action-card operations all obtain the session through an identifier-and-owner query. An unauthorised identifier produces the same not-found behaviour as a missing session. Custom scenarios are nested in the owning user, and branch creation verifies both parent and child lineage against that owner.
+
+Researcher authorisation is not inferred from a route, client flag, or pilot enrolment. It requires a verified account whose normalised email is present in the server-side allow-list. Study operations additionally check current consent, eligibility version, protocol version, withdrawal and exclusion state, collection dates, and freeze state. Dataset lifecycle mutations, participant review, and exports therefore remain protected even if a participant manually invokes their URLs.
+
+Optimistic versions and idempotency identifiers add integrity protection to authorisation. They do not merely identify who may write, but also which state that write was based on. Conditional MongoDB replacements and deterministic branch identifiers prevent lost updates and duplicate alternatives across processes. The API returns conflicts for recovery instead of choosing a winner silently.
+
+\subsection{Audio and Conversation Data Handling}
+\label{subsec:audio-conversation-data}
+
+Conversation text is stored because session continuation, replay, evidence links, and deletion controls require it. When provider-backed generation is enabled, the relevant session context may be sent to the configured provider with response storage disabled. The application does not write raw prompts or generated replies to its own operational logs. The participant information and settings interfaces disclose these boundaries rather than treating local and provider processing as equivalent.
+
+Audio requires an explicit recording action for every exchange. The browser holds the WAV transiently, and the backend checks encoded and decoded size, file structure, duration, channels, and sample rate before transcription or local inference. Transcription may send it to the configured provider, whereas multimodal inference processes it in memory. Neither path adds the recording to the session, study record, or export. Only an approved transcript, bounded prediction summary, provenance, and pacing decision may persist.
+
+Research projections minimise the richer session document. They omit identity, transcripts, free-text feedback, custom scenario content, takeaways, action cards, and raw model inputs. Exported event information is counted by event name rather than exposing arbitrary properties. Source-control exclusions separately keep environment files, local databases, raw datasets, checkpoints, model artefacts, generated runs, and backup material outside the repository.
+
+\subsection{Retention, Withdrawal, and Account Deletion}
+\label{subsec:retention-deletion}
+
+Application sessions and research records have distinct retention fields. By default, an active session expires after 30 days of inactivity, while a pseudonymous study record expires 365 days after its latest eligible activity. MongoDB time-to-live indexes perform eventual physical deletion, and repository reads also apply the deadlines logically so expired material is not returned while background deletion is pending. Token collections use their own expiry indexes.
+
+A participant may delete an individual session without deleting the account. Account deletion removes the user, owned sessions, live study records, refresh tokens, and outstanding verification and reset records. The settings interface requires browser confirmation and retains the signed-in state if the request fails, allowing a safe retry. Backups remain a separate operational responsibility and must follow the approved encrypted retention schedule.
+
+Study withdrawal is intentionally narrower. It removes questionnaires, questionnaire skips, post-rating tokens, research-event telemetry, and live study records, and marks the account as withdrawn so it is excluded from later collection and export. Ordinary account access, conversations, feedback, and takeaways remain available. The interface explains that rows already irreversibly de-identified in a frozen export or incorporated into aggregate analysis may no longer be linkable for removal. Re-enrolment after withdrawal is blocked.
+
+\subsection{Deployment Security Controls}
+\label{subsec:deployment-security-controls}
+
+Setting the environment to production, pilot, or staging activates fail-fast configuration validation. The signing secret must be unique and at least 32 bytes; allowed origins must be explicit HTTPS addresses; trusted hosts cannot contain a wildcard; HTTPS enforcement and rate limiting must be enabled; and offline demonstration mode is prohibited. Refresh cookies become secure and responses add HTTP Strict Transport Security. CORS still permits credentials only from the declared origins.
+
+The API and Nginx layers add complementary content-security, framing, referrer, content-type, permissions, and caching headers. Host validation and HTTPS redirection occur in the backend, while the frontend server restricts executable and embedded sources and grants media access only to local blob content. The intended remote arrangement terminates TLS at a maintained reverse proxy and prevents direct public access to MongoDB and the application server.
+
+The bundled limiter is explicitly scoped to a single backend process and does not trust forwarded client-address headers. A multi-worker deployment must use a shared gateway or distributed limiter. The operational baseline also requires patched hosts, dependency auditing, protected secrets, encrypted access-controlled backups, and a restore drill. The backup utility preserves BSON types and indexes, records per-collection checksums and counts, and will restore by default only into an empty database whose name ends in \texttt{\_restore\_test}, reducing the chance of overwriting the live store.
+%
+\section{Deployment and Configuration}
+\label{sec:deployment-configuration}
+
+The implementation supports three related execution arrangements: direct local development, a containerised integrated stack, and a deliberately offline demonstration. These arrangements reuse the same application code but select different repositories and optional services through configuration. None embeds production credentials or private model files in an image.
+
+\subsection{Local and Containerised Deployment}
+\label{subsec:local-container-deployment}
+
+For local development, MongoDB can run as an existing service while Uvicorn serves the FastAPI application and Vite serves the frontend with hot reloading. The API address is provided to the frontend at build or development time. Developers may instead select the in-memory repository for isolated service work, accepting that its contents disappear when the process stops.
+
+Docker Compose defines MongoDB 8, the backend, and the production frontend. A named volume stores database contents, the backend waits for the MongoDB health check, and the frontend waits for backend readiness. The backend image installs the core requirements into a Python 3.12 slim base and runs Uvicorn. Optional PyTorch and Transformers packages and private model directories are deliberately absent unless a separate inference-capable deployment supplies them.
+
+The frontend uses a Node.js 22 build stage to run the TypeScript and Vite production build, then copies only compiled assets into an Nginx image. Nginx serves the single-page-application fallback, prevents caching of \texttt{index.html}, applies immutable caching to content-hashed assets, and exposes a small health endpoint. Compose's default values are for local use; a remote deployment must replace the development signing secret and satisfy all production validation.
+
+\subsection{Offline Demonstration Mode}
+\label{subsec:offline-demo}
+
+The offline configuration selects the in-memory repository, creates a verified demonstration account at application startup, and disables OpenAI generation, role-play generation, transcription, multimodal inference, SMTP, and rate limiting. Reflection and rehearsal therefore use only deterministic local templates. No MongoDB, cloud storage, private model, email server, or internet connection is required.
+
+This mode makes the application's graceful-degradation claims demonstrable without pretending that unavailable capabilities ran. Model and transcription status remain unavailable, and data disappear on backend restart. The configuration validator rejects offline demonstration in production-like environments, so convenience credentials and automatic account creation cannot be enabled accidentally for a remote pilot.
+
+A synthetic demonstration dataset and runbook keep example conversation content separate from participant data. A stronger engineering demonstration uses real MongoDB and a compiled frontend but still disables external providers and trained inference. The two modes serve different purposes: the memory-backed mode is portable for presentation, while the isolated MongoDB smoke run verifies persistence and restart behaviour.
+
+\subsection{Environment-Based Configuration}
+\label{subsec:environment-configuration}
+
+Settings can be supplied through process variables or repository- and backend-level environment files. They cover API origins and hosts, repository choice and database name, token and retention lifetimes, provider models and timeouts, SMTP, multimodal paths and thresholds, consent and protocol versions, study targets and contacts, eligibility scope, researcher allow-list, access code, offline credentials, and rate limits. Defaults support development but do not silently qualify as production settings.
+
+The checked-in example file documents required names without containing live secrets. The real \texttt{.env} file is ignored by version control. Private model weights are synchronised into a user-selected local directory and referenced by path; raw IEMOCAP data and derived row-level artefacts remain outside the application repository. Separate dependency sets allow a deployment to omit local machine-learning libraries entirely.
+
+Configuration values with scientific meaning are also retained in versioned JSON rather than only in mutable environment variables. These include the final multimodal label order, input limits and calibration chain, as well as the study protocol task order, measures, missing-data policy, target sizes, and prohibition on efficacy claims. This separates deployer-specific secrets from inspectable experimental decisions.
+
+\subsection{Health Checks and Operational Failure Handling}
+\label{subsec:health-failure-handling}
+
+The liveness endpoint reports only that the API process can respond. Readiness revalidates settings, pings the repository, and verifies every required index; configuration, persistence, and index failures receive distinct states and HTTP 503. Optional transcription and multimodal capabilities are reported separately and do not make the text-first service unready. Container health checks consume these endpoints for dependency ordering and restart decisions.
+
+Expected failures are translated into bounded client responses: unauthenticated and forbidden requests, missing resources, validation failures, unavailable optional services, rate limits with \texttt{Retry-After}, and concurrency conflicts have distinct status codes. Provider exceptions and inference failures do not expose stack traces or raw exception content in conversation records. The frontend preserves drafts and presents retry or reload actions according to whether the operation may have committed.
+
+The system is designed to fail closed where authority is involved and fail soft where an enhancement is involved. Missing ownership, stale state, invalid consent, a closed study window, or a dataset freeze prevents the write. Missing generation, transcription, or emotion-model capability preserves the deterministic text workflow. This distinction keeps availability from weakening access, protocol, or safety constraints.
+%
+\section{Implementation Verification}
+\label{sec:implementation-verification}
+
+Verification is organised by boundary rather than by a single undifferentiated test suite. Deterministic unit tests check policies and transformations, API tests check contracts and ownership, MongoDB tests check real persistence semantics, browser tests check participant workflows and accessibility, and smoke tests join the compiled components. These are engineering checks; they do not substitute for model evaluation or participant outcomes.
+
+\subsection{Backend Unit and Integration Testing}
+\label{subsec:backend-testing}
+
+The default pytest suite forces the in-memory repository and disables SMTP, provider, transcription, and trained-model inference. It tests authentication and recovery, generic anti-enumeration responses, token rotation and revocation, ownership, optimistic versions, session lifecycle, study consent and questionnaires, exports and freezing, preparation, feedback, replay boundaries, rewind, branching, crisis precedence, dialogue transitions, affect pacing, and optional-service failure. Parameterised cases exercise profiles, difficulty levels, negations, reversals, confidence combinations, missing modalities, duplicate requests, and legacy compatibility.
+
+Machine-learning support tests separately validate IEMOCAP parsing, safe archive paths, causal context, speaker-independent folds, class weights, calibration, probability metrics, utterance pairing, fusion, bootstrap procedures, and balanced final-model smoke selection. The disabled multimodal service is tested without importing heavy machine-learning dependencies; concurrency tests verify serial inference access when enabled. These fixtures confirm implementation contracts, not the accuracy of a trained model on new users.
+
+MongoDB integration tests are opt-in and create uniquely named disposable databases. They recreate repository and service clients to check persistence across restart, required indexes and logical expiry, separate study retention, cascade deletion, optimistic conflict detection, single-use recovery, versioned dialogue restoration, branch idempotency, and saved affect provenance. Backup tests create an archive, restore it into a protected disposable target, and compare checksums and document counts.
+
+Ruff checks imports, syntax-level errors, modern Python usage, and selected bug patterns across application, test, and script code. Dependency security is checked separately because style and behavioural tests cannot identify published package vulnerabilities.
+
+\subsection{Frontend End-to-End Testing}
+\label{subsec:frontend-testing}
+
+The regular Playwright suite runs the browser against a deterministic mocked API boundary. This makes UI state and failure injection repeatable while testing registration and onboarding, required and ordinary practice, preparation, voice-review submission, feedback, replay, branching, comparison, action cards, research enrolment, questionnaire timing, researcher access, settings, and account recovery. Dedicated cases abort or reject network calls to verify that drafts, recordings, selections, and stored rows are not falsely discarded.
+
+Projects run in desktop Chromium and a mobile Chromium profile. Representative pages are scanned with axe-core against WCAG 2.0 and 2.1 A/AA rule sets, alongside assertions for keyboard focus, accessible names, live status messages, and responsive layouts. Production compilation runs the strict TypeScript project build before Vite bundling, and ESLint checks React hook and TypeScript rules.
+
+Because the normal browser suite mocks the backend, its passing result demonstrates frontend behaviour against declared contracts rather than integrated persistence. Assertions that depend on real authentication, FastAPI serialisation, MongoDB indexes, or process restart are reserved for the full-stack suite.
+
+\subsection{Full-Stack Smoke Testing}
+\label{subsec:fullstack-smoke-testing}
+
+The container smoke runner overlays a dedicated Compose configuration on the normal stack. It builds the production frontend and backend, starts an isolated MongoDB database, creates a verified offline researcher, and waits for service health. Playwright then signs in through the rendered application, creates and reloads a pre-enrolment reflection, enrols with versioned eligibility and consent, completes a required rehearsal and questionnaire, verifies progress and researcher aggregates, checks that the official export excludes the pre-consent session, restarts the backend, and confirms that the completed session persists.
+
+A second journey exercises an enhanced deterministic rehearsal, simulated network failure and draft recovery, replay, branch creation, comparison, action-card persistence, another backend restart, and preservation of the original required-task progress. The runner always removes its isolated containers and volume, and uploads traces or screenshots on continuous-integration failure. A GitHub Actions workflow runs this smoke path on pushes and pull requests.
+
+The native engineering smoke script provides a complementary local path. It builds the compiled frontend, serves it from a small local server, launches and restarts actual Uvicorn child processes, uses a uniquely named real MongoDB database, and writes a synthetic evidence manifest with environment details, source hashes, elapsed time, and restart identifiers before deleting the database. Neither smoke arrangement calls a live language provider or claims trained-model performance.
+
+\subsection{Reproducibility and Model-Provenance Checks}
+\label{subsec:reproducibility-provenance}
+
+Reproducibility checks combine declarative configuration, frozen folds, stored predictions, code-level evaluation scripts, and immutable hashes. Model preprocessing records source and manifest digests; training configurations fix seeds and hyperparameters; calibration consumes validation predictions; fusion verifies exact utterance identifiers; and dialogue-clustered bootstrap procedures retain speaker and conversation dependence. Full-data packaging is kept distinct from held-out evaluation.
+
+After private final models are downloaded, the provenance script records the Git commit, multimodal-configuration hash, platform and relevant package versions, and the size and SHA-256 digest of every text and audio model file. Ordered file entries produce aggregate directory digests. The private manifest can therefore bind an inference installation to exact artefacts without publishing licensed weights or local storage paths in the repository.
+
+The deterministic engineering evaluator uses authored synthetic conversations to compare expected state trajectories, evidence decisions, and affect-pacing actions. Its JSON output records scope, source hashes, environment, individual cases, and in-process timings, with an explicit statement that it is neither participant nor model evaluation. The evidence package similarly distinguishes reproducible engineering demonstrations from the cross-validated results reported in Chapter~\ref{chap5}.
+
+Continuous integration supplements behavioural checks with weekly and change-triggered Python and npm dependency audits, while Dependabot proposes updates for Python, npm, and workflow dependencies. Reproducing a result still requires recording the exact commit, lock files, private dataset and model provenance, export checksum, and applicable protocol version; a successful build alone is not treated as sufficient provenance.
+%
+\section{Chapter Summary}
+\label{sec:implementation-summary}
+
+This chapter described the implementation of AffectLab as a modular, text-first research prototype. The React and TypeScript frontend communicates with a typed FastAPI backend whose services separate authentication, persistence, dialogue control, affect analysis, response realisation, research collection, and optional external providers. MongoDB stores ownership-bound, versioned sessions and separately retained pseudonymous study records, while an in-memory repository and deterministic templates support isolated testing and offline demonstration.
+
+The emotion-recognition subsystem prepares speaker-independent IEMOCAP folds, trains contextual DeBERTa-v3 text and wav2vec~2.0 speech classifiers, calibrates their distributions, and combines them through late fusion. Private final artefacts are loaded only when configured and are tied to explicit calibration and provenance manifests. Within the application, these predictions remain optional uncertainty-bearing inputs to a bounded pacing policy; they do not control crisis handling, dialogue success, study completion, or feedback scores.
+
+Role-play is governed by versioned scenarios, observable evidence rules, deterministic state transitions, and stored before-and-after decisions. Provider generation may phrase an authorised action but cannot select it. Feedback remains linked to source turns, and replay, rewind, branching, comparison, takeaways, and action cards preserve the distinction between recorded evidence and user-authored reflection. Safety checks precede inference and generation and interrupt a rehearsal through a fixed local path.
+
+The participant workflow separates account use from versioned study consent and eligibility. Required tasks, immediate questionnaires, pseudonymous research projection, text-free exports, lifecycle controls, and immutable dataset freezing implement the frozen feasibility protocol without turning optional practice into protocol evidence. Authentication, ownership filtering, optimistic concurrency, retention, withdrawal, account deletion, transient audio handling, production configuration checks, and backup verification provide layered security and privacy controls appropriate to the stated prototype scope.
+
+Finally, unit, API, database, browser, accessibility, full-stack, reproducibility, and provenance checks verify the implementation at complementary boundaries. These checks establish that the coded components follow their declared contracts; they do not by themselves establish emotion-recognition validity, usability, feasibility, or participant benefit. Those empirical questions, together with quantitative results and their limitations, are addressed in Chapter~\ref{chap5}.

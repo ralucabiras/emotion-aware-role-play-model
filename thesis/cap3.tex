@@ -1,0 +1,512 @@
+\chapter{Proposed System Architecture}
+\label{chap:proposed-system-architecture}
+
+\section{System Overview}
+\label{sec:system-overview}
+
+AffectLab is designed as a hybrid, full-stack research system for rehearsing difficult interpersonal conversations. Its architecture combines deterministic application logic, trained affect-recognition models, optional generative services, and a browser-based interaction interface. The system is not constructed as a single end-to-end conversational model. Instead, responsibilities are separated so that probabilistic components can contribute linguistic flexibility and affective information without controlling safety-critical or evaluative decisions.
+
+The central architectural principle is the separation of \emph{inference}, \emph{control}, and \emph{presentation}. The affect-recognition subsystem estimates a distribution over a limited set of emotion categories from conversational text and optional speech. The dialogue-control subsystem determines how the scenario progresses, which communication features have been observed, and whether a completion condition has been reached. The response-generation subsystem expresses the selected dialogue action using either constrained generative wording or a deterministic template. The interface presents the conversation, optional affect information, feedback, and reflection tools to the user. This separation makes it possible to inspect and test each decision independently.
+
+The system follows a text-first design. A user can complete the entire rehearsal by typing, while voice input is an optional enhancement. At the beginning of a rehearsal, the user selects a scenario, difficulty level, and, where available, a simulated character profile. The standard scenarios concern workload negotiation, personal boundary-setting, and the expression of a relationship need. Each scenario defines its objective, expected communication features, dialogue stages, difficulty-dependent behaviour, and possible completion outcomes.
+
+During the rehearsal, the user submits a textual utterance and may optionally attach a short voice recording. The text is always available to the dialogue and safety components. When voice input and trained-model inference are enabled, the recording is processed for the current request and is not retained as part of the conversation history. Denial of microphone access, missing audio, or an inference failure therefore does not prevent the rehearsal from continuing.
+
+Table~\ref{tab:architecture-components} summarises the main architectural components and the boundaries placed around their responsibilities.
+
+\begin{table}[htbp]
+\centering
+\caption{Principal components of the AffectLab architecture.}
+\label{tab:architecture-components}
+\footnotesize
+\begingroup
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.20\linewidth}|p{0.35\linewidth}|p{0.35\linewidth}|}
+\hline
+\textbf{Component} & \textbf{Primary responsibility} & \textbf{Architectural boundary} \\ \hline
+
+Interaction layer &
+Supports scenario selection, text and optional voice input, conversation display, pausing, replay, branching, feedback review, and personal takeaways. &
+Does not determine dialogue outcomes, affect labels, safety decisions, or feedback scores. \\ \hline
+
+Application and session layer &
+Coordinates authenticated requests, session state, scenario configuration, conversation history, model calls, and persistence. &
+Accepts decisions from specialised components but does not treat a generated response as the authoritative dialogue state. \\ \hline
+
+Safety layer &
+Examines textual input for crisis-related language and applies a predefined interruption response when required. &
+Operates independently of affect classification and takes precedence over dialogue generation and affect adaptation. \\ \hline
+
+Affect-inference layer &
+Produces contextual text, audio, and fused probability distributions together with confidence, agreement, and availability information. &
+Provides bounded evidence rather than a statement of the user's true emotional state. Its output cannot determine safety, scenario success, or feedback scores. \\ \hline
+
+Dialogue-policy layer &
+Detects observable communication features, advances the scenario state, selects the simulated character's intended action, and determines completion or unresolved outcomes. &
+Uses explicit, scenario-specific rules. It is authoritative for progression even when generative response wording is enabled. \\ \hline
+
+Response-realisation layer &
+Transforms the dialogue action into a natural-language response using constrained generation or a deterministic template. &
+May alter wording but cannot modify the selected action, completion state, recorded evidence, or safety response. \\ \hline
+
+Feedback and reflection layer &
+Calculates communication metrics, links them to supporting turns, and supports replay, retry, branch comparison, and takeaway creation. &
+Bases assessment on recorded observable evidence. Generative phrasing cannot introduce unsupported findings. \\ \hline
+
+Persistence and research layer &
+Stores account-owned sessions, textual turns, dialogue decisions, feedback evidence, model provenance, and permitted research measures. &
+Does not retain raw voice recordings and separates identifiable application data from pseudonymous research exports. \\ \hline
+\end{tabular}
+\endgroup
+\end{table}
+
+For each submitted utterance, processing begins with authentication, session-ownership validation, and input validation. The safety layer then examines the textual message before ordinary dialogue generation occurs. If a safety condition is detected, the normal role-play path is interrupted, a predefined safety response is returned, and the interruption is recorded. This ordering prevents optional affective or generative components from overriding an explicit safety decision.
+
+When no safety interruption is required, the affective and conversational analyses are performed. The contextual text model receives the current message together with a causal window of preceding turns. If an audio sample is available, the audio model analyses the corresponding speech signal independently. The calibrated text and audio probability distributions can then be combined through late fusion. The system retains the individual modality outputs so that disagreement, missing information, and the contribution of each modality remain observable.
+
+The resulting affective estimate is interpreted by a bounded adaptation policy. The policy considers model availability, calibrated confidence, agreement between modalities, the current dialogue state, and the user's selected pacing preference. Where affect adaptation is enabled and the evidence satisfies the declared conditions, the system may make a limited change such as adding a tentative acknowledgement. Low confidence or disagreement may lead to an explicit pacing choice, while unavailable inference produces the standard non-adaptive response. The policy does not describe the estimated category as a verified internal emotion.
+
+In parallel with this bounded adaptation, the deterministic dialogue policy evaluates the user's message against the active scenario. It records observable language features and selects the next dialogue action. Depending on the scenario, relevant features may include a specific request, a concrete detail, an ``I'' statement, non-blaming language, acknowledgement of another perspective, maintenance of a boundary, or a proposed next step. The policy also determines whether the conversation should advance, continue under resistance, finish successfully, close without resolution, or stop because the maximum number of turns has been reached.
+
+The selected action is passed to the response-realisation component. When generative services are enabled, a language model receives a constrained representation of the scenario, simulated character, difficulty, current state, and required dialogue action. The generated wording is accepted only as a realisation of that action. If generation is disabled, unavailable, or invalid, the system uses the deterministic response associated with the same action. Consequently, a service failure can reduce linguistic variety but does not remove the core rehearsal workflow.
+
+After the response has been produced, the system persists the textual turns and their associated decision metadata. This metadata includes the dialogue state before and after the exchange, detected communication evidence, selected action, reason codes, affect-policy decision, model or policy versions, and whether generative or fallback wording was used. Recording these elements supports reproducibility and makes it possible to distinguish what the system decided from how that decision was expressed.
+
+At the end of a rehearsal, the feedback component calculates scenario-specific metrics from the evidence accumulated during the conversation. Each metric is linked to the turn or turns that support it. Optional generative processing may improve the readability of the feedback, but the deterministic metrics and recorded evidence remain authoritative. The completed conversation can subsequently be replayed, retried from the latest exchange, or used as the basis for an alternative branch. Branch comparison evaluates the new continuation separately from the conversational context copied from the original attempt.
+
+This architecture supports the research questions at distinct levels. The contextual text, audio, fusion, and calibration components support the model comparisons in RQ1 and RQ2. The separation between affect inference, bounded adaptation, deterministic dialogue control, and safety addresses RQ3. The integrated rehearsal, feedback, and reflection workflow provides the system evaluated for feasibility and acceptability in RQ4. Maintaining these architectural boundaries also prevents model classification performance, policy conformance, and participant outcomes from being treated as interchangeable forms of evidence.
+
+\section{System Requirements and Scope}
+\label{sec:system-requirements-scope}
+
+\subsection{Overview}
+\label{subsec:requirements-overview}
+
+The system requirements translate the research aims introduced in Chapter~\ref{chap1} and the design implications identified in Chapter~\ref{chap2} into explicit capabilities and constraints for AffectLab. They define what the prototype is expected to do, the conditions under which it should operate, and the responsibilities that must remain outside probabilistic affect recognition and generative artificial intelligence.
+
+The requirements are divided into functional and non-functional requirements. Functional requirements describe user-visible capabilities and internal system behaviours. Non-functional requirements describe qualities that apply across those capabilities, including safety, privacy, explainability, reliability, accessibility, and reproducibility. Together, they provide a basis for designing the architecture and for evaluating whether the implemented system conforms to its intended behaviour.
+
+A distinction is maintained between \emph{core} and \emph{optional} functions. Text-based structured rehearsal, deterministic dialogue control, safety handling, feedback, and session management constitute the core workflow. Voice capture, trained multimodal inference, transcription, generative response wording, and generative feedback phrasing are optional enhancements. The absence or failure of an optional component must not make the core rehearsal unusable.
+
+\subsection{Scope of the System}
+\label{subsec:system-scope}
+
+AffectLab is intended to support adults who wish to prepare for and rehearse ordinary but potentially difficult interpersonal conversations. It provides a private, repeatable environment in which users can practise alternative wording, experience controlled conversational resistance, inspect feedback linked to their own messages, and reflect on possible next steps.
+
+The primary scope comprises three standard communication situations:
+
+\begin{itemize}
+    \item negotiating workload or priorities with a manager;
+    \item stating and maintaining a personal boundary; and
+    \item expressing a relationship need using specific and non-blaming language.
+\end{itemize}
+
+Each standard scenario defines a simulated character, a communication objective, expected observable features, dialogue stages, difficulty-dependent behaviour, and explicit completion conditions. The system may additionally support user-prepared scenarios, provided that they use the communication features and safety constraints supported by the application.
+
+The system supports text-based interaction as the default modality. Optional voice input can be used for transcription and acoustic affect analysis when the relevant services are enabled. Affect analysis is limited to estimates over predefined categories derived from the selected research dataset. These estimates may inform restrained changes in conversational pacing, but they are not presented as direct measurements of the user's internal emotional state.
+
+The scope also includes post-rehearsal reflection. Users can inspect evidence-grounded feedback, replay an attempt, retry an exchange, create an alternative conversational branch, compare compatible attempts, record a personal takeaway, and prepare an action card. These functions support deliberate practice rather than unrestricted social conversation.
+
+For research use, AffectLab includes versioned consent and eligibility procedures, pre- and post-rehearsal measures, pseudonymous research records, technical-event recording, and restricted aggregate export. These functions support engineering, feasibility, and usability evaluation. They do not transform the prototype into a clinical intervention or establish that practice transfers to real-world behaviour.
+
+\subsection{Functional Requirements}
+\label{subsec:functional-requirements}
+
+The functional requirements of AffectLab are as follows.
+
+\begin{description}
+
+    \item[\textbf{FR1. User authentication and ownership}]  
+    The system shall provide account-based access and shall associate every conversation, rehearsal, feedback record, branch, preparation record, and personal takeaway with its owning user. A user shall not be able to access another user's resources.
+
+    \item[\textbf{FR2. Onboarding and disclosure}]  
+    The system shall explain its purpose, limitations, data handling, optional use of voice, and non-clinical status before the user begins the main workflow. It shall not present itself as a therapist, diagnostic instrument, mediator, or emergency service.
+
+    \item[\textbf{FR3. User preferences and practice goals}]  
+    The system shall allow users to select and update practice goals and relevant interaction preferences. Optional microphone use and affect adaptation shall remain under user control.
+
+    \item[\textbf{FR4. Scenario preparation}]  
+    The system shall allow the user to prepare for a conversation by recording its context, the intended outcome, relevant concerns, and a possible objection or source of resistance. Preparation information shall be available to the corresponding rehearsal without becoming an authoritative assessment of the situation.
+
+    \item[\textbf{FR5. Scenario selection}]  
+    The system shall provide standard scenarios for workload negotiation, personal boundary-setting, and expressing a relationship need. It may also allow account-owned custom scenarios constructed from the supported communication objectives and observable features.
+
+    \item[\textbf{FR6. Difficulty and character configuration}]  
+    The system shall support multiple difficulty levels and character profiles. These settings may vary cooperation, resistance, scepticism, time pressure, or willingness to clarify, but shall not modify the safety rules or the meaning of the scenario's communication objectives.
+
+    \item[\textbf{FR7. Rehearsal lifecycle}]  
+    The user shall be able to start, pause, resume, manually finish, and leave a rehearsal. The system shall preserve the current state when continuation is permitted and shall record the reason for completion or interruption.
+
+    \item[\textbf{FR8. Text-first interaction}]  
+    The system shall accept a textual message for each conversational turn. All core scenario, safety, feedback, and reflection functions shall remain available without microphone access or audio input.
+
+    \item[\textbf{FR9. Optional voice input}]  
+    Where voice functions are enabled, the system shall allow the user to record a short audio sample. A transcript produced from the recording shall be presented for review and editing before it is submitted as a conversational turn.
+
+    \item[\textbf{FR10. Safety precedence}]  
+    The system shall examine textual input for supported crisis-related indicators before applying ordinary affect adaptation or response generation. When a safety condition is detected, it shall interrupt the ordinary role-play path, return the predefined safety response, and record the rehearsal as safety-interrupted.
+
+    \item[\textbf{FR11. Contextual text inference}]  
+    Where trained inference is enabled, the system shall construct the text-model input from the current utterance and a fixed causal window of preceding conversational turns. It shall not use future dialogue turns or unavailable annotation information.
+
+    \item[\textbf{FR12. Acoustic inference and multimodal fusion}]  
+    When valid audio is supplied, the system shall produce separate textual and acoustic probability distributions and may combine them using the declared late-fusion configuration. It shall retain modality availability, confidence, agreement, calibration, and model-version information needed to interpret the result.
+
+    \item[\textbf{FR13. Missing-modality handling}]  
+    The system shall handle missing, rejected, invalid, or failed audio without terminating the text-based rehearsal. The absence of audio shall not be interpreted as negative evidence about the user's affect.
+
+    \item[\textbf{FR14. Bounded affect adaptation}]  
+    Where affect adaptation is enabled and permitted, the system shall translate model confidence, modality agreement, inference availability, user preference, and dialogue state into a limited set of predefined actions. Affect predictions shall not determine crisis handling, scenario success, feedback scores, participant eligibility, or research inclusion.
+
+    \item[\textbf{FR15. Deterministic dialogue progression}]  
+    The system shall use scenario-specific policies to detect observable communication features, update the dialogue stage, select the simulated character's intended action, and determine whether a completion condition has been reached.
+
+    \item[\textbf{FR16. Evidence recording}]  
+    For every relevant user turn, the system shall record the observable features detected by the active scenario policy and link those features to the corresponding conversation turn. The system shall preserve the policy and scoring versions used to produce the evidence.
+
+    \item[\textbf{FR17. Constrained response realisation}]  
+    The system shall transform the selected dialogue action into a simulated-character response. A configured language model may phrase the response, but it shall not alter the authoritative dialogue action, completion decision, safety result, or recorded evidence.
+
+    \item[\textbf{FR18. Deterministic fallback}]  
+    If generative response production is disabled, unavailable, rejected, times out, or produces an invalid result, the system shall return a deterministic response associated with the same dialogue action. The source of the response and any fallback reason shall be recorded.
+
+    \item[\textbf{FR19. Explicit rehearsal outcomes}]  
+    The system shall distinguish between relevant completion outcomes, including achievement of a practical next step, maintenance of a boundary, unresolved closure, manual completion, maximum-turn completion, and safety interruption. Scenario success shall not always require agreement from the simulated character.
+
+    \item[\textbf{FR20. Evidence-grounded feedback}]  
+    At the end of a rehearsal, the system shall calculate scenario-specific communication metrics from recorded evidence. Feedback shall identify supported strengths and areas for further practice without making claims about personality, diagnosis, or general communication competence.
+
+    \item[\textbf{FR21. Controlled feedback phrasing}]  
+    A language model may improve the wording of deterministic feedback when configured, but it shall not introduce a strength, weakness, score, or supporting example that is absent from the authoritative feedback record.
+
+    \item[\textbf{FR22. Replay and evidence inspection}]  
+    The system shall allow the user to review the completed conversation and identify the turns associated with feedback evidence, dialogue decisions, and permitted affect-adaptation actions.
+
+    \item[\textbf{FR23. Retry and branching}]  
+    The system shall support retrying an eligible exchange and creating an alternative branch from a supported point in the conversation. Branching shall preserve the copied context while distinguishing it from newly generated continuation turns.
+
+    \item[\textbf{FR24. Attempt comparison}]  
+    The system shall allow comparison only between compatible attempts, such as rehearsals using the same scenario and scoring version. For a branch, feedback shall evaluate the new continuation separately from the copied context.
+
+    \item[\textbf{FR25. Personal reflection}]  
+    The system shall allow the user to save a personal takeaway and create an action-oriented summary of wording or next steps they wish to remember. User-authored reflections shall remain distinct from system-generated feedback.
+
+    \item[\textbf{FR26. Session persistence and deletion}]  
+    The system shall retain the textual and structural information required for session recovery, replay, branching, and feedback for the configured retention period. Users shall be able to delete eligible sessions and their account-owned data.
+
+    \item[\textbf{FR27. Research participation controls}]  
+    When the research workflow is enabled, the system shall record versioned consent, eligibility confirmation, questionnaire status, required-task progress, and withdrawal. Research collection shall begin only after the applicable consent and eligibility requirements have been satisfied.
+
+    \item[\textbf{FR28. Pseudonymous research access}]  
+    The system shall provide authorised researchers with aggregate monitoring and pseudonymous exports containing only the fields required by the study protocol. Research exports shall exclude names, email addresses, passwords, raw conversation text, raw audio, custom scenario wording, feedback prose, and personal takeaways.
+
+\end{description}
+
+\subsection{Non-Functional Requirements}
+\label{subsec:non-functional-requirements}
+
+The non-functional requirements apply across the complete system.
+
+\begin{description}
+
+    \item[\textbf{NFR1. Safety}]  
+    Safety handling shall remain independent of the trained affect classifier and shall take precedence over affect adaptation and generative response production. Failure of a probabilistic component shall not suppress a deterministic safety response.
+
+    \item[\textbf{NFR2. Graceful degradation}]  
+    The core text-based rehearsal shall remain operational when microphone permission is denied, audio is unavailable, trained inference cannot be loaded, transcription fails, or an external generative service is disabled or unreachable.
+
+    \item[\textbf{NFR3. User control}]  
+    Users shall be able to decline optional voice processing, disable eligible adaptation, select an available pacing preference, pause a rehearsal, finish it manually, or leave it without being required to accept an inferred emotional interpretation.
+
+    \item[\textbf{NFR4. Privacy and data minimisation}]  
+    The system shall collect and retain only information required for the declared application and research functions. Raw audio shall be processed transiently and shall not be stored as part of the conversation record.
+
+    \item[\textbf{NFR5. Security}]  
+    The system shall protect accounts and sessions through secure password storage, authenticated access, resource-ownership checks, restricted configuration secrets, session expiry, and deployment-appropriate transport and host controls.
+
+    \item[\textbf{NFR6. Explainability and auditability}]  
+    Consequential system behaviour shall be traceable to an explicit policy, evidence record, reason code, configuration, or safety rule. The system shall distinguish model predictions, dialogue decisions, generated wording, fallback responses, and feedback metrics.
+
+    \item[\textbf{NFR7. Reproducibility}]  
+    Model, policy, scenario, scoring, consent, study-protocol, and export-schema versions shall be recorded where they affect interpretation. Evaluation configurations shall be preserved so that reported results can be reproduced without selecting settings from final test outcomes.
+
+    \item[\textbf{NFR8. Reliability and consistency}]  
+    Repeated execution with the same deterministic state and input shall produce the same dialogue transition, completion decision, evidence record, and feedback score. Concurrent or duplicate submissions shall not silently produce contradictory session states.
+
+    \item[\textbf{NFR9. Responsiveness and failure recovery}]  
+    Model-dependent operations shall use bounded execution and expose appropriate busy, error, or fallback states. Failure of an optional operation shall return control to the user rather than leaving the session in an indeterminate state.
+
+    \item[\textbf{NFR10. Accessibility}]  
+    Core workflows shall support keyboard navigation, visible focus, accessible form labels, understandable status announcements, sufficient contrast, reduced-motion preferences, and layouts suitable for desktop and mobile interaction.
+
+    \item[\textbf{NFR11. Maintainability and modularity}]  
+    Persistence, affect inference, dialogue policy, safety, generation, feedback, and research-data functions shall be separated through explicit interfaces. It shall be possible to replace an optional model or external provider without rewriting the authoritative scenario logic.
+
+    \item[\textbf{NFR12. Testability}]  
+    The architecture shall permit automated tests of dialogue transitions, safety precedence, affect-policy decisions, missing-modality behaviour, fallback generation, feedback evidence, access control, persistence, replay, branching, and research export.
+
+    \item[\textbf{NFR13. Data integrity}]  
+    Stored sessions shall preserve the relationship between turns, dialogue decisions, evidence, feedback, branches, and version information. Invalid or stale updates shall be rejected rather than silently overwriting newer session state.
+
+    \item[\textbf{NFR14. Appropriate presentation of uncertainty}]  
+    Affect outputs shall be presented as model estimates rather than verified facts. Low-confidence, conflicting, or unavailable results shall be distinguishable from supported predictions and shall not be converted into stronger psychological claims.
+
+\end{description}
+
+\subsection{Assumptions}
+\label{subsec:system-assumptions}
+
+The proposed architecture is based on the following assumptions:
+
+\begin{itemize}
+    \item Users are adults practising ordinary interpersonal communication rather than seeking diagnosis, treatment, crisis intervention, or professional mediation.
+    
+    \item The primary interaction language is English because the scenarios, deterministic language features, safety phrases, and emotion-recognition datasets are designed for English-language input.
+    
+    \item Every conversational turn contains text, either typed directly or reviewed after optional transcription. The system does not rely exclusively on acoustic input.
+    
+    \item Users have access to a modern web browser and a sufficiently stable connection to the application. Voice functions additionally require a compatible microphone and browser permission.
+    
+    \item The predefined communication features are limited proxies for observable wording. Their detection does not provide a complete assessment of communication quality or interpersonal effectiveness.
+    
+    \item Predictions derived from IEMOCAP may not generalise to spontaneous speech, different languages, cultures, accents, devices, or recording environments. Calibration measured on the benchmark may also deteriorate under deployment conditions.
+    
+    \item Agreement between textual and acoustic models increases the consistency of available model evidence but does not prove that the predicted category is correct.
+    
+    \item Optional external services are available only when valid configuration and credentials are provided. Their outputs, availability, latency, and data-handling conditions are not fully controlled by AffectLab.
+    
+    \item Replay, feedback, and branching require the system to retain conversation text for a declared period. Users are expected to receive clear information about this retention before using the application.
+    
+    \item Any participant study or remote deployment will occur only after the required institutional, ethical, security, and data-protection reviews have been completed.
+\end{itemize}
+
+\subsection{System Boundaries}
+\label{subsec:system-boundaries}
+
+The system boundaries define both the technical responsibility of AffectLab and the limits of the claims that may be made from its outputs.
+
+\begin{table}[htbp]
+\centering
+\caption{Principal boundaries of the proposed AffectLab system.}
+\label{tab:system-boundaries}
+\footnotesize
+\begingroup
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.19\linewidth}|p{0.34\linewidth}|p{0.37\linewidth}|}
+\hline
+\textbf{Boundary} & \textbf{Within the system} & \textbf{Outside the system} \\ \hline
+
+Intended use &
+Preparation, structured rehearsal, evidence-grounded feedback, repetition, and reflection for difficult interpersonal conversations. &
+Therapy, diagnosis, clinical treatment, emergency response, professional mediation, employment assessment, or institutional surveillance. \\ \hline
+
+Affect recognition &
+Prediction of predefined dataset labels from causal text context and optional speech, including confidence and modality agreement. &
+Direct measurement of private emotion, intention, truthfulness, personality, mental health, or future behaviour. \\ \hline
+
+Dialogue control &
+Scenario-specific stages, resistance, observable features, response actions, completion rules, and deterministic fallbacks. &
+Unrestricted open-domain conversation or autonomous alteration of learning objectives by a language model. \\ \hline
+
+Generative artificial intelligence &
+Optional wording of an already selected response action and optional phrasing of evidence-grounded feedback. &
+Authority over safety, scenario progression, success, scoring, eligibility, research outcomes, or unsupported advice. \\ \hline
+
+Safety &
+Conservative text-first checks, interruption of the rehearsal, predefined guidance, and separation from affect inference. &
+Comprehensive crisis detection, clinical risk assessment, monitoring of the user's environment, or contact with emergency services. \\ \hline
+
+Data handling &
+Authenticated session storage, limited conversation retention, transient audio processing, account controls, and pseudonymous research records. &
+Guarantees about infrastructure or external-provider processing beyond the configured deployment and applicable agreements. \\ \hline
+
+Evaluation &
+Emotion-classification evaluation, calibration analysis, engineering conformance tests, and exploratory feasibility and usability measures. &
+Proof of therapeutic effectiveness, causal learning benefit, reliable real-world emotion understanding, or transfer to future conversations. \\ \hline
+\end{tabular}
+\endgroup
+\end{table}
+
+External systems may include the user's browser and microphone, an email delivery service, an optional transcription or language-model provider, the database service, and the deployment infrastructure. AffectLab controls the information sent through its defined interfaces but cannot guarantee the internal availability, behaviour, or data-processing practices of an independently operated provider. Consequently, externally dependent functions must remain optional or provide an explicit failure path.
+
+The system boundary also separates participant-facing data from research-facing data. Participants may access their conversation content, feedback, branches, and takeaways. Researchers receive only the pseudonymous measures authorised by the study protocol. Operational access to a deployed database or server is an administrative responsibility and is not equivalent to permission to use participant data for research.
+
+\subsection{Summary}
+\label{subsec:requirements-summary}
+
+AffectLab is scoped as a text-first, structured communication-rehearsal prototype with optional voice, affective, and generative capabilities. Its functional requirements cover the complete path from onboarding and scenario preparation to controlled role-play, multimodal inference, feedback, replay, branching, reflection, and research-data collection. Its non-functional requirements emphasise safety precedence, graceful degradation, privacy, security, accessibility, explainability, reproducibility, and user control.
+
+The defining constraint is that probabilistic components provide bounded support rather than authoritative control. Emotion predictions cannot determine safety, success, or assessment, while generative models cannot change dialogue decisions or invent feedback evidence. These requirements establish the basis for the component architecture and interaction flow described in the following sections.
+
+\section{Ethical Considerations and Limitations}
+\label{sec:ethical-considerations-limitations}
+
+\subsection{Ethical Approach and Intended Use}
+\label{subsec:ethical-approach}
+
+AffectLab operates in a sensitive domain because users may enter personal information, discuss conflict, provide voice recordings, and receive system-generated interpretations or feedback. Ethical considerations are therefore treated as architectural requirements rather than as matters to be addressed only after implementation. The principal concerns are the possible misinterpretation of affect predictions, inappropriate reliance on generated responses, loss of user autonomy, exposure of sensitive information, unequal model performance, and confusion between communication rehearsal and psychological support.
+
+The intended use of AffectLab is limited to voluntary preparation for and rehearsal of ordinary interpersonal conversations by adults. It is not intended for diagnosis, treatment, clinical triage, crisis monitoring, employment assessment, educational assessment, surveillance, deception, or the evaluation of another person without their knowledge. It must not be used to infer protected characteristics, stable personality traits, truthfulness, or psychological disorders.
+
+The system is intended to support reflection rather than prescribe a correct way to conduct a relationship or workplace conversation. Its scenarios simplify complex interpersonal situations into structured practice tasks. Completing a scenario therefore means satisfying the declared communication conditions within the simulation; it does not establish that the same response is appropriate in every real-world context.
+
+\subsection{Ethical Use of Affect Recognition}
+\label{subsec:ethical-affect-recognition}
+
+The most significant ethical risk associated with AffectLab is that a predicted emotion could be mistaken for knowledge of the user's internal state. The trained models do not directly observe emotion. They classify textual and acoustic patterns according to categories derived from annotations in IEMOCAP. These categories represent an operational benchmark rather than a complete theory of human affect \cite{busso2008iemocap}.
+
+The primary four-class task contains anger, happiness, neutrality, and sadness, with excitement incorporated into the happiness category. It does not adequately represent anxiety, frustration, embarrassment, fear, shame, mixed affect, deliberate emotional masking, or uncertainty. A model can consequently be statistically correct according to the benchmark while still producing a description that is inappropriate for an individual user.
+
+To reduce this risk, affect outputs are treated as uncertain evidence rather than facts. The interface and dialogue policy must avoid statements such as ``you are angry'' or ``the system knows that you are sad''. Where an affective response is permitted, the wording should remain tentative and should not require the user to accept the interpretation. The user may continue normally, select a preferred pace, or disable an eligible adaptive function.
+
+Confidence does not eliminate this ethical concern. Neural classifiers may produce high-confidence errors, particularly when deployment data differ from their training distribution \cite{guo2017calibration,ovadia2019shift}. Similarly, agreement between the textual and acoustic models does not prove correctness because both may respond to the same misleading cue. The low-confidence threshold and agreement rules used by AffectLab are therefore operational safeguards rather than scientifically validated boundaries between correct and incorrect emotional interpretation.
+
+The architecture restricts affect predictions to low-consequence and reversible actions. They cannot determine crisis escalation, scenario success, communication-skill scores, study eligibility, or research inclusion. If prediction is unavailable, uncertain, or conflicting, the system returns to baseline dialogue or offers an explicit user choice. This limits the harm that can result from an incorrect classification.
+
+\subsection{User Autonomy, Transparency, and Avoidance of Dependency}
+\label{subsec:autonomy-transparency}
+
+Users should understand when they are interacting with deterministic application logic, a trained classifier, or a generative model. AffectLab therefore distinguishes dialogue decisions from their linguistic realisation and records whether a response was generated or produced from a deterministic template. Feedback metrics are similarly separated from any optional generative phrasing.
+
+Voice input is optional and requires an explicit user action. A transcript created from a recording is placed in the message composer for review and editing rather than being submitted automatically. This allows the user to correct transcription errors and decide whether the content should become part of the conversation.
+
+The user retains the ability to pause, resume, finish, or leave a rehearsal. Affect adaptation must not be used to pressure the user into continuing, accepting an interpretation, disclosing more information, or selecting a particular response. Manual completion is not treated as misconduct, and a user is not penalised for refusing voice input or declining an adaptive feature.
+
+The system must also avoid encouraging emotional dependency. Generated language should not imply consciousness, exclusive understanding, personal attachment, or an ability to replace human relationships and professional services. AffectLab may support rehearsal and reflection, but it must not position itself as the user's primary source of emotional support or claim authority over consequential interpersonal decisions.
+
+\subsection{Safety and Non-Clinical Boundaries}
+\label{subsec:safety-boundaries}
+
+Difficult-conversation practice may elicit or contain language associated with distress, self-harm, abuse, or immediate danger. AffectLab is not designed to assess the severity of such circumstances. Its safety mechanism is a conservative text-first interruption layer whose purpose is to prevent ordinary role-play from continuing when supported crisis-related expressions are detected.
+
+Safety handling remains independent of multimodal affect inference. A four-category emotion classifier is not an appropriate crisis detector, and an apparently neutral prediction must not override explicit crisis-related language. Safety handling also takes precedence over the language model so that a generated response cannot suppress or replace the predefined interruption.
+
+The safety layer nevertheless has important limitations. Lexical matching may fail when risk is expressed indirectly, metaphorically, sarcastically, with spelling variation, or in an unsupported language. Optional provider moderation may identify additional cases, but it is also probabilistic and cannot guarantee detection. Conversely, conservative rules may interrupt a conversation when crisis-related wording is quoted or discussed hypothetically.
+
+The application is not continuously monitored, does not establish the user's physical location, and cannot independently contact emergency services or another trusted person. Its safety response can provide appropriate signposting, but it cannot perform clinical triage. These limitations must be disclosed before use and repeated when a safety interruption occurs. The risks of presenting generative wellness systems as substitutes for professional care further support this restrained scope \cite{defreitas2024wellness}.
+
+\subsection{Privacy, Data Protection, and Data Governance}
+\label{subsec:privacy-data-governance}
+
+Conversation text may contain names, workplace details, relationship information, and other sensitive personal content. Voice recordings may additionally reveal identity-related characteristics, accent, health information, background conversation, or environmental details. The fact that users choose to enter this information does not remove the system's responsibility to minimise its collection and exposure.
+
+The design follows the principles of purpose limitation, data minimisation, storage limitation, transparency, integrity, and confidentiality described by the General Data Protection Regulation \cite{eu2016gdpr}. These principles are reflected in several architectural decisions:
+
+\begin{itemize}
+    \item text is collected only when required for conversation, feedback, replay, or authorised research functions;
+    \item microphone access requires an explicit user action;
+    \item audio duration and accepted file size are restricted;
+    \item raw audio is processed transiently and is not intentionally retained in the conversation record;
+    \item account-owned conversations expire according to a declared retention policy;
+    \item users can delete individual sessions and request account deletion;
+    \item research records exclude raw conversation text, audio, custom scenario wording, feedback prose, and personal takeaways; and
+    \item access to participant and researcher functions is separated and authenticated.
+\end{itemize}
+
+Pseudonymisation reduces direct identifiability but does not make active research records anonymous while they remain linkable for withdrawal or data management. This distinction must be explained accurately. Participants may withdraw from research and have identifiable study records removed where possible. If data have already been irreversibly de-identified and included in a frozen aggregate dataset, removal may no longer be technically possible; this limitation must be stated before consent rather than introduced only after withdrawal.
+
+Research consent and the lawful basis for processing personal data are related but distinct matters. Participation consent should describe the study, its risks, voluntary nature, and withdrawal procedure. The data controller must separately determine and document the appropriate legal basis for each processing purpose. The existence of a consent screen alone does not demonstrate full data-protection compliance.
+
+When an external provider is configured for transcription, generation, feedback phrasing, or moderation, relevant content may leave the locally controlled application boundary. Users must be told which functions involve external processing and whether a text-only or offline alternative is available. Provider credentials must remain outside source code and logs, while ordinary application logs should avoid storing prompts, generated responses, access tokens, or raw audio.
+
+Technical controls such as password hashing, authenticated ownership checks, restricted research exports, transport encryption, secure configuration, rate limiting, and backup protection reduce risk but cannot guarantee absolute confidentiality. A remote pilot additionally requires deployment-specific security review, appropriate institutional approval, an assessed lawful basis, and consideration of whether a data-protection impact assessment is necessary.
+
+\subsection{Fairness, Representation, and Accessibility}
+\label{subsec:fairness-representation}
+
+IEMOCAP contains a small number of English-speaking actors recorded in controlled dyadic sessions. Speaker-independent evaluation prevents direct reuse of test speakers during training, but it does not demonstrate equitable performance across cultures, accents, age groups, disabilities, gender identities, socioeconomic backgrounds, communication styles, recording devices, or spontaneous emotional situations \cite{busso2008iemocap}.
+
+The available dataset is insufficient for strong demographic fairness conclusions. Reporting only aggregate accuracy could conceal systematically weaker behaviour for particular classes or speakers. The model evaluation should therefore include per-class results, confusion matrices, fold-level variation, and failure analysis. These analyses reveal some forms of uneven performance, but they do not establish demographic fairness when the required demographic coverage and statistical power are absent.
+
+Bias can also arise from deterministic rules. Feature detectors may favour direct, standardised English phrasing and fail to recognise indirect requests, culturally specific politeness, neurodivergent communication patterns, quoted speech, or valid paraphrases. The detected features are therefore proxies for the scenario's declared objectives rather than universal measures of respectful or effective communication.
+
+The system should not penalise a user for an accent, unavailable microphone, transcription error, disability, or preference for text. Core interaction must remain keyboard accessible and usable without audio. Accessible labels, visible focus, status announcements, reduced-motion support, and responsive layouts are required to reduce avoidable participation barriers. Nevertheless, compliance checks cannot establish accessibility for every user, and evaluation with diverse participants remains necessary.
+
+\subsection{Generative Artificial Intelligence and Feedback Integrity}
+\label{subsec:generative-ethics}
+
+A generative model may produce fluent language while failing to follow the intended scenario. It may become overly agreeable, reinforce an unrealistic assumption, introduce unsupported content, or express advice with excessive confidence. Multi-turn role-play can also lose consistency as the conversation grows \cite{lu2025roleplay}. Natural wording must therefore not be interpreted as evidence that the response is educationally valid or emotionally accurate.
+
+AffectLab limits the authority of generation by requiring the deterministic dialogue policy to select the response action first. The generator may express that action in varied language, but it cannot determine scenario completion, change the evidence record, or override safety. When generation is unavailable or rejected, the associated template response is used.
+
+The same separation applies to feedback. Observable features and scores are computed deterministically. A generative model may phrase strengths and suggestions only from this structured record. It must not create a supporting example, skill observation, or criticism that is absent from the recorded evidence.
+
+These safeguards reduce but do not eliminate generative risk. Prompt constraints cannot guarantee that every output is appropriate, culturally sensitive, or factually correct. Provider models and policies may also change after deployment. Generation source, model configuration, validation outcome, and fallback reason should consequently be retained as operational provenance.
+
+\subsection{Research Ethics and Participant Protection}
+\label{subsec:research-ethics}
+
+The participant evaluation is designed as a feasibility and usability pilot rather than an effectiveness trial. Participation is restricted to adults who can understand the English-language information and provide informed consent. Individuals seeking crisis care, diagnosis, treatment, or emergency support are outside the intended study population. Eligibility confirmation is self-reported and must not be described as a clinical screening assessment.
+
+Before participation, users must receive understandable information about:
+
+\begin{itemize}
+    \item the research purpose and study procedure;
+    \item the non-clinical status of the system;
+    \item the use and limitations of affect recognition;
+    \item optional voice and external-provider processing;
+    \item the information collected and its retention period;
+    \item foreseeable privacy, emotional, and technical risks;
+    \item the voluntary nature of participation;
+    \item the right to pause, omit optional input, stop, or withdraw; and
+    \item the circumstances under which withdrawn or irreversibly de-identified data can no longer be removed.
+\end{itemize}
+
+Required research tasks use standardised scenarios and intermediate difficulty to reduce unnecessary variation. Optional voice and multimodal affect inference are exploratory and are not required for study completion. Safety interruptions and technical failures are recorded as feasibility outcomes and must not be interpreted as communication-skill failures.
+
+Pre- and post-rehearsal ratings are study-specific feasibility measures rather than validated clinical instruments. Participants may answer or explicitly skip them. Missing values must remain missing rather than being replaced with fabricated neutral scores. Research exports use pseudonymous identifiers and exclude conversation content. Only authorised researchers should access the research dashboard and exports.
+
+Recruitment must not begin until the applicable institutional ethics approval, participant-facing materials, researcher contact details, retention schedule, deployment review, and data-management responsibilities have been confirmed. Material changes after recruitment begins require a new protocol version and, where applicable, renewed approval and participant consent.
+
+\subsection{Legal and Regulatory Context}
+\label{subsec:legal-regulatory-context}
+
+The ethical safeguards described above do not by themselves establish legal compliance. Applicable obligations depend on the purpose of processing, the data used, the deployment context, the organisations involved, and the jurisdiction in which the system operates.
+
+The European Union Artificial Intelligence Act prohibits certain emotion-inference uses in workplace and educational-institution contexts, subject to its stated exceptions \cite{eu2024aiact}. AffectLab is designed for voluntary individual rehearsal and not for employers, teachers, or institutions to assess workers or students. No employer or educational authority should receive individual affect predictions or use them for selection, discipline, grading, access, or performance evaluation. However, describing the application as voluntary research does not automatically determine its legal classification. The applicability of the prohibition and other obligations requires formal assessment before institutional or public deployment.
+
+The AI Act does not replace the General Data Protection Regulation. Conversation text, account information, research measurements, and voice recordings may constitute personal data even where an AI Act prohibition does not apply. Whether a particular voice-processing operation involves special-category biometric data depends on how and why the data are processed and should not be assumed solely from the presence of an audio recording. Applicable lawful bases, transparency duties, data-subject rights, processor agreements, international transfers, retention rules, security measures, and impact-assessment obligations require deployment-specific review \cite{eu2016gdpr}.
+
+Accordingly, the dissertation evaluates technical and ethical safeguards but does not claim to provide a definitive legal determination or compliance certification.
+
+\subsection{Limitations of the Proposed System}
+\label{subsec:proposed-system-limitations}
+
+\subsubsection{Construct and model limitations}
+
+AffectLab predicts benchmark categories rather than directly measuring emotion. Its labels simplify affective experience, and its confidence values are conditional on the model, dataset, and calibration procedure. Even a well-calibrated classifier can be wrong for an individual example. Performance on IEMOCAP does not demonstrate equivalent performance during real application use.
+
+The contextual model uses a fixed number of preceding turns and cannot represent every relevant feature of a relationship or situation. The audio model may be influenced by microphone quality, background noise, speaking style, health, accent, or recording distance. Late fusion cannot correct an error when both modalities are misleading, and it may perform worse than the stronger individual modality when one input is degraded.
+
+\subsubsection{Dialogue and feedback limitations}
+
+Deterministic policies improve predictability but can respond only to anticipated stages and detectable language patterns. They may fail to recognise a valid paraphrase, sarcasm, indirect communication, or a creative solution. Template responses may become repetitive, while generated responses remain probabilistic despite their constraints.
+
+Feedback metrics capture only the observable features defined for each scenario. They cannot evaluate sincerity, appropriateness for the user's actual relationship, non-verbal behaviour, long-term consequences, or the other person's interpretation. Users may also learn to optimise their wording for the detectors without developing a broader communication skill.
+
+\subsubsection{Safety limitations}
+
+The safety layer cannot identify every dangerous or abusive situation. It is strongest for explicit supported English phrases and weaker for indirect, coded, multilingual, or context-dependent expressions. It cannot verify whether a user is currently safe, determine their location, or provide a monitored emergency response. False positives and false negatives remain possible.
+
+\subsubsection{Privacy and security limitations}
+
+Although raw audio is not intentionally retained, transient processing and transmission still create exposure. Stored conversation text may contain sensitive information, and pseudonymous research data may remain linkable while withdrawal is supported. Software controls cannot eliminate risks arising from compromised devices, incorrect deployment configuration, administrator access, provider-side processing, unpatched dependencies, or unauthorised disclosure.
+
+\subsubsection{Evaluation limitations}
+
+The engineering tests use authored and synthetic cases. Passing them demonstrates conformance to declared policies but not performance across the full diversity of human conversation. The feasibility study has a small target sample, uses a single-arm design, and does not include a randomised non-adaptive comparison. It can examine completion, usability, acceptability, and exploratory within-participant changes, but it cannot establish that AffectLab causes communication improvement.
+
+Self-reported confidence can be affected by familiarity, repetition, demand characteristics, or a desire to satisfy the researcher. Deterministic skill scores can improve because participants learn which phrases the system recognises. Neither result establishes transfer to real conversations, improved relationships, or therapeutic benefit.
+
+\subsubsection{Operational and regulatory limitations}
+
+Optional services depend on network availability, provider behaviour, credentials, and external data-handling conditions. Model or provider changes can affect outputs even when the local application remains unchanged. Local tests cannot establish the security, reliability, accessibility, or legal compliance of every deployment environment.
+
+The regulatory discussion in this dissertation is necessarily general. It does not replace advice from the responsible institution, ethics body, data-protection officer, or qualified legal professional. A future change in population, purpose, language, deployment setting, or recipient of the affect predictions may materially change the associated obligations.
+
+\subsection{Summary}
+\label{subsec:ethical-summary}
+
+The ethical design of AffectLab is based on restrained claims, separation of responsibilities, informed user choice, data minimisation, and explicit limits on probabilistic components. Affect predictions are treated as uncertain contextual signals; generative models are restricted to response and feedback wording; deterministic policies retain authority over safety, dialogue progression, evidence, and scoring. Users retain control over voice input, pacing, continuation, deletion, and research participation.
+
+These measures reduce foreseeable risks but do not remove them. Affect recognition may be inaccurate or culturally inappropriate, safety mechanisms may miss indirect risk, stored conversations remain sensitive, generated language may be unsuitable, and a small feasibility study cannot establish effectiveness. AffectLab should therefore be understood as a bounded research prototype whose responsible use depends on transparent presentation, controlled deployment, institutional oversight, and conclusions that remain proportionate to the available evidence.
