@@ -462,6 +462,50 @@ The user can edit every card field before saving. Saving requires the expected s
 
 The frontend presents the backend's typed state as a sequence of participant and researcher workflows. It does not calculate authoritative dialogue transitions, affect decisions, or study completion in the browser. Instead, components retain editable local state, submit constrained requests, and replace their view with the version returned by the server. This keeps recovery behaviour and uncertainty disclosures as important as the successful path.
 
+\subsection{Application Interface Overview}
+\label{subsec:application-interface-overview}
+
+Figures~\ref{fig:app-dashboard}, \ref{fig:app-roleplay}, and~\ref{fig:app-feedback} provide a compact visual overview of the participant-facing application. They follow the main user journey from choosing a practice activity, through an active rehearsal, to reviewing the resulting feedback. The screenshots should be captured with synthetic demonstration content and without personal or participant data. Only these three representative views are included because the purpose is to show the appearance and principal interactions of the implemented system, while the following subsections describe its behaviour in detail.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{figures/app-dashboard.png}{%
+        \includegraphics[width=\textwidth,height=0.68\textheight,keepaspectratio]{figures/app-dashboard.png}%
+    }{%
+        \fbox{\parbox[c][0.25\textheight][c]{0.92\textwidth}{\centering
+        \textbf{Screenshot placeholder: home dashboard}\\[0.5em]
+        Add \texttt{figures/app-dashboard.png}.}}
+    }
+    \caption{AffectLab home dashboard, showing the available practice paths, recommended starting point, and access to recent sessions and saved reflections.}
+    \label{fig:app-dashboard}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{figures/app-roleplay.png}{%
+        \includegraphics[width=\textwidth,height=0.68\textheight,keepaspectratio]{figures/app-roleplay.png}%
+    }{%
+        \fbox{\parbox[c][0.25\textheight][c]{0.92\textwidth}{\centering
+        \textbf{Screenshot placeholder: role-play workspace}\\[0.5em]
+        Add \texttt{figures/app-roleplay.png}.}}
+    }
+    \caption{Active role-play workspace, combining the conversation transcript and message composer with scenario progress, session controls, and optional voice and affect-aware functions.}
+    \label{fig:app-roleplay}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{figures/app-feedback.png}{%
+        \includegraphics[width=\textwidth,height=0.68\textheight,keepaspectratio]{figures/app-feedback.png}%
+    }{%
+        \fbox{\parbox[c][0.25\textheight][c]{0.92\textwidth}{\centering
+        \textbf{Screenshot placeholder: feedback and review}\\[0.5em]
+        Add \texttt{figures/app-feedback.png}.}}
+    }
+    \caption{Post-rehearsal feedback and review interface, presenting evidence-linked observations and access to replay, alternative branches, personal takeaways, and the editable action card.}
+    \label{fig:app-feedback}
+\end{figure}
+
 \subsection{Application Navigation and User Workflow}
 \label{subsec:frontend-navigation}
 
