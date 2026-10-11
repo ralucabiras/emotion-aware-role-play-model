@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "recorded_at": "2026-10-11T08:16:21.975867+00:00",
+  "scope": "single-client in-process HTTP benchmark with MemoryRepository and deterministic fallbacks; excludes network, MongoDB, external providers, trained inference, and concurrent load",
+  "environment": {
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26300-SP0"
+  },
+  "source_sha256": {
+    "backend/app/main.py": "984334aa4a56430b03f6832fa0ff803fed28fc3e19141d79c6a04f51dbb8d2e2",
+    "backend/app/api/routes.py": "22253504b9474b11ef9e02375e0a7e05bce94b2574fe81cc038ec2d1e17236f4",
+    "backend/app/services/conversation_service.py": "fb4061b564885bf697a12f04d84c372c973ae4b02bef68e9ed736510525d3bc7",
+    "backend/app/services/roleplay_service.py": "b41a7117fe07824cf9a84010ed196a7fe419346bd1e2912b8bd8655be3c68ae6",
+    "backend/app/repositories/memory.py": "93316bd396d48c81bd111f23d15742c65383bdb4c71fc64182004643eb62c967",
+    "scripts/evaluate_performance.py": "d48d518525987d2bead60cdefb7c7342c6c117e9d22cc096f934b480feb1289c"
+  },
+  "results": {
+    "liveness": {
+      "n": 200,
+      "median_ms": 1.332,
+      "p95_ms": 1.866,
+      "max_ms": 2.449
+    },
+    "scenario_catalogue": {
+      "n": 200,
+      "median_ms": 2.942,
+      "p95_ms": 3.922,
+      "max_ms": 4.892
+    },
+    "session_create": {
+      "n": 100,
+      "median_ms": 2.988,
+      "p95_ms": 3.961,
+      "max_ms": 5.322
+    },
+    "roleplay_start": {
+      "n": 100,
+      "median_ms": 3.396,
+      "p95_ms": 4.437,
+      "max_ms": 6.498
+    },
+    "deterministic_chat_turn": {
+      "n": 100,
+      "median_ms": 4.659,
+      "p95_ms": 5.836,
+      "max_ms": 11.529
+    }
+  },
+  "regression_checks": {
+    "liveness": {
+      "p95_budget_ms": 25.0,
+      "passed": true
+    },
+    "scenario_catalogue": {
+      "p95_budget_ms": 50.0,
+      "passed": true
+    },
+    "session_create": {
+      "p95_budget_ms": 50.0,
+      "passed": true
+    },
+    "roleplay_start": {
+      "p95_budget_ms": 75.0,
+      "passed": true
+    },
+    "deterministic_chat_turn": {
+      "p95_budget_ms": 100.0,
+      "passed": true
+    }
+  }
+}

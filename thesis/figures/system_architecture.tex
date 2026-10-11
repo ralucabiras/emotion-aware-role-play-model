@@ -1,0 +1,49 @@
+\begin{tikzpicture}[
+    font=\sffamily\scriptsize,
+    component/.style={draw=blue!65!black, fill=blue!7, rounded corners=2pt,
+        align=center, minimum width=3.1cm, minimum height=0.9cm},
+    authority/.style={draw=red!70!black, fill=red!7, rounded corners=2pt,
+        align=center, minimum width=3.1cm, minimum height=0.9cm},
+    evidence/.style={draw=teal!70!black, fill=teal!9, rounded corners=2pt,
+        align=center, minimum width=3.1cm, minimum height=0.9cm},
+    store/.style={cylinder, shape border rotate=90, aspect=0.25,
+        draw=violet!70!black, fill=violet!8, align=center,
+        minimum width=2.8cm, minimum height=1.05cm},
+    optional/.style={draw=black!55, fill=black!3, dashed, rounded corners=2pt,
+        align=center, minimum width=3.0cm, minimum height=0.9cm},
+    flow/.style={-{Latex[length=2.2mm]}, thick, draw=black!65},
+    signal/.style={-{Latex[length=2.2mm]}, thick, dashed, draw=teal!70!black}
+]
+\node[component] (ui) at (0,0) {Browser interaction layer\\text and optional voice};
+\node[component] (app) at (4.1,0) {Application and session layer\\authentication, ownership, state};
+\node[authority] (safety) at (8.2,2.25) {Safety layer\\authoritative interruption};
+\node[evidence] (affect) at (8.2,0.75) {Affect-inference layer\\text, audio, fusion, uncertainty};
+\node[authority] (policy) at (8.2,-0.9) {Dialogue-policy layer\\state, evidence, completion};
+\node[component] (realise) at (12.3,0) {Response realisation\\constrained generation or template};
+\node[component] (feedback) at (8.2,-2.65) {Feedback and reflection\\replay, branch, comparison};
+\node[store] (store) at (4.1,-2.65) {Persistence and\\research records};
+\node[optional] (external) at (12.3,-2.65) {Optional external services\\generation, transcription, email};
+
+\draw[flow] (ui) -- (app);
+\draw[flow] (app) -- (safety);
+\draw[flow] (app) -- (affect);
+\draw[flow] (app) -- (policy);
+\draw[signal] (affect) -- (policy);
+\draw[flow] (policy) -- (realise);
+\draw[flow] (safety.east) -| (realise.north);
+\draw[flow] (realise.west) -- ++(-0.45,0) |- (app.east);
+\draw[flow] (app) -- (ui);
+\draw[flow] (policy) -- (feedback);
+\draw[flow] (feedback) -- (store);
+\draw[flow] (app) -- (store);
+\draw[signal] (external) -- (realise);
+\draw[signal] (external.west) -- ++(-0.4,0) |- (app.south);
+
+\begin{scope}[on background layer]
+  \node[fit=(safety)(affect)(policy), draw=black!35, rounded corners=4pt,
+      fill=white, inner sep=6pt, label={[font=\sffamily\scriptsize]above:Decision boundary}] {};
+\end{scope}
+
+\node[align=center, text=red!70!black] at (8.2,-3.7)
+    {Probabilistic components provide evidence; deterministic components retain authority.};
+\end{tikzpicture}

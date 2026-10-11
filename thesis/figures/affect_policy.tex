@@ -1,0 +1,45 @@
+\begin{tikzpicture}[
+    font=\sffamily\scriptsize,
+    process/.style={draw=blue!65!black, fill=blue!7, rounded corners=2pt,
+        align=center, minimum width=2.8cm, minimum height=0.75cm},
+    decision/.style={diamond, draw=teal!70!black, fill=teal!8,
+        aspect=2.15, align=center, inner sep=1.5pt, minimum width=3.25cm},
+    action/.style={draw=orange!75!black, fill=orange!12, rounded corners=8pt,
+        align=center, minimum width=2.9cm, minimum height=0.75cm},
+    safety/.style={draw=red!70!black, fill=red!8, rounded corners=8pt,
+        align=center, minimum width=2.9cm, minimum height=0.75cm},
+    flow/.style={-{Latex[length=2.1mm]}, thick, draw=black!65},
+    label/.style={font=\sffamily\tiny, fill=white, inner sep=1pt}
+]
+\node[process] (start) at (0,3.5) {Candidate role-play response};
+\node[decision] (precedence) at (0,2.25) {Safety or completed exchange?};
+\node[safety] (override) at (5.0,2.25) {Use authoritative safety or\\completion response};
+\node[decision] (eligible) at (0,0.65) {Eligible for adaptation?};
+\node[action] (baseline1) at (-5.0,0.65) {Baseline response};
+\node[decision] (preference) at (0,-1.0) {Explicit user preference?};
+\node[action] (manual) at (5.0,-1.0) {Apply fixed user-selected pacing};
+\node[decision] (available) at (0,-2.65) {Valid multimodal estimate?};
+\node[action] (baseline2) at (-5.0,-2.65) {Baseline response\\record unavailability};
+\node[decision] (certain) at (0,-4.35) {Confidence sufficient and\\modalities agree?};
+\node[action] (choice) at (-5.0,-4.35) {Offer neutral pacing choice};
+\node[decision] (category) at (0,-6.05) {Agreed category};
+\node[action] (ack) at (-4.1,-6.05) {Anger or sadness:\\brief acknowledgement};
+\node[action] (unchanged) at (4.1,-6.05) {Happiness or neutral:\\response unchanged};
+
+\draw[flow] (start)--(precedence);
+\draw[flow] (precedence)--node[label, above]{yes}(override);
+\draw[flow] (precedence)--node[label, right]{no}(eligible);
+\draw[flow] (eligible)--node[label, above]{no}(baseline1);
+\draw[flow] (eligible)--node[label, right]{yes}(preference);
+\draw[flow] (preference)--node[label, above]{yes}(manual);
+\draw[flow] (preference)--node[label, right]{no}(available);
+\draw[flow] (available)--node[label, above]{no}(baseline2);
+\draw[flow] (available)--node[label, right]{yes}(certain);
+\draw[flow] (certain)--node[label, above]{no}(choice);
+\draw[flow] (certain)--node[label, right]{yes}(category);
+\draw[flow] (category)--node[label, above]{anger / sadness}(ack);
+\draw[flow] (category)--node[label, above]{happy / neutral}(unchanged);
+
+\node[align=center, text=black!60] at (0,-7.15)
+    {No branch changes dialogue stage, success, evidence, feedback score, or research eligibility.};
+\end{tikzpicture}

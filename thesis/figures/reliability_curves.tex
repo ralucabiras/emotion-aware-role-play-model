@@ -1,0 +1,54 @@
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=2 by 1, horizontal sep=1.25cm},
+    width=0.47\textwidth,
+    height=6.3cm,
+    xmin=0.2,
+    xmax=1.0,
+    ymin=0.0,
+    ymax=1.0,
+    xtick={0.2,0.4,0.6,0.8,1.0},
+    ytick={0.0,0.2,0.4,0.6,0.8,1.0},
+    xlabel={Mean confidence},
+    grid=major,
+    grid style={draw=black!10},
+    axis line style={draw=black!50},
+    tick style={draw=black!50},
+    tick label style={font=\scriptsize},
+    label style={font=\scriptsize},
+    title style={font=\sffamily\small},
+    legend style={font=\tiny, draw=black!25, fill=white, cells={anchor=west}},
+    unbounded coords=jump,
+]
+\nextgroupplot[
+    title={(a) Modalities and equal fusion},
+    ylabel={Empirical accuracy},
+    legend pos=north west,
+]
+\addplot[black!55, dashed, thin, forget plot] coordinates {(0.2,0.2) (1.0,1.0)};
+\addplot[blue!75!black, thick, mark=*, mark size=1.8pt]
+    table[x=mean_confidence,y=accuracy] {figures/data/reliability_context_text.dat};
+\addlegendentry{Context text}
+\addplot[purple!75!black, thick, mark=triangle*, mark size=2.1pt]
+    table[x=mean_confidence,y=accuracy] {figures/data/reliability_audio.dat};
+\addlegendentry{Audio only}
+\addplot[orange!90!black, thick, mark=square*, mark size=1.9pt]
+    table[x=mean_confidence,y=accuracy] {figures/data/reliability_equal_fusion.dat};
+\addlegendentry{Equal fusion}
+
+\nextgroupplot[
+    title={(b) Fusion calibration},
+    legend pos=north west,
+]
+\addplot[black!55, dashed, thin, forget plot] coordinates {(0.2,0.2) (1.0,1.0)};
+\addplot[orange!90!black, thick, mark=square*, mark size=1.9pt]
+    table[x=mean_confidence,y=accuracy] {figures/data/reliability_equal_fusion.dat};
+\addlegendentry{Equal fusion}
+\addplot[teal!75!black, thick, mark=triangle*, mark size=2.1pt]
+    table[x=mean_confidence,y=accuracy] {figures/data/reliability_validation_fitted.dat};
+\addlegendentry{Fold-fitted}
+\addplot[blue!75!black, thick, mark=diamond*, mark size=2.2pt]
+    table[x=mean_confidence,y=accuracy] {figures/data/reliability_global_calibrated.dat};
+\addlegendentry{Global chain}
+\end{groupplot}
+\end{tikzpicture}

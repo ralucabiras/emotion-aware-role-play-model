@@ -4,13 +4,13 @@
 \section{Chapter Overview}
 \label{sec:implementation-overview}
 
-This chapter describes the implementation of AffectLab, translating the architecture, requirements, and safeguards defined in Chapter~\ref{chap:proposed-system-architecture} into an operational research prototype. The implementation combines a React and TypeScript browser interface, a Python and FastAPI backend, MongoDB persistence, trained text and speech emotion-recognition models, and optional external services for language generation, transcription, moderation, and email delivery. These elements are integrated as replaceable components rather than as a single end-to-end model, preserving the separation between affect inference, deterministic application control, response realisation, and presentation established in the system design.
+This chapter describes the implementation of AffectLab, translating the architecture, requirements, and safeguards defined in Chapter~\ref{chap:proposed-system-architecture} into a production-oriented application. The implementation combines a React and TypeScript browser interface, a Python and FastAPI backend, MongoDB persistence, trained text and speech emotion-recognition models, and optional external services for language generation, transcription, moderation, and email delivery. These elements are integrated as replaceable components rather than as a single end-to-end model, preserving the separation between affect inference, deterministic application control, response realisation, and presentation established in the system design.
 
-The prototype follows a text-first and failure-tolerant implementation strategy. Structured role-play, dialogue progression, safety handling, evidence collection, feedback, and session management remain available without voice input or network-dependent artificial-intelligence services. When configured, the trained models add contextual textual and acoustic affect estimates, which are calibrated and combined through late fusion. Their outputs are interpreted by a bounded pacing policy and cannot determine crisis handling, dialogue success, or feedback scores. Similarly, a language model may improve the wording of a response or feedback item, but deterministic policies and recorded evidence remain authoritative. This arrangement makes component failures explicit and allows the core rehearsal workflow to fall back to reproducible local behaviour.
+The application follows a text-first and failure-tolerant implementation strategy. Structured role-play, dialogue progression, safety handling, evidence collection, feedback, and session management remain available without voice input or network-dependent artificial-intelligence services. When configured, the trained models add contextual textual and acoustic affect estimates, which are calibrated and combined through late fusion. Their outputs are interpreted by a bounded pacing policy and cannot determine crisis handling, dialogue success, or feedback scores. Similarly, a language model may improve the wording of a response or feedback item, but deterministic policies and recorded evidence remain authoritative. This arrangement makes component failures explicit and allows the core rehearsal workflow to fall back to reproducible local behaviour.
 
 The chapter first presents the technology stack, repository organisation, and configuration approach. It then explains the emotion-recognition pipeline, including dataset preparation, contextual text modelling, speech modelling, multimodal fusion, calibration, and model provenance. The subsequent sections describe the backend services and persistence layer, the scenario-based role-play engine, affect-aware pacing, safety precedence, and the feedback and reflection mechanisms. The browser interface is then considered from the perspective of the participant and researcher workflows, including conversation preparation, voice interaction, uncertainty presentation, replay, branching, questionnaires, and research export.
 
-The final sections describe the security and privacy controls, deployment modes, and verification strategy used during development. This chapter is concerned with how the system was constructed and how its implementation was checked through unit, integration, end-to-end, and smoke tests. Quantitative model performance, comparisons between system conditions, participant measures, and the interpretation of evaluation results are reported separately in Chapter~\ref{chap5}.
+The final sections describe the security and privacy controls, deployment modes, and verification strategy used during development. This chapter is concerned with how the system was constructed and how its implementation was checked through unit, integration, browser, accessibility, performance, end-to-end, and smoke tests. Quantitative model performance, the consolidated application-verification results, and a short supplementary user-pilot summary are reported separately in Chapter~\ref{chap5}.
 
 
 \section{Technology Stack and Project Organisation}
@@ -67,7 +67,7 @@ Builds the services, coordinates local deployment, serves the compiled frontend,
 
 The participant and researcher interfaces are implemented in React with TypeScript. At the time of the documented build, the lock file resolves React and React DOM to version 19.2.8, TypeScript to version 6.0.3, and Vite to version 8.2.0. The TypeScript configuration enables strict checking and targets the ES2022 and browser document-object-model libraries. This provides compile-time checking across component properties, application state, and the HTTP data structures shared by the interface and backend schemas.
 
-The frontend is a single-page application with a small application shell in \texttt{App.tsx}. It uses the browser History API to select public, authentication, onboarding, participant, settings, practice, and researcher views. Feature code is divided into components such as the role-play workspace, conversation preparation, voice capture, emotion panel, replay view, branch comparison, study checklist, and researcher dashboard. State that belongs to an individual workflow remains close to the corresponding component, avoiding a global state-management dependency for the prototype.
+The frontend is a single-page application with a small application shell in \texttt{App.tsx}. It uses the browser History API to select public, authentication, onboarding, user, settings, practice, and optional researcher views. Feature code is divided into components such as the role-play workspace, conversation preparation, voice capture, emotion panel, replay view, branch comparison, study checklist, and researcher dashboard. State that belongs to an individual workflow remains close to the corresponding component, avoiding an unnecessary global state-management dependency.
 
 Communication with the backend is centralised in a typed client under \texttt{frontend/src/services}. The client defines the API base address through \texttt{VITE\_API\_URL}, attaches the current access token, includes the refresh cookie, performs one controlled refresh after an authentication failure, and converts non-successful responses into interface errors. Request and response types are declared separately under \texttt{frontend/src/types}; this makes mismatches between components and backend response shapes visible during the TypeScript build. Browser session storage contains the short-lived access token, whereas refresh-token handling remains behind the backend-issued cookie boundary.
 
@@ -106,7 +106,7 @@ Application configuration is read through a typed Pydantic settings object. Valu
 
 Two execution arrangements are supported. During local development, the frontend development server, backend server, and an existing MongoDB installation can be run independently. Alternatively, Docker Compose builds the frontend and backend and starts them with MongoDB 8, named database storage, dependency ordering, and health checks. The frontend image uses a Node.js 22 build stage followed by a small Nginx runtime image; the backend image exposes a readiness-based container health check. An offline demonstration configuration disables network-backed functions and provides deterministic behaviour for environments in which external credentials or connectivity are inappropriate.
 
-Together, the directory boundaries, dependency separation, lock files, declarative configuration, and container definitions make the implemented prototype inspectable and repeatable. They also preserve a practical distinction between the core application, optional probabilistic services, research-only model development, and deployment-specific secrets. The following section describes the emotion-recognition pipeline that produces the local model artefacts consumed through this structure.
+Together, the directory boundaries, dependency separation, lock files, declarative configuration, and container definitions make the implemented application inspectable and repeatable. They also preserve a practical distinction between the core application, optional probabilistic services, research-only model development, and deployment-specific secrets. The following section describes the emotion-recognition pipeline that produces the local model artefacts consumed through this structure.
 %
 \section{Emotion-Recognition Pipeline}
 \label{sec:emotion-recognition-pipeline}
@@ -114,6 +114,15 @@ Together, the directory boundaries, dependency separation, lock files, declarati
 The emotion-recognition implementation transforms the private IEMOCAP release into separate text and audio classifiers. It calibrates their outputs without using held-out test labels and packages the final artefacts for optional local inference. The pipeline is isolated from the conversational application under the \texttt{ml} directory. Preprocessing, fold training, calibration, fusion, statistical comparison, final-model packaging, and integrity checks can therefore be executed without involving participant accounts or application sessions.
 
 Two stages must be distinguished. First, model choices are assessed through five speaker-independent folds. Each fold produces validation and held-out test predictions, and only these fold results are suitable for reporting performance. Second, after the experimental configuration and calibration parameters have been frozen, one text model and one audio model are trained on all eligible examples for application inference. These final full-data artefacts have no independent test split and their training metrics are not treated as evaluation evidence.
+
+Figure~\ref{fig:emotion-pipeline} makes this separation explicit by placing held-out evaluation and final-model packaging on distinct paths.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/emotion_pipeline}}
+\caption{Emotion-recognition evaluation and deployment pipeline. The lower path packages a frozen configuration for inference but does not create a new held-out performance result.}
+\label{fig:emotion-pipeline}
+\end{figure}
 
 \subsection{Dataset Preparation and Label Mapping}
 \label{subsec:dataset-preparation-label-mapping}
@@ -249,7 +258,7 @@ Service construction is centralised in a small application container. At process
 
 The application lifespan initialises repository indexes before accepting normal work. In offline demonstration mode it also creates the local demonstration account if required; this mode is rejected by production configuration. Existing eligible sessions are then used to backfill any missing study records. A separate liveness endpoint confirms that the process is running, whereas the readiness endpoint validates configuration, checks the persistence connection and required indexes, and reports the availability of optional transcription and multimodal services. A missing optional model does not make the text-first application unready.
 
-Cross-cutting HTTP behaviour is installed as middleware. Configured origins control credentialled cross-origin requests, trusted-host validation rejects unexpected host headers, and production deployments redirect HTTP traffic to HTTPS. Response middleware adds restrictive framing, content-type, referrer, permissions, caching, and content-security headers, together with HTTP Strict Transport Security in production. A configurable rate limiter applies separate windows to authentication, email, transcription, and model-backed operations. It is intentionally a single-process implementation for the prototype; a multi-instance deployment would require a shared limiter at a gateway or distributed store.
+Cross-cutting HTTP behaviour is installed as middleware. Configured origins control credentialled cross-origin requests, trusted-host validation rejects unexpected host headers, and production deployments redirect HTTP traffic to HTTPS. Response middleware adds restrictive framing, content-type, referrer, permissions, caching, and content-security headers, together with HTTP Strict Transport Security in production. A configurable rate limiter applies separate windows to authentication, email, transcription, and model-backed operations. It is intentionally a single-instance implementation; a horizontally scaled deployment would require a shared limiter at a gateway or distributed store.
 
 \subsection{Domain Models and API Schemas}
 \label{subsec:backend-domain-models}
@@ -297,6 +306,15 @@ The user turn is appended before reply selection. During an active rehearsal, th
 
 Finally, the service records a minimised completion event, updates measurement boundaries when a rehearsal ends, persists the incremented session, and synchronises an eligible study record. The response returns the committed version together with the user and assistant turns, decision summary, current role-play state, any completed feedback, and the one-use opportunity token required for an immediate post-rehearsal questionnaire. This single service path keeps the dialogue shown by the client aligned with the state and evidence retained by the backend.
 
+The ordering and alternative paths are summarised in Figure~\ref{fig:request-sequence}. In particular, the safety branch terminates ordinary processing before optional affect inference and response generation.
+
+\begin{figure}[p]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/request_sequence}}
+\caption{Sequence of a version-bound conversation request, including safety precedence and failure-tolerant optional processing.}
+\label{fig:request-sequence}
+\end{figure}
+
 \subsection{Optional Services and Deterministic Fallbacks}
 \label{subsec:backend-fallbacks}
 
@@ -333,6 +351,15 @@ The enhanced scenario policy represents each supported conversation as a small s
 
 The three graphs contain scenario-specific checks. For example, the workload path requires the user to acknowledge the stated delivery constraint while proposing a supported trade-off before agreement can be confirmed. The boundary path distinguishes a maintained refusal from a reversal or conditional acceptance and varies the permitted pressure rounds by difficulty and profile. The relationship path requires a specific personal need, acknowledgement of perspective, and a feasible request; unsupported or explicitly unresolved endings remain recorded as such. These rules model the authored practice exercise, not the probable behaviour of a real manager, friend, or partner.
 
+Figure~\ref{fig:dialogue-states} presents the principal state progression for the three standardised scenarios and the explicit non-success exits shared by the controllers.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/dialogue_states}}
+\caption{Principal dialogue-state progression for workload, boundary, and relationship rehearsal.}
+\label{fig:dialogue-states}
+\end{figure}
+
 Each processed rehearsal message produces a decision record containing the before-and-after dialogue snapshots, selected character action, reason codes, linked user and assistant turns, supporting evidence identifiers, generation metadata, character profile, and scenario, policy, and scoring versions. Completion reasons distinguish success, the turn limit, manual completion, and safety interruption. Persisting these transitions makes recovery exact: a restored session does not need to infer its stage again from the transcript.
 
 \subsection{Communication-Evidence Extraction}
@@ -353,6 +380,15 @@ Automatic adaptation is restricted to active, enhanced, non-required rehearsals.
 
 When automatic adaptation is eligible, missing audio, unavailable models, inference failure, or unsupported categories produce no addition. If any fused or component confidence is below the stored threshold, or if text and audio disagree, the response neutrally offers a pacing choice. Confident agreement on anger or sadness adds only the phrase ``I hear you.''; supported agreement on happiness or neutral produces no addition. The user-selected gentler and more-challenge modes use fixed prompts. The full decision, reason, source, model version, timings, preference, and probability summaries are stored with the assistant turn, allowing the interface to explain the exact action without reconstructing it later.
 
+Figure~\ref{fig:affect-policy} expresses the same policy as a decision tree and highlights the precedence of safety, eligibility, and explicit user choice over automatic inference.
+
+\begin{figure}[p]
+\centering
+\resizebox{0.86\textwidth}{!}{\input{figures/affect_policy}}
+\caption{Decision tree for bounded affect-aware pacing. Every terminal action preserves the authoritative dialogue state and evidence.}
+\label{fig:affect-policy}
+\end{figure}
+
 \subsection{Response Realisation}
 \label{subsec:response-realisation}
 
@@ -369,7 +405,7 @@ A local crisis-language detector executes before model inference and response ge
 
 On a detected safety condition, the backend skips multimodal inference and pacing, emits the fixed crisis response, and changes an active or paused role play to interrupted with the completion reason \texttt{safety\_interruption}. The decision trail preserves the preceding dialogue state and records the interruption action. Safety-interrupted wording is never reused as a suggested action-card phrase, and the research workflow does not count the attempt as a completed protocol task.
 
-The response states the prototype's limitations and directs the user to emergency or crisis support without claiming to know the user's location or contacting services on their behalf. Because the deterministic safety path precedes provider and classifier output, failure of either optional component cannot remove the interruption. False negatives and ambiguous statements remain possible, which is why the interface consistently states that AffectLab is not monitored care, diagnosis, or emergency support.
+The response states the application's limitations and directs the user to emergency or crisis support without claiming to know the user's location or contacting services on their behalf. Because the deterministic safety path precedes provider and classifier output, failure of either optional component cannot remove the interruption. False negatives and ambiguous statements remain possible, which is why the interface consistently states that AffectLab is not monitored care, diagnosis, or emergency support.
 %
 \section{Feedback and Reflection Features}
 \label{sec:feedback-reflection}
@@ -403,6 +439,15 @@ Branching provides a copy-on-write alternative without modifying the original. I
 
 The child is labelled as a retry with no required-study association. Its feedback covers only newly authored continuation evidence; copied context is not counted again in turn totals, events, or generation statistics. Comparison presents the shared context once and the original and alternative continuations side by side, including actions, evidence, sources, and outcomes. If the parent has been deleted, expired, or changed since the branch was created, the saved alternative remains usable but the original continuation is explicitly marked unavailable. This prevents a silently altered source from being presented as a controlled comparison.
 
+Figure~\ref{fig:branching-model} illustrates the copy-on-write branch and the distinction between shared context and newly assessed continuation turns.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/branching_model}}
+\caption{Replay, rewind, and copy-on-write branching from a stored pre-turn dialogue snapshot.}
+\label{fig:branching-model}
+\end{figure}
+
 \subsection{Takeaways and Action Cards}
 \label{subsec:takeaways-action-cards}
 
@@ -422,7 +467,7 @@ The frontend presents the backend's typed state as a sequence of participant and
 
 The React application uses the browser History API to provide public landing and information pages, registration, sign-in, email verification and recovery, onboarding, the authenticated home dashboard, the practice workspace, settings, and the restricted researcher dashboard. On initial load it attempts to restore the access session and then performs one refresh-token exchange if necessary. Unauthenticated access to a protected route returns to sign-in, while a verified user who has not completed the current onboarding version is directed through onboarding before reaching the workspace.
 
-Onboarding explains that the prototype is not therapy or diagnosis, that affect estimates can be wrong, that voice is optional, and that emergency support is outside the service. The participant selects between one and three practice goals, which are stored on the account and used to recommend a starting scenario without restricting the available scenarios. The home dashboard then offers reflection, guided role play, recent sessions, saved takeaways, and a descriptive history of observed skills. Sessions can be resumed, renamed, or deleted.
+Onboarding explains that the application is not therapy or diagnosis, that affect estimates can be wrong, that voice is optional, and that emergency support is outside the service. The user selects between one and three practice goals, which are stored on the account and used to recommend a starting scenario without restricting the available scenarios. The home dashboard then offers reflection, guided role play, recent sessions, saved takeaways, and a descriptive history of observed skills. Sessions can be resumed, renamed, or deleted.
 
 The application shell includes explicit loading, empty, success, and failure states. An error boundary provides a recoverable sign-in path if a component cannot render. Network operations disable only the relevant control, expose errors through alert or status regions, and generally retain the user's input for retry. Responsive CSS changes the multi-column workspace and comparisons into single-column layouts, while visible keyboard focus, semantic controls, reduced-motion rules, live regions, and touch-sized actions support accessible desktop and mobile use.
 
@@ -456,7 +501,7 @@ The interface permits a user to disable the microphone preference locally, enabl
 \subsection{Presentation of Affect and Uncertainty}
 \label{subsec:frontend-affect-presentation}
 
-The standard emotion panel displays the backend's tentative lexical state using a distribution, valence, arousal, intensity, trend, and confidence. Its language consistently presents these values as estimates. The panel is secondary to the conversation and is accompanied by the prototype disclaimer rather than being used as an authoritative description of how the participant feels.
+The standard emotion panel displays the backend's tentative lexical state using a distribution, valence, arousal, intensity, trend, and confidence. Its language consistently presents these values as estimates. The panel is secondary to the conversation and is accompanied by the uncertainty disclaimer rather than being used as an authoritative description of how the user feels.
 
 When a valid multimodal result is available, a separate panel presents the fused confidence, text and voice leaders, modality agreement, full distribution, latency, queue time, and the statement that audio was not stored. A fused label below the configured display threshold is headed as an uncertain estimate rather than as the predicted category. Disagreement receives an explicit explanation, and the full probabilities remain visible so that the leading label is not separated from its uncertainty.
 
@@ -471,7 +516,7 @@ Replay presents a selectable exchange timeline with linked evidence, controller 
 
 The comparison view separates shared context from two labelled continuation regions and stacks them on narrow screens. It reports utterances, evidence, actions, sources, outcomes, and agreements without ranking one branch as globally better. The action-card view provides editable, character-limited fields with save, retry, copy, and download controls. Save failures preserve edits, and version conflicts ask the user to refresh rather than overwriting a newer card.
 
-\subsection{Researcher and Participant Interfaces}
+\subsection{Optional Research Interfaces}
 \label{subsec:frontend-research-interfaces}
 
 Participant research controls live in settings and the authenticated dashboard rather than in public registration. The settings page fetches the current server-provided information sheet, displays eligibility criteria, data categories, processors, audio handling, retention, risks, withdrawal terms, and contacts, and requires separate confirmations plus the access code. Enrolled participants can see their pseudonymous identifier and consent versions, download a text-free personal research JSON file, or enter a two-step withdrawal flow without deleting the ordinary account.
@@ -480,7 +525,7 @@ An enrolled participant also receives a three-task checklist. It obtains progres
 
 The allow-listed researcher dashboard presents descriptive recruitment and completion counts, protocol status, scenario and difficulty summaries, questionnaire averages, skill summaries, generation sources, and pseudonymous participant activity. Researchers may set the collection dates, record a bounded exclusion reason and data-quality note, download the versioned CSV, and initiate the final dataset freeze when eligible. Names, email addresses, transcripts, audio, custom wording, and takeaways are not rendered. A non-researcher cannot reach this view merely by navigating to its route because the API applies the independent researcher dependency.
 %
-\section{Research Workflow Implementation}
+\section{Optional Research Support and Data Export}
 \label{sec:research-workflow-implementation}
 
 The research workflow implements the frozen feasibility protocol as versioned application state. Account privacy acceptance and study participation are separate, and ordinary use of AffectLab does not imply research consent. The protocol identifier, consent version, eligibility version, attempt purpose, task association, and measurement timestamps are carried into the records needed to reconstruct the study flow.
@@ -520,11 +565,20 @@ The researcher dashboard constructs aggregates from the current protocol cohort 
 The live CSV uses the versioned \texttt{affectlab-frozen-dataset-v4} schema. Its rows include pseudonymous identifiers, consent and eligibility versions, timestamps, task classification, branch and feedback scope, questionnaire values, numeric feedback, generation and fallback counts, and event counts. Missing values remain empty rather than imputed. Branch rows explicitly report copied-context counts and continuation-only feedback so that they are not pooled unknowingly with full attempts. The participant's personal JSON export follows the same exclusion of identity and conversation text while retaining their own participant identifier.
 
 Once the configured study end date is reached, an authorised researcher may start the freeze operation. The repository uses a freeze token to prevent concurrent freezes, generates a de-identified CSV with new sequential participant and session labels, stores its schema, protocol, time, row and participant counts, and SHA-256 digest, and then marks the lifecycle frozen. Subsequent CSV downloads return this immutable stored content with its checksum. Date changes, participant-review edits, enrolment, and research-record updates are blocked after freezing; withdrawal remains available, although an irreversibly de-identified frozen row can no longer be linked for removal.
+
+Figure~\ref{fig:research-data-lifecycle} summarises the minimising projection, distinct retention domains, and boundary introduced by irreversible dataset freezing.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/research_data_lifecycle}}
+\caption{Research-data lifecycle from the richer account-owned session to the pseudonymous live record and immutable de-identified export.}
+\label{fig:research-data-lifecycle}
+\end{figure}
 %
 \section{Security, Privacy, and Data Protection}
 \label{sec:security-privacy-data-protection}
 
-Security and privacy controls are distributed across configuration validation, middleware, authentication services, ownership-aware repositories, data minimisation, and user-facing lifecycle operations. They define a research prototype boundary rather than a guarantee of confidentiality. The repository includes a separate remote-pilot baseline because a local demonstration configuration is not sufficient for participant-facing deployment.
+Security and privacy controls are distributed across configuration validation, middleware, authentication services, ownership-aware repositories, data minimisation, and user-facing lifecycle operations. They establish a production-oriented security baseline rather than a guarantee of confidentiality. The repository includes a separate remote-deployment baseline because a local demonstration configuration is not sufficient for internet-facing use.
 
 \subsection{Authentication and Token Management}
 \label{subsec:security-token-management}
@@ -585,6 +639,15 @@ Docker Compose defines MongoDB 8, the backend, and the production frontend. A na
 
 The frontend uses a Node.js 22 build stage to run the TypeScript and Vite production build, then copies only compiled assets into an Nginx image. Nginx serves the single-page-application fallback, prevents caching of \texttt{index.html}, applies immutable caching to content-hashed assets, and exposes a small health endpoint. Compose's default values are for local use; a remote deployment must replace the development signing secret and satisfy all production validation.
 
+Figure~\ref{fig:deployment-topology} shows the resulting service topology and distinguishes locally controlled components from optional external processing.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/deployment_topology}}
+\caption{Containerised deployment topology and external-service boundary.}
+\label{fig:deployment-topology}
+\end{figure}
+
 \subsection{Offline Demonstration Mode}
 \label{subsec:offline-demo}
 
@@ -615,7 +678,7 @@ The system is designed to fail closed where authority is involved and fail soft 
 \section{Implementation Verification}
 \label{sec:implementation-verification}
 
-Verification is organised by boundary rather than by a single undifferentiated test suite. Deterministic unit tests check policies and transformations, API tests check contracts and ownership, MongoDB tests check real persistence semantics, browser tests check participant workflows and accessibility, and smoke tests join the compiled components. These are engineering checks; they do not substitute for model evaluation or participant outcomes.
+Verification is organised by boundary rather than by a single undifferentiated test suite. Deterministic unit tests check policies and transformations, API tests check contracts and ownership, MongoDB tests check real persistence semantics, browser tests check user workflows and accessibility, performance tests detect latency regressions, and smoke tests join the compiled components. These developer-led checks provide the principal evidence for application quality; model accuracy and supplementary user perceptions remain separate questions.
 
 \subsection{Backend Unit and Integration Testing}
 \label{subsec:backend-testing}
@@ -636,6 +699,13 @@ The regular Playwright suite runs the browser against a deterministic mocked API
 Projects run in desktop Chromium and a mobile Chromium profile. Representative pages are scanned with axe-core against WCAG 2.0 and 2.1 A/AA rule sets, alongside assertions for keyboard focus, accessible names, live status messages, and responsive layouts. Production compilation runs the strict TypeScript project build before Vite bundling, and ESLint checks React hook and TypeScript rules.
 
 Because the normal browser suite mocks the backend, its passing result demonstrates frontend behaviour against declared contracts rather than integrated persistence. Assertions that depend on real authentication, FastAPI serialisation, MongoDB indexes, or process restart are reserved for the full-stack suite.
+
+\subsection{Performance Regression Testing}
+\label{subsec:performance-testing}
+
+The repeatable performance script exercises the deterministic text-first workflow through FastAPI's in-process HTTP test transport. After warming the application, it records repeated liveness, authenticated scenario-catalogue, session-creation, role-play-start, and conversation-turn requests. Each summary includes the sample count, median, 95th percentile, and maximum, while the evidence file records the execution environment and SHA-256 hashes of the relevant application and benchmark sources.
+
+The benchmark deliberately uses the memory repository and disables transcription, trained multimodal inference, and provider generation. This isolates locally controlled routing, authentication, validation, dialogue, persistence-interface, and serialisation overhead and makes the check stable enough for regression use. Its scope statement explicitly excludes network transit, MongoDB, external providers, concurrent users, and deployment capacity. The performance results are reported in Section~\ref{subsec:performance-results}; production staging must repeat the measurement with the selected database, models, providers, network, and expected concurrency.
 
 \subsection{Full-Stack Smoke Testing}
 \label{subsec:fullstack-smoke-testing}
@@ -660,12 +730,12 @@ Continuous integration supplements behavioural checks with weekly and change-tri
 \section{Chapter Summary}
 \label{sec:implementation-summary}
 
-This chapter described the implementation of AffectLab as a modular, text-first research prototype. The React and TypeScript frontend communicates with a typed FastAPI backend whose services separate authentication, persistence, dialogue control, affect analysis, response realisation, research collection, and optional external providers. MongoDB stores ownership-bound, versioned sessions and separately retained pseudonymous study records, while an in-memory repository and deterministic templates support isolated testing and offline demonstration.
+This chapter described the implementation of AffectLab as a modular, text-first, production-oriented application. The React and TypeScript frontend communicates with a typed FastAPI backend whose services separate authentication, persistence, dialogue control, affect analysis, response realisation, research collection, and optional external providers. MongoDB stores ownership-bound, versioned sessions and separately retained pseudonymous study records, while an in-memory repository and deterministic templates support isolated testing and offline demonstration.
 
 The emotion-recognition subsystem prepares speaker-independent IEMOCAP folds, trains contextual DeBERTa-v3 text and wav2vec~2.0 speech classifiers, calibrates their distributions, and combines them through late fusion. Private final artefacts are loaded only when configured and are tied to explicit calibration and provenance manifests. Within the application, these predictions remain optional uncertainty-bearing inputs to a bounded pacing policy; they do not control crisis handling, dialogue success, study completion, or feedback scores.
 
 Role-play is governed by versioned scenarios, observable evidence rules, deterministic state transitions, and stored before-and-after decisions. Provider generation may phrase an authorised action but cannot select it. Feedback remains linked to source turns, and replay, rewind, branching, comparison, takeaways, and action cards preserve the distinction between recorded evidence and user-authored reflection. Safety checks precede inference and generation and interrupt a rehearsal through a fixed local path.
 
-The participant workflow separates account use from versioned study consent and eligibility. Required tasks, immediate questionnaires, pseudonymous research projection, text-free exports, lifecycle controls, and immutable dataset freezing implement the frozen feasibility protocol without turning optional practice into protocol evidence. Authentication, ownership filtering, optimistic concurrency, retention, withdrawal, account deletion, transient audio handling, production configuration checks, and backup verification provide layered security and privacy controls appropriate to the stated prototype scope.
+The optional research workflow separates account use from versioned study consent and eligibility. Required tasks, immediate questionnaires, pseudonymous research projection, text-free exports, lifecycle controls, and immutable dataset freezing implement the frozen pilot protocol without affecting ordinary practice. Authentication, ownership filtering, optimistic concurrency, retention, withdrawal, account deletion, transient audio handling, production configuration checks, and backup verification provide layered security and privacy controls appropriate to controlled deployment.
 
-Finally, unit, API, database, browser, accessibility, full-stack, reproducibility, and provenance checks verify the implementation at complementary boundaries. These checks establish that the coded components follow their declared contracts; they do not by themselves establish emotion-recognition validity, usability, feasibility, or participant benefit. Those empirical questions, together with quantitative results and their limitations, are addressed in Chapter~\ref{chap5}.
+Finally, unit, API, database, browser, accessibility, performance, full-stack, reproducibility, and provenance checks verify the implementation at complementary boundaries. These checks establish that the coded components follow their declared contracts and that the local deterministic path remains responsive under the measured conditions. Model validity, deployment-scale capacity, and the limited supporting user evidence are reported with their separate boundaries in Chapter~\ref{chap5}.

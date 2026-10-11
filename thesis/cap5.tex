@@ -1,143 +1,346 @@
-\chapter{Evaluation and Results}\label{chap5}
+\chapter{Evaluation and Results}
+\label{chap5}
 
-\section{Overview}
+\section{Chapter Overview}
+\label{sec:evaluation-overview}
 
-The purpose of the evaluation is to determine whether an emotion-aware adaptive technical support agent provides measurable benefits compared to a non-adaptive baseline agent. The proposed system is designed to adapt its troubleshooting strategy according to the estimated affective state of the user, particularly frustration and urgency. Therefore, the evaluation must consider not only task completion, but also user experience, perceived clarity, cognitive workload, and the agent’s ability to handle difficult or emotionally charged interactions.
+This chapter evaluates AffectLab primarily as a complete technical product. It first reports the speaker-independent emotion-recognition experiments concerning conversational context, acoustic information, multimodal fusion, and calibration. It then evaluates the integrated application through authored engineering cases, automated unit and integration suites, production builds, browser and accessibility checks, persistence and recovery exercises, full-stack smoke journeys, and a reproducible response-time benchmark. A short final subsection reports the supplementary user-pilot results without treating that small study as the principal validation of the application.
 
-The evaluation follows a comparative design. Two versions of the technical support agent are compared under similar conditions. The first version is a non-adaptive baseline agent that follows a predefined troubleshooting flow without using affective information for strategy selection. The second version is the proposed adaptive agent, which uses estimated affective state and interaction context to select between different support strategies, such as normal troubleshooting, guided step-by-step support, fast-track support, and recovery behaviour.
+These sources support different claims. IEMOCAP results measure classification and probability quality on a controlled corpus. Engineering evidence establishes that the application follows its specified transitions, fallbacks, ownership rules, safety precedence, persistence contracts, responsive layouts, and recovery paths under the tested conditions. Local timings characterise the deterministic core but are not a substitute for deployment-specific load testing. The small user pilot contributes limited contextual evidence about perceived realism, usefulness, and workflow completion; it does not carry the claim that the product is technically ready for controlled deployment.
 
-This comparison makes it possible to isolate the effect of affect-driven strategy adaptation. Both agents are intended to use the same general troubleshooting knowledge and solve the same types of technical issues. The main difference is that the adaptive agent modifies its interaction behaviour based on the user’s estimated emotional state, while the baseline agent follows a fixed interaction style.
+The chapter first maps the research questions to their appropriate evidence. It then presents the common model-evaluation protocol, the contextual-text comparison, the audio and multimodal results, and the classification--calibration trade-off. Application verification, performance results, and the concise pilot summary follow. The final discussion answers each research question only to the extent supported by the available evidence and identifies threats to validity.
 
-\section{Evaluation Objectives}
+\section{Evaluation Scope and Evidence Hierarchy}
+\label{sec:evaluation-scope}
 
-The evaluation aims to answer the research questions defined in the introduction. More specifically, it investigates whether affect-driven strategy adaptation improves the effectiveness and perceived quality of technical support interactions.
+\subsection{Research Questions and Evaluation Levels}
+\label{subsec:evaluation-rq-mapping}
 
-The first objective is to compare the adaptive agent and the non-adaptive baseline in terms of task-level performance. This includes whether the technical issue is resolved, how many conversation turns are required, and whether the agent avoids unnecessary repetition.
+Table~\ref{tab:evaluation-rq-map} maps the four research questions introduced in Section~\ref{sec:research-questions} to an evaluation unit and an admissible conclusion. This prevents model accuracy, policy conformance, and integrated application quality from being combined into one undifferentiated claim.
 
-The second objective is to evaluate the user experience produced by the two agents. Since technical support interactions are often influenced by frustration, uncertainty, and time pressure, subjective measures such as satisfaction, perceived helpfulness, clarity, and cognitive workload are important. Prior research on task-oriented dialogue evaluation emphasizes the importance of user satisfaction in addition to task success \cite{sun2021simulatingSatisfaction}, while workload assessment methods such as NASA-TLX provide a way to estimate perceived cognitive effort \cite{hart1988nasatlx}.
+\begin{table}[htbp]
+\centering
+\caption{Mapping between research questions, evidence, and permitted conclusions.}
+\label{tab:evaluation-rq-map}
+\footnotesize
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.08\textwidth}|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.27\textwidth}|X|}
+\hline
+\textbf{RQ} & \textbf{Evaluation unit} & \textbf{Principal evidence} & \textbf{Permitted conclusion} \\ \hline
+RQ1 & IEMOCAP utterance with causal dialogue history & Utterance-only and three-turn contextual text predictions on identical held-out sessions & Whether causal context improves benchmark text classification. \\ \hline
+RQ2 & Paired textual and acoustic IEMOCAP samples & Audio baseline, equal-weight fusion, validation-fitted fusion, and calibration metrics & Whether audio adds benchmark classification information and what calibration trade-off follows. \\ \hline
+RQ3 & Versioned application decision and complete workflow & Authored policy fixtures, automated tests, saved provenance, and full-stack smoke journeys & Whether uncertain estimates are translated into the specified bounded, explainable, and failure-tolerant actions. \\ \hline
+RQ4 & Integrated application and its principal workflows & Automated suites, desktop/mobile browser checks, production builds, persistence and recovery exercises, full-stack smoke journeys, and local response-time measurements & Whether the completed system satisfies its declared functional and non-functional requirements under reproducible developer-led verification. \\ \hline
+\end{tabularx}
+\end{table}
 
-The third objective is to analyze the behaviour of the adaptive agent in difficult scenarios. These include situations where the first proposed solution fails, where the user expresses frustration, where the user appears urgent, or where escalation may be needed. These cases are especially relevant because the advantage of an adaptive support agent is expected to be most visible when the interaction becomes problematic.
+RQ1 and RQ2 are empirical machine-learning questions with completed results. RQ3 concerns the bounded integration policy: because the policy is deterministic, controlled input cases can establish whether it implements its specification. RQ4 concerns the quality of the complete implementation and is evaluated through complementary developer-led and automated checks at service, API, persistence, browser, accessibility, recovery, and full-stack boundaries. The small user pilot is reported separately as supporting product feedback rather than as the main answer to RQ4.
 
-\section{Compared Systems}
+\subsection{Separation of Development, Evaluation, and Deployment Evidence}
+\label{subsec:evaluation-separation}
 
-The evaluation compares two versions of the same technical support system.
+The model study separates training, validation, and test roles by complete IEMOCAP sessions. Validation predictions select temperatures and, where applicable, fusion parameters; the held-out session supplies evaluation predictions. The predeclared equal-weight fusion is retained as the principal classification comparison because its weight was not selected from the fused test results. Fold-specific validation-fitted fusion is reported as a calibration analysis rather than substituted retrospectively as the headline classifier.
 
-\subsection{Non-Adaptive Baseline Agent}
+The final text and audio packages were trained on all 5,531 eligible utterances after the cross-validation design and epoch counts were frozen. These packages have no independent test partition of their own. Their training behaviour and balanced-sample smoke checks are therefore integrity evidence, not model-performance results. Performance claims in this chapter come from the five session-held-out experiments.
 
-The baseline agent follows the same general troubleshooting flow as the proposed system, but it does not adapt its strategy based on affective state. It can ask clarifying questions, provide troubleshooting steps, verify whether the solution worked, and escalate if necessary. However, its interaction style remains fixed throughout the conversation.
+Engineering test cases use controlled utterances and probability distributions to exercise known policy branches. Browser and full-stack tests automate test accounts and ratings. Their purpose is to demonstrate repeatability, persistence, recovery, and guard conditions, not to estimate human behaviour or the deployed model's accuracy. The supplementary user pilot is therefore interpreted independently of these tests.
 
-For example, if a user expresses frustration after a failed solution, the baseline agent may continue with the next troubleshooting step in the same format. It does not explicitly switch to shorter responses, guided mode, recovery mode, or fast-track mode based on emotional cues. This version represents a standard structured support chatbot.
+\section{Emotion-Recognition Evaluation Methodology}
+\label{sec:model-evaluation-methodology}
 
-\subsection{Adaptive Emotion-Aware Agent}
+\subsection{Benchmark Task and Speaker-Independent Splits}
+\label{subsec:evaluation-benchmark-splits}
 
-The adaptive agent uses the same troubleshooting logic as the baseline agent, but it also estimates the user’s affective state and uses it as input for strategy selection. The affective state may include frustration, urgency or arousal, and confidence in the affect prediction.
+The primary benchmark uses the four IEMOCAP categories anger, happiness, neutral, and sadness. Excitement is merged with happiness, and utterances carrying other source labels are excluded. The resulting task contains 5,531 matched text--audio examples drawn from 151 dialogues across the five dyadic sessions of IEMOCAP \,\cite{busso2008iemocap}. The same utterance identifiers and label order are used for the text, audio, and fusion experiments.
 
-Based on this information, the agent can select one of several interaction modes. In normal mode, it follows standard troubleshooting behaviour. In guided mode, it provides shorter instructions and one step at a time, which is useful when the user appears frustrated or overwhelmed. In fast-track mode, it prioritizes direct solutions and reduces unnecessary explanation, which is useful when the user appears urgent but not highly frustrated. In recovery mode, it summarizes previous attempts, avoids repeating failed steps, and proposes an alternative route or escalation when repeated failures occur.
+Five folds provide speaker-independent coverage. In each fold, one complete session is reserved for testing and a different complete session for validation; the remaining three sessions are used for training. Every session therefore appears exactly once as test data. Keeping both speakers from a dyad within one session prevents an individual's utterances from appearing in the training portion of the fold in which that person is tested.
 
-The adaptive agent therefore differs from the baseline not in the technical knowledge available to it, but in how it chooses to interact with the user during the troubleshooting process.
+The utterance-only and contextual text conditions use the same DeBERTa-v3-small architecture, training settings, labels, seed, and folds. Their only intended difference is the input: the contextual condition prepends the previous three causal dialogue turns with speaker-relative markers. The audio condition uses wav2vec~2.0 on the paired 16~kHz waveform. This design supports paired comparisons because competing configurations produce predictions for the same examples.
 
-\section{Test Scenarios}
+\subsection{Classification and Calibration Measures}
+\label{subsec:evaluation-measures}
 
-The evaluation will use a set of predefined technical support scenarios. Each scenario represents a common support problem and includes an expected resolution path. The use of predefined scenarios allows the two agents to be evaluated under comparable conditions.
+Classification is reported through accuracy, macro-averaged F1, weighted F1, and per-class F1. Macro F1 gives each class equal weight and is the primary aggregate measure because the class frequencies are unequal. Weighted F1 complements it by weighting each class according to its support. Per-class results are retained so that an aggregate gain cannot conceal deterioration in one category.
 
-The scenarios should include both simple and difficult interactions. Simple scenarios are useful for testing whether the agent can complete standard troubleshooting tasks efficiently. Difficult scenarios are more important for evaluating affect-aware adaptation because they include frustration, urgency, repeated failure, ambiguity, or conversational breakdown.
+Probability quality is considered separately. Negative log-likelihood and the multiclass Brier score are proper scoring rules over the complete predicted distribution. Expected calibration error (ECE) partitions examples by maximum confidence and accumulates the absolute difference between the mean confidence and empirical accuracy within each bin. Because ECE depends on the chosen bins and does not fully describe multiclass calibration, it is interpreted alongside the proper scores and reliability outputs rather than as a complete measure \,\cite{guo2017calibration,kull2019dirichlet}.
 
-Examples of possible scenario categories include login problems, access or permission errors, installation issues, configuration problems, connectivity issues, and performance-related complaints. For each category, one or more scenario variants can be created. A basic variant may involve a calm user and a direct solution path. A more difficult variant may include a failed first solution, unclear user input, or an explicit expression of frustration.
+Temperature scaling is fitted on validation logits only. For a logit vector $\mathbf{z}$ and positive temperature $T$, the calibrated distribution is
+\begin{equation}
+    \hat{\mathbf{p}} = \operatorname{softmax}\!\left(\frac{\mathbf{z}}{T}\right).
+    \label{eq:evaluation-temperature}
+\end{equation}
+A single temperature changes confidence concentration but not the predicted class. Fusion weights and a final fusion temperature are also fitted only from validation predictions in the deployment-oriented configurations.
 
-For example, a login issue scenario may begin with the user saying that they cannot access their account. In the simple version, the correct path may involve resetting the password. In the difficult version, the user may say that they already tried resetting the password and that the system still does not work. This allows the evaluation to observe whether the adaptive agent enters recovery or guided mode instead of repeating standard instructions.
+\subsection{Paired Dialogue-Level Statistical Comparison}
+\label{subsec:evaluation-bootstrap}
 
-The scenario set should be balanced so that both agents are tested on the same types of problems. If human participants are used, the order of the agents and scenarios should be varied where possible to reduce ordering effects.
+Utterances from one conversation are not independent observations. Statistical comparisons therefore use a paired percentile bootstrap over the 151 complete dialogues rather than sampling individual rows. For each of 10,000 replicates, dialogues are sampled with replacement and the same sampled dialogue indices are applied to both compared systems. The difference in accuracy, macro F1, or weighted F1 is then recomputed. The 2.5th and 97.5th percentiles form the reported 95\% interval. The procedure uses seed 20260808.
 
-\section{Objective Metrics}
+This interval describes uncertainty under resampling of the observed dialogue clusters. It is not a confidence interval over all cultures, microphones, languages, or spontaneous emotional settings. No participant or speaker subgroup inference is attempted because IEMOCAP contains only ten actors and was not designed to support such claims.
 
-Objective metrics are used to measure the task-level performance of the two agents. These metrics are based on observable interaction outcomes and can be collected automatically from conversation logs.
+\section{Contextual Text-Emotion Results}
+\label{sec:context-text-results}
 
-The first objective metric is the resolution rate, which measures the percentage of scenarios in which the agent successfully guides the user to a solution. This is a central metric for task-oriented dialogue systems because the primary goal of the agent is to solve the user’s technical issue.
+\subsection{Primary Four-Class Comparison}
+\label{subsec:four-class-context-results}
 
-The second metric is the number of dialogue turns required to reach resolution. A lower number of turns may indicate a more efficient interaction, although this must be interpreted carefully. In some cases, an adaptive agent may intentionally use more turns in guided mode in order to reduce user confusion. Therefore, turn count should be considered together with satisfaction and cognitive workload.
+Table~\ref{tab:context-text-results} compares utterance-only text with the three-turn causal context condition. Context improved accuracy from 0.6624 to 0.7304 and macro F1 from 0.6651 to 0.7332. The absolute macro-F1 gain was 0.0681, with a dialogue-bootstrap 95\% interval from 0.0504 to 0.0857. All three aggregate intervals excluded zero.
 
-The third metric is the number of repeated or failed troubleshooting steps. This is especially relevant for technical support because repeating already-failed solutions can increase frustration and reduce trust. An adaptive system should ideally avoid unnecessary repetition, especially after the user signals that a step has already failed.
+\begin{table}[htbp]
+\centering
+\caption{Four-class contextual-text results on five held-out IEMOCAP sessions.}
+\label{tab:context-text-results}
+\footnotesize
+\begin{tabular}{|l|r|r|r|c|}
+\hline
+\textbf{Metric} & \textbf{Utterance only} & \textbf{Three-turn context} & \textbf{Difference} & \textbf{95\% interval} \\ \hline
+Accuracy & 0.6624 & 0.7304 & +0.0680 & [0.0496, 0.0864] \\ \hline
+Macro F1 & 0.6651 & 0.7332 & +0.0681 & [0.0504, 0.0857] \\ \hline
+Weighted F1 & 0.6640 & 0.7300 & +0.0661 & [0.0477, 0.0842] \\ \hline
+\end{tabular}
+\end{table}
 
-The fourth metric is escalation rate. Escalation occurs when the agent determines that the issue cannot be resolved within the current interaction and recommends contacting a human support agent or collecting additional diagnostic information. A very high escalation rate may indicate that the system is ineffective, while a very low escalation rate may indicate that it fails to recognize when escalation is necessary.
+The per-class differences were not uniform. Happiness improved by 0.0882, neutral by 0.0338, and sadness by 0.1307, with intervals above zero. Anger improved by 0.0198, but its interval $[-0.0073, 0.0449]$ included zero. The result therefore supports an aggregate benefit from context but does not establish an anger-specific improvement.
 
-Additional metrics may include average interaction length, number of recovery mode activations, number of guided mode activations, and affect trajectory over the conversation. For the adaptive agent, these logs can help analyze whether emotional signals actually influenced the policy decisions.
+The calibrated contextual model obtained pooled ECE 0.0311. This value describes the benchmark distribution after validation-fitted temperature scaling and does not validate the 0.55 application threshold on real AffectLab conversations.
 
-\section{Subjective Metrics}
+\subsection{Exploratory Six-Class Comparison}
+\label{subsec:six-class-context-results}
 
-Subjective metrics are used to evaluate the user’s perception of the interaction. These metrics are important because a technical support agent can complete a task while still being perceived as confusing, frustrating, or unhelpful. Since the proposed system aims to improve both efficiency and user experience, subjective evaluation is necessary.
+An exploratory task aligned additional source labels to anger, anxiety, frustration, joy, neutral, and sadness. Context again improved all aggregate measures, as shown in Table~\ref{tab:six-class-context-results}. The macro-F1 gain was 0.0732 with an interval from 0.0485 to 0.1009.
 
-User satisfaction can be measured using a short questionnaire after each interaction. Participants can be asked to rate how satisfied they were with the support received, how helpful the agent was, how clear the instructions were, and whether they felt the agent responded appropriately to their situation.
+\begin{table}[htbp]
+\centering
+\caption{Exploratory six-class contextual-text comparison.}
+\label{tab:six-class-context-results}
+\footnotesize
+\begin{tabular}{|l|r|r|r|c|}
+\hline
+\textbf{Metric} & \textbf{Utterance only} & \textbf{Three-turn context} & \textbf{Difference} & \textbf{95\% interval} \\ \hline
+Accuracy & 0.5674 & 0.6228 & +0.0554 & [0.0382, 0.0734] \\ \hline
+Macro F1 & 0.5490 & 0.6222 & +0.0732 & [0.0485, 0.1009] \\ \hline
+Weighted F1 & 0.5675 & 0.6205 & +0.0529 & [0.0359, 0.0702] \\ \hline
+\end{tabular}
+\end{table}
 
-Perceived clarity is particularly important in troubleshooting. The user should be able to understand what the agent is asking them to do and why. Guided mode is expected to improve clarity in difficult interactions by reducing the amount of information presented at once.
+The anxiety difference was comparatively large at 0.1650, but it had a wide interval $[0.0476, 0.3144]$ and arose from only 40 IEMOCAP fear annotations mapped to anxiety. Anger and neutral intervals included zero. Consequently, the six-class experiment is not used as the deployed classifier and does not support a strong conclusion about anxiety recognition.
 
-Perceived empathy or emotional awareness can also be measured, but it should be phrased carefully. Since the agent does not truly know the user’s emotional state, the questionnaire should focus on whether the participant felt that the system responded appropriately, not whether the system “understood their emotions” with certainty.
+\subsection{Answer to RQ1}
+\label{subsec:rq1-answer}
 
-Cognitive workload can be measured using a simplified NASA-TLX-inspired questionnaire. NASA-TLX is commonly used to assess perceived workload in human-machine interaction \cite{hart1988nasatlx}. For this dissertation, a short version may include questions about mental effort, frustration, time pressure, and overall difficulty.
+Within the declared IEMOCAP protocol, RQ1 is answered positively. Adding the three preceding causal turns improved the principal text model by approximately 6.8 percentage points in accuracy and macro F1 compared with the utterance-only condition. Pairing, folds, architecture, and optimisation settings were held constant, and the dialogue-level intervals for all aggregate measures excluded zero.
 
-\section{Questionnaire Design}
+The result is evidence for contextual benchmark classification, not proof that context reveals a user's true emotion. It also does not isolate which part of the representation produced the gain: additional lexical content, speaker markers, or interaction history may each contribute. External validation would be required to determine whether the improvement persists for spontaneous microphone speech and user-authored rehearsal conversations.
 
-After interacting with each agent, participants can complete a short questionnaire using a Likert scale, for example from 1 to 5, where 1 means strongly disagree and 5 means strongly agree. The questionnaire should be short enough to avoid participant fatigue, especially if each participant tests multiple scenarios.
+\section{Speech and Multimodal Results}
+\label{sec:multimodal-results}
 
-Possible questionnaire statements include:
+\subsection{Audio-Only Baseline}
+\label{subsec:audio-results}
 
-\begin{enumerate}
-    \item The agent's instructions were clear.
-    \item The agent helped me progress toward solving the problem.
-    \item The agent avoided repeating unnecessary steps.
-    \item The agent responded appropriately when the interaction became difficult.
-    \item I was satisfied with the support provided by the agent.
-    \item The interaction required a low amount of mental effort.
-    \item I would prefer using this agent for similar technical support problems.
-\end{enumerate}
+The wav2vec~2.0 audio classifier obtained accuracy 0.6279, macro F1 0.6349, weighted F1 0.6229, and calibrated ECE 0.0468. Its per-class F1 scores were 0.7142 for anger, 0.5782 for happiness, 0.5757 for neutral, and 0.6715 for sadness. Audio was weaker than contextual text in aggregate but stronger for anger than the overall pattern might suggest, indicating that the modalities contained different useful information.
 
-For a NASA-TLX-inspired workload evaluation, participants may be asked to rate the following dimensions:
+The comparison does not imply that the acoustic model measured emotion independently of linguistic content: speech representations can encode phonetic, lexical, speaker, and recording characteristics as well as prosody. It establishes only that the audio branch produced non-redundant predictive information on the matched benchmark task.
 
-\begin{enumerate}
-    \item Mental demand: How mentally demanding was the interaction?
-    \item Effort: How much effort was required to complete the interaction?
-    \item Frustration: How frustrated did you feel during the interaction?
-    \item Temporal demand: How rushed did you feel during the interaction?
-    \item Performance: How successful did you feel in completing the task?
-\end{enumerate}
+\subsection{Predeclared Equal-Weight Late Fusion}
+\label{subsec:equal-fusion-results}
 
-The questionnaire can also include one or two open-ended questions. For example, participants may be asked what they liked about the interaction and what they found confusing or frustrating. These qualitative responses can provide useful explanations for the numerical results.
+The principal fusion experiment averaged validation-calibrated text and audio posterior distributions with weights of 0.5. Table~\ref{tab:equal-fusion-results} shows that fusion improved accuracy, macro F1, and weighted F1 over contextual text on the same rows. The macro-F1 difference was 0.0551 with a 95\% interval from 0.0407 to 0.0713. Every one of the 10,000 dialogue-bootstrap replicates favoured fusion for each aggregate metric.
 
-\section{Experimental Procedure}
+\begin{table}[htbp]
+\centering
+\caption{Predeclared equal-weight fusion compared with contextual text.}
+\label{tab:equal-fusion-results}
+\begin{tabular}{|l|r|r|r|c|}
+\hline
+\textbf{Metric} & \textbf{Context text} & \textbf{Equal fusion} & \textbf{Difference} & \textbf{95\% interval} \\ \hline
+Accuracy & 0.7304 & 0.7832 & +0.0528 & [0.0381, 0.0683] \\ \hline
+Macro F1 & 0.7332 & 0.7883 & +0.0551 & [0.0407, 0.0713] \\ \hline
+Weighted F1 & 0.7300 & 0.7815 & +0.0514 & [0.0366, 0.0671] \\ \hline
+\end{tabular}
+\end{table}
 
-The evaluation can be conducted using a controlled user study. Participants are asked to interact with both the adaptive and non-adaptive agents using predefined technical support scenarios. The agents should be presented in a way that does not reveal which one is adaptive, in order to reduce bias.
+Fusion per-class F1 was 0.8277 for anger, 0.8163 for happiness, 0.7014 for neutral, and 0.8080 for sadness. Unlike the contextual-text comparison, the combined system showed substantial performance across all four categories. Because the fusion rule was fixed before inspection of the combined test outcome, this result is retained as the primary evidence that audio contributed complementary benchmark information.
 
-Each participant may be assigned a small number of scenarios. To reduce ordering effects, the order of the agents can be counterbalanced. For example, half of the participants interact with the baseline agent first, while the other half interact with the adaptive agent first. Similarly, scenario order can be varied.
+\subsection{Classification--Calibration Trade-Off}
+\label{subsec:fusion-calibration-results}
 
-During each interaction, the system logs relevant data such as the selected support mode, estimated affective values, number of turns, failed attempts, recovery activations, escalation decisions, and final outcome. After each interaction, the participant completes the questionnaire.
+Equal averaging improved classification but produced ECE 0.1619. Separately calibrated modality probabilities therefore did not remain calibrated after fusion. This result is important for AffectLab because confidence, not only the top class, is consumed by the pacing policy. Treating the equal-fusion probability as reliable would have contradicted the evaluation evidence.
 
-If a full user study is not feasible, an initial evaluation can be performed using scripted user simulations. In this case, predefined user responses are used to test whether the adaptive agent reacts correctly to frustration, urgency, failed steps, or ambiguous input. However, a human user study is preferable for evaluating perceived satisfaction, clarity, and workload.
+Fold-specific validation fitting selected text weights between 0.54 and 0.63 and then fitted a final temperature. This reduced ECE to 0.0283, while macro F1 decreased from 0.7883 to 0.7758. Table~\ref{tab:calibration-tradeoff} summarises the principal configurations. The complete global chain fitted text and audio temperatures and then fusion parameters on 5,531 pooled out-of-fold validation predictions. It selected text weight 0.59, audio weight 0.41, and final temperature 0.5989.
 
-\section{Data Analysis}
+\begin{table}[htbp]
+\centering
+\caption{Classification and calibration trade-off among multimodal configurations.}
+\label{tab:calibration-tradeoff}
+\footnotesize
+\begin{tabular}{|l|r|r|r|r|}
+\hline
+\textbf{Configuration} & \textbf{Accuracy} & \textbf{Macro F1} & \textbf{Weighted F1} & \textbf{ECE} \\ \hline
+Contextual text & 0.7304 & 0.7332 & 0.7300 & 0.0311 \\ \hline
+Audio only & 0.6279 & 0.6349 & 0.6229 & 0.0468 \\ \hline
+Equal-weight fusion & 0.7832 & 0.7883 & 0.7815 & 0.1619 \\ \hline
+Fold validation-fitted fusion & 0.7717 & 0.7758 & 0.7707 & 0.0283 \\ \hline
+Final global calibration chain & 0.7736 & 0.7776 & 0.7728 & 0.0242 \\ \hline
+\end{tabular}
+\end{table}
 
-The collected data will be analyzed by comparing the adaptive agent and the baseline agent across the selected metrics. For objective metrics, the analysis can include average resolution rate, average number of turns, average number of failed repeated steps, and escalation frequency. For subjective metrics, the analysis can include mean questionnaire scores for satisfaction, clarity, helpfulness, and workload.
+Figure~\ref{fig:model-results} places the classification results and calibration trade-off on common visual scales. The utterance-only condition is omitted from the calibration panel because no canonical ECE is reported for that configuration.
 
-If the number of participants is sufficient, simple statistical tests may be applied to determine whether observed differences are meaningful. For example, paired comparisons can be used if the same participants interact with both agents. However, even if the sample size is limited, descriptive statistics and qualitative analysis can still provide useful insight into the behaviour of the system.
+\begin{figure}[p]
+\centering
+\input{figures/model_results}
+\caption{Aggregate four-class model results. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally.}
+\label{fig:model-results}
+\end{figure}
 
-The analysis should also examine specific difficult scenarios. Since the adaptive agent is expected to be most useful when frustration, urgency, or repeated failure occurs, it is important to compare performance separately for simple and difficult scenarios. This can show whether affect-aware adaptation provides particular benefits under challenging interaction conditions.
+The row-normalised confusion matrices in Figure~\ref{fig:model-confusion-matrices} expose the class-specific complementarity behind the aggregate result. Audio recognised anger more often than contextual text (78.1\% versus 69.6\% recall), whereas contextual text was substantially stronger for happiness and neutral. Equal fusion raised recall to 85.1\% for anger, 81.1\% for happiness, 66.6\% for neutral, and 85.8\% for sadness. The final global chain retained a more balanced pattern while using probabilities suitable for operational confidence.
 
-For the adaptive agent, logs of selected strategies can be analyzed to determine how often each mode was activated and whether the activations were appropriate. For example, guided mode should occur more often in interactions with high frustration, while fast-track mode should occur more often in urgent but cooperative interactions. Recovery mode should occur primarily after repeated failed attempts or conversational breakdown.
+\begin{figure}[p]
+\centering
+\input{figures/confusion_matrices}
+\caption{Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. The fold-fitted matrix is omitted because its class pattern is nearly identical to the final global chain.}
+\label{fig:model-confusion-matrices}
+\end{figure}
+
+Figure~\ref{fig:model-reliability-curves} shows the corresponding bin-level calibration behaviour. Equal fusion lies systematically above the ideal diagonal through its populated mid-confidence region, indicating under-confidence despite its superior classification performance. Validation-fitted and global calibration move the fusion curve much closer to the diagonal. The isolated low-confidence points contain very few observations and should not be interpreted as stable local estimates.
+
+\begin{figure}[p]
+\centering
+\input{figures/reliability_curves}
+\caption{Reliability curves from pooled held-out predictions. Each point represents a non-empty equal-width bin of maximum class probability; the dashed diagonal denotes perfect calibration. Panel (a) compares the unimodal systems with predeclared equal fusion, and Panel (b) shows the effect of validation-derived fusion calibration. ECE values in Table~\ref{tab:calibration-tradeoff} use the prespecified 15-bin calculation, while the curves use ten bins for legibility.}
+\label{fig:model-reliability-curves}
+\end{figure}
+\clearpage
+
+The final global chain also obtained negative log-likelihood 0.6075 and multiclass Brier score 0.3280. It is the configuration stored for full-data packaging because it provides the single parameter set required by one final text model and one final audio model. However, its pooled calibration fitting uses all out-of-fold validation rows and is an operational configuration analysis, not a new independent confirmatory comparison. The equal-weight result remains the classification headline.
+
+\subsection{Answer to RQ2}
+\label{subsec:rq2-answer}
+
+RQ2 is also answered positively within IEMOCAP. Equal-weight late fusion improved macro F1 by 0.0551 over contextual text and by 0.1534 over audio alone, showing complementary information in the textual and acoustic branches. The paired interval against contextual text excluded zero.
+
+The answer includes a material trade-off: the strongest classifier was poorly calibrated, whereas validation-fitted and global calibration configurations sacrificed approximately one percentage point of macro F1 while reducing ECE substantially. AffectLab therefore uses the global validation-derived chain for operational confidence and retains conservative presentation rules. Calibration under IEMOCAP does not guarantee calibration after distribution shift \,\cite{ovadia2019shift}.
+
+\section{Application Verification and Readiness}
+\label{sec:engineering-evaluation}
+
+\subsection{Deterministic Dialogue Cases}
+\label{subsec:dialogue-case-results}
+
+The versioned engineering evaluator contains five authored trajectories for enhanced workload, boundary, and relationship practice. Each specifies the user turns and expected sequence of controller stages. All five enhanced trajectories matched their expected sequence, as shown in Table~\ref{tab:dialogue-case-results}. The fixed controller is included only to expose the change in policy granularity; it stops according to its own earlier completion conditions and is not treated as a human-performance baseline.
+
+\begin{table}[htbp]
+\centering
+\caption{Authored enhanced-dialogue trajectory results.}
+\label{tab:dialogue-case-results}
+\footnotesize
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.18\textwidth}|X|>{\raggedright\arraybackslash}p{0.20\textwidth}|}
+\hline
+\textbf{Case} & \textbf{Expected and observed enhanced stages} & \textbf{Final state} \\ \hline
+Workload agreement & constraints $\rightarrow$ agree $\rightarrow$ resolved & Completed: success \\ \hline
+Workload non-confirmation & constraints $\rightarrow$ agree $\rightarrow$ agree & Active; no false agreement \\ \hline
+Boundary maintained & pressure $\rightarrow$ resolved & Completed: success \\ \hline
+Relationship next step & perspective $\rightarrow$ agree $\rightarrow$ resolved & Completed: success \\ \hline
+Relationship unresolved & perspective $\rightarrow$ unresolved & Completed: unresolved \\ \hline
+\end{tabularx}
+\end{table}
+
+These cases show that the enhanced controller requires intermediate evidence rather than completing as soon as one generic success phrase is detected. They do not show that its dialogue is more persuasive, realistic, or educational for a participant. Those properties require human evaluation.
+
+\subsection{Evidence Extraction and Affect-Pacing Cases}
+\label{subsec:policy-case-results}
+
+Twelve human-authored feature judgements were compared with the deterministic extractor. The fixture produced five true positives, four true negatives, one false positive, and two false negatives. Reported speech containing ``I need'' was incorrectly attributed to the current speaker; an indirect refusal and the synonym ``shift'' were missed. With only twelve designed cases, these counts are diagnostic examples rather than a held-out accuracy estimate. Importantly, the errors expose the intended limitation of a bounded lexical policy and justify replaying the complete source utterance.
+
+Seven controlled affect cases exercised matching confident estimates, modality disagreement, low confidence, missing audio, an unavailable model, disabled adaptation, and an explicit user choice. All seven produced the declared action. Matching high-confidence sadness allowed a brief acknowledgement; disagreement and low confidence offered a pacing choice; unavailable evidence and disabled adaptation preserved the baseline; and the explicit gentler preference took precedence. Separate tests verify that safety, completion, ineligible sessions, and required study tasks override adaptation.
+
+The deterministic evaluator recorded median in-process service latency of approximately 0.64~ms and a lower-order-statistic 95th-percentile value of approximately 3.46~ms across 19 calls. These figures exclude HTTP, MongoDB, provider generation, and trained inference and are not a load test or production latency claim.
+
+\subsection{Automated and Full-Stack Verification Results}
+\label{subsec:automated-system-results}
+
+The default backend run performed for the completed implementation reported 240 passing tests and 13 skipped tests. The skipped group contains opt-in checks requiring an external environment, including real MongoDB or private model conditions; it is not counted as a passing result. The frontend production TypeScript build, Vite build, ESLint check, and backend Ruff check completed successfully. These runs verify the current code paths but do not replace the versioned evidence artefacts.
+
+The saved full-stack smoke manifest reports two passing browser journeys against a compiled frontend, actual FastAPI process, and disposable MongoDB 8.0.1 database. The journeys included account access, pre-consent exclusion, enrolment, a required task and questionnaire, researcher export, enhanced dialogue, network-failure recovery, replay, branching, comparison, and action-card persistence. The backend was stopped and relaunched twice while MongoDB remained active, and persisted state was verified after each relevant restart. The recorded total run time was 95.72 seconds; this is demonstration timing, not a capacity benchmark.
+
+The test evidence also covers ownership failures, stale versions, duplicate identifiers, crisis precedence, missing optional services, invalid audio, post-questionnaire timing, withdrawal, immutable dataset freezing, desktop and mobile workflows, keyboard navigation, and automated accessibility checks. Together, these checks support conformance to the implementation contract described in Chapter~\ref{chap:implementation}. They cannot establish that the text detector covers every crisis expression or that the user interface is accessible to every disability group.
+
+\subsection{Performance and Responsive-Interface Checks}
+\label{subsec:performance-results}
+
+A reproducible local benchmark exercised the HTTP boundary of the deterministic core using FastAPI's in-process transport and the memory repository. It included routing, bearer-token authentication, request validation, application services, and response serialisation. After warm-up, the benchmark collected 200 samples for read-only endpoints and 100 samples for each state-changing workflow operation. Table~\ref{tab:performance-results} reports the results from the recorded Windows~11 and Python~3.14.3 run.
+
+\begin{table}[htbp]
+\centering
+\caption{Local single-client application latency results.}
+\label{tab:performance-results}
+\begin{tabular}{|l|r|r|r|}
+\hline
+\textbf{Operation} & \textbf{Samples} & \textbf{Median (ms)} & \textbf{95th percentile (ms)} \\ \hline
+Liveness endpoint & 200 & 1.332 & 1.866 \\ \hline
+Authenticated scenario catalogue & 200 & 2.942 & 3.922 \\ \hline
+Session creation & 100 & 2.988 & 3.961 \\ \hline
+Role-play start & 100 & 3.396 & 4.437 \\ \hline
+Deterministic conversation turn & 100 & 4.659 & 5.836 \\ \hline
+\end{tabular}
+\end{table}
+
+The benchmark is a fast regression check for local application overhead, not a production-capacity test. It excludes network latency, MongoDB, external generation and transcription providers, trained multimodal inference, and concurrent clients. Those variables depend on the deployed environment and require a separate staged load test. Within its declared scope, however, the result shows that the locally controlled text-first path adds only a few milliseconds per request and that optional services are not on the critical path when deterministic fallbacks are used. All five measurements passed their predeclared 95th-percentile regression budgets. The JSON evidence artefact records the environment, sample counts, budgets, source hashes, individual scope exclusions, and summary statistics.
+
+Perceived responsiveness also depends on the browser rather than API latency alone. The frontend therefore runs as a compiled production build in both desktop Chromium and a Pixel~7 mobile profile. The browser suite verifies responsive layouts, keyboard interaction, focus behaviour, live status messages, preservation of unsent input after failure, and immediate recovery controls. These checks support the claim that the interface is responsive across the tested viewports; they do not replace field measurements of Core Web Vitals on the eventual hosting infrastructure.
+
+\subsection{Answer to RQ3}
+\label{subsec:rq3-answer}
+
+RQ3 asks how uncertain multimodal predictions can be integrated while keeping behaviour explainable, controllable, safe, and failure-tolerant. The implementation and engineering evidence provide a constructive answer: the classifier output is validated and stored as evidence; a deterministic policy maps confidence, agreement, availability, eligibility, and user preference to a small action set; the dialogue controller remains authoritative; and each action and fallback reason is persisted for replay.
+
+The authored cases and automated tests show that low confidence and disagreement produce a user choice, missing inference preserves the baseline, explicit preference takes precedence, and safety bypasses model adaptation. Version-bound requests and optimistic persistence attach a prediction to its exact exchange. This establishes specified system behaviour under the tested conditions. It does not establish that the emotion label itself is correct for a real participant or that pacing improves their outcome.
+
+\subsection{Answer to RQ4: Integrated Application Quality}
+\label{subsec:rq4-status}
+
+RQ4 is answered through the combined engineering evidence. The completed application passed 240 backend tests, production frontend compilation and linting, desktop and mobile browser workflows, accessibility scans, two database-backed full-stack journeys, restart-persistence checks, and the authored dialogue and affect-policy fixtures. Its locally controlled text-first path also remained below 7~ms at the 95th percentile for the measured core operations. Together with ownership enforcement, optimistic concurrency, deterministic fallbacks, health checks, containerisation, and recovery behaviour, these results support readiness for a controlled production deployment with the tested configuration.
+
+This conclusion is deliberately environment-specific. It does not claim internet-scale capacity or guarantee the latency of MongoDB, trained inference, or external providers. A public deployment should establish its own service-level objectives and repeat concurrent-load, network, backup, security, and observability checks in staging.
+
+\subsection{Supplementary User-Pilot Results}
+\label{subsec:participant-results}
+
+A small single-arm pilot was retained as supplementary feedback on the product rather than as its central validation. Ten people enrolled and created 27 sessions. Under the prespecified first-required-attempt rule, 21 of 24 selected attempts reached task completion and six participants completed all three required scenarios and questionnaires. The resulting protocol-completion estimate was 60.0\% (Wilson 95\% interval 31.3\%--83.2\%), below the original 80\% target. Median ratings for both scenario realism and feedback usefulness were 5 on a seven-point scale. Among 19 matched pre/post observations from seven participants, the mean confidence change was +0.53 and the median change was +1.
+
+These results suggest that respondents generally found the experience realistic and the feedback useful, while incomplete protocols identify workflow friction worth refining. Because the sample was small, uncontrolled, and incomplete, the confidence change is descriptive rather than evidence that AffectLab caused improvement. The pilot therefore provides a modest user perspective that complements---but does not outweigh---the model results and the much broader developer-led verification of the application.
 
 \section{Threats to Validity and Limitations}
+\label{sec:evaluation-limitations}
 
-Several limitations may affect the evaluation. First, the number of participants may be limited, especially in a master’s dissertation context. A small sample size may reduce the generalizability of the results. To address this, the evaluation should include both quantitative metrics and qualitative observations.
+\subsection{Model and Statistical Validity}
+\label{subsec:model-validity-threats}
 
-Second, the scenarios may be predefined and may not fully represent the complexity of real technical support interactions. Real users may describe problems unclearly, omit important information, or behave unpredictably. However, predefined scenarios are useful for controlled comparison because they allow both agents to be tested under similar conditions.
+The five test folds cover all IEMOCAP sessions, but the corpus contains only ten actors. Fold results are therefore dependent on a small set of speakers, acted or improvised tasks, recording conditions, and annotation practices. The dialogue bootstrap reflects the 151 observed conversations but cannot compensate for missing demographic, cultural, linguistic, and environmental diversity. Only one primary training seed was used after the pipeline check, so optimisation variance is not fully characterised.
 
-Third, affective state estimation is uncertain. The system may incorrectly estimate frustration or urgency, especially when user messages are short, ambiguous, sarcastic, or emotionally neutral. This limitation should be acknowledged, and the system should use confidence scores or conservative adaptation rules to reduce the risk of inappropriate strategy switching.
+Repeated GPU execution can produce small numerical variation. The reported paired comparisons use the latest internally consistent private prediction files, each checked against its neighbouring metrics record. This preserves internal pairing but illustrates why commit, configuration, and file hashes are necessary. The final full-data packages cannot be evaluated on their training rows, and their file-level provenance remains incomplete until the private directories are downloaded and hashed beside the application.
 
-Fourth, participant behaviour in an evaluation setting may differ from real support interactions. Participants may not feel genuine frustration or urgency when acting through scenarios. To reduce this issue, scenarios can include realistic prompts and failure conditions, but the evaluation should still acknowledge that simulated interactions cannot fully reproduce real emotional states.
+ECE is bin-dependent, and calibration can deteriorate under shift. The global deployment chain is fitted from pooled validation roles across the corpus; it is useful for choosing one full-data configuration but is not an independent external calibration study. The 0.55 and 0.75 presentation bands are operational thresholds rather than validated psychological boundaries.
 
-Fifth, the comparison between adaptive and non-adaptive agents must be carefully designed to ensure fairness. Both agents should have access to the same troubleshooting knowledge and issue-resolution paths. Otherwise, improvements may be caused by better technical content rather than affect-aware adaptation.
+\subsection{External and Construct Validity}
+\label{subsec:external-validity-threats}
 
-Despite these limitations, the proposed evaluation methodology is suitable for studying whether affect-driven strategy adaptation can improve the performance and perceived quality of a technical support dialogue agent.
+IEMOCAP labels describe annotated expressive categories, not direct measurements of internal emotion. Mapping excitement to happiness and fear to exploratory anxiety further simplifies the constructs. Model performance must not be interpreted as diagnosis, emotional truth, or equitable performance across accents, languages, devices, ages, disabilities, or cultures.
 
-\section{Summary}
+The role-play features are likewise operational constructs. A phrase detector can identify authored patterns such as a clear refusal or practical request, but it does not measure general communication ability or transfer to a real conversation. The diagnostic fixture already demonstrates missed synonyms, indirect language, and reported-speech error. Deterministic feedback is more auditable than an unconstrained judgement, but it remains limited by these definitions.
 
-This chapter section defined the planned evaluation methodology for the proposed emotion-aware technical support agent. The evaluation compares an adaptive agent with a non-adaptive baseline using predefined support scenarios. Objective metrics such as resolution rate, number of turns, failed repeated steps, and escalation rate are combined with subjective metrics such as satisfaction, clarity, perceived helpfulness, and cognitive workload.
+The engineering evaluation largely uses deterministic templates and test accounts. It does not evaluate live provider variability, private-model latency under concurrent participant use, real microphone noise, or long-duration deployment. The successful smoke journey establishes integration and restart persistence only for its tested path.
 
-The methodology is designed to evaluate both task performance and user experience. This is important because the proposed contribution is not only a technical troubleshooting flow, but an affect-aware decision mechanism that adapts the agent’s strategy based on frustration, urgency, and interaction difficulty. By comparing the adaptive and non-adaptive versions under controlled conditions, the dissertation can assess whether using affective state as a policy-level control signal improves technical support interactions.
+\subsection{Supplementary User-Evidence Limitations}
+\label{subsec:participant-validity-threats}
+
+The pilot was single-arm and included only ten enrolled individuals from a narrow convenience sample. Missing ratings, incomplete protocols, repeated exposure, demand characteristics, and self-selection may influence the descriptive results. The study-specific ratings are not validated clinical scales, and the absence of a control condition means that the observed confidence change cannot establish causation, sustained skill development, or transfer to real conversations. These limitations are why the pilot is presented as supplementary feedback rather than the principal evidence for the application.
+
+\section{Chapter Summary}
+\label{sec:evaluation-summary}
+
+The evaluation provides completed answers to the two machine-learning questions. Three-turn causal context improved the four-class text model from 0.6651 to 0.7332 macro F1, with a paired dialogue-bootstrap interval excluding zero. Equal-weight text--audio fusion further improved macro F1 to 0.7883, demonstrating complementary benchmark information. However, its ECE of 0.1619 exposed a classification--calibration trade-off. Validation-derived calibration reduced ECE substantially at a modest classification cost, motivating the global text-dominant configuration used for final packaging.
+
+The application evaluation answers RQ3 and RQ4 at the level of specified, reproducible system behaviour. All five authored enhanced dialogue trajectories and all seven affect-pacing decisions matched expectations. Diagnostic evidence cases exposed one false positive and two false negatives rather than concealing lexical limitations. A 240-test backend run, production frontend checks, desktop/mobile browser and accessibility tests, two full-stack journeys, persistence across backend restarts, and local HTTP timings verify complementary functional and non-functional boundaries. The deterministic conversation path recorded a median of 4.659~ms and a 95th percentile of 5.836~ms in the scoped local benchmark.
+
+The small pilot remains supporting evidence: realism and usefulness both had a median rating of 5, while six of ten enrolled users completed the full protocol. Those observations help prioritise product refinements but do not define the quality or readiness of the whole application. The overall result is a helpful, fully implemented communication-practice system whose model behaviour, core policies, interfaces, persistence, accessibility, recovery, and local responsiveness have been tested thoroughly by the developer and through automation, with deployment-scale performance appropriately reserved for environment-specific staging tests.

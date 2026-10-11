@@ -4,7 +4,7 @@
 \section{System Overview}
 \label{sec:system-overview}
 
-AffectLab is designed as a hybrid, full-stack research system for rehearsing difficult interpersonal conversations. Its architecture combines deterministic application logic, trained affect-recognition models, optional generative services, and a browser-based interaction interface. The system is not constructed as a single end-to-end conversational model. Instead, responsibilities are separated so that probabilistic components can contribute linguistic flexibility and affective information without controlling safety-critical or evaluative decisions.
+AffectLab is designed as a hybrid, full-stack, production-oriented application for rehearsing difficult interpersonal conversations. Its architecture combines deterministic application logic, trained affect-recognition models, optional generative services, and a browser-based interaction interface. The system is not constructed as a single end-to-end conversational model. Instead, responsibilities are separated so that probabilistic components can contribute linguistic flexibility and affective information without controlling safety-critical or evaluative decisions.
 
 The central architectural principle is the separation of \emph{inference}, \emph{control}, and \emph{presentation}. The affect-recognition subsystem estimates a distribution over a limited set of emotion categories from conversational text and optional speech. The dialogue-control subsystem determines how the scenario progresses, which communication features have been observed, and whether a completion condition has been reached. The response-generation subsystem expresses the selected dialogue action using either constrained generative wording or a deterministic template. The interface presents the conversation, optional affect information, feedback, and reflection tools to the user. This separation makes it possible to inspect and test each decision independently.
 
@@ -13,6 +13,15 @@ The system follows a text-first design. A user can complete the entire rehearsal
 During the rehearsal, the user submits a textual utterance and may optionally attach a short voice recording. The text is always available to the dialogue and safety components. When voice input and trained-model inference are enabled, the recording is processed for the current request and is not retained as part of the conversation history. Denial of microphone access, missing audio, or an inference failure therefore does not prevent the rehearsal from continuing.
 
 Table~\ref{tab:architecture-components} summarises the main architectural components and the boundaries placed around their responsibilities.
+
+Figure~\ref{fig:system-architecture} shows the corresponding information and authority flow. Solid paths represent the core workflow, while dashed paths identify optional evidence or services whose absence must not prevent text-based rehearsal.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/system_architecture}}
+\caption{Logical architecture of AffectLab and separation between probabilistic evidence and authoritative application control.}
+\label{fig:system-architecture}
+\end{figure}
 
 \begin{table}[htbp]
 \centering
@@ -74,7 +83,7 @@ After the response has been produced, the system persists the textual turns and 
 
 At the end of a rehearsal, the feedback component calculates scenario-specific metrics from the evidence accumulated during the conversation. Each metric is linked to the turn or turns that support it. Optional generative processing may improve the readability of the feedback, but the deterministic metrics and recorded evidence remain authoritative. The completed conversation can subsequently be replayed, retried from the latest exchange, or used as the basis for an alternative branch. Branch comparison evaluates the new continuation separately from the conversational context copied from the original attempt.
 
-This architecture supports the research questions at distinct levels. The contextual text, audio, fusion, and calibration components support the model comparisons in RQ1 and RQ2. The separation between affect inference, bounded adaptation, deterministic dialogue control, and safety addresses RQ3. The integrated rehearsal, feedback, and reflection workflow provides the system evaluated for feasibility and acceptability in RQ4. Maintaining these architectural boundaries also prevents model classification performance, policy conformance, and participant outcomes from being treated as interchangeable forms of evidence.
+This architecture supports the research questions at distinct levels. The contextual text, audio, fusion, and calibration components support the model comparisons in RQ1 and RQ2. The separation between affect inference, bounded adaptation, deterministic dialogue control, and safety addresses RQ3. The integrated rehearsal, feedback, persistence, recovery, accessibility, and deployment workflow provides the system evaluated for application quality in RQ4. Maintaining these architectural boundaries also prevents model classification performance, policy conformance, application readiness, and supplementary user feedback from being treated as interchangeable forms of evidence.
 
 \section{System Requirements and Scope}
 \label{sec:system-requirements-scope}
@@ -82,7 +91,7 @@ This architecture supports the research questions at distinct levels. The contex
 \subsection{Overview}
 \label{subsec:requirements-overview}
 
-The system requirements translate the research aims introduced in Chapter~\ref{chap1} and the design implications identified in Chapter~\ref{chap2} into explicit capabilities and constraints for AffectLab. They define what the prototype is expected to do, the conditions under which it should operate, and the responsibilities that must remain outside probabilistic affect recognition and generative artificial intelligence.
+The system requirements translate the research aims introduced in Chapter~\ref{chap1} and the design implications identified in Chapter~\ref{chap2} into explicit capabilities and constraints for AffectLab. They define what the application is expected to do, the conditions under which it should operate, and the responsibilities that must remain outside probabilistic affect recognition and generative artificial intelligence.
 
 The requirements are divided into functional and non-functional requirements. Functional requirements describe user-visible capabilities and internal system behaviours. Non-functional requirements describe qualities that apply across those capabilities, including safety, privacy, explainability, reliability, accessibility, and reproducibility. Together, they provide a basis for designing the architecture and for evaluating whether the implemented system conforms to its intended behaviour.
 
@@ -107,7 +116,7 @@ The system supports text-based interaction as the default modality. Optional voi
 
 The scope also includes post-rehearsal reflection. Users can inspect evidence-grounded feedback, replay an attempt, retry an exchange, create an alternative conversational branch, compare compatible attempts, record a personal takeaway, and prepare an action card. These functions support deliberate practice rather than unrestricted social conversation.
 
-For research use, AffectLab includes versioned consent and eligibility procedures, pre- and post-rehearsal measures, pseudonymous research records, technical-event recording, and restricted aggregate export. These functions support engineering, feasibility, and usability evaluation. They do not transform the prototype into a clinical intervention or establish that practice transfers to real-world behaviour.
+For optional research use, AffectLab includes versioned consent and eligibility procedures, pre- and post-rehearsal measures, pseudonymous research records, technical-event recording, and restricted aggregate export. These functions support supplementary study workflows. They do not transform the application into a clinical intervention or establish that practice transfers to real-world behaviour.
 
 \subsection{Functional Requirements}
 \label{subsec:functional-requirements}
@@ -234,7 +243,7 @@ The non-functional requirements apply across the complete system.
     Repeated execution with the same deterministic state and input shall produce the same dialogue transition, completion decision, evidence record, and feedback score. Concurrent or duplicate submissions shall not silently produce contradictory session states.
 
     \item[\textbf{NFR9. Responsiveness and failure recovery}]  
-    Model-dependent operations shall use bounded execution and expose appropriate busy, error, or fallback states. Failure of an optional operation shall return control to the user rather than leaving the session in an indeterminate state.
+    Model-dependent operations shall use bounded execution and expose appropriate busy, error, or fallback states. Failure of an optional operation shall return control to the user rather than leaving the session in an indeterminate state. The locally controlled text-first path shall be measurable independently of provider and model latency so that responsiveness regressions can be detected reproducibly.
 
     \item[\textbf{NFR10. Accessibility}]  
     Core workflows shall support keyboard navigation, visible focus, accessible form labels, understandable status announcements, sufficient contrast, reduced-motion preferences, and layouts suitable for desktop and mobile interaction.
@@ -321,7 +330,7 @@ Authenticated session storage, limited conversation retention, transient audio p
 Guarantees about infrastructure or external-provider processing beyond the configured deployment and applicable agreements. \\ \hline
 
 Evaluation &
-Emotion-classification evaluation, calibration analysis, engineering conformance tests, and exploratory feasibility and usability measures. &
+Emotion-classification evaluation, calibration analysis, engineering conformance, accessibility, recovery, and performance tests, with a small supplementary user pilot. &
 Proof of therapeutic effectiveness, causal learning benefit, reliable real-world emotion understanding, or transfer to future conversations. \\ \hline
 \end{tabular}
 \endgroup
@@ -334,7 +343,7 @@ The system boundary also separates participant-facing data from research-facing 
 \subsection{Summary}
 \label{subsec:requirements-summary}
 
-AffectLab is scoped as a text-first, structured communication-rehearsal prototype with optional voice, affective, and generative capabilities. Its functional requirements cover the complete path from onboarding and scenario preparation to controlled role-play, multimodal inference, feedback, replay, branching, reflection, and research-data collection. Its non-functional requirements emphasise safety precedence, graceful degradation, privacy, security, accessibility, explainability, reproducibility, and user control.
+AffectLab is scoped as a text-first, structured communication-rehearsal application with optional voice, affective, generative, and research-support capabilities. Its functional requirements cover the complete path from onboarding and scenario preparation to controlled role-play, multimodal inference, feedback, replay, branching, reflection, and optional research-data collection. Its non-functional requirements emphasise safety precedence, graceful degradation, privacy, security, accessibility, explainability, reproducibility, responsiveness, and user control.
 
 The defining constraint is that probabilistic components provide bounded support rather than authoritative control. Emotion predictions cannot determine safety, success, or assessment, while generative models cannot change dialogue decisions or invent feedback evidence. These requirements establish the basis for the component architecture and interaction flow described in the following sections.
 
@@ -494,7 +503,7 @@ Although raw audio is not intentionally retained, transient processing and trans
 
 \subsubsection{Evaluation limitations}
 
-The engineering tests use authored and synthetic cases. Passing them demonstrates conformance to declared policies but not performance across the full diversity of human conversation. The feasibility study has a small target sample, uses a single-arm design, and does not include a randomised non-adaptive comparison. It can examine completion, usability, acceptability, and exploratory within-participant changes, but it cannot establish that AffectLab causes communication improvement.
+The engineering tests use authored and synthetic cases. Passing them demonstrates conformance to declared policies but not performance across the full diversity of human conversation. Local response-time checks do not establish concurrent-user capacity or external-provider latency. The small user pilot uses a single-arm design and does not include a randomised non-adaptive comparison; it can provide product feedback but cannot establish that AffectLab causes communication improvement.
 
 Self-reported confidence can be affected by familiarity, repetition, demand characteristics, or a desire to satisfy the researcher. Deterministic skill scores can improve because participants learn which phrases the system recognises. Neither result establishes transfer to real conversations, improved relationships, or therapeutic benefit.
 
@@ -509,4 +518,4 @@ The regulatory discussion in this dissertation is necessarily general. It does n
 
 The ethical design of AffectLab is based on restrained claims, separation of responsibilities, informed user choice, data minimisation, and explicit limits on probabilistic components. Affect predictions are treated as uncertain contextual signals; generative models are restricted to response and feedback wording; deterministic policies retain authority over safety, dialogue progression, evidence, and scoring. Users retain control over voice input, pacing, continuation, deletion, and research participation.
 
-These measures reduce foreseeable risks but do not remove them. Affect recognition may be inaccurate or culturally inappropriate, safety mechanisms may miss indirect risk, stored conversations remain sensitive, generated language may be unsuitable, and a small feasibility study cannot establish effectiveness. AffectLab should therefore be understood as a bounded research prototype whose responsible use depends on transparent presentation, controlled deployment, institutional oversight, and conclusions that remain proportionate to the available evidence.
+These measures reduce foreseeable risks but do not remove them. Affect recognition may be inaccurate or culturally inappropriate, safety mechanisms may miss indirect risk, stored conversations remain sensitive, generated language may be unsuitable, and a small user pilot cannot establish effectiveness. AffectLab should therefore be understood as a bounded, production-oriented application whose responsible use depends on transparent presentation, controlled deployment, appropriate oversight, and conclusions that remain proportionate to the available evidence.

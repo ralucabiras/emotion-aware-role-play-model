@@ -1,0 +1,50 @@
+\begin{tikzpicture}[
+    font=\sffamily\scriptsize,
+    state/.style={draw=blue!65!black, fill=blue!7, rounded corners=2pt,
+        align=center, minimum width=2.35cm, minimum height=0.75cm},
+    evidence/.style={draw=teal!70!black, fill=teal!9, rounded corners=2pt,
+        align=center, minimum width=2.35cm, minimum height=0.75cm},
+    terminal/.style={draw=orange!75!black, fill=orange!12, rounded corners=8pt,
+        align=center, minimum width=2.1cm, minimum height=0.75cm},
+    exit/.style={draw=red!65!black, fill=red!7, rounded corners=2pt,
+        align=center, minimum width=2.4cm, minimum height=0.7cm},
+    flow/.style={-{Latex[length=2.1mm]}, thick, draw=black!65},
+    stop/.style={-{Latex[length=2.1mm]}, dashed, draw=red!65!black}
+]
+\node[anchor=east, font=\sffamily\bfseries\scriptsize] at (-0.25,2.4) {Workload};
+\node[state] (w1) at (1.2,2.4) {Explain problem};
+\node[state] (w2) at (4.25,2.4) {Address constraint};
+\node[evidence] (w3) at (7.3,2.4) {Supported trade-off};
+\node[state] (w4) at (10.35,2.4) {Confirm agreement};
+\node[terminal] (w5) at (13.3,2.4) {Resolved};
+\draw[flow] (w1)--(w2); \draw[flow] (w2)--(w3); \draw[flow] (w3)--(w4); \draw[flow] (w4)--(w5);
+
+\node[anchor=east, font=\sffamily\bfseries\scriptsize] at (-0.25,0.85) {Boundary};
+\node[state] (b1) at (1.2,0.85) {Clear refusal};
+\node[state] (b2) at (4.25,0.85) {Character pressure};
+\node[evidence] (b3) at (7.3,0.85) {Maintain boundary};
+\node[state] (b4) at (10.35,0.85) {Respectful closure};
+\node[terminal] (b5) at (13.3,0.85) {Boundary held};
+\draw[flow] (b1)--(b2); \draw[flow] (b2)--(b3); \draw[flow] (b3)--(b4); \draw[flow] (b4)--(b5);
+\draw[flow, bend right=35] (b2.south) to node[below, align=center]{difficulty/profile may\\repeat pressure} (b2.south east);
+
+\node[anchor=east, font=\sffamily\bfseries\scriptsize] at (-0.25,-0.7) {Relationship};
+\node[state] (r1) at (1.2,-0.7) {Describe situation};
+\node[evidence] (r2) at (4.25,-0.7) {State specific need};
+\node[state] (r3) at (7.3,-0.7) {Acknowledge perspective};
+\node[evidence] (r4) at (10.35,-0.7) {Practical request};
+\node[terminal] (r5) at (13.3,-0.7) {Next step / resolved};
+\draw[flow] (r1)--(r2); \draw[flow] (r2)--(r3); \draw[flow] (r3)--(r4); \draw[flow] (r4)--(r5);
+
+\node[exit] (manual) at (3.0,-2.45) {Manual completion};
+\node[exit] (limit) at (6.2,-2.45) {Maximum-turn outcome};
+\node[exit] (unresolved) at (9.4,-2.45) {Unresolved outcome};
+\node[exit] (safety) at (12.6,-2.45) {Safety interruption};
+\draw[stop] (1.2,-1.2) -- ++(0,-0.45) -| (manual.north);
+\draw[stop] (7.3,-1.2) -- ++(0,-0.45) -| (limit.north);
+\draw[stop] (10.35,-1.2) -- ++(0,-0.45) -| (unresolved.north);
+\draw[stop] (13.3,-1.2) -- ++(0,-0.45) -| (safety.north);
+
+\node[align=center, text=black!60] at (7.2,-3.25)
+    {Transitions require stage-appropriate observable evidence; unsupported input remains in the current state.};
+\end{tikzpicture}

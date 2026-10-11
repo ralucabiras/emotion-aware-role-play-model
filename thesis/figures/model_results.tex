@@ -1,0 +1,70 @@
+\begin{minipage}[t]{0.47\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.88\linewidth,
+    height=6.4cm,
+    ybar,
+    bar width=8pt,
+    ymin=0.60,
+    ymax=0.82,
+    ylabel={Macro F1},
+    symbolic x coords={Utterance,Context,Audio,Equal,Fold-fit,Global},
+    xtick=data,
+    xticklabels={Utterance text,Context text,Audio only,Equal fusion,Fold-fitted,Global chain},
+    x tick label style={rotate=40,anchor=east,font=\scriptsize},
+    y tick label style={font=\scriptsize},
+    ylabel style={font=\scriptsize},
+    grid=major,
+    grid style={draw=black!10},
+    axis line style={draw=black!50},
+    tick style={draw=black!50},
+    nodes near coords,
+    nodes near coords style={font=\tiny, rotate=90, anchor=west},
+    title={(a) Classification performance},
+    title style={font=\sffamily\small}
+]
+\addplot[fill=blue!45, draw=blue!70!black] coordinates {
+    (Utterance,0.6651) (Context,0.7332) (Audio,0.6349)
+    (Equal,0.7883) (Fold-fit,0.7758) (Global,0.7776)
+};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.88\linewidth,
+    height=6.4cm,
+    xmin=0.015,
+    xmax=0.175,
+    ymin=0.62,
+    ymax=0.80,
+    xlabel={Expected calibration error},
+    ylabel={Macro F1},
+    x tick label style={font=\scriptsize},
+    y tick label style={font=\scriptsize},
+    xlabel style={font=\scriptsize},
+    ylabel style={font=\scriptsize},
+    grid=major,
+    grid style={draw=black!10},
+    axis line style={draw=black!50},
+    tick style={draw=black!50},
+    title={(b) Calibration trade-off},
+    title style={font=\sffamily\small}
+]
+\addplot[only marks, mark=*, mark size=2.5pt, blue!75!black]
+    coordinates {(0.0311,0.7332) (0.0468,0.6349)};
+\addplot[only marks, mark=square*, mark size=2.8pt, orange!85!black]
+    coordinates {(0.1619,0.7883)};
+\addplot[only marks, mark=triangle*, mark size=3pt, teal!75!black]
+    coordinates {(0.0283,0.7758) (0.0242,0.7776)};
+\node[font=\tiny, anchor=south west] at (axis cs:0.0311,0.7332) {Context};
+\node[font=\tiny, anchor=north west] at (axis cs:0.0468,0.6349) {Audio};
+\node[font=\tiny, anchor=south east] at (axis cs:0.1619,0.7883) {Equal fusion};
+\node[font=\tiny, anchor=north west] at (axis cs:0.0283,0.7758) {Fold-fitted};
+\node[font=\tiny, anchor=south west] at (axis cs:0.0242,0.7776) {Global};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}

@@ -139,14 +139,6 @@ Pengcheng He, Jianfeng Gao, and Weizhu Chen.
   with gradient-disentangled embedding sharing.
 \newblock arXiv preprint arXiv:2111.09543, 2021.
 
-\bibitem[HS88]{hart1988nasatlx}
-Sandra~G. Hart and Lowell~E. Staveland.
-\newblock Development of {NASA-TLX} (task load index): Results of empirical and
-  theoretical research.
-\newblock In Peter~A. Hancock and Najmedin Meshkati, editors, {\em Human Mental
-  Workload}, volume~52 of {\em Advances in Psychology}, pages 139--183.
-  North-Holland, Amsterdam, 1988.
-
 \bibitem[HT07]{hattie2007feedback}
 John Hattie and Helen Timperley.
 \newblock The power of feedback.
@@ -256,15 +248,6 @@ James~A. Russell.
 Klaus~R. Scherer.
 \newblock What are emotions? and how can they be measured?
 \newblock {\em Social Science Information}, 44(4):695--729, 2005.
-
-\bibitem[SZB{\etalchar{+}}21]{sun2021simulatingSatisfaction}
-Weiwei Sun, Shuo Zhang, Krisztian Balog, Zhaochun Ren, Pengjie Ren, Zhumin
-  Chen, and Maarten de~Rijke.
-\newblock Simulating user satisfaction for the evaluation of task-oriented
-  dialogue systems.
-\newblock In {\em Proceedings of the 44th International ACM SIGIR Conference on
-  Research and Development in Information Retrieval}, pages 2499--2506.
-  Association for Computing Machinery, 2021.
 
 \bibitem[TBL{\etalchar{+}}19]{tsai2019mult}
 Yao-Hung~Hubert Tsai, Shaojie Bai, Paul~Pu Liang, J.~Zico Kolter,

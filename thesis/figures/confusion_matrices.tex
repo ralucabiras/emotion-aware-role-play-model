@@ -1,0 +1,61 @@
+\begin{tikzpicture}
+\pgfplotsset{
+    dissertation confusion/.style={
+        width=0.40\textwidth,
+        height=0.33\textwidth,
+        xmin=-0.5,
+        xmax=3.5,
+        ymin=-0.5,
+        ymax=3.5,
+        y dir=reverse,
+        axis on top,
+        enlargelimits=false,
+        xtick={0,1,2,3},
+        ytick={0,1,2,3},
+        xticklabels={Ang.,Hap.,Neu.,Sad.},
+        yticklabels={Anger,Happiness,Neutral,Sadness},
+        tick label style={font=\scriptsize},
+        label style={font=\scriptsize},
+        title style={font=\sffamily\small},
+        point meta min=0,
+        point meta max=100,
+        colormap={dissertationblue}{rgb255(0cm)=(247,251,255); rgb255(1cm)=(66,146,198)},
+    },
+}
+\begin{groupplot}[
+    group style={group size=2 by 2, horizontal sep=0.85cm, vertical sep=1.55cm},
+    dissertation confusion,
+]
+\nextgroupplot[title={(a) Context text},ylabel={True label}]
+\addplot[matrix plot*, mesh/cols=4, point meta=explicit]
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_context_text.dat};
+\addplot[only marks, mark=none, point meta=explicit,
+    nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}\%},
+    nodes near coords style={font=\tiny}]
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_context_text.dat};
+
+\nextgroupplot[title={(b) Audio only},yticklabels={}]
+\addplot[matrix plot*, mesh/cols=4, point meta=explicit]
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_audio.dat};
+\addplot[only marks, mark=none, point meta=explicit,
+    nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}\%},
+    nodes near coords style={font=\tiny}]
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_audio.dat};
+
+\nextgroupplot[title={(c) Equal fusion},xlabel={Predicted label},ylabel={True label}]
+\addplot[matrix plot*, mesh/cols=4, point meta=explicit]
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_equal_fusion.dat};
+\addplot[only marks, mark=none, point meta=explicit,
+    nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}\%},
+    nodes near coords style={font=\tiny}]
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_equal_fusion.dat};
+
+\nextgroupplot[title={(d) Final global chain},xlabel={Predicted label},yticklabels={}]
+\addplot[matrix plot*, mesh/cols=4, point meta=explicit]
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_global_calibrated.dat};
+\addplot[only marks, mark=none, point meta=explicit,
+    nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}\%},
+    nodes near coords style={font=\tiny}]
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_global_calibrated.dat};
+\end{groupplot}
+\end{tikzpicture}

@@ -1,0 +1,47 @@
+\begin{tikzpicture}[
+    font=\sffamily\scriptsize,
+    pipelineStep/.style={draw=blue!65!black, fill=blue!7, rounded corners=2pt,
+        align=center, minimum width=2.35cm, minimum height=0.85cm},
+    model/.style={draw=teal!70!black, fill=teal!10, rounded corners=2pt,
+        align=center, minimum width=2.35cm, minimum height=0.85cm},
+    result/.style={draw=orange!75!black, fill=orange!12, rounded corners=2pt,
+        align=center, minimum width=2.5cm, minimum height=0.85cm},
+    deploy/.style={draw=violet!70!black, fill=violet!9, rounded corners=2pt,
+        align=center, minimum width=2.45cm, minimum height=0.85cm},
+    flow/.style={-{Latex[length=2.2mm]}, thick, draw=black!65},
+    freeze/.style={-{Latex[length=2.2mm]}, thick, dashed, draw=violet!75!black}
+]
+\node[pipelineStep] (raw) at (0,1.5) {Private IEMOCAP\\text and audio};
+\node[pipelineStep] (prep) at (3.0,1.5) {Validated preprocessing\\and label mapping};
+\node[pipelineStep] (folds) at (6.0,1.5) {Five session-held-out folds\\train / validation / test};
+\node[model] (text) at (9.0,2.25) {Contextual text model\\three causal turns};
+\node[model] (audio) at (9.0,0.75) {Audio model\\16 kHz waveform};
+\node[pipelineStep] (cal) at (12.0,1.5) {Validation-only calibration\\and fusion fitting};
+\node[result] (eval) at (15.0,1.5) {Held-out evaluation\\classification and calibration};
+
+\draw[flow] (raw) -- (prep);
+\draw[flow] (prep) -- (folds);
+\draw[flow] (folds) -- (text);
+\draw[flow] (folds) -- (audio);
+\draw[flow] (text) -- (cal);
+\draw[flow] (audio) -- (cal);
+\draw[flow] (cal) -- (eval);
+
+\node[deploy] (frozen) at (6.0,-1.25) {Frozen architecture, epochs,\\labels, and calibration chain};
+\node[deploy] (full) at (9.2,-1.25) {Train final text and audio\\models on all eligible rows};
+\node[deploy] (package) at (12.3,-1.25) {Private versioned\\model package};
+\node[deploy] (inference) at (15.25,-1.25) {Optional application inference\\with explicit provenance};
+
+\draw[freeze] (folds.south) -- (frozen.north);
+\draw[freeze] (cal.south) -- (frozen.north east);
+\draw[flow] (frozen) -- (full);
+\draw[flow] (full) -- (package);
+\draw[flow] (package) -- (inference);
+
+\begin{scope}[on background layer]
+  \node[fit=(raw)(eval), draw=black!30, rounded corners=4pt, inner sep=7pt,
+      label={[font=\sffamily\scriptsize]above:Evaluation path --- supports performance claims}] {};
+  \node[fit=(frozen)(inference), draw=violet!45, rounded corners=4pt, inner sep=7pt,
+      label={[font=\sffamily\scriptsize, text=violet!75!black]below:Deployment path --- supports inference, not a new held-out result}] {};
+\end{scope}
+\end{tikzpicture}

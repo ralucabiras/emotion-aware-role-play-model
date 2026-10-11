@@ -1,0 +1,699 @@
+{
+  "labels": [
+    "anger",
+    "happiness",
+    "neutral",
+    "sadness"
+  ],
+  "binning": {
+    "reliability": "10 equal-width bins of maximum predicted probability; final bin includes 1.0",
+    "ece": "15 equal-width bins, matching ml.evaluation.metrics.expected_calibration_error"
+  },
+  "systems": {
+    "context_text": {
+      "n": 5531,
+      "accuracy": 0.7304284939432291,
+      "ece": 0.031145170608495316,
+      "reliability_diagram_ece": 0.03684770404117875,
+      "support": [
+        1103,
+        1636,
+        1708,
+        1084
+      ],
+      "confusion_counts": [
+        [
+          768,
+          17,
+          248,
+          70
+        ],
+        [
+          11,
+          1331,
+          220,
+          74
+        ],
+        [
+          176,
+          256,
+          1091,
+          185
+        ],
+        [
+          32,
+          62,
+          140,
+          850
+        ]
+      ],
+      "confusion_row_percent": [
+        [
+          69.62828649138713,
+          1.5412511332728922,
+          22.484134179510427,
+          6.346328195829556
+        ],
+        [
+          0.6723716381418093,
+          81.35696821515893,
+          13.447432762836186,
+          4.52322738386308
+        ],
+        [
+          10.304449648711945,
+          14.988290398126464,
+          63.875878220140514,
+          10.831381733021077
+        ],
+        [
+          2.952029520295203,
+          5.719557195571956,
+          12.915129151291513,
+          78.41328413284133
+        ]
+      ],
+      "reliability_bins": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.3,
+          "count": 1,
+          "mean_confidence": 0.2993987798690796,
+          "accuracy": 1.0
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.4,
+          "count": 60,
+          "mean_confidence": 0.3764848157763481,
+          "accuracy": 0.3333333333333333
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "count": 353,
+          "mean_confidence": 0.46351937379783004,
+          "accuracy": 0.43342776203966005
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6,
+          "count": 555,
+          "mean_confidence": 0.5488680756843842,
+          "accuracy": 0.5045045045045045
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.7,
+          "count": 667,
+          "mean_confidence": 0.65367841640155,
+          "accuracy": 0.5817091454272864
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.8,
+          "count": 993,
+          "mean_confidence": 0.7542786521373799,
+          "accuracy": 0.6908358509566969
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "count": 2153,
+          "mean_confidence": 0.8558307542559495,
+          "accuracy": 0.8392940083604273
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "count": 749,
+          "mean_confidence": 0.9163350858420969,
+          "accuracy": 0.9412550066755674
+        }
+      ],
+      "display_name": "Context text"
+    },
+    "audio": {
+      "n": 5531,
+      "accuracy": 0.6279153860061472,
+      "ece": 0.04682593744586939,
+      "reliability_diagram_ece": 0.046825937445869395,
+      "support": [
+        1103,
+        1636,
+        1708,
+        1084
+      ],
+      "confusion_counts": [
+        [
+          861,
+          103,
+          101,
+          38
+        ],
+        [
+          267,
+          869,
+          314,
+          186
+        ],
+        [
+          152,
+          312,
+          916,
+          328
+        ],
+        [
+          28,
+          86,
+          143,
+          827
+        ]
+      ],
+      "confusion_row_percent": [
+        [
+          78.05983680870354,
+          9.338168631006347,
+          9.15684496826836,
+          3.445149592021759
+        ],
+        [
+          16.320293398533007,
+          53.117359413202934,
+          19.193154034229828,
+          11.36919315403423
+        ],
+        [
+          8.899297423887587,
+          18.26697892271663,
+          53.62997658079625,
+          19.20374707259953
+        ],
+        [
+          2.5830258302583027,
+          7.9335793357933575,
+          13.191881918819188,
+          76.29151291512915
+        ]
+      ],
+      "reliability_bins": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.3,
+          "count": 2,
+          "mean_confidence": 0.2849920988082886,
+          "accuracy": 0.0
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.4,
+          "count": 96,
+          "mean_confidence": 0.3695398798833291,
+          "accuracy": 0.23958333333333334
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "count": 516,
+          "mean_confidence": 0.45595787731251974,
+          "accuracy": 0.43992248062015504
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6,
+          "count": 696,
+          "mean_confidence": 0.5523989332475882,
+          "accuracy": 0.47844827586206895
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.7,
+          "count": 1581,
+          "mean_confidence": 0.6609339553068742,
+          "accuracy": 0.5964579380139152
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.8,
+          "count": 2152,
+          "mean_confidence": 0.7437588271986153,
+          "accuracy": 0.7100371747211895
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "count": 488,
+          "mean_confidence": 0.8346333081116442,
+          "accuracy": 0.8586065573770492
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        }
+      ],
+      "display_name": "Audio only"
+    },
+    "equal_fusion": {
+      "n": 5531,
+      "accuracy": 0.7832218405351654,
+      "ece": 0.16192703420627014,
+      "reliability_diagram_ece": 0.16186921427526824,
+      "support": [
+        1103,
+        1636,
+        1708,
+        1084
+      ],
+      "confusion_counts": [
+        [
+          939,
+          21,
+          117,
+          26
+        ],
+        [
+          57,
+          1326,
+          187,
+          66
+        ],
+        [
+          144,
+          231,
+          1137,
+          196
+        ],
+        [
+          26,
+          35,
+          93,
+          930
+        ]
+      ],
+      "confusion_row_percent": [
+        [
+          85.13145965548505,
+          1.9038984587488668,
+          10.607434270172257,
+          2.357207615593835
+        ],
+        [
+          3.4841075794621026,
+          81.05134474327629,
+          11.430317848410757,
+          4.034229828850855
+        ],
+        [
+          8.430913348946136,
+          13.524590163934427,
+          66.56908665105387,
+          11.475409836065573
+        ],
+        [
+          2.3985239852398523,
+          3.2287822878228782,
+          8.579335793357934,
+          85.79335793357933
+        ]
+      ],
+      "reliability_bins": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.3,
+          "count": 4,
+          "mean_confidence": 0.288226607022807,
+          "accuracy": 0.0
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.4,
+          "count": 215,
+          "mean_confidence": 0.3678843562252993,
+          "accuracy": 0.3627906976744186
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "count": 1401,
+          "mean_confidence": 0.457351531930797,
+          "accuracy": 0.5938615274803711
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6,
+          "count": 1074,
+          "mean_confidence": 0.5428384345205192,
+          "accuracy": 0.7932960893854749
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.7,
+          "count": 732,
+          "mean_confidence": 0.6516439648436718,
+          "accuracy": 0.837431693989071
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.8,
+          "count": 1231,
+          "mean_confidence": 0.7557590045065148,
+          "accuracy": 0.9065800162469537
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "count": 842,
+          "mean_confidence": 0.8324237104124808,
+          "accuracy": 0.9608076009501187
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "count": 32,
+          "mean_confidence": 0.9046238427981734,
+          "accuracy": 1.0
+        }
+      ],
+      "display_name": "Equal fusion"
+    },
+    "validation_fitted": {
+      "n": 5531,
+      "accuracy": 0.7716506960766588,
+      "ece": 0.028315489395567713,
+      "reliability_diagram_ece": 0.02537523074042295,
+      "support": [
+        1103,
+        1636,
+        1708,
+        1084
+      ],
+      "confusion_counts": [
+        [
+          869,
+          17,
+          170,
+          47
+        ],
+        [
+          28,
+          1347,
+          196,
+          65
+        ],
+        [
+          156,
+          232,
+          1146,
+          174
+        ],
+        [
+          30,
+          45,
+          103,
+          906
+        ]
+      ],
+      "confusion_row_percent": [
+        [
+          78.78513145965549,
+          1.5412511332728922,
+          15.41251133272892,
+          4.261106074342702
+        ],
+        [
+          1.7114914425427872,
+          82.33496332518338,
+          11.98044009779951,
+          3.9731051344743276
+        ],
+        [
+          9.133489461358314,
+          13.583138173302109,
+          67.096018735363,
+          10.187353629976581
+        ],
+        [
+          2.7675276752767526,
+          4.1512915129151295,
+          9.501845018450185,
+          83.57933579335793
+        ]
+      ],
+      "reliability_bins": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.3,
+          "count": 1,
+          "mean_confidence": 0.2898556119083425,
+          "accuracy": 0.0
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.4,
+          "count": 75,
+          "mean_confidence": 0.3707397720047158,
+          "accuracy": 0.4
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "count": 304,
+          "mean_confidence": 0.46210029847858497,
+          "accuracy": 0.4276315789473684
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6,
+          "count": 629,
+          "mean_confidence": 0.5512965791668715,
+          "accuracy": 0.5135135135135135
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.7,
+          "count": 842,
+          "mean_confidence": 0.6537430377736366,
+          "accuracy": 0.6448931116389549
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.8,
+          "count": 910,
+          "mean_confidence": 0.745122156301139,
+          "accuracy": 0.8010989010989011
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "count": 778,
+          "mean_confidence": 0.8563514604722801,
+          "accuracy": 0.8354755784061697
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "count": 1992,
+          "mean_confidence": 0.9497942156935106,
+          "accuracy": 0.9352409638554217
+        }
+      ],
+      "display_name": "Validation-fitted fusion"
+    },
+    "global_calibrated": {
+      "n": 5531,
+      "accuracy": 0.7736394865304647,
+      "ece": 0.024226810014981892,
+      "reliability_diagram_ece": 0.019454472017255423,
+      "support": [
+        1103,
+        1636,
+        1708,
+        1084
+      ],
+      "confusion_counts": [
+        [
+          874,
+          14,
+          167,
+          48
+        ],
+        [
+          29,
+          1346,
+          195,
+          66
+        ],
+        [
+          152,
+          225,
+          1152,
+          179
+        ],
+        [
+          29,
+          48,
+          100,
+          907
+        ]
+      ],
+      "confusion_row_percent": [
+        [
+          79.23844061650045,
+          1.2692656391659112,
+          15.14052583862194,
+          4.351767905711696
+        ],
+        [
+          1.7726161369193154,
+          82.27383863080685,
+          11.919315403422983,
+          4.034229828850855
+        ],
+        [
+          8.899297423887587,
+          13.173302107728338,
+          67.44730679156909,
+          10.480093676814988
+        ],
+        [
+          2.6752767527675276,
+          4.428044280442805,
+          9.22509225092251,
+          83.67158671586716
+        ]
+      ],
+      "reliability_bins": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "count": 0,
+          "mean_confidence": null,
+          "accuracy": null
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.3,
+          "count": 1,
+          "mean_confidence": 0.2901717558603153,
+          "accuracy": 0.0
+        },
+        {
+          "lower": 0.3,
+          "upper": 0.4,
+          "count": 70,
+          "mean_confidence": 0.36973284266294837,
+          "accuracy": 0.37142857142857144
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "count": 308,
+          "mean_confidence": 0.46133356711246387,
+          "accuracy": 0.4512987012987013
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6,
+          "count": 614,
+          "mean_confidence": 0.5498598641040575,
+          "accuracy": 0.5211726384364821
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.7,
+          "count": 893,
+          "mean_confidence": 0.651551304741539,
+          "accuracy": 0.6506159014557671
+        },
+        {
+          "lower": 0.7,
+          "upper": 0.8,
+          "count": 869,
+          "mean_confidence": 0.7471664429860702,
+          "accuracy": 0.7986191024165707
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "count": 782,
+          "mean_confidence": 0.8537946950294442,
+          "accuracy": 0.8452685421994884
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "count": 1994,
+          "mean_confidence": 0.9489839463566354,
+          "accuracy": 0.9317953861584755
+        }
+      ],
+      "display_name": "Final global chain"
+    }
+  }
+}

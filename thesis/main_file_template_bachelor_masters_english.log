@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.6)  8 OCT 2026 19:57
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.6)  9 OCT 2026 21:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -140,62 +140,90 @@ File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
 \Gin@req@height=\dimen158
 \Gin@req@width=\dimen159
 )
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
-Package: geometry 2026/03/07 v6.0 Page Geometry
-
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
-Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
-
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
-Package: iftex 2024/12/12 v1.0g TeX engine tests
-))
-\Gm@cnth=\count296
-\Gm@cntv=\count297
-\c@Gm@tempcnt=\count298
-\Gm@bindingoffset=\dimen160
-\Gm@wd@mp=\dimen161
-\Gm@odd@mp=\dimen162
-\Gm@even@mp=\dimen163
-\Gm@layoutwidth=\dimen164
-\Gm@layoutheight=\dimen165
-\Gm@layouthoffset=\dimen166
-\Gm@layoutvoffset=\dimen167
-\Gm@dimlist=\toks29
-
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
-\lst@mode=\count299
-\lst@gtempboxa=\box55
-\lst@token=\toks30
-\lst@length=\count300
-\lst@currlwidth=\dimen168
-\lst@column=\count301
-\lst@pos=\count302
-\lst@lostspace=\dimen169
-\lst@width=\dimen170
-\lst@newlines=\count303
-\lst@lineno=\count304
-\lst@maxwidth=\dimen171
-
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty
-File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tikz.
+sty
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.sty
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfrcs.st
+y
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil
+-common.tex
+\pgfutil@everybye=\toks29
+\pgfutil@tempdima=\dimen160
+\pgfutil@tempdimb=\dimen161
 )
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
-File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
-\c@lstnumber=\count305
-\lst@skipnumbers=\count306
-\lst@framebox=\box56
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil
+-latex.def
+\pgfutil@abb=\box55
 )
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
-File: listings.cfg 2025/11/14 1.11b listings configuration
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrcs.
+code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revision.tex)
+Package: pgfrcs 2025-08-29 v3.1.11a (3.1.11a)
 ))
-Package: listings 2025/11/14 1.11b (Carsten Heinz)
-==> First Aid for listings.sty no longer applied!
-    Expected:
-        2024/09/23 1.10c (Carsten Heinz)
-    but found:
-        2025/11/14 1.11b (Carsten Heinz)
-    so I'm assuming it got fixed.
+Package: pgf 2025-08-29 v3.1.11a (3.1.11a)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgfcore.
+sty
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\pgfsys.
+sty
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s.code.tex
+Package: pgfsys 2025-08-29 v3.1.11a (3.1.11a)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
+.code.tex
+\pgfkeys@pathtoks=\toks30
+\pgfkeys@temptoks=\toks31
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
+libraryfiltered.code.tex
+\pgfkeys@tmptoks=\toks32
+))
+\pgf@x=\dimen162
+\pgf@y=\dimen163
+\pgf@xa=\dimen164
+\pgf@ya=\dimen165
+\pgf@xb=\dimen166
+\pgf@yb=\dimen167
+\pgf@xc=\dimen168
+\pgf@yc=\dimen169
+\pgf@xd=\dimen170
+\pgf@yd=\dimen171
+\w@pgf@writea=\write3
+\r@pgf@reada=\read2
+\c@pgf@counta=\count296
+\c@pgf@countb=\count297
+\c@pgf@countc=\count298
+\c@pgf@countd=\count299
+\t@pgf@toka=\toks33
+\t@pgf@tokb=\toks34
+\t@pgf@tokc=\toks35
+\pgf@sys@id@count=\count300
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf.c
+fg
+File: pgf.cfg 2025-08-29 v3.1.11a (3.1.11a)
+)
+Driver file for pgf: pgfsys-pdftex.def
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s-pdftex.def
+File: pgfsys-pdftex.def 2025-08-29 v3.1.11a (3.1.11a)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s-common-pdf.def
+File: pgfsys-common-pdf.def 2025-08-29 v3.1.11a (3.1.11a)
+)))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+ssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfsyssoftpath@smallbuffer@items=\count301
+\pgfsyssoftpath@bigbuffer@items=\count302
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+sprotocol.code.tex
+File: pgfsysprotocol.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+))
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
 Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
 
@@ -213,33 +241,516 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/colortbl\colortbl.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+e.code.tex
+Package: pgfcore 2025-08-29 v3.1.11a (3.1.11a)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code
+.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathutil.
+code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathparse
+r.code.tex
+\pgfmath@dimen=\dimen172
+\pgfmath@count=\count303
+\pgfmath@box=\box56
+\pgfmath@toks=\toks36
+\pgfmath@stack@operand=\toks37
+\pgfmath@stack@operation=\toks38
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.basic.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.trigonometric.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.random.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.comparison.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.base.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.round.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.misc.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.integerarithmetics.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathcalc.
+code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfloat
+.code.tex
+\c@pgfmathroundto@lastzeros=\count304
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.code.
+tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epoints.code.tex
+File: pgfcorepoints.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@picminx=\dimen173
+\pgf@picmaxx=\dimen174
+\pgf@picminy=\dimen175
+\pgf@picmaxy=\dimen176
+\pgf@pathminx=\dimen177
+\pgf@pathmaxx=\dimen178
+\pgf@pathminy=\dimen179
+\pgf@pathmaxy=\dimen180
+\pgf@xx=\dimen181
+\pgf@xy=\dimen182
+\pgf@yx=\dimen183
+\pgf@yy=\dimen184
+\pgf@zx=\dimen185
+\pgf@zy=\dimen186
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epathconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@path@lastx=\dimen187
+\pgf@path@lasty=\dimen188
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epathusage.code.tex
+File: pgfcorepathusage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@shorten@end@additional=\dimen189
+\pgf@shorten@start@additional=\dimen190
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+escopes.code.tex
+File: pgfcorescopes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfpic=\box57
+\pgf@hbox=\box58
+\pgf@layerbox@main=\box59
+\pgf@picture@serial@count=\count305
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+egraphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgflinewidth=\dimen191
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+etransformations.code.tex
+File: pgfcoretransformations.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@pt@x=\dimen192
+\pgf@pt@y=\dimen193
+\pgf@pt@temp=\dimen194
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+equick.code.tex
+File: pgfcorequick.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eobjects.code.tex
+File: pgfcoreobjects.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epathprocessing.code.tex
+File: pgfcorepathprocessing.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+earrows.code.tex
+File: pgfcorearrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfarrowsep=\dimen195
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eshade.code.tex
+File: pgfcoreshade.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@max=\dimen196
+\pgf@sys@shading@range@num=\count306
+\pgf@shadingcount=\count307
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eimage.code.tex
+File: pgfcoreimage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eexternal.code.tex
+File: pgfcoreexternal.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfexternal@startupbox=\box60
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+elayers.code.tex
+File: pgfcorelayers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+etransparency.code.tex
+File: pgfcoretransparency.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epatterns.code.tex
+File: pgfcorepatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+erdf.code.tex
+File: pgfcorerdf.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+shapes.code.tex
+File: pgfmoduleshapes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfnodeparttextbox=\box61
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+plot.code.tex
+File: pgfmoduleplot.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfco
+mp-version-0-65.sty
+Package: pgfcomp-version-0-65 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@nodesepstart=\dimen197
+\pgf@nodesepend=\dimen198
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfco
+mp-version-1-18.sty
+Package: pgfcomp-version-1-18 2025-08-29 v3.1.11a (3.1.11a)
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgffor.st
+y
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfkeys.s
+ty
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
+.code.tex))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath.sty
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code
+.tex))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgffor.
+code.tex
+Package: pgffor 2025-08-29 v3.1.11a (3.1.11a)
+\pgffor@iter=\dimen199
+\pgffor@skip=\dimen256
+\pgffor@stack=\toks39
+\pgffor@toks=\toks40
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z\tikz.code.tex
+Package: tikz 2025-08-29 v3.1.11a (3.1.11a)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
+aryplothandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@plot@mark@count=\count308
+\pgfplotmarksize=\dimen257
+)
+\tikz@lastx=\dimen258
+\tikz@lasty=\dimen259
+\tikz@lastxsaved=\dimen260
+\tikz@lastysaved=\dimen261
+\tikz@lastmovetox=\dimen262
+\tikz@lastmovetoy=\dimen263
+\tikzleveldistance=\dimen264
+\tikzsiblingdistance=\dimen265
+\tikz@figbox=\box62
+\tikz@figbox@bg=\box63
+\tikz@tempbox=\box64
+\tikz@tempbox@bg=\box65
+\tikztreelevel=\count309
+\tikznumberofchildren=\count310
+\tikznumberofcurrentchild=\count311
+\tikz@fig@count=\count312
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+matrix.code.tex
+File: pgfmodulematrix.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfmatrixcurrentrow=\count313
+\pgfmatrixcurrentcolumn=\count314
+\pgf@matrix@numberofcolumns=\count315
+)
+\tikz@expandcount=\count316
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
+aryarrows.meta.code.tex
+File: pgflibraryarrows.meta.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfarrowinset=\dimen266
+\pgfarrowlength=\dimen267
+\pgfarrowwidth=\dimen268
+\pgfarrowlinewidth=\dimen269
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarybackgrounds.code.tex
+File: tikzlibrarybackgrounds.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@layerbox@background=\box66
+\pgf@layerboxsaved@background=\box67
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarycalc.code.tex
+File: tikzlibrarycalc.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibraryfit.code.tex
+File: tikzlibraryfit.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarymatrix.code.tex
+File: tikzlibrarymatrix.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarypositioning.code.tex
+File: tikzlibrarypositioning.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibraryshapes.geometric.code.tex
+File: tikzlibraryshapes.geometric.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\
+pgflibraryshapes.geometric.code.tex
+File: pgflibraryshapes.geometric.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibraryshapes.multipart.code.tex
+File: tikzlibraryshapes.multipart.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\
+pgflibraryshapes.multipart.code.tex
+File: pgflibraryshapes.multipart.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfnodepartlowerbox=\box68
+\pgfnodeparttwobox=\box69
+\pgfnodepartthreebox=\box70
+\pgfnodepartfourbox=\box71
+\pgfnodeparttwentybox=\box72
+\pgfnodepartnineteenbox=\box73
+\pgfnodeparteighteenbox=\box74
+\pgfnodepartseventeenbox=\box75
+\pgfnodepartsixteenbox=\box76
+\pgfnodepartfifteenbox=\box77
+\pgfnodepartfourteenbox=\box78
+\pgfnodepartthirteenbox=\box79
+\pgfnodeparttwelvebox=\box80
+\pgfnodepartelevenbox=\box81
+\pgfnodeparttenbox=\box82
+\pgfnodepartninebox=\box83
+\pgfnodeparteightbox=\box84
+\pgfnodepartsevenbox=\box85
+\pgfnodepartsixbox=\box86
+\pgfnodepartfivebox=\box87
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibraryshapes.symbols.code.tex
+File: tikzlibraryshapes.symbols.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\
+pgflibraryshapes.symbols.code.tex
+File: pgflibraryshapes.symbols.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgfplots\pgfplots.sty
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.rev
+ision.tex)
+Package: pgfplots 2021/05/15 v1.18.1 Data Visualization (1.18.1)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.cod
+e.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotscore
+.code.tex
+\t@pgfplots@toka=\toks41
+\t@pgfplots@tokb=\toks42
+\t@pgfplots@tokc=\toks43
+\pgfplots@tmpa=\dimen270
+\c@pgfplots@coordindex=\count317
+\c@pgfplots@scanlineindex=\count318
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/sys\pgfplots
+sysgeneric.code.tex))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/libs\pgfplot
+slibrary.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/oldpgfcompat
+ib\pgfplotsoldpgfsupp_loader.code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
+aryfpu.code.tex)
+Package pgfplots: loading complementary utilities for your pgf version...
+\t@pgf@toka=\toks44
+\t@pgf@tokb=\toks45
+\t@pgf@tokc=\toks46
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/oldpgfcompat
+ib\pgfplotsoldpgfsupp_pgfutil-common-lists.tex))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
+sutil.code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsliststructure.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsliststructureext.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsarray.code.tex
+\c@pgfplotsarray@tmp=\count319
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsmatrix.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/numtable\pgf
+plotstableshared.code.tex
+\c@pgfplotstable@counta=\count320
+\t@pgfplotstable@a=\toks47
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsdeque.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
+sbinary.code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
+sbinary.data.code.tex))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
+sutil.verb.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/libs\pgflibr
+arypgfplots.surfshading.code.tex
+\c@pgfplotslibrarysurf@no=\count321
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/sys\pgflibra
+rypgfplots.surfshading.pgfsys-pdftex.def)))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
+scolormap.code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
+scolor.code.tex))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotsstac
+kedplots.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotsplot
+handlers.code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotsmesh
+plothandler.code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotsmesh
+plotimage.code.tex)))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.sca
+ling.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotscoor
+dprocessing.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.err
+orbars.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.mar
+kers.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotstick
+s.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.pat
+hs.code.tex)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarydecorations.code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+decorations.code.tex
+\pgfdecoratedcompleteddistance=\dimen271
+\pgfdecoratedremainingdistance=\dimen272
+\pgfdecoratedinputsegmentcompleteddistance=\dimen273
+\pgfdecoratedinputsegmentremainingdistance=\dimen274
+\pgf@decorate@distancetomove=\dimen275
+\pgf@decorate@repeatstate=\count322
+\pgfdecorationsegmentamplitude=\dimen276
+\pgfdecorationsegmentlength=\dimen277
+)
+\tikz@lib@dec@box=\box88
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarydecorations.pathmorphing.code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/decorat
+ions\pgflibrarydecorations.pathmorphing.code.tex))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarydecorations.pathreplacing.code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/decorat
+ions\pgflibrarydecorations.pathreplacing.code.tex))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/libs\tikzlib
+rarypgfplots.contourlua.code.tex)
+\pgfplots@numplots=\count323
+\pgfplots@xmin@reg=\dimen278
+\pgfplots@xmax@reg=\dimen279
+\pgfplots@ymin@reg=\dimen280
+\pgfplots@ymax@reg=\dimen281
+\pgfplots@zmin@reg=\dimen282
+\pgfplots@zmax@reg=\dimen283
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibraryplotmarks.code.tex
+File: tikzlibraryplotmarks.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
+aryplotmarks.code.tex
+File: pgflibraryplotmarks.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/libs\tikzlib
+rarypgfplots.groupplots.code.tex
+\pgfplots@group@current@plot=\count324
+\pgfplots@group@current@row=\count325
+\pgfplots@group@current@column=\count326
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+Package: geometry 2026/03/07 v6.0 Page Geometry
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
+Package: iftex 2024/12/12 v1.0g TeX engine tests
+))
+\Gm@cnth=\count327
+\Gm@cntv=\count328
+\c@Gm@tempcnt=\count329
+\Gm@bindingoffset=\dimen284
+\Gm@wd@mp=\dimen285
+\Gm@odd@mp=\dimen286
+\Gm@even@mp=\dimen287
+\Gm@layoutwidth=\dimen288
+\Gm@layoutheight=\dimen289
+\Gm@layouthoffset=\dimen290
+\Gm@layoutvoffset=\dimen291
+\Gm@dimlist=\toks48
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
+\lst@mode=\count330
+\lst@gtempboxa=\box89
+\lst@token=\toks49
+\lst@length=\count331
+\lst@currlwidth=\dimen292
+\lst@column=\count332
+\lst@pos=\count333
+\lst@lostspace=\dimen293
+\lst@width=\dimen294
+\lst@newlines=\count334
+\lst@lineno=\count335
+\lst@maxwidth=\dimen295
+
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty
+File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
+File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
+\c@lstnumber=\count336
+\lst@skipnumbers=\count337
+\lst@framebox=\box90
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
+File: listings.cfg 2025/11/14 1.11b listings configuration
+))
+Package: listings 2025/11/14 1.11b (Carsten Heinz)
+==> First Aid for listings.sty no longer applied!
+    Expected:
+        2024/09/23 1.10c (Carsten Heinz)
+    but found:
+        2025/11/14 1.11b (Carsten Heinz)
+    so I'm assuming it got fixed.
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/colortbl\colortbl.sty
 Package: colortbl 2026/05/01 v1.0l Color table columns (DPC)
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty
 Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
-\col@sep=\dimen172
-\ar@mcellbox=\box57
-\extrarowheight=\dimen173
-\NC@list=\toks31
+\col@sep=\dimen296
+\ar@mcellbox=\box91
+\extrarowheight=\dimen297
+\NC@list=\toks50
 \extratabsurround=\skip57
 \backup@length=\skip58
-\ar@cellbox=\box58
+\ar@cellbox=\box92
 )
-\everycr=\toks32
+\everycr=\toks51
 \minrowclearance=\skip59
-\rownum=\count307
+\rownum=\count338
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/multirow\multirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 \multirow@colwidth=\skip60
-\multirow@cntb=\count308
+\multirow@cntb=\count339
 \multirow@dima=\skip61
-\bigstrutjot=\dimen174
+\bigstrutjot=\dimen298
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.sty
 Package: babel 2025/12/11 v25.17 The multilingual framework for LuaLaTeX, pdfLa
 TeX and XeLaTeX
-\babel@savecnt=\count309
+\babel@savecnt=\count340
 LaTeX Encoding Info:    Redeclaring text command \ij (encoding OT1) on input li
 ne 2068.
 LaTeX Encoding Info:    Redeclaring text command \IJ (encoding OT1) on input li
@@ -254,12 +765,12 @@ LaTeX Encoding Info:    Ignoring declaration for text command \IJ (encoding ?)
 on input line 2076.
 LaTeX Encoding Info:    Ignoring declaration for text command \SS (encoding ?) 
 on input line 2101.
-\U@D=\dimen175
+\U@D=\dimen299
 \l@unhyphenated=\language79
 
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/babel\txtbabel.def)
-\bbl@readstream=\read2
-\bbl@dirlevel=\count310
+\bbl@readstream=\read3
+\bbl@dirlevel=\count341
 Package babel Info: Configuration files are deprecated, as
 (babel)             they can break document portability.
 (babel)             Reported on input line 4196.
@@ -292,17 +803,17 @@ Package: paralist 2017/01/22 v2.7 Extended list environments
 \plpartopsep=\skip63
 \plitemsep=\skip64
 \plparsep=\skip65
-\pl@lab=\toks33
+\pl@lab=\toks52
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty
 Package: tabularx 2023/12/11 v2.12a `tabularx' package (DPC)
-\TX@col@width=\dimen176
-\TX@old@table=\dimen177
-\TX@old@col=\dimen178
-\TX@target=\dimen179
-\TX@delta=\dimen180
-\TX@cols=\count311
-\TX@ftn=\toks34
+\TX@col@width=\dimen300
+\TX@old@table=\dimen301
+\TX@old@col=\dimen302
+\TX@target=\dimen303
+\TX@delta=\dimen304
+\TX@cols=\count342
+\TX@ftn=\toks53
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape.sty
 Package: pdflscape 2022-10-27 v0.13 Display of landscape pages in PDF
@@ -328,17 +839,17 @@ Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
 nment
  (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count312
-\float@exts=\toks35
-\float@box=\box59
-\@float@everytoks=\toks36
-\@floatcapt=\box60
+\c@float@type=\count343
+\float@exts=\toks54
+\float@box=\box93
+\@float@everytoks=\toks55
+\@floatcapt=\box94
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
 Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
 )
-\@float@every@algorithm=\toks37
-\c@algorithm=\count313
+\@float@every@algorithm=\toks56
+\c@algorithm=\count344
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algpseudoc
 ode.sty
@@ -349,26 +860,26 @@ cx.sty
 Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
 
 Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
-\c@ALG@line=\count314
-\c@ALG@rem=\count315
-\c@ALG@nested=\count316
+\c@ALG@line=\count345
+\c@ALG@rem=\count346
+\c@ALG@nested=\count347
 \ALG@tlm=\skip66
 \ALG@thistlm=\skip67
-\c@ALG@Lnr=\count317
-\c@ALG@blocknr=\count318
-\c@ALG@storecount=\count319
-\c@ALG@tmpcounter=\count320
+\c@ALG@Lnr=\count348
+\c@ALG@blocknr=\count349
+\c@ALG@storecount=\count350
+\c@ALG@tmpcounter=\count351
 \ALG@tmplength=\skip68
 )
 Document Style - pseudocode environments for use with the `algorithmicx' style
 ) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/enumitem\enumitem.sty
 Package: enumitem 2025/02/06 v3.11 Customized lists
 \labelindent=\skip69
-\enit@outerparindent=\dimen181
-\enit@toks=\toks38
-\enit@inbox=\box61
-\enit@count@id=\count321
-\enitdp@description=\count322
+\enit@outerparindent=\dimen305
+\enit@toks=\toks57
+\enit@inbox=\box95
+\enit@count@id=\count352
+\enitdp@description=\count353
 ) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
 Package: hyperref 2025-07-12 v7.01o Hypertext links for LaTeX
 
@@ -415,20 +926,20 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count323
+\c@section@level=\count354
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
 Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count324
+\etb@tempcnta=\count355
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.s
 ty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
 )
 )
-\@linkdim=\dimen182
-\Hy@linkcounter=\count325
-\Hy@pagecounter=\count326
+\@linkdim=\dimen306
+\Hy@linkcounter=\count356
+\Hy@pagecounter=\count357
  (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
 File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
@@ -436,7 +947,7 @@ Now handling font encoding PD1 ...
 ) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count327
+\Hy@SavedSpaceFactor=\count358
  (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
 File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
@@ -449,14 +960,14 @@ Package hyperref Info: Plain pages OFF on input line 4210.
 Package hyperref Info: Backreferencing OFF on input line 4215.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4462.
-\c@Hy@tempcnt=\count328
+\c@Hy@tempcnt=\count359
 
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4801.
-\XeTeXLinkMargin=\dimen183
+\XeTeXLinkMargin=\dimen307
 
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
@@ -466,9 +977,9 @@ Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count329
-\Field@Width=\dimen184
-\Fld@charsize=\dimen185
+\Fld@menulength=\count360
+\Field@Width=\dimen308
+\Fld@charsize=\dimen309
 Package hyperref Info: Hyper figures OFF on input line 6078.
 Package hyperref Info: Link nesting OFF on input line 6083.
 Package hyperref Info: Hyper index ON on input line 6086.
@@ -476,16 +987,16 @@ Package hyperref Info: backreferencing OFF on input line 6093.
 Package hyperref Info: Link coloring OFF on input line 6098.
 Package hyperref Info: Link coloring with OCG OFF on input line 6103.
 Package hyperref Info: PDF/A mode OFF on input line 6108.
-\Hy@abspage=\count330
-\c@Item=\count331
-\c@Hfootnote=\count332
+\Hy@abspage=\count361
+\c@Item=\count362
+\c@Hfootnote=\count363
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
 File: hpdftex.def 2025-07-12 v7.01o Hyperref driver for pdfTeX
-\Fld@listcount=\count333
-\c@bookmark@seq@number=\count334
+\Fld@listcount=\count364
+\c@bookmark@seq@number=\count365
 
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfil
 echeck.sty
@@ -500,51 +1011,51 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 \Hy@SectionHShift=\skip70
 )
-\c@thm=\count335
-\c@defn=\count336
-\c@rem=\count337
-\c@exmp=\count338
+\c@thm=\count366
+\c@defn=\count367
+\c@rem=\count368
+\c@exmp=\count369
 
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
 tex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count339
+\l__color_backend_stack_int=\count370
 ) (main_file_template_bachelor_masters_english.aux)
 \openout1 = `main_file_template_bachelor_masters_english.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
 
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count340
-\scratchdimen=\dimen186
-\scratchbox=\box62
-\nofMPsegments=\count341
-\nofMParguments=\count342
-\everyMPshowfont=\toks39
-\MPscratchCnt=\count343
-\MPscratchDim=\dimen187
-\MPnumerator=\count344
-\makeMPintoPDFobject=\count345
-\everyMPtoPDFconversion=\toks40
+\scratchcounter=\count371
+\scratchdimen=\dimen310
+\scratchbox=\box96
+\nofMPsegments=\count372
+\nofMParguments=\count373
+\everyMPshowfont=\toks58
+\MPscratchCnt=\count374
+\MPscratchDim=\dimen311
+\MPnumerator=\count375
+\makeMPintoPDFobject=\count376
+\everyMPtoPDFconversion=\toks59
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
 ase.sty
@@ -556,6 +1067,9 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
+Package pgfplots notification 'compat/show suggested version=true': document ha
+s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
+
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -590,25 +1104,25 @@ File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-\c@lstlisting=\count346
-Package hyperref Info: Link coloring OFF on input line 28.
+\c@lstlisting=\count377
+Package hyperref Info: Link coloring OFF on input line 33.
 (main_file_template_bachelor_masters_english.out)
 (main_file_template_bachelor_masters_english.out)
-\@outlinefile=\write3
-\openout3 = `main_file_template_bachelor_masters_english.out'.
+\@outlinefile=\write4
+\openout4 = `main_file_template_bachelor_masters_english.out'.
 
-<FI.png, id=715, 578.8827pt x 290.0436pt>
+<FI.png, id=890, 578.8827pt x 290.0436pt>
 File: FI.png Graphic file (type png)
 <use FI.png>
-Package pdftex.def Info: FI.png  used on input line 36.
+Package pdftex.def Info: FI.png  used on input line 41.
 (pdftex.def)             Requested size: 100.0pt x 50.10338pt.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 57.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 62.
 
 
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 57.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 62.
 
 
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
@@ -620,15 +1134,15 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 2] [3] [4] (main_file_template_bachelor_masters_english.toc [5
 
 ] [6] [7]
-[8])
-\tf@toc=\write4
-\openout4 = `main_file_template_bachelor_masters_english.toc'.
+[8] [9])
+\tf@toc=\write5
+\openout5 = `main_file_template_bachelor_masters_english.toc'.
 
- (cap1.tex [9] [10
+ (cap1.tex [10]
+Chapter 1.
+[11
 
 ]
-Chapter 1.
-[11]
 Underfull \hbox (badness 1194) in paragraph at lines 16--17
 []\OT1/cmr/m/n/12 Recent re-search has be-gun to ex-am-ine the use of lan-guage
  mod-els for
@@ -801,345 +1315,419 @@ Underfull \hbox (badness 10000) in paragraph at lines 259--259
 \OT1/cmr/m/n/10 specific val-i-da-tion and can-not
  []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
+(figures/literature_gap.tex)
+Underfull \vbox (badness 4108) has occurred while \output is active []
 
  [48]
 [49]) (cap3.tex [50]
 Chapter 3.
+[51
 
-Underfull \hbox (badness 1454) in paragraph at lines 29--29
+] (figures/system_architecture.tex)
+Underfull \hbox (badness 1454) in paragraph at lines 38--38
 \OT1/cmr/m/n/10 and op-tional voice in-put, con-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 32--32
+Underfull \hbox (badness 10000) in paragraph at lines 41--41
 []|\OT1/cmr/m/n/10 Application and
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
+Underfull \hbox (badness 10000) in paragraph at lines 42--42
 []|\OT1/cmr/m/n/10 Coordinates au-then-ti-cated re-
  []
 
 
-Underfull \hbox (badness 3989) in paragraph at lines 33--33
+Underfull \hbox (badness 3989) in paragraph at lines 42--42
 \OT1/cmr/m/n/10 quests, ses-sion state, sce-nario
  []
 
 
-Underfull \hbox (badness 3158) in paragraph at lines 33--33
+Underfull \hbox (badness 3158) in paragraph at lines 42--42
 \OT1/cmr/m/n/10 con-fig-u-ra-tion, con-ver-sa-tion his-
  []
 
 
-Underfull \hbox (badness 1270) in paragraph at lines 37--37
+Underfull \hbox (badness 1270) in paragraph at lines 46--46
 \OT1/cmr/m/n/10 related lan-guage and ap-plies a
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 40--40
+Underfull \hbox (badness 10000) in paragraph at lines 49--49
 []|\OT1/cmr/m/n/10 Affect-inference
  []
 
 
-Underfull \hbox (badness 1331) in paragraph at lines 41--41
+Underfull \hbox (badness 1331) in paragraph at lines 50--50
 \OT1/cmr/m/n/10 ment, and avail-abil-ity in-for-ma-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 44--44
+Underfull \hbox (badness 10000) in paragraph at lines 53--53
 []|\OT1/cmr/m/n/10 Dialogue-policy
  []
 
 
-Underfull \hbox (badness 3792) in paragraph at lines 45--45
+Underfull \hbox (badness 3792) in paragraph at lines 54--54
 []|\OT1/cmr/m/n/10 Detects ob-serv-able com-mu-ni-ca-
  []
 
 
-Underfull \hbox (badness 1253) in paragraph at lines 45--45
+Underfull \hbox (badness 1253) in paragraph at lines 54--54
 \OT1/cmr/m/n/10 de-ter-mines com-ple-tion or un-re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 46--46
+Underfull \hbox (badness 10000) in paragraph at lines 55--55
 []|\OT1/cmr/m/n/10 Uses ex-plicit, scenario-specific
  []
 
 
-Underfull \hbox (badness 2111) in paragraph at lines 46--46
+Underfull \hbox (badness 2111) in paragraph at lines 55--55
 \OT1/cmr/m/n/10 rules. It is au-thor-i-ta-tive for
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 48--48
+Underfull \hbox (badness 10000) in paragraph at lines 57--57
 []|\OT1/cmr/m/n/10 Response-
  []
 
 
-Underfull \hbox (badness 1635) in paragraph at lines 49--49
+Underfull \hbox (badness 1635) in paragraph at lines 58--58
 []|\OT1/cmr/m/n/10 Transforms the di-a-logue ac-tion
  []
 
 
-Underfull \hbox (badness 1571) in paragraph at lines 50--50
+Underfull \hbox (badness 1571) in paragraph at lines 59--59
 []|\OT1/cmr/m/n/10 May al-ter word-ing but can-not
  []
 
 
-Underfull \hbox (badness 2856) in paragraph at lines 52--52
+Underfull \hbox (badness 2856) in paragraph at lines 61--61
 []|\OT1/cmr/m/n/10 Feedback and re-
  []
 
 
-Underfull \hbox (badness 2951) in paragraph at lines 53--53
+Underfull \hbox (badness 2951) in paragraph at lines 62--62
 []|\OT1/cmr/m/n/10 Calculates com-mu-ni-ca-tion met-
  []
 
 
-Underfull \hbox (badness 1852) in paragraph at lines 53--53
+Underfull \hbox (badness 1852) in paragraph at lines 62--62
 \OT1/cmr/m/n/10 rics, links them to sup-port-ing
  []
 
 
-Underfull \hbox (badness 2237) in paragraph at lines 54--54
+Underfull \hbox (badness 2237) in paragraph at lines 63--63
 \OT1/cmr/m/n/10 serv-able ev-i-dence. Gen-er-a-tive
  []
 
 
-Underfull \hbox (badness 7759) in paragraph at lines 57--57
+Underfull \hbox (badness 7759) in paragraph at lines 66--66
 []|\OT1/cmr/m/n/10 Stores account-owned ses-sions,
  []
 
 
-Underfull \hbox (badness 2600) in paragraph at lines 57--57
+Underfull \hbox (badness 2600) in paragraph at lines 66--66
 \OT1/cmr/m/n/10 nance, and per-mit-ted re-search
  []
 
-[51
-
-] [52] [53] [54] [55] [56]
-Underfull \hbox (badness 1189) in paragraph at lines 174--175
+[52] [53] [54] [55] [56]
+Underfull \hbox (badness 1189) in paragraph at lines 183--184
 \OT1/cmr/m/n/12 e-vant com-ple-tion out-comes, in-clud-ing achieve-ment of a pr
 ac-ti-cal next
  []
 
-[57]
-Underfull \hbox (badness 2359) in paragraph at lines 231--232
+[57] [58]
+Underfull \hbox (badness 2359) in paragraph at lines 240--241
 []\OT1/cmr/m/n/12 Model, pol-icy, sce-nario, scor-ing, con-sent, study-
  []
 
-[58]
-Underfull \hbox (badness 10000) in paragraph at lines 237--238
+
+Underfull \hbox (badness 10000) in paragraph at lines 246--247
 []\OT1/cmr/m/n/12 Model-dependent op-er-a-tions
  []
 
-[59]
-Underfull \hbox (badness 10000) in paragraph at lines 300--300
+[59] [60]
+Underfull \hbox (badness 10000) in paragraph at lines 309--309
 []|\OT1/cmr/m/n/10 Preparation, struc-tured re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 300--300
+Underfull \hbox (badness 10000) in paragraph at lines 309--309
 \OT1/cmr/m/n/10 hearsal, evidence-grounded
  []
 
 
-Underfull \hbox (badness 2626) in paragraph at lines 300--300
+Underfull \hbox (badness 2626) in paragraph at lines 309--309
 \OT1/cmr/m/n/10 tion for dif-fi-cult in-ter-per-sonal
  []
 
 
-Underfull \hbox (badness 1043) in paragraph at lines 301--301
+Underfull \hbox (badness 1043) in paragraph at lines 310--310
 \OT1/cmr/m/n/10 sess-ment, or in-sti-tu-tional surveil-
  []
 
 
-Underfull \hbox (badness 5985) in paragraph at lines 308--308
+Underfull \hbox (badness 5985) in paragraph at lines 317--317
 []|\OT1/cmr/m/n/10 Scenario-specific stages, re-sis-
  []
 
 
-Underfull \hbox (badness 1377) in paragraph at lines 308--308
+Underfull \hbox (badness 1377) in paragraph at lines 317--317
 \OT1/cmr/m/n/10 tance, ob-serv-able fea-tures, re-
  []
 
 
-Underfull \hbox (badness 3482) in paragraph at lines 311--311
+Underfull \hbox (badness 3482) in paragraph at lines 320--320
 []|\OT1/cmr/m/n/10 Generative ar-ti-fi-
  []
 
 
-Underfull \hbox (badness 6758) in paragraph at lines 312--312
+Underfull \hbox (badness 6758) in paragraph at lines 321--321
 \OT1/cmr/m/n/10 se-lected re-sponse ac-tion and
  []
 
 
-Underfull \hbox (badness 1748) in paragraph at lines 312--312
+Underfull \hbox (badness 1748) in paragraph at lines 321--321
 \OT1/cmr/m/n/10 op-tional phras-ing of evidence-
  []
 
 
-Underfull \hbox (badness 4328) in paragraph at lines 320--320
+Underfull \hbox (badness 4328) in paragraph at lines 329--329
 []|\OT1/cmr/m/n/10 Authenticated ses-sion stor-age,
  []
 
 
-Underfull \hbox (badness 3333) in paragraph at lines 320--320
+Underfull \hbox (badness 3333) in paragraph at lines 329--329
 \OT1/cmr/m/n/10 lim-ited con-ver-sa-tion re-ten-tion,
  []
 
 
-Underfull \hbox (badness 1354) in paragraph at lines 320--320
+Underfull \hbox (badness 1354) in paragraph at lines 329--329
 \OT1/cmr/m/n/10 count con-trols, and pseudony-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 324--324
+Underfull \hbox (badness 10000) in paragraph at lines 333--333
 []|\OT1/cmr/m/n/10 Emotion-classification eval-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 324--324
+Underfull \hbox (badness 10000) in paragraph at lines 333--333
 \OT1/cmr/m/n/10 u-a-tion, cal-i-bra-tion anal-y-sis,
  []
 
 
-Underfull \hbox (badness 3029) in paragraph at lines 324--324
+Underfull \hbox (badness 3029) in paragraph at lines 333--333
 \OT1/cmr/m/n/10 en-gi-neer-ing con-for-mance tests,
  []
 
 
-Underfull \hbox (badness 1616) in paragraph at lines 325--325
+Underfull \hbox (badness 1616) in paragraph at lines 334--334
 \OT1/cmr/m/n/10 world emo-tion un-der-stand-ing, or
  []
 
-[60] [61] [62] [63] [64] [65] [66] [67] [68]) (cap4.tex [69] [70
-
-]
+[61] [62] [63] [64] [65] [66] [67] [68] [69]) (cap4.tex [70]
 Chapter 4.
-[71] [72] [73] [74] [75] [76] [77] [78] [79] [80] [81] [82] [83] [84] [85]
-Underfull \vbox (badness 1735) has occurred while \output is active []
+[71
 
- [86]
-[87]
+] [72] [73] [74] [75] (figures/emotion_pipeline.tex) [76] [77]
+Underfull \vbox (badness 4254) has occurred while \output is active []
+
+ [78]
+[79] [80] [81] [82] [83] [84] [85] (figures/request_sequence.tex) [86] [87]
+(figures/dialogue_states.tex)
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [88]
-[89] [90] [91] [92] [93] [94] [95] [96] [97]
-Underfull \vbox (badness 2600) has occurred while \output is active []
+[89] [90] (figures/affect_policy.tex) [91] [92] (figures/branching_model.tex)
+[93] [94]
+Underfull \vbox (badness 1087) has occurred while \output is active []
+
+ [95]
+[96] [97]
+Underfull \vbox (badness 1087) has occurred while \output is active []
 
  [98]
-[99] [100] [101] [102] [103]
-Underfull \vbox (badness 2189) has occurred while \output is active []
+Underfull \vbox (badness 2894) has occurred while \output is active []
 
- [104])
-(cap5.tex [105] [106
+ [99]
+(figures/research_data_lifecycle.tex) [100]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [101]
+[102] [103] (figures/deployment_topology.tex) [104] [105] [106] [107])
+(cap5.tex [108] [109] [110
 
 ]
 Chapter 5.
-[107] [108] [109] [110] [111] [112]) (cap6.tex [113] [114
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+[]|\OT1/cmr/m/n/10 Whether un-cer-tain es-ti-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+\OT1/cmr/m/n/10 the spec-i-fied bounded,
+ []
+
+
+Underfull \hbox (badness 5231) in paragraph at lines 33--33
+\OT1/cmr/m/n/10 ex-plain-able, and failure-
+ []
+
+[111]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [112]
+[113] [114] [115] (figures/model_results.tex
+Package pgfplots info on input line 26: Using 'lua backend=false' for axis: x c
+oord trafo unsupported.
+) (figures/confusion_matrices.tex
+PGFPlots: reading {figures/data/confusion_context_text.dat}
+PGFPlots: reading {figures/data/confusion_context_text.dat}
+PGFPlots: reading {figures/data/confusion_audio.dat}
+PGFPlots: reading {figures/data/confusion_audio.dat}
+PGFPlots: reading {figures/data/confusion_equal_fusion.dat}
+PGFPlots: reading {figures/data/confusion_equal_fusion.dat}
+PGFPlots: reading {figures/data/confusion_global_calibrated.dat}
+PGFPlots: reading {figures/data/confusion_global_calibrated.dat}
+)
+(figures/reliability_curves.tex
+PGFPlots: reading {figures/data/reliability_context_text.dat}
+PGFPlots: reading {figures/data/reliability_audio.dat}
+PGFPlots: reading {figures/data/reliability_equal_fusion.dat}
+PGFPlots: reading {figures/data/reliability_equal_fusion.dat}
+PGFPlots: reading {figures/data/reliability_validation_fitted.dat}
+PGFPlots: reading {figures/data/reliability_global_calibrated.dat}
+) [116] [117] [118] [119
+
+] [120] [121]
+(figures/participant_flow.tex) [122] [123] [124] [125]) (cap6.tex [126]
+Chapter 6.
+[127
 
 ]
-Chapter 6.
-) (main_file_template_bachelor_masters_english.bbl [115] [116
+Underfull \vbox (badness 1009) has occurred while \output is active []
 
-] [117]
+ [128]
+[129] [130] [131]
+Underfull \hbox (badness 10000) in paragraph at lines 131--131
+[]|\OT1/cmr/m/n/10 More pre-cise com-ple-tion, miss-ing-ness,
+ []
+
+
+Underfull \hbox (badness 7981) in paragraph at lines 131--131
+\OT1/cmr/m/n/10 ac-cept-abil-ity, con-fi-dence, fea-ture, and
+ []
+
+[132] [133] [134]) (main_file_template_bachelor_masters_english.bbl [135]
+[136
+
+] [137]
 Underfull \hbox (badness 1577) in paragraph at lines 112--120
 []\OT1/cmr/m/n/12 Deepanway Ghosal, Navonil Ma-jumder, Sou-janya Po-ria, Niy-at
 i
  []
 
-[118]
-Underfull \hbox (badness 4582) in paragraph at lines 156--162
+[138]
+Underfull \hbox (badness 4582) in paragraph at lines 148--154
 []\OT1/cmr/m/n/12 Meelis Kull, Miquel Perello-Nieto, Markus K^^?angsepp, Telmo
  []
 
-[119] [120]) [121] [122
+[139] [140]) [141] [142
 
 ]
 Appendix A.
 
-Underfull \hbox (badness 10000) in paragraph at lines 153--153
+Underfull \hbox (badness 10000) in paragraph at lines 158--158
 []|\OT1/cmr/m/n/12 Generate func-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 153--153
+Underfull \hbox (badness 10000) in paragraph at lines 158--158
 []|\OT1/cmr/m/n/12 Generate ini-tial
  []
 
 
-Underfull \hbox (badness 2512) in paragraph at lines 153--153
+Underfull \hbox (badness 2512) in paragraph at lines 158--158
 \OT1/cmr/m/n/12 state of the art
  []
 
 
-Underfull \hbox (badness 2680) in paragraph at lines 153--153
+Underfull \hbox (badness 2680) in paragraph at lines 158--158
 []|\OT1/cmr/m/n/12 Correct gram-mar
  []
 
-[123] [124
+[143] [144
 
 ]
 Appendix B.
-[125] [126
+[145] [146
 
 ]
 Appendix C.
-[127] [128
+[147] [148
 
 ]
 Appendix D.
-[129] [130
+[149] [150
 
 ]
 Appendix E.
-[131] [132
+[151] [152
 
 ]
 Appendix F.
-[133] (main_file_template_bachelor_masters_english.aux)
+[153] (main_file_template_bachelor_masters_english.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main_file_template_bachelor_masters_english.
 out' has not changed.
-(rerunfilecheck)             Checksum: 5DE72E312ACF42B81C3E5DBB4BCC9190;39622.
+(rerunfilecheck)             Checksum: 20D204EB0D4181A018BDFB50CA86B6DB;50984.
  ) 
 Here is how much of TeX's memory you used:
- 15573 strings out of 467871
- 244557 string characters out of 5418376
- 690695 words of memory out of 5000000
- 43795 multiletter control sequences out of 15000+600000
- 640973 words of font info for 91 fonts, out of 8000000 for 9000
+ 39606 strings out of 467871
+ 912209 string characters out of 5418376
+ 1524444 words of memory out of 5000000
+ 67301 multiletter control sequences out of 15000+600000
+ 646148 words of font info for 108 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,14n,83p,1027b,618s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,19n,104p,1027b,2868s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\raluc\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
 1200.pk><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
 ts/cm/cmbx10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/publ
 ic/amsfonts/cm/cmbx12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/t
 ype1/public/amsfonts/cm/cmex10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTe
 X/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/raluc/AppData/Local/Progr
-ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/raluc/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/raluc/App
-Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/r
-aluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/
-Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.p
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/raluc/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/raluc/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users
+/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><
+C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr
+12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmr6.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/
+amsfonts/cm/cmr7.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
+public/amsfonts/cm/cmr8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts
+/type1/public/amsfonts/cm/cmsl12.pfb><C:/Users/raluc/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><C:/Users/raluc/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/amsfonts/cm/cmss8.pfb><C:/Users/raluc/AppData/L
+ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/ralu
+c/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/U
+sers/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.p
 fb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm
-/cmr8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
-onts/cm/cmsl12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/pu
-blic/amsfonts/cm/cmsy10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts
-/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKT
-eX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/raluc/AppData/Local/Prog
-rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/raluc/AppData/L
-ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on main_file_template_bachelor_masters_english.pdf (133 pages, 8
-26865 bytes).
+/cmsy8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
+fonts/cm/cmti12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/p
+ublic/amsfonts/cm/cmtt10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/font
+s/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on main_file_template_bachelor_masters_english.pdf (153 pages, 1
+070330 bytes).
 PDF statistics:
- 1906 PDF objects out of 2073 (max. 8388607)
- 422 named destinations out of 1000 (max. 500000)
- 1430 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 2296 PDF objects out of 2487 (max. 8388607)
+ 496 named destinations out of 1000 (max. 500000)
+ 1786 words of extra memory for PDF output out of 10000 (max. 10000000)
 

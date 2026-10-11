@@ -56,7 +56,7 @@ The anxiety estimate remains exploratory because IEMOCAP contains only 40 fear a
 
 ## Calibration
 
-For the context models, pooled calibrated ECE was 0.0317 on the four-class task and 0.0362 on the six-class task. Calibration changes confidence, not predicted labels or F1. Application confidence thresholds still require separate validation on AffectLab-like conversational data.
+For the context models, pooled calibrated ECE was 0.0311 on the four-class task and 0.0362 on the six-class task. Calibration changes confidence, not predicted labels or F1. Application confidence thresholds still require separate validation on AffectLab-like conversational data.
 
 ## Private aggregate reports
 

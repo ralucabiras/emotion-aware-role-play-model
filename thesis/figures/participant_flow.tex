@@ -1,0 +1,37 @@
+\begin{tikzpicture}[
+    font=\sffamily\scriptsize,
+    stage/.style={draw=blue!65!black, fill=blue!7, rounded corners=2pt,
+        align=center, minimum width=3.0cm, minimum height=0.9cm},
+    scenario/.style={draw=teal!70!black, fill=teal!9, rounded corners=2pt,
+        align=center, minimum width=2.75cm, minimum height=1.0cm},
+    outcome/.style={draw=orange!75!black, fill=orange!12, rounded corners=8pt,
+        align=center, minimum width=3.1cm, minimum height=0.9cm},
+    missing/.style={draw=red!65!black, fill=red!6, dashed, rounded corners=2pt,
+        align=center, minimum width=3.0cm, minimum height=0.9cm},
+    flow/.style={-{Latex[length=2.2mm]}, thick, draw=black!65},
+    attrition/.style={-{Latex[length=2.2mm]}, dashed, draw=red!65!black}
+]
+\node[stage] (enrolled) at (0,1.4) {10 enrolled participants};
+\node[stage] (attempts) at (3.8,1.4) {24 selected first required attempts};
+\draw[flow] (enrolled)--(attempts);
+
+\node[scenario] (work) at (7.4,2.8) {Workload\\9 available / 8 complete};
+\node[scenario] (bound) at (7.4,1.4) {Boundary\\8 available / 6 complete};
+\node[scenario] (rel) at (7.4,0.0) {Relationship\\7 available / 7 complete};
+\draw[flow] (attempts)--(work);
+\draw[flow] (attempts)--(bound);
+\draw[flow] (attempts)--(rel);
+
+\node[stage] (tasks) at (11.2,1.4) {21 complete tasks with\\complete post-rating};
+\draw[flow] (work)--(tasks);
+\draw[flow] (bound)--(tasks);
+\draw[flow] (rel)--(tasks);
+
+\node[outcome] (protocol) at (14.8,1.4) {6 complete protocols\\60.0\% [31.3\%, 83.2\%]};
+\draw[flow] (tasks)--(protocol);
+
+\node[missing] (other) at (7.4,-1.65) {Observed incomplete paths\\2 unfinished; 1 skipped post-rating;\\2 skipped pre-questionnaires};
+\draw[attrition] (attempts.south)--(other.north);
+\node[align=center, text=red!65!black] at (14.8,-0.2)
+    {Prespecified feasibility threshold: 80\%};
+\end{tikzpicture}

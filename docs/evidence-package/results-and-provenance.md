@@ -5,13 +5,27 @@ Use this table for the dissertation presentation. Do not substitute training-sam
 | System | Accuracy | Macro F1 | Weighted F1 | ECE | Evaluation provenance |
 | --- | ---: | ---: | ---: | ---: | --- |
 | Utterance-only text | 0.6624 | 0.6651 | 0.6640 | — | Five session-held-out IEMOCAP folds |
-| Three-turn context text | 0.7304 | 0.7332 | 0.7300 | 0.0317 | Same folds; validation temperature scaling |
+| Three-turn context text | 0.7304 | 0.7332 | 0.7300 | 0.0311 | Same folds; validation temperature scaling |
 | Audio only | 0.6279 | 0.6349 | 0.6229 | 0.0468 | Same folds; validation temperature scaling |
 | Equal-weight late fusion | 0.7832 | 0.7883 | 0.7815 | 0.1619 | Predeclared paired comparison; classification headline |
 | Validation-fitted fold fusion | 0.7717 | 0.7758 | 0.7707 | 0.0283 | Fold validation-selected weights and temperature |
 | Final global calibration chain, applied to OOF predictions | 0.7736 | 0.7776 | 0.7728 | 0.0242 | Pooled unique out-of-fold validation calibration |
 
 Context improved macro F1 over utterance-only text by 0.0681, with dialogue-bootstrap 95% interval [0.0504, 0.0857]. Equal fusion improved macro F1 over paired context text by 0.0551, interval [0.0407, 0.0713]. The equal fusion is the confirmatory classification result; the final global chain is the operational confidence configuration.
+
+## Application performance regression check
+
+The recorded single-client, in-process HTTP benchmark used the memory repository and deterministic fallbacks. It includes routing, authentication, validation, application services, and response serialisation, while excluding network transit, MongoDB, trained inference, external providers, and concurrent load.
+
+| Operation | Samples | Median (ms) | 95th percentile (ms) |
+| --- | ---: | ---: | ---: |
+| Liveness | 200 | 1.332 | 1.866 |
+| Authenticated scenario catalogue | 200 | 2.942 | 3.922 |
+| Session creation | 100 | 2.988 | 3.961 |
+| Role-play start | 100 | 3.396 | 4.437 |
+| Deterministic conversation turn | 100 | 4.659 | 5.836 |
+
+Run `.\.venv\Scripts\python.exe scripts\evaluate_performance.py` from the repository root to regenerate `docs/evidence-package/generated/performance-v1.json`. The command fails if a measured 95th percentile exceeds its deliberately generous regression budget. These timings are a reproducible local baseline, not a production-capacity or external-provider latency claim.
 
 ## Exact artifact provenance
 

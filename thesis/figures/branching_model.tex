@@ -1,0 +1,41 @@
+\begin{tikzpicture}[
+    font=\sffamily\scriptsize,
+    turn/.style={circle, draw=blue!65!black, fill=blue!7, minimum size=0.72cm,
+        inner sep=1pt},
+    branchturn/.style={circle, draw=teal!70!black, fill=teal!10, minimum size=0.72cm,
+        inner sep=1pt},
+    result/.style={draw=orange!75!black, fill=orange!12, rounded corners=2pt,
+        align=center, minimum width=2.5cm, minimum height=0.8cm},
+    note/.style={draw=black!45, fill=black!3, rounded corners=2pt,
+        align=center, text width=3.8cm, minimum height=0.8cm},
+    flow/.style={-{Latex[length=2.1mm]}, thick, draw=black!65},
+    copied/.style={-{Latex[length=2.1mm]}, thick, dashed, draw=teal!70!black}
+]
+\node[turn] (u1) at (0,0) {U1};
+\node[turn] (a1) at (1.2,0) {A1};
+\node[turn] (u2) at (2.4,0) {U2};
+\node[turn] (a2) at (3.6,0) {A2};
+\node[turn, very thick] (point) at (4.8,0) {U3};
+\draw[flow] (u1)--(a1); \draw[flow] (a1)--(u2); \draw[flow] (u2)--(a2); \draw[flow] (a2)--(point);
+\node[above=0.35cm of point, align=center] {selected branch point\\with saved pre-turn state};
+
+\node[turn] (oa) at (6.4,1.15) {A3};
+\node[turn] (ou) at (7.6,1.15) {U4};
+\node[result] (or) at (9.5,1.15) {Original outcome\\and original feedback};
+\draw[flow] (point) -- (oa); \draw[flow] (oa)--(ou); \draw[flow] (ou)--(or);
+\node[above=0.25cm of ou, text=blue!70!black] {immutable original};
+
+\node[branchturn] (bu) at (6.4,-1.15) {U3'};
+\node[branchturn] (ba) at (7.6,-1.15) {A3'};
+\node[result] (br) at (9.5,-1.15) {Alternative outcome\\continuation-only feedback};
+\draw[copied] (point) -- node[below left, align=center]{copy shared context;\\restore snapshot} (bu);
+\draw[flow] (bu)--(ba); \draw[flow] (ba)--(br);
+\node[below=0.25cm of ba, text=teal!70!black] {new authored continuation};
+
+\node[note] (compare) at (12.7,0) {Side-by-side comparison:\\shared context shown once;\\actions, evidence, sources, and outcomes};
+\draw[flow] (or)--(compare);
+\draw[flow] (br)--(compare);
+
+\node[note] at (2.1,-2.25) {Rewind removes only the latest linked exchange and restores its exact preceding snapshot.};
+\node[note] at (8.0,-2.45) {Copied turns are excluded from new turn counts, generation statistics, and branch feedback.};
+\end{tikzpicture}

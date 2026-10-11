@@ -1,32 +1,183 @@
-\chapter{Conclusions and Future Work}\label{chap6}
+\chapter{Conclusions and Future Work}
+\label{chap6}
 
-6.1 Conclusions
+\section{Chapter Overview}
+\label{sec:conclusion-overview}
 
-Summarize what was built and what was shown.
+This dissertation investigated how multimodal emotion recognition can be incorporated into a helpful application for rehearsing difficult interpersonal conversations without allowing uncertain predictions to control consequential decisions. The work combined speaker-independent emotion-recognition experiments, an uncertainty-aware interaction policy, structured role-play scenarios, evidence-grounded feedback, a production-oriented full-stack application, and a layered developer-led verification strategy. AffectLab demonstrates one way of using affective information as bounded conversational evidence rather than as a declaration of a user's internal state.
 
-6.2 Contributions
+This final chapter synthesises the findings in relation to the four research questions, identifies the principal contributions, and restates the boundaries of the conclusions. It then proposes a prioritised programme of future work spanning deployment-scale performance, operational governance, model generalisation, policy comparison, feedback validation, accessibility, and longer-term product research. The chapter closes by considering what the implemented and tested application establishes and what remains environment- or study-dependent.
 
-State your main contributions:
+\section{Summary of the Dissertation}
+\label{sec:conclusion-summary-work}
 
-affective state model for support dialogue;
-FSM-based adaptive tech-support agent;
-strategy selection based on frustration and urgency;
-comparison with non-adaptive baseline.
-6.3 Limitations
+The dissertation began from two connected problems. First, emotion recognition in conversation is uncertain, sensitive to context, and vulnerable to distribution shift. Second, a role-play application needs predictable progression, evidence-grounded feedback, safety precedence, and user control even when machine-learning or generative services are unavailable. Treating these as separate problems would make it easy either to build a strong benchmark classifier with no responsible interaction design or to build an interactive application whose affective behaviour could not be evaluated independently.
 
-Mention realistic limitations:
+AffectLab addresses this tension through separation of responsibilities. Contextual text and speech models estimate an affective probability distribution. A versioned adaptation policy considers confidence, agreement, availability, eligibility, and user preference before selecting a small pacing action. Deterministic scenario controllers remain authoritative for dialogue stage, completion, and unresolved outcomes. Observable language features determine feedback metrics, while an optional language model is restricted to response realisation. Safety handling bypasses affect adaptation, and missing external services preserve the baseline text workflow.
 
-limited dataset/scenarios;
-text-only affect detection;
-rule-based adaptation;
-not deployed in a real support environment.
-6.4 Future Work
+The implementation supports three fixed scenarios: workload negotiation, boundary-setting, and expression of relationship needs. It also provides preparation, replay, rewind, branching, comparison, takeaways, and action cards so that a rehearsal can be inspected and revisited. Authentication, ownership checks, retention controls, transient voice handling, health checks, production configuration validation, containerised deployment, deterministic fallbacks, backup verification, and optional research-data controls make the application suitable for controlled production use and future study.
 
-Possible future directions:
+Evaluation was deliberately divided by claim. IEMOCAP experiments support classification and calibration findings on the benchmark. Authored trajectories, 240 passing backend tests, production frontend checks, desktop/mobile browser and accessibility suites, database-backed full-stack journeys, restart recovery, and local HTTP timings support application-quality claims. The scoped performance run recorded a 4.659~ms median and 5.836~ms 95th percentile for deterministic conversation turns. Section~\ref{subsec:participant-results} retains the small pilot results as supplementary user feedback, separate from the primary model and application evidence.
 
-multimodal emotion recognition using audio/video;
-reinforcement learning-based policy adaptation;
-larger user study;
-real-world support logs;
-personalization over multiple sessions;
-integration with ticketing systems.
+\section{Conclusions for the Research Questions}
+\label{sec:conclusion-research-questions}
+
+\subsection{RQ1: The Contribution of Conversational Context}
+\label{subsec:conclusion-rq1}
+
+RQ1 asked whether preceding conversational turns improve text-based emotion recognition compared with independent utterance classification. Under the declared four-class, speaker-independent IEMOCAP protocol, the answer is yes. Adding the previous three causal dialogue turns increased accuracy from 0.6624 to 0.7304 and macro F1 from 0.6651 to 0.7332. The paired dialogue-bootstrap macro-F1 difference was +0.0681, with a 95\% interval from 0.0504 to 0.0857. Accuracy and weighted-F1 intervals also excluded zero.
+
+The result is strengthened by the controlled comparison: architecture, label set, data partitions, seed, and optimisation settings were held constant, leaving the input context as the intended experimental difference. The exploratory six-class comparison produced the same aggregate direction, although its anxiety category was based on only 40 mapped fear examples and cannot support a stable anxiety-recognition claim.
+
+The conclusion remains task-specific. Context improved annotated emotion classification in IEMOCAP, but the experiment does not establish that the model recovers a person's private emotional state or that the same gain will transfer to spontaneous AffectLab conversations. Per-class results also show why the aggregate conclusion should not be generalised indiscriminately: the anger improvement was small and its interval included zero. The contribution of context is therefore a benchmark classification finding rather than a claim of general emotional understanding.
+
+\subsection{RQ2: Multimodal Complementarity and Calibration}
+\label{subsec:conclusion-rq2}
+
+RQ2 asked whether contextual text and acoustic information are complementary and what trade-off exists between classification and confidence calibration. The audio-only model achieved macro F1 0.6349, below the contextual text result of 0.7332. Nevertheless, combining the two calibrated probability distributions with the predeclared equal-weight rule increased macro F1 to 0.7883 and accuracy to 0.7832. The macro-F1 improvement over contextual text was +0.0551, with a dialogue-bootstrap 95\% interval from 0.0407 to 0.0713; all 10,000 bootstrap replicates favoured fusion. Acoustic information therefore contributed complementary benchmark information even though it was the weaker modality in isolation.
+
+The strongest classifier was not the best calibrated configuration. Equal-weight fusion produced ECE 0.1619, compared with 0.0311 for contextual text. Validation-fitted fusion reduced ECE to 0.0283 while retaining macro F1 0.7758. The final full-data calibration chain, selected for operational packaging rather than confirmatory comparison, obtained pooled validation-role macro F1 0.7776 and ECE 0.0242 with a text-dominant weight of 0.59.
+
+These results answer both parts of RQ2. Text and speech were complementary for classification, but probability combination sharpened confidence enough to require a separate calibration decision. Consequently, an application should not choose a fusion configuration solely because it maximises test-set F1. The distinction between classification performance and operational confidence is central when probabilities influence thresholds, user-facing uncertainty, or adaptive behaviour.
+
+\subsection{RQ3: Bounded Integration of Affective Evidence}
+\label{subsec:conclusion-rq3}
+
+RQ3 concerned the responsible integration of uncertain multimodal predictions into structured role-play. The project provides a constructive engineering answer. AffectLab stores the complete prediction and provenance, validates it against the current session and turn, and maps it through a deterministic policy to one of a restricted set of pacing actions. Low confidence or modality disagreement offers the user a pacing choice; high-confidence agreement may permit a modest acknowledgement; an explicit preference can preserve baseline behaviour; unavailable inference falls back without blocking the conversation; and safety interruption takes precedence over all affective adaptation.
+
+This separation prevents the classifier from deciding whether a scenario succeeds, what feedback score is assigned, whether a participant is eligible, or whether a safety response is required. Optional language generation can phrase a selected action but cannot replace the recorded decision. Optimistic persistence, request identifiers, model versions, source fields, and fallback reasons make the resulting behaviour replayable and auditable.
+
+The engineering evaluation supports this answer within the tested conditions. All five authored enhanced dialogue trajectories and all seven affect-pacing cases matched their expected outcomes. The full automated backend suite passed, and two integrated browser journeys completed against the disposable database while surviving actual backend restarts. These results establish policy conformance, recovery, ownership, persistence, and failure tolerance. They do not establish that an affect prediction was correct for a human user or that adaptation improves a user's rehearsal outcome.
+
+\subsection{RQ4: Integrated Application Quality and Readiness}
+\label{subsec:conclusion-rq4}
+
+RQ4 asked whether the completed application satisfies its declared functional and non-functional requirements under reproducible engineering evaluation. The answer is positive for the tested configuration. The backend suite reported 240 passes, the frontend passed strict production compilation and linting, browser checks exercised desktop and mobile layouts with automated accessibility scanning, and two full-stack journeys verified real API serialisation, MongoDB persistence, network-failure recovery, branching, export, and state preservation across backend restarts. Authored cases additionally verified the deterministic dialogue and affect-pacing policies.
+
+Responsiveness was tested separately from correctness. In a single-client, in-process HTTP benchmark, liveness, scenario retrieval, session creation, role-play start, and a deterministic conversation turn all remained below 7~ms at the 95th percentile. The benchmark excludes network transit, MongoDB, trained inference, providers, and concurrent users, so it supports a local-regression claim rather than internet-scale capacity. Taken together with fail-fast production configuration, health checks, ownership protection, optimistic concurrency, fallbacks, backup exercises, and containerisation, the evidence supports readiness for a controlled production deployment. Public scale still requires environment-specific load, security, observability, and incident-response validation.
+
+\section{Principal Contributions}
+\label{sec:conclusion-contributions}
+
+\subsection{Empirical and Machine-Learning Contributions}
+\label{subsec:conclusion-ml-contributions}
+
+The first contribution is a controlled, speaker-independent comparison of utterance-only and causal-context text emotion recognition. By pairing predictions at dialogue level and reporting aggregate, per-class, and exploratory six-class results, the study demonstrates a clear contextual benefit while preserving class-specific uncertainty.
+
+The second contribution is a comparative text--audio pipeline that retains unimodal baselines and distinguishes predeclared fusion from validation-fitted operational configurations. Reporting calibration beside accuracy and F1 exposes a trade-off that would be hidden by classification metrics alone. The final pipeline also records the temperatures, modality weights, label order, and provenance needed to reproduce the operational transformation from logits to probabilities.
+
+\subsection{System and Interaction-Design Contributions}
+\label{subsec:conclusion-system-contributions}
+
+The principal system contribution is a hybrid architecture in which trained models and generative services can influence presentation without becoming authoritative for dialogue outcomes, assessment, or safety. The uncertainty-aware affect policy turns confidence, agreement, availability, and preference into inspectable behaviour. Deterministic fallbacks preserve a useful interaction when optional services fail.
+
+The three scenario controllers contribute explicit models of different interpersonal objectives. Workload negotiation seeks a practical prioritisation decision, boundary-setting recognises a respectfully maintained refusal without requiring compliance, and relationship practice seeks a specific need or next step while allowing disagreement to remain unresolved. This avoids reducing every role-play to one generic success condition.
+
+Evidence-grounded feedback and reflective tools form a further applied contribution. Metrics point to specific conversational turns rather than issuing an unexplained global judgement. Replay, rewind, branching, and comparison support counterfactual practice from the same context. Together, these features make a conversation an inspectable practice artefact instead of a transient exchange ending in an opaque score.
+
+\subsection{Application-Verification and Infrastructure Contributions}
+\label{subsec:conclusion-method-contributions}
+
+The dissertation contributes a layered verification framework that keeps model performance, application conformance, performance scope, and supporting user feedback separate. This prevents benchmark accuracy from being interpreted as product reliability and prevents a small pilot from overshadowing the much broader technical verification. The framework combines deterministic fixtures, automated unit and API suites, real persistence checks, desktop/mobile browser and accessibility tests, production builds, recovery journeys, source-hashed evidence artefacts, and a repeatable latency benchmark.
+
+The full-stack application also provides deployment and research infrastructure. Production configuration fails closed on weak secrets, origins, hosts, HTTPS, and rate limiting; health endpoints distinguish core readiness from optional model availability; Docker packaging, database persistence, backups, ownership enforcement, transient audio, and deterministic fallbacks are implemented rather than described only as future requirements. Separate consent, pseudonymous export, withdrawal, and dataset freezing remain available when the optional research workflow is used.
+
+Finally, the evidence package and versioned configurations improve auditability. Model metrics, paired comparisons, policy fixtures, automated tests, performance summaries, smoke manifests, and protocol files identify which claim is supported by which artefact. Some private model-package hashes remain to be finalised, but the overall approach demonstrates how a production-oriented dissertation application can make its evidence boundaries inspectable.
+
+\section{Limitations of the Conclusions}
+\label{sec:conclusion-limitations}
+
+\subsection{Model and Data Limitations}
+\label{subsec:conclusion-model-limitations}
+
+The emotion-recognition conclusions derive from IEMOCAP, a corpus of ten actors completing acted or improvised English interactions. The dataset does not represent the full variation of spontaneous emotion, language, accent, age, disability, culture, device quality, or background noise that AffectLab may encounter. The four-class mapping simplifies expressive categories, and the exploratory mapping from fear to anxiety is especially weak. One primary training seed limits the assessment of optimisation variability.
+
+Speaker-independent session folds reduce identity leakage but do not constitute external validation. Calibration can also deteriorate under domain shift even when it is strong on pooled validation roles. The final full-data packages have no independent test set because all eligible benchmark examples are used for training after configuration selection. Their operational thresholds must therefore be treated as design parameters, not validated psychological boundaries.
+
+\subsection{Application and Measurement Limitations}
+\label{subsec:conclusion-application-limitations}
+
+The dialogue policies cover three bounded scenarios and cannot represent the ambiguity, power imbalance, culture, history, or stakes of all interpersonal situations. Feature extraction is transparent but lexically limited: paraphrases can be missed, indirect speech can be misread, and detected phrases do not establish communication competence. Generative responses remain dependent on an external provider when enabled, while template fallbacks trade linguistic variety for predictability.
+
+Engineering evaluation used authored cases, deterministic services, synthetic accounts, and a small number of integrated journeys. The local latency benchmark used an in-process transport and memory repository. These establish behaviour and regression performance on the tested paths but not prolonged concurrent capacity, internet latency, real provider response time, adversarial traffic, diverse microphones, or every assistive technology. A controlled production deployment is supported by the present evidence, while wider or higher-risk deployment still requires independent security review, monitoring, incident response, secret management, and jurisdiction-specific governance.
+
+\subsection{Supporting User-Evidence Limitations}
+\label{subsec:conclusion-human-limitations}
+
+The supplementary pilot included ten enrolled users, only six of whom completed all three required tasks. It had no randomised control condition and used study-specific ordinal items. Incomplete tasks, missing ratings, demand characteristics, repetition, familiarity, and self-selection may all influence the summaries. The pilot therefore informs product refinement but does not establish sustained skill acquisition, causal benefit, or transfer to real conversations. AffectLab is not a diagnostic, clinical, crisis, or therapeutic system.
+
+\section{Future Work}
+\label{sec:conclusion-future-work}
+
+Future work should proceed in an order that strengthens the weakest evidence before increasing system autonomy. Table~\ref{tab:future-work-roadmap} summarises the proposed sequence.
+
+\begin{table}[htbp]
+\centering
+\caption{Prioritised future-work roadmap.}
+\label{tab:future-work-roadmap}
+\footnotesize
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.14\textwidth}|>{\raggedright\arraybackslash}p{0.32\textwidth}|X|}
+\hline
+\textbf{Priority} & \textbf{Work package} & \textbf{Evidence produced} \\ \hline
+Immediate & Staging performance, load, and resilience evaluation & Response-time distributions, throughput, saturation points, recovery time, and resource use with production persistence, models, providers, and expected concurrency. \\ \hline
+Near term & External and stress-condition model evaluation & Cross-corpus classification, calibration under shift, device and noise robustness, and appropriately powered subgroup analyses. \\ \hline
+Near term & Validate dialogue features and feedback with human annotation & Construct validity, inter-rater agreement, paraphrase coverage, error categories, and revised evidence rules. \\ \hline
+Medium term & Controlled comparison of baseline and affect-aware interaction & Supporting evidence about whether bounded adaptation changes pacing preference, task completion, perceived helpfulness, or intrusiveness. \\ \hline
+Longer term & Longitudinal, multilingual, and participatory accessibility work & Retention, transfer, broader inclusion, privacy, and governance evidence. \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Validate Deployment Performance and Reliability}
+\label{subsec:future-performance}
+
+The immediate next step is to repeat the local performance check in a staging environment that matches the intended deployment. This should use the production Nginx--FastAPI--MongoDB path, packaged text and audio models, configured external providers, realistic network conditions, and representative session histories. Warm and cold starts, deterministic fallback turns, multimodal inference, transcription, replay, export, and branch creation should be measured separately so that a slow optional service is not hidden inside an aggregate average.
+
+A concurrent-load tool should report throughput, median and tail latency, error rate, queue time, CPU, memory, and database utilisation as client count increases. Service-level objectives should be declared before the run, and tests should identify the saturation point rather than merely recording one successful request. Soak testing, forced provider timeouts, database restart, backup restoration, and process replacement should additionally measure recovery behaviour and verify that incomplete requests do not create duplicate turns or corrupt session versions.
+
+Browser performance should be measured on the deployed build using Core Web Vitals and interaction traces on desktop and representative mobile hardware. These staging results would complement the current responsive-layout and accessibility suite and turn the existing production-ready architecture into deployment-specific operational evidence.
+
+\subsection{Broaden Model Validation and Improve Uncertainty Handling}
+\label{subsec:future-model-validation}
+
+The model pipeline should be tested across corpora and, with explicit consent, on data closer to the intended use context. Cross-corpus evaluation would reveal how much of the IEMOCAP result depends on actors, recording conditions, and label conventions. Stress tests should vary microphones, compression, background noise, transcript errors, utterance length, and missing modalities. Multilingual work should begin with a new construct and annotation review rather than directly transferring the English label mapping.
+
+Repeated training seeds and stronger baselines would better quantify optimisation uncertainty. Future comparisons could investigate longer or learned context selection, speaker-aware aggregation, modality-specific missingness training, and alternative late-fusion rules. These additions should retain paired evaluation and should not tune headline claims on the test partition.
+
+Calibration requires continued attention after deployment. Reliability should be monitored by source, device condition, and data period where lawful and statistically justified. Selective prediction, abstention, or distribution-shift indicators may be more appropriate than forcing every input into an affect label. Thresholds should be revised only with held-out or prospectively collected evidence, and the application should preserve an accessible baseline regardless of model availability.
+
+\subsection{Evaluate and Refine the Adaptation Policy}
+\label{subsec:future-adaptation-policy}
+
+The existing policy is intentionally small and deterministic. Future evaluation should ablate its inputs to determine whether confidence, modality agreement, and explicit preference each contribute useful information. Logs can identify how often actions are selected, declined, reversed, or followed by manual pacing changes. Qualitative interviews could reveal whether acknowledgements feel supportive, inaccurate, intrusive, or distracting.
+
+Personalisation should remain transparent and opt-in. A user might prefer fewer affect acknowledgements, text-only operation, slower pacing, or different uncertainty wording. Such preferences can be stored as explicit controls rather than inferred as stable psychological traits. Any learned policy should first be evaluated offline against safety and autonomy constraints and compared with the deterministic baseline. Reinforcement learning based on engagement alone would be inappropriate because longer interaction is not equivalent to better rehearsal.
+
+\subsection{Validate Feedback and Communication Measures}
+\label{subsec:future-feedback-validation}
+
+The deterministic feature rules should be compared with independent human annotations of the same turns. This would quantify precision, recall, agreement, synonym coverage, and systematic error for features such as a clear request, boundary maintenance, non-blaming language, and a specific need. The analysis should include indirect phrasing, negation, reported speech, culturally varied wording, and speech-to-text errors.
+
+Semantic or learned detectors could improve paraphrase coverage, but they should return evidence spans and uncertainty rather than opaque trait scores. Feedback usefulness should also be evaluated separately from detector accuracy: a technically correct observation may still be poorly timed or unhelpful. Co-design with communication educators and target users could refine wording while preserving the distinction between observable behaviour and personal judgement.
+
+\subsection{Study Transfer, Accessibility, and Long-Term Use}
+\label{subsec:future-transfer-accessibility}
+
+Later studies should examine whether users return voluntarily, whether repeated practice remains useful, and whether any measured change persists. Transfer to real conversations would require independent outcomes, such as user-reported application of a planned request or externally rated role-plays, not merely improvement on the same scenario. Such studies should avoid clinical claims unless they adopt an appropriate clinical design and oversight.
+
+Accessibility evaluation should involve users of keyboards, screen readers, speech input, captions, reduced-motion settings, and different cognitive or communication needs. The current interface and automated checks provide a foundation but cannot replace participatory accessibility testing. Broader language and cultural adaptation should include local review of scenario norms, refusal styles, power relationships, consent materials, and safety resources.
+
+\subsection{Strengthen Deployment, Privacy, and Governance}
+\label{subsec:future-deployment-governance}
+
+Before expanding beyond a controlled deployment, the system should complete staging load tests, an independent security review, production backup-and-recovery exercises, dependency and model monitoring, operational alerting, and documented incident response. Provider changes should be treated as versioned operational factors because they can alter transcription, generation, latency, or failure modes. Model and policy artefacts should be signed or hashed, and the remaining private-package provenance gaps should be closed.
+
+Data minimisation should continue to guide development. Audio should remain transient unless a separately justified protocol requires retention, and derived research records should avoid reconstructable conversation content. Retention, deletion, export access, and withdrawal should be tested periodically in the deployed environment. Governance should also define who may change scenarios, thresholds, prompts, safety resources, or analysis code and how those changes are reviewed and recorded.
+
+\section{Final Conclusion}
+\label{sec:final-conclusion}
+
+This dissertation shows that multimodal affect recognition can be connected to conversational role-play without making the classifier the authority over the interaction. Causal dialogue context improved textual emotion classification on the chosen benchmark, and audio supplied complementary information that improved fused classification. The accompanying calibration results demonstrated that stronger classification does not automatically produce trustworthy confidence. This finding shaped the application design: uncertainty is retained, adaptation is bounded, users can decline it, and missing inference preserves the core workflow.
+
+AffectLab's broader contribution is therefore practical, architectural, and methodological as much as predictive. Deterministic scenario progression, evidence-grounded feedback, constrained generation, safety precedence, provenance, and complementary verification layers make the system's behaviour more inspectable. The completed engineering evidence establishes that this design works end to end across its tested policies, interfaces, persistence, accessibility, recovery, and local-response paths. It is a helpful communication-practice application, not merely a model demonstration.
+
+The completed system is ready for controlled production deployment under the tested configuration: it has production builds and configuration checks, health and recovery paths, security and ownership controls, deterministic fallbacks, broad automated coverage, real-database smoke journeys, desktop/mobile accessibility checks, and measured local responsiveness. That claim remains narrower than internet-scale capacity or guaranteed third-party latency, which must be established in the target environment. Likewise, benchmark performance does not establish emotional truth, and the small uncontrolled pilot does not establish participant benefit. Within those boundaries, the dissertation delivers a thoroughly developer-tested and reproducibly evaluated application for emotion-aware communication rehearsal while preserving uncertainty and user agency.

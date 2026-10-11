@@ -30,6 +30,7 @@ Safety checks precede model generation. Raw audio is processed in memory and is 
 - [System card](system-card.md): intended use, prohibited use, privacy, safety, and limitations.
 - [Canonical results and provenance](results-and-provenance.md): the only compact headline table to use in slides.
 - [Reproduction and demonstration](reproduction-and-demo.md): training references, evidence capture, offline demo, and presentation runbook.
+- `generated/performance-v1.json`: source-hashed local HTTP latency evidence for the deterministic core workflow.
 - `synthetic-demo.json`: fictional, redistribution-safe demonstration wording.
 
 The private IEMOCAP dataset, row-level predictions, and model weights are intentionally excluded.
