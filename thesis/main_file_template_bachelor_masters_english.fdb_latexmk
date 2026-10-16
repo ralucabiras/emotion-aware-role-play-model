@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main_file_template_bachelor_masters_english"] 1791707352.13882 "main_file_template_bachelor_masters_english.aux" "main_file_template_bachelor_masters_english.bbl" "main_file_template_bachelor_masters_english" 1791707366.44789 0
+["bibtex main_file_template_bachelor_masters_english"] 1792175878.94516 "main_file_template_bachelor_masters_english.aux" "main_file_template_bachelor_masters_english.bbl" "main_file_template_bachelor_masters_english" 1792175897.32854 0
   "./myBib.bib" 1791477753 20377 f0ce0055b75c2a446a23c1ea211ba20a ""
   "C:/Users/raluc/AppData/Local/Programs/MiKTeX/bibtex/bst/bibtex/alpha.bst" 1291864736 23907 a5f93555796fb564b924339521f10a7c ""
-  "main_file_template_bachelor_masters_english.aux" 1791707364 67031 1e2455f0e3a138160e9932f0ee3c73c2 "pdflatex"
+  "main_file_template_bachelor_masters_english.aux" 1792175895 68812 5202ceca1d2d4f1be9b8b09660623a31 "pdflatex"
   (generated)
   "main_file_template_bachelor_masters_english.bbl"
   "main_file_template_bachelor_masters_english.blg"
   (rewritten before read)
-["pdflatex"] 1791707352.90055 "c:/Users/raluc/OneDrive/Documents/GitHub/emotion-aware-role-play-model/thesis/main_file_template_bachelor_masters_english.tex" "main_file_template_bachelor_masters_english.pdf" "main_file_template_bachelor_masters_english" 1791707366.4499 0
+["pdflatex"] 1792175879.66091 "c:/Users/raluc/OneDrive/Documents/GitHub/emotion-aware-role-play-model/thesis/main_file_template_bachelor_masters_english.tex" "main_file_template_bachelor_masters_english.pdf" "main_file_template_bachelor_masters_english" 1792175897.33189 0
   "C:/Users/raluc/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1791309586 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/raluc/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/tcrm1200.pk" 1791309593 14064 1d3ed55af3e4dadfa93f340769eb882f ""
   "C:/Users/raluc/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1791308431 13333487 b5a1cb8b17e719429859f01c62e58311 ""
@@ -265,14 +265,17 @@
   "C:/Users/raluc/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/raluc/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
   "FI.png" 1791307006 52065 24e585ff0616d5f8463ac45775ba3019 ""
-  "c:/Users/raluc/OneDrive/Documents/GitHub/emotion-aware-role-play-model/thesis/main_file_template_bachelor_masters_english.tex" 1791707351 7646 ec9c4d6cd7c12aef96a5944355c85571 ""
+  "c:/Users/raluc/OneDrive/Documents/GitHub/emotion-aware-role-play-model/thesis/main_file_template_bachelor_masters_english.tex" 1792174309 9321 cac1b5c59c0b01af2dcff924b8726291 ""
   "cap1.tex" 1791706679 63640 bfb9da3e635c3585f13776512771fe80 ""
   "cap2.tex" 1791706680 56075 c8b7c508d23e494d5f0a2b3ddb306197 ""
   "cap3.tex" 1791706681 59189 1c444acb4e0564c8b4d6918378c11400 ""
-  "cap4.tex" 1791706689 122823 ca2485f4aaf02ef1fbbd0af18e792f71 ""
-  "cap5.tex" 1791706701 38950 d249b0758366ddc37d4606a5af86f3fa ""
+  "cap4.tex" 1791707647 125397 d51776a645fee0b3e8a50d080212eea1 ""
+  "cap5.tex" 1792175818 39296 d249b0758366ddc37d4606a5af86f3fa ""
   "cap6.tex" 1791706612 29003 37b53ee32fabc2ad9a4d24a18bd67bab ""
   "figures/affect_policy.tex" 1791568792 2723 91ed957f0507edc4ccf7007afad6d199 ""
+  "figures/app-dashboard.png" 1791708396 233257 127bfe5c925adaae3dd3d2eb87aa16e3 ""
+  "figures/app-feedback.png" 1791708630 96303 235237521c4f3f71b2b9090ba3d6aa0e ""
+  "figures/app-roleplay.png" 1791708503 224970 65d9b53db3feca20745451876eb8e3e9 ""
   "figures/branching_model.tex" 1791569108 2209 3ee47142cfbffc96a79ff8e90bcad0f4 ""
   "figures/confusion_matrices.tex" 1791570559 2831 96ef12c77089a998de0cbc242468df4c ""
   "figures/data/confusion_audio.dat" 1791570352 361 9573daa6e62da0825aa3aaced04638e4 ""
@@ -293,11 +296,11 @@
   "figures/request_sequence.tex" 1791569129 2532 7a76606169347fd5411454a7120cdb38 ""
   "figures/research_data_lifecycle.tex" 1791569130 2257 3151bfc5d6c4e61c9d74e0c921538643 ""
   "figures/system_architecture.tex" 1791569146 2687 bf659d87dfb1a9a6c41ef90854764882 ""
-  "main_file_template_bachelor_masters_english.aux" 1791707364 67031 1e2455f0e3a138160e9932f0ee3c73c2 "pdflatex"
-  "main_file_template_bachelor_masters_english.bbl" 1791707352 13194 15a1508bbf5b37a60f0f422114196200 "bibtex main_file_template_bachelor_masters_english"
-  "main_file_template_bachelor_masters_english.out" 1791707364 50709 6450723e7d8ea5e76924450002ae89f5 "pdflatex"
-  "main_file_template_bachelor_masters_english.tex" 1791707351 7646 ec9c4d6cd7c12aef96a5944355c85571 ""
-  "main_file_template_bachelor_masters_english.toc" 1791707364 22463 754b8d4eb072d9f8c64a640a33f335e0 "pdflatex"
+  "main_file_template_bachelor_masters_english.aux" 1792175895 68812 5202ceca1d2d4f1be9b8b09660623a31 "pdflatex"
+  "main_file_template_bachelor_masters_english.bbl" 1792175879 13194 15a1508bbf5b37a60f0f422114196200 "bibtex main_file_template_bachelor_masters_english"
+  "main_file_template_bachelor_masters_english.out" 1792175895 50928 1d6fdc3be2412a8a3fbc52fee5d8ea37 "pdflatex"
+  "main_file_template_bachelor_masters_english.tex" 1792174309 9321 cac1b5c59c0b01af2dcff924b8726291 ""
+  "main_file_template_bachelor_masters_english.toc" 1792175895 22571 a71e26638d86017ad7aca3cac54e9302 "pdflatex"
   (generated)
   "main_file_template_bachelor_masters_english.aux"
   "main_file_template_bachelor_masters_english.log"

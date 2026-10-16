@@ -129,95 +129,96 @@
 \contentsline {subsection}{\numberline {4.6.3}Rewind, Branching, and Comparison}{93}{subsection.4.6.3}%
 \contentsline {subsection}{\numberline {4.6.4}Takeaways and Action Cards}{93}{subsection.4.6.4}%
 \contentsline {section}{\numberline {4.7}Frontend Application}{95}{section.4.7}%
-\contentsline {subsection}{\numberline {4.7.1}Application Navigation and User Workflow}{95}{subsection.4.7.1}%
-\contentsline {subsection}{\numberline {4.7.2}Conversation Preparation}{96}{subsection.4.7.2}%
-\contentsline {subsection}{\numberline {4.7.3}Role-Play Workspace}{96}{subsection.4.7.3}%
-\contentsline {subsection}{\numberline {4.7.4}Voice Capture and Multimodal Interaction}{96}{subsection.4.7.4}%
-\contentsline {subsection}{\numberline {4.7.5}Presentation of Affect and Uncertainty}{97}{subsection.4.7.5}%
-\contentsline {subsection}{\numberline {4.7.6}Feedback, Replay, and Comparison Interfaces}{97}{subsection.4.7.6}%
-\contentsline {subsection}{\numberline {4.7.7}Optional Research Interfaces}{98}{subsection.4.7.7}%
-\contentsline {section}{\numberline {4.8}Optional Research Support and Data Export}{98}{section.4.8}%
-\contentsline {subsection}{\numberline {4.8.1}Participant Enrolment and Consent}{99}{subsection.4.8.1}%
-\contentsline {subsection}{\numberline {4.8.2}Study Progress and Questionnaires}{99}{subsection.4.8.2}%
-\contentsline {subsection}{\numberline {4.8.3}Pseudonymous Research Records}{100}{subsection.4.8.3}%
-\contentsline {subsection}{\numberline {4.8.4}Research Dashboard and Data Export}{100}{subsection.4.8.4}%
-\contentsline {section}{\numberline {4.9}Security, Privacy, and Data Protection}{101}{section.4.9}%
-\contentsline {subsection}{\numberline {4.9.1}Authentication and Token Management}{101}{subsection.4.9.1}%
-\contentsline {subsection}{\numberline {4.9.2}Authorisation and Resource Isolation}{102}{subsection.4.9.2}%
-\contentsline {subsection}{\numberline {4.9.3}Audio and Conversation Data Handling}{102}{subsection.4.9.3}%
-\contentsline {subsection}{\numberline {4.9.4}Retention, Withdrawal, and Account Deletion}{102}{subsection.4.9.4}%
-\contentsline {subsection}{\numberline {4.9.5}Deployment Security Controls}{103}{subsection.4.9.5}%
-\contentsline {section}{\numberline {4.10}Deployment and Configuration}{103}{section.4.10}%
-\contentsline {subsection}{\numberline {4.10.1}Local and Containerised Deployment}{104}{subsection.4.10.1}%
-\contentsline {subsection}{\numberline {4.10.2}Offline Demonstration Mode}{104}{subsection.4.10.2}%
-\contentsline {subsection}{\numberline {4.10.3}Environment-Based Configuration}{105}{subsection.4.10.3}%
-\contentsline {subsection}{\numberline {4.10.4}Health Checks and Operational Failure Handling}{105}{subsection.4.10.4}%
-\contentsline {section}{\numberline {4.11}Implementation Verification}{106}{section.4.11}%
-\contentsline {subsection}{\numberline {4.11.1}Backend Unit and Integration Testing}{106}{subsection.4.11.1}%
-\contentsline {subsection}{\numberline {4.11.2}Frontend End-to-End Testing}{106}{subsection.4.11.2}%
-\contentsline {subsection}{\numberline {4.11.3}Performance Regression Testing}{107}{subsection.4.11.3}%
-\contentsline {subsection}{\numberline {4.11.4}Full-Stack Smoke Testing}{107}{subsection.4.11.4}%
-\contentsline {subsection}{\numberline {4.11.5}Reproducibility and Model-Provenance Checks}{108}{subsection.4.11.5}%
-\contentsline {section}{\numberline {4.12}Chapter Summary}{108}{section.4.12}%
-\contentsline {chapter}{\numberline {5}Evaluation and Results}{111}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Chapter Overview}{111}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Evaluation Scope and Evidence Hierarchy}{111}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Research Questions and Evaluation Levels}{111}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Separation of Development, Evaluation, and Deployment Evidence}{112}{subsection.5.2.2}%
-\contentsline {section}{\numberline {5.3}Emotion-Recognition Evaluation Methodology}{113}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Benchmark Task and Speaker-Independent Splits}{113}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Classification and Calibration Measures}{113}{subsection.5.3.2}%
-\contentsline {subsection}{\numberline {5.3.3}Paired Dialogue-Level Statistical Comparison}{114}{subsection.5.3.3}%
-\contentsline {section}{\numberline {5.4}Contextual Text-Emotion Results}{114}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}Primary Four-Class Comparison}{114}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}Exploratory Six-Class Comparison}{114}{subsection.5.4.2}%
-\contentsline {subsection}{\numberline {5.4.3}Answer to RQ1}{115}{subsection.5.4.3}%
-\contentsline {section}{\numberline {5.5}Speech and Multimodal Results}{115}{section.5.5}%
-\contentsline {subsection}{\numberline {5.5.1}Audio-Only Baseline}{115}{subsection.5.5.1}%
-\contentsline {subsection}{\numberline {5.5.2}Predeclared Equal-Weight Late Fusion}{115}{subsection.5.5.2}%
-\contentsline {subsection}{\numberline {5.5.3}Classification--Calibration Trade-Off}{116}{subsection.5.5.3}%
-\contentsline {subsection}{\numberline {5.5.4}Answer to RQ2}{120}{subsection.5.5.4}%
-\contentsline {section}{\numberline {5.6}Application Verification and Readiness}{120}{section.5.6}%
-\contentsline {subsection}{\numberline {5.6.1}Deterministic Dialogue Cases}{120}{subsection.5.6.1}%
-\contentsline {subsection}{\numberline {5.6.2}Evidence Extraction and Affect-Pacing Cases}{121}{subsection.5.6.2}%
-\contentsline {subsection}{\numberline {5.6.3}Automated and Full-Stack Verification Results}{121}{subsection.5.6.3}%
-\contentsline {subsection}{\numberline {5.6.4}Performance and Responsive-Interface Checks}{122}{subsection.5.6.4}%
-\contentsline {subsection}{\numberline {5.6.5}Answer to RQ3}{122}{subsection.5.6.5}%
-\contentsline {subsection}{\numberline {5.6.6}Answer to RQ4: Integrated Application Quality}{123}{subsection.5.6.6}%
-\contentsline {subsection}{\numberline {5.6.7}Supplementary User-Pilot Results}{123}{subsection.5.6.7}%
-\contentsline {section}{\numberline {5.7}Threats to Validity and Limitations}{123}{section.5.7}%
-\contentsline {subsection}{\numberline {5.7.1}Model and Statistical Validity}{123}{subsection.5.7.1}%
-\contentsline {subsection}{\numberline {5.7.2}External and Construct Validity}{124}{subsection.5.7.2}%
-\contentsline {subsection}{\numberline {5.7.3}Supplementary User-Evidence Limitations}{124}{subsection.5.7.3}%
-\contentsline {section}{\numberline {5.8}Chapter Summary}{125}{section.5.8}%
-\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{127}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Chapter Overview}{127}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Summary of the Dissertation}{127}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Conclusions for the Research Questions}{128}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}RQ1: The Contribution of Conversational Context}{128}{subsection.6.3.1}%
-\contentsline {subsection}{\numberline {6.3.2}RQ2: Multimodal Complementarity and Calibration}{129}{subsection.6.3.2}%
-\contentsline {subsection}{\numberline {6.3.3}RQ3: Bounded Integration of Affective Evidence}{129}{subsection.6.3.3}%
-\contentsline {subsection}{\numberline {6.3.4}RQ4: Integrated Application Quality and Readiness}{130}{subsection.6.3.4}%
-\contentsline {section}{\numberline {6.4}Principal Contributions}{130}{section.6.4}%
-\contentsline {subsection}{\numberline {6.4.1}Empirical and Machine-Learning Contributions}{130}{subsection.6.4.1}%
-\contentsline {subsection}{\numberline {6.4.2}System and Interaction-Design Contributions}{130}{subsection.6.4.2}%
-\contentsline {subsection}{\numberline {6.4.3}Application-Verification and Infrastructure Contributions}{131}{subsection.6.4.3}%
-\contentsline {section}{\numberline {6.5}Limitations of the Conclusions}{131}{section.6.5}%
-\contentsline {subsection}{\numberline {6.5.1}Model and Data Limitations}{131}{subsection.6.5.1}%
-\contentsline {subsection}{\numberline {6.5.2}Application and Measurement Limitations}{132}{subsection.6.5.2}%
-\contentsline {subsection}{\numberline {6.5.3}Supporting User-Evidence Limitations}{132}{subsection.6.5.3}%
-\contentsline {section}{\numberline {6.6}Future Work}{132}{section.6.6}%
-\contentsline {subsection}{\numberline {6.6.1}Validate Deployment Performance and Reliability}{132}{subsection.6.6.1}%
-\contentsline {subsection}{\numberline {6.6.2}Broaden Model Validation and Improve Uncertainty Handling}{133}{subsection.6.6.2}%
-\contentsline {subsection}{\numberline {6.6.3}Evaluate and Refine the Adaptation Policy}{134}{subsection.6.6.3}%
-\contentsline {subsection}{\numberline {6.6.4}Validate Feedback and Communication Measures}{134}{subsection.6.6.4}%
-\contentsline {subsection}{\numberline {6.6.5}Study Transfer, Accessibility, and Long-Term Use}{134}{subsection.6.6.5}%
-\contentsline {subsection}{\numberline {6.6.6}Strengthen Deployment, Privacy, and Governance}{135}{subsection.6.6.6}%
-\contentsline {section}{\numberline {6.7}Final Conclusion}{135}{section.6.7}%
-\contentsline {chapter}{Bibliography}{141}{chapter*.10}%
-\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{143}{appendix.A}%
-\contentsline {section}{\numberline {A.1}ChatGPT Details}{143}{section.A.1}%
-\contentsline {subsection}{\numberline {A.1.1}Literature Exploration}{144}{subsection.A.1.1}%
-\contentsline {subsection}{\numberline {A.1.2}Academic Writing Assistance}{144}{subsection.A.1.2}%
-\contentsline {subsection}{\numberline {A.1.3}LaTeX Formatting Assistance}{144}{subsection.A.1.3}%
-\contentsline {subsection}{\numberline {A.1.4}Technical Guidance and Debugging}{144}{subsection.A.1.4}%
+\contentsline {subsection}{\numberline {4.7.1}Application Interface Overview}{95}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Application Navigation and User Workflow}{95}{subsection.4.7.2}%
+\contentsline {subsection}{\numberline {4.7.3}Conversation Preparation}{99}{subsection.4.7.3}%
+\contentsline {subsection}{\numberline {4.7.4}Role-Play Workspace}{99}{subsection.4.7.4}%
+\contentsline {subsection}{\numberline {4.7.5}Voice Capture and Multimodal Interaction}{100}{subsection.4.7.5}%
+\contentsline {subsection}{\numberline {4.7.6}Presentation of Affect and Uncertainty}{100}{subsection.4.7.6}%
+\contentsline {subsection}{\numberline {4.7.7}Feedback, Replay, and Comparison Interfaces}{101}{subsection.4.7.7}%
+\contentsline {subsection}{\numberline {4.7.8}Optional Research Interfaces}{101}{subsection.4.7.8}%
+\contentsline {section}{\numberline {4.8}Optional Research Support and Data Export}{102}{section.4.8}%
+\contentsline {subsection}{\numberline {4.8.1}Participant Enrolment and Consent}{102}{subsection.4.8.1}%
+\contentsline {subsection}{\numberline {4.8.2}Study Progress and Questionnaires}{102}{subsection.4.8.2}%
+\contentsline {subsection}{\numberline {4.8.3}Pseudonymous Research Records}{103}{subsection.4.8.3}%
+\contentsline {subsection}{\numberline {4.8.4}Research Dashboard and Data Export}{103}{subsection.4.8.4}%
+\contentsline {section}{\numberline {4.9}Security, Privacy, and Data Protection}{104}{section.4.9}%
+\contentsline {subsection}{\numberline {4.9.1}Authentication and Token Management}{104}{subsection.4.9.1}%
+\contentsline {subsection}{\numberline {4.9.2}Authorisation and Resource Isolation}{105}{subsection.4.9.2}%
+\contentsline {subsection}{\numberline {4.9.3}Audio and Conversation Data Handling}{105}{subsection.4.9.3}%
+\contentsline {subsection}{\numberline {4.9.4}Retention, Withdrawal, and Account Deletion}{106}{subsection.4.9.4}%
+\contentsline {subsection}{\numberline {4.9.5}Deployment Security Controls}{106}{subsection.4.9.5}%
+\contentsline {section}{\numberline {4.10}Deployment and Configuration}{107}{section.4.10}%
+\contentsline {subsection}{\numberline {4.10.1}Local and Containerised Deployment}{107}{subsection.4.10.1}%
+\contentsline {subsection}{\numberline {4.10.2}Offline Demonstration Mode}{107}{subsection.4.10.2}%
+\contentsline {subsection}{\numberline {4.10.3}Environment-Based Configuration}{108}{subsection.4.10.3}%
+\contentsline {subsection}{\numberline {4.10.4}Health Checks and Operational Failure Handling}{108}{subsection.4.10.4}%
+\contentsline {section}{\numberline {4.11}Implementation Verification}{109}{section.4.11}%
+\contentsline {subsection}{\numberline {4.11.1}Backend Unit and Integration Testing}{109}{subsection.4.11.1}%
+\contentsline {subsection}{\numberline {4.11.2}Frontend End-to-End Testing}{110}{subsection.4.11.2}%
+\contentsline {subsection}{\numberline {4.11.3}Performance Regression Testing}{110}{subsection.4.11.3}%
+\contentsline {subsection}{\numberline {4.11.4}Full-Stack Smoke Testing}{110}{subsection.4.11.4}%
+\contentsline {subsection}{\numberline {4.11.5}Reproducibility and Model-Provenance Checks}{111}{subsection.4.11.5}%
+\contentsline {section}{\numberline {4.12}Chapter Summary}{111}{section.4.12}%
+\contentsline {chapter}{\numberline {5}Evaluation and Results}{113}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Chapter Overview}{113}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Evaluation Scope and Evidence Hierarchy}{113}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Research Questions and Evaluation Levels}{113}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Separation of Development, Evaluation, and Deployment Evidence}{114}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}Emotion-Recognition Evaluation Methodology}{115}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Benchmark Task and Speaker-Independent Splits}{115}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Classification and Calibration Measures}{115}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.3}Paired Dialogue-Level Statistical Comparison}{116}{subsection.5.3.3}%
+\contentsline {section}{\numberline {5.4}Contextual Text-Emotion Results}{116}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Primary Four-Class Comparison}{116}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Exploratory Six-Class Comparison}{116}{subsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.4.3}Answer to RQ1}{117}{subsection.5.4.3}%
+\contentsline {section}{\numberline {5.5}Speech and Multimodal Results}{117}{section.5.5}%
+\contentsline {subsection}{\numberline {5.5.1}Audio-Only Baseline}{117}{subsection.5.5.1}%
+\contentsline {subsection}{\numberline {5.5.2}Predeclared Equal-Weight Late Fusion}{117}{subsection.5.5.2}%
+\contentsline {subsection}{\numberline {5.5.3}Classification--Calibration Trade-Off}{118}{subsection.5.5.3}%
+\contentsline {subsection}{\numberline {5.5.4}Answer to RQ2}{122}{subsection.5.5.4}%
+\contentsline {section}{\numberline {5.6}Application Verification and Readiness}{122}{section.5.6}%
+\contentsline {subsection}{\numberline {5.6.1}Deterministic Dialogue Cases}{122}{subsection.5.6.1}%
+\contentsline {subsection}{\numberline {5.6.2}Evidence Extraction and Affect-Pacing Cases}{123}{subsection.5.6.2}%
+\contentsline {subsection}{\numberline {5.6.3}Automated and Full-Stack Verification Results}{123}{subsection.5.6.3}%
+\contentsline {subsection}{\numberline {5.6.4}Performance and Responsive-Interface Checks}{124}{subsection.5.6.4}%
+\contentsline {subsection}{\numberline {5.6.5}Answer to RQ3}{124}{subsection.5.6.5}%
+\contentsline {subsection}{\numberline {5.6.6}Answer to RQ4: Integrated Application Quality}{125}{subsection.5.6.6}%
+\contentsline {subsection}{\numberline {5.6.7}Supplementary User-Pilot Results}{125}{subsection.5.6.7}%
+\contentsline {section}{\numberline {5.7}Threats to Validity and Limitations}{125}{section.5.7}%
+\contentsline {subsection}{\numberline {5.7.1}Model and Statistical Validity}{125}{subsection.5.7.1}%
+\contentsline {subsection}{\numberline {5.7.2}External and Construct Validity}{126}{subsection.5.7.2}%
+\contentsline {subsection}{\numberline {5.7.3}Supplementary User-Evidence Limitations}{126}{subsection.5.7.3}%
+\contentsline {section}{\numberline {5.8}Chapter Summary}{127}{section.5.8}%
+\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{129}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Chapter Overview}{129}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Summary of the Dissertation}{129}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Conclusions for the Research Questions}{130}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}RQ1: The Contribution of Conversational Context}{130}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}RQ2: Multimodal Complementarity and Calibration}{131}{subsection.6.3.2}%
+\contentsline {subsection}{\numberline {6.3.3}RQ3: Bounded Integration of Affective Evidence}{131}{subsection.6.3.3}%
+\contentsline {subsection}{\numberline {6.3.4}RQ4: Integrated Application Quality and Readiness}{132}{subsection.6.3.4}%
+\contentsline {section}{\numberline {6.4}Principal Contributions}{132}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Empirical and Machine-Learning Contributions}{132}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.2}System and Interaction-Design Contributions}{132}{subsection.6.4.2}%
+\contentsline {subsection}{\numberline {6.4.3}Application-Verification and Infrastructure Contributions}{133}{subsection.6.4.3}%
+\contentsline {section}{\numberline {6.5}Limitations of the Conclusions}{133}{section.6.5}%
+\contentsline {subsection}{\numberline {6.5.1}Model and Data Limitations}{133}{subsection.6.5.1}%
+\contentsline {subsection}{\numberline {6.5.2}Application and Measurement Limitations}{134}{subsection.6.5.2}%
+\contentsline {subsection}{\numberline {6.5.3}Supporting User-Evidence Limitations}{134}{subsection.6.5.3}%
+\contentsline {section}{\numberline {6.6}Future Work}{134}{section.6.6}%
+\contentsline {subsection}{\numberline {6.6.1}Validate Deployment Performance and Reliability}{134}{subsection.6.6.1}%
+\contentsline {subsection}{\numberline {6.6.2}Broaden Model Validation and Improve Uncertainty Handling}{135}{subsection.6.6.2}%
+\contentsline {subsection}{\numberline {6.6.3}Evaluate and Refine the Adaptation Policy}{136}{subsection.6.6.3}%
+\contentsline {subsection}{\numberline {6.6.4}Validate Feedback and Communication Measures}{136}{subsection.6.6.4}%
+\contentsline {subsection}{\numberline {6.6.5}Study Transfer, Accessibility, and Long-Term Use}{136}{subsection.6.6.5}%
+\contentsline {subsection}{\numberline {6.6.6}Strengthen Deployment, Privacy, and Governance}{137}{subsection.6.6.6}%
+\contentsline {section}{\numberline {6.7}Final Conclusion}{137}{section.6.7}%
+\contentsline {chapter}{Bibliography}{143}{chapter*.10}%
+\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{145}{appendix.A}%
+\contentsline {section}{\numberline {A.1}ChatGPT Details}{145}{section.A.1}%
+\contentsline {subsection}{\numberline {A.1.1}Literature Exploration}{146}{subsection.A.1.1}%
+\contentsline {subsection}{\numberline {A.1.2}Academic Writing Assistance}{146}{subsection.A.1.2}%
+\contentsline {subsection}{\numberline {A.1.3}LaTeX Formatting Assistance}{146}{subsection.A.1.3}%
+\contentsline {subsection}{\numberline {A.1.4}Technical Guidance and Debugging}{146}{subsection.A.1.4}%
