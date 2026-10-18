@@ -172,6 +172,15 @@ The backend exposes optional authenticated inference at `POST /api/affect/multim
 
 Multimodal responses expose calibrated text-only, audio-only, and fused distributions, plus agreement, latency, queue time, and confidence-level metadata. The UI does not headline a fused label below `MULTIMODAL_LOW_CONFIDENCE_THRESHOLD` (0.55 by default). This is a presentation abstention policy rather than a modification to the frozen model or its probabilities. Inference is serialized per backend process to prevent simultaneous requests from competing for model memory.
 
+To run the controlled live integration smoke after synchronizing the private artifacts and setting the `MULTIMODAL_*` paths, use:
+
+```powershell
+cd backend
+..\.venv\Scripts\python.exe -m pytest -m trained_model_integration tests/test_trained_model_integration.py
+```
+
+The smoke loads both packaged models on CPU, sends one paired text/WAV probe through the calibrated application inference path, stores its `AffectDecision`, and reloads the saved explanation through a fresh service. The generated WAV is only a deterministic pipeline probe: the test asserts provenance, probability integrity, persistence, and absence of raw audio, not emotion correctness or real-world accuracy. Without local private artifacts, the test is skipped with the missing configuration names.
+
 When that endpoint is enabled and its artifacts are available, the authenticated frontend shows an optional **Add voice** control. The browser records at most 20 seconds, converts the sample to mono 16 kHz PCM WAV, sends it only with the typed transcript for the current inference request, and then discards it. Microphone denial, an unavailable model, or an inference error leaves the normal text conversation usable. Browser microphone capture works on `localhost`; non-local deployments require HTTPS.
 
 With `TRANSCRIPTION_ENABLED=true` and `OPENAI_API_KEY` configured, stopping a recording sends that transient WAV to OpenAI file transcription using the environment-selected `OPENAI_TRANSCRIPTION_MODEL` (`gpt-transcribe` by default). The returned transcript is placed in the composer for explicit review and editing; it is never sent as a chat turn until the user presses Send. AffectLab does not persist the raw recording. The implementation follows the [official OpenAI file transcription guide](https://developers.openai.com/api/docs/guides/speech-to-text).

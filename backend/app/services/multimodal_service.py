@@ -119,6 +119,27 @@ class MultimodalAffectService:
                 self._status = "error"
                 raise
 
+    def _apply_calibration(self, text_logits, audio_logits):
+        """Apply the frozen deployment calibration and late-fusion chain."""
+        import torch
+
+        text_probabilities = torch.softmax(
+            text_logits / self.calibration["text_temperature"], dim=-1
+        )
+        audio_probabilities = torch.softmax(
+            audio_logits / self.calibration["audio_temperature"], dim=-1
+        )
+        fused = (
+            self.calibration["text_weight"] * text_probabilities
+            + self.calibration["audio_weight"] * audio_probabilities
+        )
+        probabilities = torch.softmax(
+            torch.log(fused.clamp_min(1e-12))
+            / self.calibration["fusion_temperature"],
+            dim=-1,
+        )
+        return text_probabilities, audio_probabilities, probabilities
+
     def _analyze_sync(self, context: str, audio: bytes, queue_ms: int = 0) -> dict:
         import numpy as np
         import soundfile as sf
@@ -155,21 +176,10 @@ class MultimodalAffectService:
         with torch.inference_mode():
             text_logits = self.text_model(**text_inputs).logits.float()
             audio_logits = self.audio_model(**audio_inputs).logits.float()
-            text_probabilities = torch.softmax(
-                text_logits / self.calibration["text_temperature"], dim=-1
+            text_probabilities, audio_probabilities, probabilities = (
+                self._apply_calibration(text_logits, audio_logits)
             )
-            audio_probabilities = torch.softmax(
-                audio_logits / self.calibration["audio_temperature"], dim=-1
-            )
-            fused = (
-                self.calibration["text_weight"] * text_probabilities
-                + self.calibration["audio_weight"] * audio_probabilities
-            )
-            probabilities = torch.softmax(
-                torch.log(fused.clamp_min(1e-12))
-                / self.calibration["fusion_temperature"],
-                dim=-1,
-            )[0].cpu().numpy()
+            probabilities = probabilities[0].cpu().numpy()
         text_values = text_probabilities[0].cpu().numpy()
         audio_values = audio_probabilities[0].cpu().numpy()
         index = int(probabilities.argmax())
