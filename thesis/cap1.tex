@@ -128,7 +128,7 @@ To achieve the aim of the dissertation, the following objectives were defined:
 
     \item To evaluate the application through automated unit, integration, browser, persistence, recovery, accessibility, responsive-layout, performance, and end-to-end tests, together with reproducible authored engineering cases.
 
-    \item To report a small user pilot as supplementary product feedback on completion, perceived realism, feedback usefulness, and self-reported confidence without making therapeutic or causal-effectiveness claims.
+    \item To report a small user pilot as supplementary product feedback on completion, perceived realism, feedback usefulness, and self-reported confidence for the non-adaptive required-task workflow, without treating those observations as evidence for multimodal adaptation or making therapeutic or causal-effectiveness claims.
 
     \item To document the limitations of the dataset, trained models, dialogue policies, evaluation procedures, and intended use so that the conclusions remain proportionate to the evidence collected.
 \end{enumerate}
@@ -213,7 +213,7 @@ Second, a comprehensive engineering evaluation examines dialogue transitions, sc
 
 Third, a reproducible local performance check measures liveness, authenticated scenario retrieval, session creation, role-play start, and a deterministic conversation turn through the HTTP application boundary. Its purpose is to detect regressions in the locally controlled path; deployment-specific concurrent-load and provider latency remain separate operational checks.
 
-Finally, results from a small single-arm user pilot are retained in one supporting subsection. Completion, realism, feedback usefulness, and confidence ratings provide useful product context, but the study is not used to carry the technical-readiness claim or to assert lasting communication improvement.
+Finally, results from a small single-arm user pilot are retained in one supporting subsection. Required tasks bypassed multimodal inference and affect-aware pacing, so completion, realism, feedback usefulness, and confidence ratings provide product context only for the baseline rehearsal workflow. The study is not used to evaluate emotion-aware adaptation, carry the technical-readiness claim, or assert lasting communication improvement.
 
 \section{Expected Contributions}
 \label{sec:expected-contributions}
@@ -355,7 +355,7 @@ The model experiments evaluate classification on IEMOCAP rather than on recordin
 
 The engineering evaluation uses authored synthetic cases to exercise known dialogue, evidence, adaptation, persistence, and fallback behaviours. These cases are useful for testing whether the implementation follows its declared rules, but they are not an independent sample of human conversations. Passing the authored cases demonstrates policy conformance rather than improved communication outcomes.
 
-The supplementary user pilot uses a single-arm, within-participant design and a small convenience sample. It provides product feedback about completion, perceived realism, feedback usefulness, and self-reported confidence. Without a randomised non-adaptive control group, it cannot establish that affect-aware adaptation causes better outcomes than a non-adaptive system.
+The supplementary user pilot uses a single-arm, within-participant design and a small convenience sample. Its required tasks explicitly bypass multimodal inference and affect-aware pacing, so it provides product feedback only about completion, perceived realism, deterministic-feedback usefulness, and self-reported confidence in the baseline workflow. It therefore cannot assess the acceptability or benefit of affect-aware adaptation; a future controlled comparison of otherwise equivalent adaptive and non-adaptive conditions would be required.
 
 Self-reported confidence may be influenced by familiarity with the application, demand characteristics, or repeated exposure to a scenario. Deterministic skill measures may change because users learn how the application detects particular language features. Neither type of change establishes that participants communicate more effectively outside the system.
 
