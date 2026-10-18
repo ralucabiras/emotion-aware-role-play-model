@@ -224,6 +224,33 @@ The answer includes a material trade-off: the strongest classifier was poorly ca
 \section{Application Verification and Readiness}
 \label{sec:engineering-evaluation}
 
+Table~\ref{tab:requirements-traceability} provides a compact trace from the requirements in Chapter~\ref{chap:proposed-system-architecture} to their implementation and verification evidence. Requirements are grouped only where they share the same implementation boundary, verification method, outcome, and principal limitation. Here, ``passed'' means conformance under the cited developer-led checks, not universal validation beyond the tested configuration.
+
+\begin{table}[p]
+\centering
+\caption{Compact requirement-to-evidence traceability matrix.}
+\label{tab:requirements-traceability}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.96}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.16\textwidth}|>{\raggedright\arraybackslash}p{0.19\textwidth}|>{\raggedright\arraybackslash}p{0.24\textwidth}|>{\raggedright\arraybackslash}p{0.09\textwidth}|X|}
+\hline
+\textbf{Requirement IDs} & \textbf{Implementation location} & \textbf{Verification method} & \textbf{Outcome} & \textbf{Principal limitation} \\ \hline
+FR1, FR26; NFR5, NFR13 & Authentication, persistence, isolation, and deletion (Sections~\ref{subsec:backend-authentication}, \ref{subsec:backend-session-persistence}, and \ref{sec:security-privacy-data-protection}) & API, security, ownership, stale-write, deletion, and MongoDB recovery tests & Passed & No independent penetration test or deployed backup exercise \\ \hline
+FR2, FR3, FR25; NFR3 & Onboarding, preferences, takeaways, and action cards (Sections~\ref{subsec:frontend-navigation} and \ref{subsec:takeaways-action-cards}) & API and browser onboarding, preference, reflection, and recovery journeys & Passed & No independent usability assessment of these controls \\ \hline
+FR4--FR8, FR15, FR19 & Preparation, scenario configuration, lifecycle, and dialogue policies (Sections~\ref{subsec:frontend-preparation}, \ref{subsec:scenario-representation}, and \ref{subsec:dialogue-transitions}) & Policy/unit, API, desktop/mobile browser, authored-trajectory, and smoke tests & Passed & Three standard scenarios and controlled inputs \\ \hline
+FR9, FR11--FR13; NFR2, NFR4 & Voice, causal-context inference, fusion, and fallback paths (Sections~\ref{sec:emotion-recognition-pipeline}, \ref{subsec:frontend-voice}, and \ref{subsec:audio-conversation-data}) & Context, multimodal, transcription, transient-audio, missing-service, and browser tests & Passed in tested configuration & Limited live-device, provider, and private-model execution \\ \hline
+FR10; NFR1 & Crisis interruption and safety precedence (Section~\ref{subsec:safety-precedence}) & Crisis paraphrase, false-positive, precedence, API, and conversation tests & Passed & A bounded lexical detector cannot cover every expression \\ \hline
+FR14; NFR14 & Bounded affect pacing and uncertainty presentation (Sections~\ref{subsec:affect-pacing} and \ref{subsec:frontend-affect-presentation}) & Seven authored policy cases plus preference, disagreement, failure, and replay tests & Passed & Controlled probabilities; no evidence of user benefit \\ \hline
+FR16--FR18, FR20--FR21; NFR6, NFR8 & Evidence, response realisation, fallback, and feedback (Sections~\ref{subsec:communication-evidence}, \ref{subsec:response-realisation}, and \ref{subsec:evidence-feedback}) & Determinism, evidence-linking, constrained-generation, fallback, feedback, and concurrency tests & Passed & Designed cases do not exhaust language variation \\ \hline
+FR22--FR24 & Replay, retry, branching, and comparison (Sections~\ref{subsec:conversation-replay} and \ref{subsec:rewind-branching}) & Backend, browser, stale-state, restart-persistence, and full-stack smoke tests & Passed & Synthetic histories rather than natural long-term use \\ \hline
+FR27--FR28; NFR7 & Consent, study progress, pseudonymous export, and versioning (Section~\ref{sec:research-workflow-implementation} and Subsection~\ref{subsec:reproducibility-provenance}) & Protocol, eligibility, withdrawal, export-exclusion, dataset-freeze, provenance, and smoke tests & Passed & No independent privacy or reproduction audit \\ \hline
+NFR9 & Health, bounded failures, recovery, and local responsiveness (Subsections~\ref{subsec:health-failure-handling} and \ref{subsec:performance-testing}) & Recovery journeys, health checks, full-stack restart, and performance regression artefact & Passed locally & No networked concurrent-load or provider-latency test \\ \hline
+NFR10 & Accessible and responsive interface (Subsections~\ref{subsec:frontend-navigation} and \ref{subsec:frontend-testing}) & axe-core scans, keyboard assertions, and desktop/mobile browser runs & Passed tested views & No evaluation with users with disabilities \\ \hline
+NFR11--NFR12 & Modular and testable architecture (Sections~\ref{subsec:backend-service-architecture} and \ref{sec:implementation-verification}) & Interface inspection, provider substitution, and automated suites across component boundaries & Shown & Maintainability was not measured longitudinally \\ \hline
+\end{tabularx}
+\end{table}
+
 \subsection{Deterministic Dialogue Cases}
 \label{subsec:dialogue-case-results}
 
@@ -263,7 +290,7 @@ The default backend run performed for the completed implementation reported 240 
 
 The saved full-stack smoke manifest reports two passing browser journeys against a compiled frontend, actual FastAPI process, and disposable MongoDB 8.0.1 database. The journeys included account access, pre-consent exclusion, enrolment, a required task and questionnaire, researcher export, enhanced dialogue, network-failure recovery, replay, branching, comparison, and action-card persistence. The backend was stopped and relaunched twice while MongoDB remained active, and persisted state was verified after each relevant restart. The recorded total run time was 95.72 seconds; this is demonstration timing, not a capacity benchmark.
 
-The test evidence also covers ownership failures, stale versions, duplicate identifiers, crisis precedence, missing optional services, invalid audio, post-questionnaire timing, withdrawal, immutable dataset freezing, desktop and mobile workflows, keyboard navigation, and automated accessibility checks. Together, these checks support conformance to the implementation contract described in Chapter~\ref{chap:implementation}. They cannot establish that the text detector covers every crisis expression or that the user interface is accessible to every disability group.
+Together, these complementary checks support the requirement outcomes summarised in Table~\ref{tab:requirements-traceability}; their principal scope limitations are reported in the same table.
 
 \subsection{Performance and Responsive-Interface Checks}
 \label{subsec:performance-results}
@@ -299,7 +326,7 @@ The authored cases and automated tests show that low confidence and disagreement
 \subsection{Answer to RQ4: Integrated Application Quality}
 \label{subsec:rq4-status}
 
-RQ4 is answered through the combined engineering evidence. The completed application passed 240 backend tests, production frontend compilation and linting, desktop and mobile browser workflows, accessibility scans, two database-backed full-stack journeys, restart-persistence checks, and the authored dialogue and affect-policy fixtures. Its locally controlled text-first path also remained below 7~ms at the 95th percentile for the measured core operations. Together with ownership enforcement, optimistic concurrency, deterministic fallbacks, health checks, containerisation, and recovery behaviour, these results support readiness for a controlled production deployment with the tested configuration.
+RQ4 is answered through the combined evidence traced in Table~\ref{tab:requirements-traceability}. The automated, browser, full-stack, recovery, and authored-policy checks passed in the tested configuration, while the locally controlled text-first operations remained below 7~ms at the 95th percentile. These results support readiness for a controlled production deployment with that configuration.
 
 This conclusion is deliberately environment-specific. It does not claim internet-scale capacity or guarantee the latency of MongoDB, trained inference, or external providers. A public deployment should establish its own service-level objectives and repeat concurrent-load, network, backup, security, and observability checks in staging.
 
