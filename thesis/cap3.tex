@@ -114,6 +114,8 @@ Each standard scenario defines a simulated character, a communication objective,
 
 The system supports text-based interaction as the default modality. Optional voice input can be used for transcription and acoustic affect analysis when the relevant services are enabled. Affect analysis is limited to estimates over predefined categories derived from the selected research dataset. These estimates may inform restrained changes in conversational pacing, but they are not presented as direct measurements of the user's internal emotional state.
 
+General conversation outside an active rehearsal uses an additional deterministic routing layer. It may expose tentative labels for requested support, a phrase following a causal connector, conversational pushback, or a matched cognitive-pattern vocabulary and use them to select a supportive response strategy. These labels describe which authored lexical rule fired on the current message. They are not latent-state estimates, clinical constructs, or user attributes, and the dissertation evaluates them only as application rules. Cognitive assessment, diagnosis, and treatment remain outside scope.
+
 The scope also includes post-rehearsal reflection. Users can inspect evidence-grounded feedback, replay an attempt, retry an exchange, create an alternative conversational branch, compare compatible attempts, record a personal takeaway, and prepare an action card. These functions support deliberate practice rather than unrestricted social conversation.
 
 For optional research use, AffectLab includes versioned consent and eligibility procedures, pre- and post-rehearsal measures, pseudonymous research records, technical-event recording, and restricted aggregate export. These functions support supplementary study workflows. They do not transform the application into a clinical intervention or establish that practice transfers to real-world behaviour.
@@ -208,6 +210,9 @@ The functional requirements of AffectLab are as follows.
 
     \item[\textbf{FR28. Pseudonymous research access}]  
     The system shall provide authorised researchers with aggregate monitoring and pseudonymous exports containing only the fields required by the study protocol. Research exports shall exclude names, email addresses, passwords, raw conversation text, raw audio, custom scenario wording, feedback prose, and personal takeaways.
+
+    \item[\textbf{FR29. Bounded general support routing}]
+    Outside active role-play, the system may use deterministic lexical rules to select among a declared set of general support strategies. Any intent, cognitive-pattern, possible-context, readiness, or resistance output shall be presented as a tentative rule match rather than a psychological measurement. The subsystem shall not determine crisis detection, eligibility, research inclusion, scenario progression, completion, or feedback scores, and its rule-priority values shall not be presented as probabilities.
 
 \end{description}
 
@@ -371,6 +376,17 @@ To reduce this risk, affect outputs are treated as uncertain evidence rather tha
 Confidence does not eliminate this ethical concern. Neural classifiers may produce high-confidence errors, particularly when deployment data differ from their training distribution \cite{guo2017calibration,ovadia2019shift}. Similarly, agreement between the textual and acoustic models does not prove correctness because both may respond to the same misleading cue. The low-confidence threshold and agreement rules used by AffectLab are therefore operational safeguards rather than scientifically validated boundaries between correct and incorrect emotional interpretation.
 
 The architecture restricts affect predictions to low-consequence and reversible actions. They cannot determine crisis escalation, scenario success, communication-skill scores, study eligibility, or research inclusion. If prediction is unavailable, uncertain, or conflicting, the system returns to baseline dialogue or offers an explicit user choice. This limits the harm that can result from an incorrect classification.
+
+\subsection{Ethical Limits of Cognitive-Pattern and Intent Heuristics}
+\label{subsec:ethical-cognitive-heuristics}
+
+The rule-based component named \texttt{RuleBasedCognitiveAnalyzer} in the source code creates a particular risk of category confusion. Terms such as ``cognitive distortion'', ``intent'', ``cause'', ``readiness'', and ``resistance'' have psychological or interpersonal meanings beyond what a phrase matcher can support. In AffectLab, they are implementation labels for lexical routing: the system does not interview the user, examine enduring beliefs, consider a clinical history, or compare observations with a validated instrument or professional judgement. The ethical justification for retaining the component is therefore narrow. It can make a low-consequence template choice reproducible and inspectable, but it cannot assess cognition.
+
+The user-facing explanation presents a matched item as a tentative pattern that may be wrong and presents the extracted clause only as possible context. Nevertheless, tentative wording does not make an invalid inference valid. False positives may pathologise ordinary emphasis, quotation, sarcasm, or culturally specific language; false negatives may omit indirect or unfamiliar wording; the ``cause'' field may merely copy a grammatically adjacent clause; and the intent, readiness, and resistance values may misrepresent what the user wants. Naming a familiar therapeutic concept may also lend the output more authority than its evidence warrants.
+
+Several authority limits reduce, but do not remove, these risks. The fields are not used for eligibility, study inclusion, feedback scores, scenario success, or clinical and safety decisions. During active role-play, the scenario controller rather than the support-strategy selector determines the required action. A crisis flag takes precedence, and the generator is instructed not to diagnose. The labels and strategy reasons remain visible so that the routing is contestable rather than hidden. These controls justify treating the subsystem as a transparent prototype heuristic; they do not justify a claim of psychological validity or user benefit.
+
+Accordingly, the evaluation standard for this dissertation is implementation conformance: whether declared strings produce declared tags and whether priority rules produce the specified response category. Any stronger use would require a separately justified construct definition, expert and target-user review, representative annotated data, inter-rater procedures, error and subgroup analysis, comparison with a neutral baseline, and prospective evaluation of helpfulness and harm. Until such evidence exists, the outputs must not be presented or interpreted as clinical assessment, and the safest future refinement may be to replace psychological terminology with descriptions of directly observed language.
 
 \subsection{User Autonomy, Transparency, and Avoidance of Dependency}
 \label{subsec:autonomy-transparency}

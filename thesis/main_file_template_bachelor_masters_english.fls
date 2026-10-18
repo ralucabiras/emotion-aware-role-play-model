@@ -1,6 +1,6 @@
-PWD c:\Users\raluc\OneDrive\Documents\GitHub\emotion-aware-role-play-model\thesis
+PWD C:\Users\raluc\OneDrive\Documents\GitHub\emotion-aware-role-play-model\thesis
 INPUT C:\Users\raluc\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
-INPUT c:\Users\raluc\OneDrive\Documents\GitHub\emotion-aware-role-play-model\thesis\main_file_template_bachelor_masters_english.tex
+INPUT main_file_template_bachelor_masters_english.tex
 OUTPUT main_file_template_bachelor_masters_english.log
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex\latex\base\book.cls
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex\latex\base\book.cls
@@ -456,12 +456,12 @@ INPUT .\figures\system_architecture.tex
 INPUT .\figures\system_architecture.tex
 INPUT figures\system_architecture.tex
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmss8.tfm
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt12.tfm
 INPUT .\cap4.tex
 INPUT .\cap4.tex
 INPUT .\cap4.tex
 INPUT .\cap4.tex
 INPUT cap4.tex
-INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt12.tfm
 INPUT .\figures\emotion_pipeline.tex
 INPUT .\figures\emotion_pipeline.tex
 INPUT .\figures\emotion_pipeline.tex
@@ -509,6 +509,8 @@ INPUT .\figures\app-feedback.png
 INPUT .\figures\app-feedback.png
 INPUT .\figures\app-feedback.png
 INPUT .\figures\app-feedback.png
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx8.tfm
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt8.tfm
 INPUT .\figures\research_data_lifecycle.tex
 INPUT .\figures\research_data_lifecycle.tex
 INPUT .\figures\research_data_lifecycle.tex
@@ -524,7 +526,6 @@ INPUT .\cap5.tex
 INPUT .\cap5.tex
 INPUT .\cap5.tex
 INPUT cap5.tex
-INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx8.tfm
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx6.tfm
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx7.tfm
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx5.tfm
@@ -558,6 +559,7 @@ INPUT figures\data\reliability_equal_fusion.dat
 INPUT figures\data\reliability_equal_fusion.dat
 INPUT figures\data\reliability_validation_fitted.dat
 INPUT figures\data\reliability_global_calibrated.dat
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti10.tfm
 INPUT .\cap6.tex
 INPUT .\cap6.tex
 INPUT .\cap6.tex
@@ -575,6 +577,8 @@ INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\c
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx8.pfb
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx8.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmex10.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmex10.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi10.pfb
@@ -609,9 +613,13 @@ INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\c
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy6.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy8.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy8.pfb
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti10.pfb
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti10.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti12.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti12.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt10.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt10.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt12.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt12.pfb
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt8.pfb
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt8.pfb

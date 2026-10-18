@@ -283,6 +283,8 @@ The system provides text-based role-play with optional voice input. It supports 
 
 The application includes optional language-model-based response generation, feedback phrasing, moderation, and transcription. These services are placed behind deterministic interfaces and fallbacks so that the core workflow remains available when an external service is disabled or unavailable. The system does not attempt to provide unrestricted open-domain conversation. Its adaptive role-play functions are limited to the scenarios, dialogue stages, character behaviours, and communication features explicitly represented by the application.
 
+Outside active role-play, the application also contains a small rule-based routing aid. It matches surface phrases associated with a requested form of help, a possible explanatory clause, conversational pushback, and ten named cognitive-pattern vocabularies, then uses those matches to choose among general supportive response templates. This subsystem is included in the implementation scope because its labels are visible to the user and can affect a response. It is not part of the trained emotion-recognition contribution and is not evaluated as a psychological assessment. Its tests establish only that declared lexical rules and priority order are implemented consistently; they do not establish construct validity, diagnostic accuracy, therapeutic value, or optimal strategy selection.
+
 \subsection{Machine-Learning Scope}
 
 The machine-learning component focuses on supervised categorical emotion recognition from text and audio. The primary experimental task uses four IEMOCAP classes: anger, happiness, sadness, and neutral. Excitement is merged with happiness in accordance with the selected benchmark configuration. The models do not represent the complete range of human affect and do not identify complex or mixed states such as anxiety, guilt, shame, uncertainty, embarrassment, or frustration as independent operational classes.
@@ -333,6 +335,8 @@ The system may send conversation content to an external provider when the releva
 
 AffectLab is not a medical device, mental-health intervention, diagnostic system, or emergency service. It is not intended to diagnose emotion, anxiety, depression, cognitive distortion, relationship problems, or any other psychological condition. Its affective outputs are model predictions over predefined labels and must not be interpreted as clinical assessments.
 
+In particular, the interface term ``possible cognitive pattern'' denotes a match to a short, authored phrase list rather than an assessment of the user's beliefs or cognition. The associated intent, cause, readiness, and resistance fields are likewise routing variables computed from the current wording, not findings about a person. A missing match does not show that a pattern is absent, and a match does not show that it is present in a clinical sense.
+
 The application includes a conservative text-based crisis-phrase check and optional provider moderation. These mechanisms cannot detect every expression of risk, particularly when language is indirect, ambiguous, culturally specific, misspelled, or expressed through audio characteristics rather than explicit text. The safety layer therefore reduces specific foreseeable risks but does not provide complete crisis detection or clinical triage.
 
 Safety decisions remain text-first and independent of the multimodal model. This prevents uncertain emotion predictions from overriding explicit crisis-related language, but it also means that distress expressed only through tone of voice may not activate the safety mechanism. Users requiring urgent or professional support must be directed to appropriate human and emergency services.
@@ -370,6 +374,7 @@ The following areas are intentionally outside the scope of this dissertation:
     \item video, facial-expression, gaze, gesture, or physiological-signal analysis;
     \item unrestricted simulation of arbitrary real people;
     \item claims of long-term improvement or transfer to real-world relationships;
+    \item assessment, diagnosis, or treatment of cognitive distortions or other psychological constructs;
     \item population-level validation across cultures, accents, ages, or clinical groups;
     \item internet-scale capacity, multi-region high-availability hosting, or public clinical deployment; and
     \item replacing communication professionals, mediators, counsellors, or other forms of human support.

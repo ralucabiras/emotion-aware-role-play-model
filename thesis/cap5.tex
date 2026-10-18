@@ -241,6 +241,7 @@ FR2, FR3, FR25; NFR3 & Onboarding, preferences, takeaways, and action cards (Sec
 FR4--FR8, FR15, FR19 & Preparation, scenario configuration, lifecycle, and dialogue policies (Sections~\ref{subsec:frontend-preparation}, \ref{subsec:scenario-representation}, and \ref{subsec:dialogue-transitions}) & Policy/unit, API, desktop/mobile browser, authored-trajectory, and smoke tests & Passed & Three standard scenarios and controlled inputs \\ \hline
 FR9, FR11--FR13; NFR2, NFR4 & Voice, causal-context inference, fusion, and fallback paths (Sections~\ref{sec:emotion-recognition-pipeline}, \ref{subsec:frontend-voice}, and \ref{subsec:audio-conversation-data}) & Context, multimodal, transcription, transient-audio, missing-service, and browser tests & Passed in tested configuration & Limited live-device, provider, and private-model execution \\ \hline
 FR10; NFR1 & Crisis interruption and safety precedence (Section~\ref{subsec:safety-precedence}) & Crisis paraphrase, false-positive, precedence, API, and conversation tests & Passed & A bounded lexical detector cannot cover every expression \\ \hline
+FR29 & Cognitive heuristics and strategy selection (Subsection~\ref{subsec:cognitive-support-routing}) & Authored unit and service cases for pattern, intent, clause extraction, pushback, strategy, and safety precedence & Passed as rule conformance only & No construct, predictive, clinical, comparative-helpfulness, or harm evaluation \\ \hline
 FR14; NFR14 & Bounded affect pacing and uncertainty presentation (Sections~\ref{subsec:affect-pacing} and \ref{subsec:frontend-affect-presentation}) & Seven authored policy cases plus preference, disagreement, failure, and replay tests & Passed & Controlled probabilities; no evidence of user benefit \\ \hline
 FR16--FR18, FR20--FR21; NFR6, NFR8 & Evidence, response realisation, fallback, and feedback (Sections~\ref{subsec:communication-evidence}, \ref{subsec:response-realisation}, and \ref{subsec:evidence-feedback}) & Determinism, evidence-linking, constrained-generation, fallback, feedback, and concurrency tests & Passed & Designed cases do not exhaust language variation \\ \hline
 FR22--FR24 & Replay, retry, branching, and comparison (Sections~\ref{subsec:conversation-replay} and \ref{subsec:rewind-branching}) & Backend, browser, stale-state, restart-persistence, and full-stack smoke tests & Passed & Synthetic histories rather than natural long-term use \\ \hline
@@ -273,6 +274,29 @@ Relationship unresolved & perspective $\rightarrow$ unresolved & Completed: unre
 \end{table}
 
 These cases show that the enhanced controller requires intermediate evidence rather than completing as soon as one generic success phrase is detected. They do not show that its dialogue is more persuasive, realistic, or educational for a participant. Those properties require human evaluation.
+
+\subsection{Cognitive-Heuristic and Support-Routing Cases}
+\label{subsec:cognitive-routing-results}
+
+The cognitive and strategy tests are small, implementation-authored examples rather than a labelled evaluation dataset. Table~\ref{tab:cognitive-routing-cases} states exactly what they establish. The combined sentence deliberately activates several rules at once; the test verifies that the documented precedence and extraction code are stable, not that a human assessor would assign the same psychological labels.
+
+\begin{table}[htbp]
+\centering
+\caption{Implemented cognitive-heuristic and support-routing checks.}
+\label{tab:cognitive-routing-cases}
+\footnotesize
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.28\textwidth}|>{\raggedright\arraybackslash}p{0.31\textwidth}|X|}
+\hline
+\textbf{Authored input or condition} & \textbf{Verified implementation result} & \textbf{What the check does not establish} \\ \hline
+``They will definitely think I am a failure because I missed one deadline. What should I do?'' & A cognitive-pattern rule matches; practical-help wins the intent precedence; the clause after \emph{because} is copied as possible context & That the speaker has a cognitive distortion, that the copied clause is the true cause, or that practical advice is wanted \\ \hline
+``But that won't work. This is pointless.'' & The explicit pushback vocabulary produces a resistance value above the selector threshold & Psychological resistance, its degree, persistence, or cause \\ \hline
+``How do I handle this?'' with the default lexical affect state & Practical-help routing makes practical suggestion the highest-scoring strategy & That the suggestion is helpful, well timed, or superior to clarification or reflection \\ \hline
+Crisis flag true with high arousal & Safety escalation wins over all ordinary strategy scores & Sensitivity or specificity of crisis detection, or adequacy of the safety response \\ \hline
+Two authored emotional-support messages & The analyser, selector, and offline template compose a non-generic emotion-specific response & Accuracy of the affect or intent label, user preference, therapeutic value, or absence of harm \\ \hline
+\end{tabularx}
+\end{table}
+
+These checks cover selected positive paths and one precedence condition. They do not systematically test all ten pattern families, all combinations and tie cases, negated and quoted pattern language, malformed causal clauses, demographic or dialectal variation, or user correction of a wrong inference. The browser suite verifies rendering of deterministic decision data but does not independently validate the semantics of the labels. Consequently, the appropriate result is ``conforms to the tested rules'', not an accuracy percentage. The subsystem did not contribute an outcome measure to the pilot, and no claim is made that its labels or selected strategies improved the participant experience.
 
 \subsection{Evidence Extraction and Affect-Pacing Cases}
 \label{subsec:policy-case-results}
@@ -376,6 +400,8 @@ ECE is bin-dependent, and calibration can deteriorate under shift. The global de
 IEMOCAP labels describe annotated expressive categories, not direct measurements of internal emotion. Mapping excitement to happiness and fear to exploratory anxiety further simplifies the constructs. Model performance must not be interpreted as diagnosis, emotional truth, or equitable performance across accents, languages, devices, ages, disabilities, or cultures.
 
 The role-play features are likewise operational constructs. A phrase detector can identify authored patterns such as a clear refusal or practical request, but it does not measure general communication ability or transfer to a real conversation. The diagnostic fixture already demonstrates missed synonyms, indirect language, and reported-speech error. Deterministic feedback is more auditable than an unconstrained judgement, but it remains limited by these definitions.
+
+The rule-based cognitive fields have an even narrower evidential basis. Familiar labels such as cognitive distortion, intent, cause, readiness, and resistance may suggest assessment of an internal state, but the implementation observes only the current message and assigns fixed values when short patterns occur. No clinician, validated questionnaire, independent annotator, held-out corpus, or participant self-report was used as a reference standard. The tests reported in Subsection~\ref{subsec:cognitive-routing-results} establish software conformance, not accuracy, construct validity, or clinical validity. Because the pilot neither isolated this subsystem nor measured its helpfulness or harms, the selected support strategy cannot be claimed to be optimal or beneficial. False and overly authoritative labels remain a risk, especially for negation, quotation, indirect language, cultural variation, and messages containing several possible requests.
 
 The engineering evaluation largely uses deterministic templates and test accounts. It does not evaluate live provider variability, private-model latency under concurrent participant use, real microphone noise, or long-duration deployment. The successful smoke journey establishes integration and restart persistence only for its tested path.
 
