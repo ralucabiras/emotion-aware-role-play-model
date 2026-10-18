@@ -225,7 +225,7 @@ For each single-modality fold, temperature scaling fits one positive scalar on v
 
 The evaluation utilities compute accuracy, macro F1, weighted F1, per-class precision, recall and F1, negative log-likelihood, multiclass Brier score, and expected calibration error. Expected calibration error partitions maximum confidence into fixed bins and accumulates the sample-weighted difference between mean confidence and empirical accuracy. Row-level outputs retain the complete probability vector rather than only the winning label, enabling later reliability analysis and exact pairing between modalities. Statistical comparisons use paired percentile bootstrap samples at dialogue level so that multiple turns from one conversation remain in the same resampled unit; those results belong to the evaluation chapter rather than the implementation account.
 
-At inference time, the backend returns the calibrated text, audio, and fused distributions, each modality's selected label and confidence, and an explicit indicator of whether the two modalities agree. Fused confidence below 0.55 is labelled \emph{low}, confidence from 0.55 up to 0.75 is labelled \emph{moderate}, and confidence at or above 0.75 is labelled \emph{high}. The 0.55 boundary is configurable and controls presentation and adaptation policy only: it does not modify the model probabilities, turn a prediction into a verified emotion, or establish that estimates above the threshold are correct.
+At inference time, the backend returns the calibrated text, audio, and fused distributions, each modality's selected label and confidence, and an explicit indicator of whether the two modalities agree. Fused confidence below 0.55 is labelled \emph{low}, confidence from 0.55 up to 0.75 is labelled \emph{moderate}, and confidence at or above 0.75 is labelled \emph{high}. The adaptation policy uses the configurable 0.55 low-confidence boundary for the fused, textual, and acoustic confidences; the 0.75 boundary names the high presentation band but does not impose a further adaptation gate. These boundaries do not modify the model probabilities, turn a prediction into a verified emotion, or establish that estimates above them are correct.
 
 Missing, invalid, conflicting, or low-confidence evidence is represented explicitly rather than converted into a stronger claim. The role-play workflow remains usable without audio or trained inference, and the dialogue policy and crisis checks do not depend on the predicted category. Calibration measured on IEMOCAP may deteriorate under changes in speakers, microphones, language, interaction style, or context \,\cite{ovadia2019shift}. The application therefore treats confidence and cross-modal agreement as bounded operational signals, not as guarantees of correctness.
 
@@ -378,7 +378,7 @@ The affect-pacing policy is a separate versioned layer applied after the dialogu
 
 Automatic adaptation is restricted to active, enhanced, non-required rehearsals. Required study tasks, associated retries, ordinary reflection, legacy sessions, paused or completed attempts, and ineligible scenarios use the baseline response. Safety and completed-exchange conditions take precedence. The policy also refuses to translate model categories into anxiety, readiness, resistance, or other psychological constructs; the existing lexical state tracker remains independent.
 
-When automatic adaptation is eligible, missing audio, unavailable models, inference failure, or unsupported categories produce no addition. If any fused or component confidence is below the stored threshold, or if text and audio disagree, the response neutrally offers a pacing choice. Confident agreement on anger or sadness adds only the phrase ``I hear you.''; supported agreement on happiness or neutral produces no addition. The user-selected gentler and more-challenge modes use fixed prompts. The full decision, reason, source, model version, timings, preference, and probability summaries are stored with the assistant turn, allowing the interface to explain the exact action without reconstructing it later.
+When automatic adaptation is eligible, missing audio, unavailable models, inference failure, or unsupported categories produce no addition. If any fused or component confidence is below the stored low-confidence threshold, or if the fused, text, and audio labels do not all agree, the response neutrally offers a pacing choice. When all three confidences meet that threshold and all three labels agree, anger or sadness adds only the phrase ``I hear you.''; agreement on happiness or neutral produces no addition. Thus, a matching estimate in either the moderate or high presentation band can reach the category branch. The user-selected gentler and more-challenge modes use fixed prompts. The full decision, reason, source, model version, timings, preference, and probability summaries are stored with the assistant turn, allowing the interface to explain the exact action without reconstructing it later.
 
 Figure~\ref{fig:affect-policy} expresses the same policy as a decision tree and highlights the precedence of safety, eligibility, and explicit user choice over automatic inference.
 
@@ -489,7 +489,7 @@ Figures~\ref{fig:app-dashboard}, \ref{fig:app-roleplay}, and~\ref{fig:app-feedba
         \textbf{Screenshot placeholder: role-play workspace}\\[0.5em]
         Add \texttt{figures/app-roleplay.png}.}}
     }
-    \caption{Active role-play workspace, combining the conversation transcript and message composer with scenario progress, session controls, and optional voice and affect-aware functions.}
+    \caption{Active role-play workspace, combining the conversation transcript and message composer with scenario progress, session controls, and optional voice and affect-aware functions. The standard affect panel shown here is the lexical estimate; a trained voice--text result, when available, appears in a separate panel.}
     \label{fig:app-roleplay}
 \end{figure}
 
@@ -545,11 +545,32 @@ The interface permits a user to disable the microphone preference locally, enabl
 \subsection{Presentation of Affect and Uncertainty}
 \label{subsec:frontend-affect-presentation}
 
-The standard emotion panel displays the backend's tentative lexical state using a distribution, valence, arousal, intensity, trend, and confidence. Its language consistently presents these values as estimates. The panel is secondary to the conversation and is accompanied by the uncertainty disclaimer rather than being used as an authoritative description of how the user feels.
+The standard emotion panel displays the backend's tentative lexical state using a distribution, valence, arousal, intensity, trend, and confidence. This is the panel shown in Figure~\ref{fig:app-roleplay}; it is not an output of the trained multimodal classifier. Its confidence is a deterministic heuristic derived from lexical evidence and temporal smoothing, so, for example, a displayed value of 80\% does not mean that the estimate has an empirically calibrated 80\% probability of being correct. Its language consistently presents these values as estimates. The panel is secondary to the conversation and is accompanied by the uncertainty disclaimer rather than being used as an authoritative description of how the user feels.
 
 When a valid multimodal result is available, a separate panel presents the fused confidence, text and voice leaders, modality agreement, full distribution, latency, queue time, and the statement that audio was not stored. A fused label below the configured display threshold is headed as an uncertain estimate rather than as the predicted category. Disagreement receives an explicit explanation, and the full probabilities remain visible so that the leading label is not separated from its uncertainty.
 
 For exchange-linked pacing, the ``Why this response?'' view uses the persisted \texttt{AffectDecision}. It shows whether analysis was requested and available, the selected action and reason, user preference, fallback code, model and policy versions, timings, and distributions. Reloading displays the same record and does not run inference again. Missing or failed inference is represented as an availability gap, not silently replaced by the lexical estimate.
+
+Table~\ref{tab:application-analysis-components} makes explicit the different inputs, vocabularies, score semantics, operational effects, and supporting evidence of the four analysis and decision components. In particular, only the trained multimodal classifier has corpus-level classification and calibration evidence; the remaining scores expose deterministic rule strength or priority and must not be interpreted as probabilities.
+
+\begin{table}[p]
+\centering
+\caption{Distinction between the trained affect model and the application's deterministic analysis and decision components.}
+\label{tab:application-analysis-components}
+\scriptsize
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.10\textwidth}|>{\raggedright\arraybackslash}p{0.11\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{0.15\textwidth}|>{\raggedright\arraybackslash}p{0.16\textwidth}|}
+\hline
+\textbf{Component} & \textbf{Inputs} & \textbf{Labels or outputs} & \textbf{Meaning of scores} & \textbf{Affected behaviour} & \textbf{Evaluation evidence} \\ \hline
+Trained multimodal classifier & Target text, up to three preceding causal turns, and up to 20 seconds of 16~kHz speech & Anger, happiness, neutral, and sadness & Temperature-scaled text and audio class probabilities followed by calibrated late fusion; confidence is the maximum fused probability & Separate voice--text panel and optional bounded pacing. It does not determine crisis handling and is excluded from required study tasks & Five speaker-independent IEMOCAP folds with classification, calibration, confusion-matrix, and dialogue-bootstrap analyses (Section~\ref{sec:multimodal-results}) \\ \hline
+Lexical affect estimator (\texttt{lexical-v2}) & Current user text and the preceding lexical state used for smoothing & Anxiety, sadness, anger, frustration, shame, guilt, joy, and neutral; also valence, arousal, intensity, and trend & Normalised term weights, a neutral prior, punctuation adjustments, and temporal smoothing. Confidence is heuristic rule strength, not a calibrated probability & Standard affect panel; input to support-strategy selection and to bounded role-play state and evidence handling & Unit and authored-case tests of rule behaviour only; no labelled-corpus accuracy or calibration evaluation \\ \hline
+Rule-based cognitive analyser & Current user text and the independently determined crisis flag & Five intent categories, ten possible cognitive-pattern matches, a possible cause, readiness, resistance, and request flags & Fixed values and pattern-derived weights indicating which rules matched; neither probabilities nor validated psychological measurements & Supplies tentative features to the strategy selector; it does not override crisis precedence or the role-play controller & Unit and authored-case tests of rule behaviour only; no predictive- or construct-validity evaluation \\ \hline
+Scored strategy selector & Smoothed lexical state and cognitive-analysis output & Validation, reflection, clarification, validate--reframe, practical suggestion, rehearsal invitation, de-escalation, or safety escalation & Additive rule priorities used to rank strategies; scores are not probabilities & Selects the general-response strategy outside active role play. Safety and active role-play actions remain independently authoritative & Deterministic policy and integration tests (Section~\ref{subsec:policy-case-results}); no evidence that the selected strategy is clinically effective or optimal \\ \hline
+\end{tabularx}
+\endgroup
+\end{table}
 
 \subsection{Feedback, Replay, and Comparison Interfaces}
 \label{subsec:frontend-feedback-interfaces}
