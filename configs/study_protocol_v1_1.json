@@ -1,0 +1,109 @@
+{
+  "protocol_id": "affectlab-feasibility-v1.1",
+  "amends": "affectlab-feasibility-v1.0",
+  "status": "frozen_before_recruitment_pending_external_approval",
+  "amendment_date": "2026-10-18",
+  "frozen_on": "2026-10-18",
+  "effective_date": "2026-10-18",
+  "participant_information_version": "2026-10-18-v2",
+  "design": "single_arm_within_participant_feasibility_usability_pilot",
+  "participant_target": 15,
+  "completer_target": 12,
+  "enrolled_set": "all_validly_enrolled_participants_including_zero_start_unless_data_cannot_be_used_under_approved_withdrawal_terms",
+  "primary_outcome": {
+    "name": "protocol_completion",
+    "definition": "First required attempts for workload, boundary, and relationship at intermediate difficulty each reach an eligible automatic ending and have a complete immediate post questionnaire",
+    "feasibility_threshold": 0.8,
+    "interpretation": "preliminary_feasibility_signal_not_definitive_evidence",
+    "qualifying_completion_reasons": ["success", "maximum_turns"],
+    "nonqualifying_completion_reasons": ["user_finished", "safety_interruption", "unresolved", "abandoned", "technical_failure"],
+    "required_post_items": ["confidence", "realism", "usefulness"]
+  },
+  "required_tasks": [
+    {"order": 1, "scenario_id": "workload", "difficulty": "intermediate"},
+    {"order": 2, "scenario_id": "boundary", "difficulty": "intermediate"},
+    {"order": 3, "scenario_id": "relationship", "difficulty": "intermediate"}
+  ],
+  "fixed_order_limitation": "scenario_effects_are_confounded_with_order_interface_familiarity_fatigue_and_practice",
+  "measurements": {
+    "pre": ["confidence", "anxiety"],
+    "post": ["confidence", "realism", "usefulness"],
+    "scale": {"minimum": 1, "maximum": 7},
+    "confidence_analyses": {
+      "within_scenario": "post_confidence_minus_pre_confidence_same_task",
+      "across_scenario_baseline": "descriptive_only_due_to_scenario_and_order_confounding"
+    }
+  },
+  "manual_finish": {
+    "post_questionnaire_may_be_collected": true,
+    "qualifies_for_primary_outcome": false
+  },
+  "communication_indicator_scoring": {
+    "version": "affectlab-required-lexical-v1.1",
+    "method": "versioned_deterministic_case_insensitive_lexical_rules",
+    "uses_llm_judgment": false,
+    "uses_affect_model": false,
+    "range": [0.0, 1.0],
+    "formula": "matching_eligible_participant_turns_divided_by_eligible_participant_turns",
+    "cross_scenario_composite": false,
+    "within_scenario_improvement_claim": false,
+    "locked_predicates": {
+      "concrete_request": {
+        "type": "any_lowercase_substring",
+        "values": ["i need", "i want", "i would like", "could you", "please", "i can't", "i cannot", "no,"]
+      },
+      "maintained_boundary": {
+        "type": "any_lowercase_substring",
+        "values": ["i can't", "i cannot", "i won't", "not able", "my boundary", "i need to say no"]
+      },
+      "blame_language": {
+        "type": "any_lowercase_substring",
+        "values": ["you always", "you never", "you don't", "your fault", "you make me"]
+      },
+      "specific_detail": {
+        "type": "any_lowercase_substring_or_regex",
+        "values": ["deadline", "because", "when ", "this week", "priority", "specifically", "each week", "per week", "evening", "weekend", "minutes", "hours", "meeting", "interrupt", "chores", "dishes", "cleaning", "monday", "tuesday", "wednesday", "thursday", "friday"],
+        "regex": "\\b\\d+\\b"
+      },
+      "i_statement": {
+        "type": "regex",
+        "regex": "\\bi (?:feel|need|want|would like|am)\\b"
+      },
+      "excessive_apology": {
+        "type": "regex_count_greater_than",
+        "regex": "\\b(sorry|apologi[sz]e)\\b",
+        "threshold": 1
+      }
+    },
+    "metrics": {
+      "workload": [
+        {"name": "clear_request", "predicate": "configured_direct_or_first_person_request_phrase"},
+        {"name": "specific_detail", "predicate": "configured_task_deadline_time_frequency_priority_or_numeric_detail"},
+        {"name": "no_configured_blame_marker", "predicate": "absence_of_configured_blame_lexicon"}
+      ],
+      "boundary": [
+        {"name": "clear_refusal_or_maintained_boundary", "predicate": "configured_refusal_phrase", "note": "clear refusal and boundary maintenance export labels are one underlying indicator"},
+        {"name": "no_repeated_apology", "predicate": "no_more_than_one_sorry_or_apologise_apologize_occurrence_per_turn"}
+      ],
+      "relationship": [
+        {"name": "i_statement", "predicate": "configured_i_feel_need_want_would_like_am_pattern"},
+        {"name": "specific_detail", "predicate": "configured_task_deadline_time_frequency_priority_or_numeric_detail", "stored_label_may_be": "specific need"},
+        {"name": "no_configured_blame_marker", "predicate": "absence_of_configured_blame_lexicon"}
+      ]
+    }
+  },
+  "missing_data": {
+    "primary": "noncompletion_no_imputation",
+    "secondary": "available_case_with_denominators",
+    "paired_confidence": "requires_same_task_pre_and_post",
+    "prohibited": ["mean_imputation", "last_observation_carried_forward", "model_based_imputation"]
+  },
+  "multimodal_role": "exploratory_not_core_intervention",
+  "efficacy_claims_permitted": false,
+  "recruitment_gate": [
+    "ethics_and_supervisory_requirements_complete",
+    "participant_materials_reference_effective_protocol",
+    "deployed_application_and_export_rules_concordant_with_protocol",
+    "scoring_dictionary_and_version_frozen"
+  ]
+}

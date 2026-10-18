@@ -1,6 +1,6 @@
 # Research CSV v3 and required-attempt selection
 
-Historical schema: new exports use [v4 with branch activity scope](research-export-v4.md). Existing frozen v3 files are unchanged.
+Historical schema: new exports use [v5 with protocol-scoring provenance](research-export-v5.md), which retains the v4 branch fields. Existing frozen v3 files are unchanged.
 
 V3 live exports and newly frozen datasets used `affectlab-frozen-dataset-v3`. Previously frozen files remain unchanged, retaining their original schema version and checksum. V3 retains the columns and privacy boundaries described in [CSV v2](research-export-v2.md) and adds the fields below. Personal research JSON is now `affectlab-research-export-v3` and exposes the same attempt classification and primary flags.
 
@@ -19,7 +19,7 @@ For each participant and each required task in the current protocol, select the 
 
 That original attempt remains selected if it is interrupted, skipped, abandoned, or lacks post-ratings. A later successful retry, additional-practice attempt, or duplicate required record never replaces it. A duplicate required-start request is rejected; participants can resume the original attempt or start additional practice. Durable study records preserve the selection after conversation-session deletion or expiry.
 
-The checklist, protocol-completion dashboard, live CSV, newly frozen CSV, and personal JSON use this same selector. `primary_task_complete` additionally requires `success`, `maximum_turns`, or `user_finished` and post-confidence, realism, and usefulness all present in 1-7. Primary protocol completion requires all three selected tasks to qualify. Other rehearsal totals and rating/skill summaries remain exploratory summaries over retained eligible activity; they are not the primary protocol-completion measure.
+The checklist, protocol-completion dashboard, live CSV, newly frozen CSV, and personal JSON use this same selector. Under the historical v1.0 rule, `primary_task_complete` additionally required `success`, `maximum_turns`, or `user_finished` and post-confidence, realism, and usefulness all present in 1-7. Protocol v1.1 and export v5 exclude `user_finished` from primary completion. Primary protocol completion requires all three selected tasks to qualify. Other rehearsal totals and rating/skill summaries remain exploratory summaries over retained eligible activity; they are not the primary protocol-completion measure.
 
 Existing records without purpose metadata remain `legacy_unknown` and are excluded from primary selection; the application does not infer checklist participation from scenario or difficulty. They remain available for clearly identified exploratory/legacy reporting. Do not silently backfill purpose from a successful result.
 

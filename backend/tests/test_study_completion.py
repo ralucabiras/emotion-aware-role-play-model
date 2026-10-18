@@ -1,4 +1,6 @@
+import json
 from datetime import timedelta
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -16,6 +18,19 @@ from app.models.domain import (
 )
 from app.repositories.memory import MemoryRepository
 from app.services.eligibility import eligibility_version
+from app.services.study_tasks import PRIMARY_COMPLETION_REASONS, REQUIRED_SCORING_VERSION
+
+
+def test_active_defaults_match_machine_readable_protocol_v1_1():
+    protocol = json.loads(
+        (Path(__file__).parents[2] / "configs" / "study_protocol_v1_1.json").read_text(encoding="utf-8")
+    )
+    assert settings.study_protocol_version == protocol["protocol_id"]
+    assert settings.study_consent_version == protocol["participant_information_version"]
+    assert settings.study_participant_target == protocol["participant_target"] == 15
+    assert settings.study_completer_target == protocol["completer_target"] == 12
+    assert PRIMARY_COMPLETION_REASONS == set(protocol["primary_outcome"]["qualifying_completion_reasons"])
+    assert REQUIRED_SCORING_VERSION == protocol["communication_indicator_scoring"]["version"]
 
 
 async def enrolled_cohort():
@@ -44,25 +59,28 @@ async def add_task(repository, user, scenario, reason="success", post=True, **ov
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("reason,expected", [
-    ("success", 3), ("maximum_turns", 3), ("user_finished", 3),
-    ("safety_interruption", 0), ("technical_failure", 0), ("unknown", 0), (None, 0),
+@pytest.mark.parametrize("reason,completed,manual,protocol_complete", [
+    ("success", 3, 0, True), ("maximum_turns", 3, 0, True),
+    ("user_finished", 0, 3, False),
+    ("safety_interruption", 0, 0, False), ("technical_failure", 0, 0, False),
+    ("unknown", 0, 0, False), (None, 0, 0, False),
 ])
-async def test_completion_counts_require_an_explicit_qualifying_reason(reason, expected):
+async def test_completion_counts_distinguish_manual_finishes_from_completed_rehearsals(reason, completed, manual, protocol_complete):
     repository, user = await enrolled_cohort()
     for scenario in ("workload", "boundary", "relationship"):
         # Interrupted legacy records can contain post-ratings; they must still fail.
         await add_task(repository, user, scenario, reason=reason)
     _, rows, dashboard = await pilot_dataset(repository)
     assert dashboard["sessions"] == 3
-    assert dashboard["completed_rehearsals"] == rows[0]["completed_rehearsals"] == expected
-    assert dashboard["completion_rate"] == expected / 3
-    assert dashboard["protocol_completers"] == int(expected == 3)
-    assert dashboard["protocol_completion_rate"] == int(expected == 3)
-    assert rows[0]["protocol_complete"] is (expected == 3)
-    assert rows[0]["completion_status"] == ("complete" if expected else "in_progress")
-    assert dashboard["scenario_completions"] == ({"workload": 1, "boundary": 1, "relationship": 1} if expected else {})
-    assert dashboard["difficulty_completions"] == ({"intermediate": 3} if expected else {})
+    assert dashboard["completed_rehearsals"] == rows[0]["completed_rehearsals"] == completed
+    assert dashboard["manual_finishes"] == rows[0]["manual_finishes"] == manual
+    assert dashboard["completion_rate"] == completed / 3
+    assert dashboard["protocol_completers"] == int(protocol_complete)
+    assert dashboard["protocol_completion_rate"] == int(protocol_complete)
+    assert rows[0]["protocol_complete"] is protocol_complete
+    assert rows[0]["completion_status"] == ("complete" if protocol_complete else "in_progress")
+    assert dashboard["scenario_completions"] == ({"workload": 1, "boundary": 1, "relationship": 1} if completed else {})
+    assert dashboard["difficulty_completions"] == ({"intermediate": 3} if completed else {})
 
 
 @pytest.mark.asyncio
@@ -95,10 +113,11 @@ async def test_protocol_completion_requires_current_protocol_all_scenarios_and_i
     await add_task(repository, user, "relationship", protocol_version="another-protocol")
     await add_task(repository, user, "custom_example")
     _, rows, dashboard = await pilot_dataset(repository)
-    assert dashboard["sessions"] == dashboard["completed_rehearsals"] == 5
+    assert dashboard["sessions"] == 5
+    assert dashboard["completed_rehearsals"] == 2
     assert dashboard["protocol_completers"] == 0
     assert rows[0]["protocol_complete"] is False
-    await add_task(repository, user, "relationship", reason="user_finished")
+    await add_task(repository, user, "relationship", reason="success")
     _, rows, dashboard = await pilot_dataset(repository)
     assert dashboard["protocol_completers"] == 1
     assert rows[0]["protocol_complete"] is True

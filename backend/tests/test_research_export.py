@@ -64,8 +64,12 @@ async def test_export_contains_scores_sources_and_zero_session_participants():
     assert attempt["schema_version"] == CSV_SCHEMA_VERSION
     metrics = json.loads(attempt["feedback_metrics_json"])
     assert metrics == [metric.model_dump(mode="json") for metric in session.feedback.metrics]
+    assert [metric["name"] for metric in metrics] == [
+        "clear request", "specific detail", "no configured blame marker",
+    ]
     assert metrics[0]["evidence_turns"]
     assert attempt["feedback_generation_source"] == "deterministic"
+    assert attempt["scoring_version"] == "affectlab-required-lexical-v1.1"
     assert attempt["pre_confidence"] == "2" and attempt["post_confidence"] == "5"
     assert attempt["pre_submitted_at"] and attempt["post_submitted_at"]
     assert attempt["roleplay_started_at"] and attempt["roleplay_completed_at"]

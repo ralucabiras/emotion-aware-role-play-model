@@ -4,11 +4,19 @@ from app.models.domain import Difficulty, StudyRecord
 
 PROTOCOL_TASK_ORDER = ("workload", "boundary", "relationship")
 PROTOCOL_REQUIRED_SCENARIOS = set(PROTOCOL_TASK_ORDER)
-QUALIFYING_COMPLETION_REASONS = {"success", "maximum_turns", "user_finished"}
+PRIMARY_COMPLETION_REASONS = {"success", "maximum_turns"}
+ENDED_REHEARSAL_REASONS = {*PRIMARY_COMPLETION_REASONS, "user_finished"}
+REQUIRED_SCORING_VERSION = "affectlab-required-lexical-v1.1"
 
 
 def is_completed_rehearsal(record: StudyRecord) -> bool:
-    return bool(record.scenario_id and record.completion_reason in QUALIFYING_COMPLETION_REASONS)
+    """A rehearsal that reached an eligible automatic workflow ending."""
+    return bool(record.scenario_id and record.completion_reason in PRIMARY_COMPLETION_REASONS)
+
+
+def is_ended_rehearsal(record: StudyRecord) -> bool:
+    """An automatic ending or manual stop that can offer immediate post-ratings."""
+    return bool(record.scenario_id and record.completion_reason in ENDED_REHEARSAL_REASONS)
 
 
 def has_complete_post_questionnaire(record: StudyRecord) -> bool:
@@ -26,7 +34,8 @@ def is_completed_protocol_task(record: StudyRecord) -> bool:
                 and record.required_task_id == record.scenario_id
                 and record.scenario_id in PROTOCOL_REQUIRED_SCENARIOS
                 and record.difficulty == Difficulty.INTERMEDIATE
-                and is_completed_rehearsal(record) and has_complete_post_questionnaire(record))
+                and record.completion_reason in PRIMARY_COMPLETION_REASONS
+                and has_complete_post_questionnaire(record))
 
 
 

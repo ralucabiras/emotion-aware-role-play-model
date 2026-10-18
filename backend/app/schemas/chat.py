@@ -49,6 +49,7 @@ class UserResponse(BaseModel):
     researcher: bool = False
     pilot_enrolled: bool = False
     study_consent_version: str | None = None
+    study_protocol_version: str | None = None
     study_consented_at: str | None = None
     eligibility_version: str | None = None
     eligibility_confirmed_at: str | None = None

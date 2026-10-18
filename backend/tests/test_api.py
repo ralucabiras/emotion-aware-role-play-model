@@ -445,6 +445,7 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
             assert enrolled.status_code == 200
             assert enrolled.json()["pilot_enrolled"] is True
             assert enrolled.json()["study_consent_version"] == version
+            assert enrolled.json()["study_protocol_version"] == "affectlab-feasibility-v1.1"
             assert enrolled.json()["study_consented_at"]
             assert enrolled.json()["eligibility_version"] == information.json()["eligibility_version"]
             assert enrolled.json()["eligibility_confirmed_at"]
@@ -465,6 +466,9 @@ def test_pilot_enrollment_and_researcher_dashboard_exclude_identity_and_text() -
             dashboard = client.get("/api/research/dashboard", headers=researcher_headers)
             assert dashboard.status_code == 200
             assert dashboard.json()["participants"] == 1
+            assert dashboard.json()["protocol_version"] == "affectlab-feasibility-v1.1"
+            assert dashboard.json()["participant_target"] == 15
+            assert dashboard.json()["completer_target"] == 12
             assert dashboard.json()["participant_activity"][0]["participant_id"] == participant_id
             serialized = dashboard.text
             assert "pilot-participant@example.com" not in serialized
@@ -598,7 +602,7 @@ def test_research_lifecycle_review_and_immutable_frozen_export() -> None:
             )
             assert frozen.status_code == 200
             manifest = frozen.json()
-            assert manifest["schema_version"] == "affectlab-frozen-dataset-v4"
+            assert manifest["schema_version"] == "affectlab-frozen-dataset-v5"
             assert manifest["record_count"] == 2
             assert manifest["participant_count"] == 2
             assert len(manifest["sha256"]) == 64

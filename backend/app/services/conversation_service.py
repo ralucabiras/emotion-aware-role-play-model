@@ -38,7 +38,11 @@ from app.services.interfaces import CognitiveAnalyzer, EmotionAnalyzer, Response
 from app.services.llm_service import OpenAIResponseGenerator
 from app.services.roleplay_service import SCENARIOS, RolePlayService
 from app.services.strategy_service import RuleBasedStrategySelector, ScoredStrategySelector
-from app.services.study_tasks import PROTOCOL_REQUIRED_SCENARIOS, select_required_attempts
+from app.services.study_tasks import (
+    PROTOCOL_REQUIRED_SCENARIOS,
+    REQUIRED_SCORING_VERSION,
+    select_required_attempts,
+)
 
 
 def dialogue_snapshot(session: Session) -> DialogueSnapshot:
@@ -179,6 +183,7 @@ class ConversationService:
             completion_reason=roleplay.completion_reason if roleplay else None,
             feedback_metrics=feedback.metrics if feedback else [],
             feedback_generation_source=feedback.generation_source if feedback else None,
+            scoring_version=roleplay.scoring_version if roleplay else None,
             roleplay_started_at=roleplay.started_at if roleplay else None,
             roleplay_completed_at=roleplay.completed_at if roleplay else None,
             generation_source_counts=dict(Counter(
@@ -334,6 +339,8 @@ class ConversationService:
             if required_task_id in select_required_attempts(await self.repository.list_study_records(user_id)):
                 raise ValueError("This required task already has an attempt. Resume it or choose additional practice.")
         state.attempt_purpose, state.required_task_id = attempt_purpose, required_task_id
+        if attempt_purpose == "required":
+            state.scoring_version = REQUIRED_SCORING_VERSION
         if custom and custom.preparation:
             state.scenario_version, state.policy_version, state.scoring_version = "prepared-brief-v1", "prepared-generic-v1", "prepared-features-v1"
         if character_profile is not None:

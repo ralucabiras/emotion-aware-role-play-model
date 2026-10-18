@@ -433,6 +433,7 @@ class StudyRecord(BaseModel):
     completion_reason: str | None = None
     feedback_metrics: list[FeedbackMetric] = Field(default_factory=list)
     feedback_generation_source: str | None = None
+    scoring_version: str | None = None
     roleplay_started_at: datetime | None = None
     roleplay_completed_at: datetime | None = None
     # None means unavailable in legacy records, not an observed zero.

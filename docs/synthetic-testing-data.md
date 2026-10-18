@@ -1,12 +1,17 @@
-# Synthetic testing dataset
+# Local development dataset
 
-Run from `backend`: `../.venv/Scripts/python.exe -m scripts.seed_mock_data seed`.
-This replaces only the known synthetic accounts and tagged synthetic sessions in the configured database. It no longer adds sessions to a real/researcher account. Before replacement, affected documents (including authentication tokens) are backed up under ignored `.local/seed-backups/`; keep these local and private. `clear` backs up and removes the same fixtures. Frozen databases are not reseeded.
+From `backend`, run:
 
-The ten existing example.com accounts use password `affectlab-synthetic-demo`. Names remain natural for interface testing; session titles, account quality notes, and research events identify synthetic origin. These accounts remain included in the current testing dashboard and exports.
+```powershell
+../.venv/Scripts/python.exe -m scripts.seed_mock_data reset
+```
 
-Cases include six complete three-task procedures, one procedure with a skipped post-questionnaire, one paused second task, one active first task, and one enrollment without activity. Two separate retries and one additional deadline practice exercise history/comparison and primary-attempt selection. A successful retry does not repair the skipped required questionnaire. Pre-questionnaire skips and manual finish are also covered.
+`reset` is intentionally destructive to the configured application database. It first validates the complete replacement dataset in memory, verifies that `ENVIRONMENT=development` and every MongoDB host is local, writes a BSON-preserving backup under ignored `.local/database-backups/`, drops the configured database, recreates its indexes, and inserts the new data. The command removes prior accounts, sessions, authentication tokens, study records, lifecycle settings, and frozen exports. `seed` works only with an empty database. `clear` backs up and drops the database without reseeding it.
 
-Required tasks run workload, boundary, relationship at intermediate difficulty. Conversation, evidence, scores, feedback, purpose associations, questionnaires and source counts are produced through the current application services without external model calls. Scripted wording, ratings and wall times are constructed fixtures. Ratings include unchanged and lower confidence as well as increases. A fixed random seed makes case variation reproducible; timestamps are relative to execution, with enrollment preceding activity. Generator sources truthfully record deterministic/template behavior, not OpenAI generation.
+The dataset contains 17 enrolled accounts—15 in the active analysis cohort, one withdrawn, and one excluded—plus four ordinary application accounts and one researcher account. It mirrors the protocol v1.1 enrollment target and covers complete and incomplete task sequences, an active rehearsal, a paused rehearsal, missing ratings, retries, additional practice, withdrawal, exclusion, saved takeaways, and ordinary reflections. Dates span recent weeks and remain inside configured retention windows. Conversations, feedback evidence, questionnaire records, source counts, and relationships are produced through the current application services without external model calls.
 
-Use these data for functional testing and clearly identified synthetic illustrations only. They are not observed participant outcomes or an estimate of likely study results. Wipe the test dataset before participant collection; do not merge it with collected results. Local backups remain after clearing the database and should also be removed when no longer needed.
+Names, session titles, notes, and results are presented exactly as normal application data. They do not carry fixture prefixes or labels. The sole provenance marker is the development-only `development_metadata` collection, whose `usage-seed-provenance` document records the generator version, fixed random seed, local scope, and that the observations are simulated. This collection is not exposed by the application API or UI.
+
+All generated accounts share the local password `AffectLabLocal2026!`. Participant addresses use the reserved `example.com` domain. The researcher address is the first address in `RESEARCHER_EMAILS`, allowing the researcher dashboard to be tested with the same local password.
+
+These records are for local functional testing and visualization only. They are not observed participant outcomes or research findings. Run `clear` before collecting real data, verify that the application database is empty, and remove local database backups when they are no longer needed.

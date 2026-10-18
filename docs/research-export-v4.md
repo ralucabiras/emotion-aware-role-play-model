@@ -1,6 +1,6 @@
 # Research export v4: branch activity and feedback scope
 
-New live CSV and newly frozen datasets use `affectlab-frozen-dataset-v4`. Personal research JSON uses `affectlab-research-export-v4`. Existing frozen files remain byte-for-byte unchanged. V4 retains the privacy boundaries, missing-value rules and required-attempt selection described in [v3](research-export-v3.md).
+Historical schema: new exports use [v5 with protocol-scoring provenance](research-export-v5.md). Existing frozen v4 files remain byte-for-byte unchanged. V4 used `affectlab-frozen-dataset-v4` for CSV and `affectlab-research-export-v4` for personal JSON. It retains the privacy boundaries, missing-value rules and required-attempt selection described in [v3](research-export-v3.md).
 
 | Field | Meaning |
 | --- | --- |

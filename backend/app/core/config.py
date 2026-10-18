@@ -45,10 +45,10 @@ class Settings(BaseSettings):
     email_verification_hours: int = 24
     password_reset_minutes: int = 30
     research_consent_version: str = "2026-08-18-v1"
-    study_consent_version: str = "2026-09-21-v1"
-    study_protocol_version: str = "affectlab-feasibility-v1.0"
-    study_participant_target: int = 30
-    study_completer_target: int = 24
+    study_consent_version: str = "2026-10-18-v2"
+    study_protocol_version: str = "affectlab-feasibility-v1.1"
+    study_participant_target: int = 15
+    study_completer_target: int = 12
     study_retention_period: str = "Minimized pseudonymous study records are retained for 365 days after their most recent study activity, then automatically deleted. Active conversation sessions expire separately after 30 days of inactivity."
     study_researcher_name: str = "Raluca Biras"
     study_researcher_email: str = "calmai.etherapy@gmail.com"

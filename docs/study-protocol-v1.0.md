@@ -17,7 +17,7 @@ This is not a clinical-effectiveness or therapeutic-efficacy study. It cannot es
 
 ### Primary outcome
 
-Protocol completion: the proportion of enrolled participants who complete all three required standardized scenarios at intermediate difficulty and submit the post-rehearsal questionnaire for each. The feasibility target is at least 80% completion (24 of 30 if exactly 30 enroll).
+Protocol completion: the proportion of enrolled participants who complete all three required standardized scenarios at intermediate difficulty and submit the post-rehearsal questionnaire for each. The feasibility target is at least 80% completion (8 of 10 if exactly 10 enroll).
 
 ### Secondary outcomes
 
@@ -54,9 +54,9 @@ Eligibility is self-reported. Exclusion is not a clinical judgment, and the appl
 
 ## Recruitment target and analysis populations
 
-- Target enrollment: 30 participants.
-- Target protocol completers: at least 24.
-- Recruitment stops at 30 valid enrolled participants unless a documented amendment is approved before additional enrollment.
+- Target enrollment: 10 participants.
+- Target protocol completers: at least 8.
+- Recruitment stops at 10 valid enrolled participants unless a documented amendment is approved before additional enrollment.
 - Enrolled set: everyone who provides the current protocol consent and begins at least one required scenario.
 - Completer set: enrolled participants satisfying the primary outcome definition.
 - Per-task set: all eligible completed task/questionnaire pairs for the relevant secondary analysis.

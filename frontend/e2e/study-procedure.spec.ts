@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { expectAccessible, installApiMock } from './support'
 
-test('enrolled participant follows all three guided tasks at intermediate difficulty', async ({page})=>{
+test('manual finishes advance the guide without counting as primary completion', async ({page})=>{
   await installApiMock(page,{enrolled:true})
   await page.goto('/app')
   const checklist=page.getByRole('region',{name:'Your study checklist'})
@@ -21,8 +21,9 @@ test('enrolled participant follows all three guided tasks at intermediate diffic
     await page.getByLabel('Scenario realism').selectOption('6')
     await page.getByLabel('Feedback usefulness').selectOption('7')
     await page.getByRole('button',{name:'Save research ratings'}).click()
-    await expect(checklist).toContainText(`${index+1} of 3 tasks complete`)
+    await expect(checklist).toContainText('0 of 3 tasks complete')
     await expect(checklist.locator('li').nth(index)).toContainText(title)
+    await expect(checklist.locator('li').nth(index)).toContainText('Attempt recorded - incomplete')
     if(index<2){
       const nextTitle=index===0?'Boundary conversation':'Relationship conversation'
       await checklist.getByRole('button',{name:`Next task: ${nextTitle}`}).click()
@@ -31,7 +32,7 @@ test('enrolled participant follows all three guided tasks at intermediate diffic
   await expect(checklist).toContainText('you have reached the end of the study tasks')
   await expect(checklist.getByRole('button',{name:/Next task/})).toHaveCount(0)
   await page.goto('/app')
-  await expect(checklist).toContainText('3 of 3 tasks complete')
+  await expect(checklist).toContainText('0 of 3 tasks complete')
   await expectAccessible(page)
 })
 

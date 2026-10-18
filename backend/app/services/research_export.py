@@ -7,7 +7,7 @@ from collections import Counter
 from app.core.config import settings
 from app.services.study_tasks import is_completed_protocol_task, select_required_attempts
 
-CSV_SCHEMA_VERSION = "affectlab-frozen-dataset-v4"
+CSV_SCHEMA_VERSION = "affectlab-frozen-dataset-v5"
 CSV_FIELDS = [
     "schema_version", "row_type", "protocol_version", "participant_id", "enrolled_at",
     "consent_version", "consented_at", "eligibility_version", "eligibility_confirmed_at",
@@ -17,7 +17,7 @@ CSV_FIELDS = [
     "completion_reason", "roleplay_started_at", "roleplay_completed_at",
     "pre_confidence", "pre_anxiety", "pre_submitted_at",
     "post_confidence", "post_realism", "post_usefulness", "post_submitted_at",
-    "feedback_metrics_json", "feedback_generation_source",
+    "feedback_metrics_json", "feedback_generation_source", "scoring_version",
     "generation_source_counts_json", "fallback_reason_counts_json", "event_counts_json",
 ]
 
@@ -86,6 +86,7 @@ async def export_research_rows(repository, users, deidentified=False):
                 "post_submitted_at": timestamp(post.submitted_at) if post else "",
                 "feedback_metrics_json": json_cell([metric.model_dump(mode="json") for metric in record.feedback_metrics]),
                 "feedback_generation_source": record.feedback_generation_source or "",
+                "scoring_version": record.scoring_version or "",
                 "generation_source_counts_json": json_cell(record.generation_source_counts),
                 "fallback_reason_counts_json": json_cell(record.fallback_reason_counts),
                 # Event properties can contain custom wording; only export counts.

@@ -13,6 +13,7 @@ from app.models.domain import (
     utcnow,
 )
 from app.services import scenario_dialogue, workload_dialogue
+from app.services.study_tasks import REQUIRED_SCORING_VERSION
 
 LEVELS = {Difficulty.BEGINNER: (0.25, 0.8), Difficulty.INTERMEDIATE: (0.5, 0.6), Difficulty.DIFFICULT: (0.75, 0.4)}
 SCENARIOS = {
@@ -162,6 +163,23 @@ class RolePlayService:
                 ("non-blaming language", [not e.blame_language for e in evidence]),
             ],
         }
+        if state.scoring_version == REQUIRED_SCORING_VERSION:
+            metric_sets.update({
+                "workload": [
+                    ("clear request", [e.concrete_request for e in evidence]),
+                    ("specific detail", [e.specific_detail for e in evidence]),
+                    ("no configured blame marker", [not e.blame_language for e in evidence]),
+                ],
+                "boundary": [
+                    ("clear refusal or maintained boundary", [e.maintained_boundary for e in evidence]),
+                    ("no repeated apology", [not e.excessive_apology for e in evidence]),
+                ],
+                "relationship": [
+                    ("I-statement", [e.i_statement for e in evidence]),
+                    ("specific detail", [e.specific_detail for e in evidence]),
+                    ("no configured blame marker", [not e.blame_language for e in evidence]),
+                ],
+            })
         if state.scenario_id.startswith("custom_"):
             scenario = state.scenario
             available = {

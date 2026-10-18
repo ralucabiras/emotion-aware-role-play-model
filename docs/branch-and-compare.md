@@ -37,7 +37,7 @@ Parent deletion/expiry leaves the child’s copied context and active continuati
 
 Language feedback in a branch uses only evidence from new responses and is labelled `evidence_scope=continuation`. The recorded outcome is for the resumed conversation and can depend on shared context. Ordinary previous-attempt score comparisons exclude branches to avoid comparing different evidence scopes; the explicit Compare view shows the saved continuations instead.
 
-Copied turn IDs are excluded from study `turn_count`, generation-source counts and fallback counts. Research events start with a fresh `branch_created` event; original message/questionnaire events are not copied. [Research export v4](research-export-v4.md) identifies branch records, copied context counts and feedback scope. Required-attempt selection is unchanged. Historical frozen files retain their original content, schema version and checksum.
+Copied turn IDs are excluded from study `turn_count`, generation-source counts and fallback counts. Research events start with a fresh `branch_created` event; original message/questionnaire events are not copied. [Research export v5](research-export-v5.md) retains the v4 branch fields identifying branch records, copied context counts and feedback scope. Required-attempt selection is unchanged. Historical frozen files retain their original content, schema version and checksum.
 
 ## Synthetic demonstration
 

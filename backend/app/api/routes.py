@@ -95,8 +95,10 @@ from app.services.roleplay_service import SCENARIOS
 from app.services.study_tasks import (
     PROTOCOL_REQUIRED_SCENARIOS,
     PROTOCOL_TASK_ORDER,
+    REQUIRED_SCORING_VERSION,
     is_completed_protocol_task,
     is_completed_rehearsal,
+    is_ended_rehearsal,
     select_required_attempts,
 )
 from app.services.transcription_service import InvalidAudio, TranscriptionService, TranscriptionUnavailable
@@ -249,6 +251,7 @@ def user_response(user: User) -> UserResponse:
         researcher=is_researcher(user.email),
         pilot_enrolled=has_current_study_consent(user),
         study_consent_version=user.study_consent.version if user.study_consent else None,
+        study_protocol_version=user.study_consent.protocol_version if user.study_consent else None,
         study_consented_at=user.study_consent.accepted_at.isoformat() if user.study_consent else None,
         eligibility_version=user.study_eligibility.version if user.study_eligibility else None,
         eligibility_confirmed_at=user.study_eligibility.confirmed_at.isoformat() if user.study_eligibility else None,
@@ -368,7 +371,7 @@ async def research_export(
     records = await repository.list_study_records(user.id)
     primary_ids = {record.session_id for record in select_required_attempts(records).values()}
     return {
-        "schema_version": "affectlab-research-export-v4",
+        "schema_version": "affectlab-research-export-v5",
         "protocol_version": settings.study_protocol_version,
         "participant_id": str(user.participant_id),
         "account_privacy_acceptance": {"version": user.consent_version, "accepted_at": user.consented_at},
@@ -397,6 +400,7 @@ async def research_export(
                 "completion_reason": record.completion_reason,
                 "feedback_metrics": [metric.model_dump(mode="json") for metric in record.feedback_metrics],
                 "feedback_generation_source": record.feedback_generation_source,
+                "scoring_version": record.scoring_version,
                 "questionnaires": {
                     phase: answer.model_dump(mode="json")
                     for phase, answer in record.questionnaires.items()
@@ -420,10 +424,11 @@ async def study_information(user: User = Depends(current_user)):
         protocol_version=settings.study_protocol_version,
         study_label=settings.pilot_study_label,
         title="Participant information sheet",
-        summary=("AffectLab is a dissertation study of whether emotion-aware reflection and adaptive role-play can support practice for difficult conversations. Taking part is voluntary and is separate from holding an AffectLab account."),
+        summary=("AffectLab is a 15-participant dissertation feasibility and usability pilot of an emotion-aware reflection and adaptive role-play workflow for difficult-conversation practice. Taking part is voluntary and is separate from holding an AffectLab account."),
         data_collected=[
             "A pseudonymous participant identifier and study-consent record.",
             "Questionnaire ratings, interaction events, scenario choices, completion data, and feedback metrics.",
+            "Versioned deterministic wording indicators derived from rehearsal turns; these are narrow lexical observations, not validated measures of communication ability.",
             "Conversation text in active application sessions; researcher dashboard and CSV exports exclude this text.",
             "Profile and account data required to operate and secure the application; these are not included in pseudonymous study exports.",
         ],
@@ -442,6 +447,8 @@ async def study_information(user: User = Depends(current_user)):
         risks_and_limitations=[
             f"Eligibility is limited to people aged {settings.minimum_participant_age} or over, located in {settings.geographic_scope}, using {settings.supported_language}.",
             "Discussing difficult situations may feel uncomfortable; you may pause or stop at any time.",
+            "The three required scenarios use a fixed order, so differences between scenarios cannot establish improvement through practice.",
+            "Manually finishing a scenario allows immediate post-ratings but does not count as primary protocol completion.",
             "Emotion estimates and generated replies can be inaccurate, biased, repetitive, or inappropriate.",
             "AffectLab is not therapy, diagnosis, medical advice, or an emergency service.",
             settings.emergency_limitations,
@@ -554,7 +561,7 @@ async def participant_study_progress(user: User = Depends(current_user), reposit
         latest = required_attempts.get(scenario_id)
         session = sessions.get(latest.session_id) if latest else None
         resumable = session and session.roleplay and session.roleplay.status in {"active", "paused"}
-        awaiting_ratings = session and session.post_questionnaire_token and latest and is_completed_rehearsal(latest)
+        awaiting_ratings = session and session.post_questionnaire_token and latest and is_ended_rehearsal(latest)
         if latest and is_completed_protocol_task(latest):
             status = "complete"
         elif resumable:
@@ -591,22 +598,28 @@ async def pilot_dataset(repository):
     difficulties: dict[str, int] = defaultdict(int)
     questionnaires: dict[str, list[float]] = defaultdict(list)
     generation_sources: dict[str, int] = defaultdict(int)
-    total_sessions = completed = protocol_completers = 0
+    total_sessions = completed = manual_finishes = protocol_completers = 0
     activity_records = []
     for user in cohort:
         study_records = [record for record in all_records if record.user_id == user.id and record.protocol_version == settings.study_protocol_version]
         eligible = has_current_study_consent(user)
         if eligible: total_sessions += len(study_records)
-        user_completed = sum(is_completed_rehearsal(record) for record in study_records)
+        required_attempts = select_required_attempts(study_records)
+        selected_ids = {record.session_id for record in required_attempts.values()}
+        user_completed = sum(is_completed_rehearsal(record) for record in required_attempts.values())
+        user_manual_finishes = sum(
+            record.completion_reason == "user_finished" for record in required_attempts.values()
+        )
         qualifying_scenarios = {
             record.scenario_id
-            for record in select_required_attempts(study_records).values()
+            for record in required_attempts.values()
             if is_completed_protocol_task(record)
         }
         protocol_complete = qualifying_scenarios == PROTOCOL_REQUIRED_SCENARIOS
         if eligible:
             protocol_completers += int(protocol_complete)
             completed += user_completed
+            manual_finishes += user_manual_finishes
         last_active = max((record.last_activity_at for record in study_records), default=user.pilot_enrolled_at)
         activity_records.append({
             "participant_id": str(user.participant_id),
@@ -614,6 +627,7 @@ async def pilot_dataset(repository):
             "last_active_at": last_active,
             "sessions": len(study_records),
             "completed_rehearsals": user_completed,
+            "manual_finishes": user_manual_finishes,
             "protocol_complete": protocol_complete,
             "completion_status": "withdrawn" if user.study_withdrawal else "excluded" if user.study_excluded_at else "complete" if protocol_complete else "in_progress",
             "excluded": bool(user.study_excluded_at),
@@ -626,16 +640,20 @@ async def pilot_dataset(repository):
         if not eligible:
             continue
         for record in study_records:
-            if is_completed_rehearsal(record):
+            selected = record.session_id in selected_ids
+            if selected and is_completed_rehearsal(record):
                 scenarios[record.scenario_id] += 1
                 if record.difficulty: difficulties[record.difficulty.value] += 1
             if record.feedback_generation_source:
                 generation_sources[record.feedback_generation_source] += 1
-                for metric in record.feedback_metrics: metric_values[metric.name].append(metric.score)
-            for answer in record.questionnaires.values():
-                for name in ("confidence", "anxiety", "realism", "usefulness"):
-                    value = getattr(answer, name)
-                    if value is not None: questionnaires[f"{answer.phase}_{name}"].append(value)
+            if selected and record.scoring_version == REQUIRED_SCORING_VERSION:
+                for metric in record.feedback_metrics:
+                    metric_values[f"{record.scenario_id}: {metric.name}"].append(metric.score)
+            if selected:
+                for answer in record.questionnaires.values():
+                    for name in ("confidence", "anxiety", "realism", "usefulness"):
+                        value = getattr(answer, name)
+                        if value is not None: questionnaires[f"{answer.phase}_{name}"].append(value)
     lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
     frozen_export = (
         await repository.get_frozen_export(lifecycle.frozen_export_id)
@@ -648,12 +666,15 @@ async def pilot_dataset(repository):
         "participants": len(users), "sessions": total_sessions,
         "participant_target": settings.study_participant_target,
         "completed_rehearsals": completed,
+        "manual_finishes": manual_finishes,
         "protocol_completers": protocol_completers,
         "completer_target": settings.study_completer_target,
         "protocol_completion_rate": protocol_completers / len(users) if users else 0,
-        "completion_rate": completed / total_sessions if total_sessions else 0,
+        "completion_rate": completed / (len(users) * len(PROTOCOL_TASK_ORDER)) if users else 0,
         "scenario_completions": dict(scenarios), "difficulty_completions": dict(difficulties),
-        "average_skill_scores": {name: sum(values) / len(values) for name, values in metric_values.items()},
+        "average_communication_indicators": {
+            name: sum(values) / len(values) for name, values in metric_values.items()
+        },
         "questionnaire_averages": {name: sum(values) / len(values) for name, values in questionnaires.items()},
         "generation_sources": dict(generation_sources),
         "participant_activity": sorted(activity_records, key=lambda item: item["last_active_at"], reverse=True),
