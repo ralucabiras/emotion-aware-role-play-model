@@ -33,7 +33,7 @@ from scripts.mongo_backup import backup_database
 
 RANDOM_SEED = 20261016
 PASSWORD = "AffectLabLocal2026!"
-DATASET_VERSION = "local-usage-v1"
+DATASET_VERSION = "local-usage-v2"
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 
 PARTICIPANT_PROFILES = [
@@ -196,7 +196,7 @@ async def add_rehearsal(
     )
     messages = (
         ["I'm not sure how to put this into words yet."]
-        if outcome in {"active", "paused"}
+        if outcome in {"active", "paused", "manual"}
         else DIALOGUES[scenario][rng.randrange(len(DIALOGUES[scenario]))]
     )
     for message in messages:
@@ -205,6 +205,8 @@ async def add_rehearsal(
             break
     if outcome == "paused" and session.roleplay.status == RolePlayStatus.ACTIVE:
         session = await service.set_roleplay_status(session.id, user.id, "pause")
+    elif outcome == "manual" and session.roleplay.status == RolePlayStatus.ACTIVE:
+        session = await service.set_roleplay_status(session.id, user.id, "finish")
     elif outcome == "complete" and session.roleplay.status == RolePlayStatus.ACTIVE:
         # Protocol v1.1 does not count a manual finish as primary completion.
         # Complete designated fixture paths through the deterministic controller.
@@ -293,7 +295,9 @@ async def build_cohort() -> MemoryRepository:
 
         for task in tasks:
             outcome = "complete"
-            ratings_skipped = index == 12 and task == "relationship"
+            ratings_skipped = False
+            if index == 12 and task == "relationship":
+                outcome = "manual"
             if index == 13 and task == "boundary":
                 outcome = "paused"
             if index == 14 and task == "workload":
@@ -453,6 +457,9 @@ async def write_fixtures(fixtures: MemoryRepository) -> dict[str, int | str]:
             "scope": "local-only",
             "generator": "backend.scripts.seed_mock_data",
             "generator_version": DATASET_VERSION,
+            "protocol_version": settings.study_protocol_version,
+            "consent_version": settings.study_consent_version,
+            "scoring_version": "affectlab-required-lexical-v1.1",
             "random_seed": RANDOM_SEED,
             "contains_observed_participant_data": False,
             "created_at": utcnow(),

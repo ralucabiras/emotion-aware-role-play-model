@@ -1,6 +1,7 @@
 """Local usage fixtures obey the same persistence and measurement rules as real use."""
 import pytest
 
+from app.api.routes import pilot_dataset
 from app.services.roleplay_service import RolePlayService
 from app.services.study_tasks import is_completed_protocol_task, select_required_attempts
 from scripts.seed_mock_data import build_cohort
@@ -16,12 +17,16 @@ async def test_synthetic_cohort_is_consistent_and_covers_incomplete_paths():
     assert len(cohort) == 17
     assert len(active_cohort) == 15
     completed = []
+    manual_finishes = []
     turn_counts, usefulness, changes = set(), set(), set()
     for user in active_cohort:
         assert user.study_eligibility.confirmed_at == user.pilot_enrolled_at
         records = await repo.list_study_records(user.id)
         selected = select_required_attempts(records)
         completed.append(sum(is_completed_protocol_task(r) for r in selected.values()))
+        manual_finishes.extend(
+            r for r in selected.values() if r.completion_reason == "user_finished"
+        )
         ordered = sorted(selected.values(), key=lambda r: r.roleplay_started_at)
         assert [r.scenario_id for r in ordered] == ["workload", "boundary", "relationship"][:len(ordered)]
         for record in records:
@@ -49,6 +54,20 @@ async def test_synthetic_cohort_is_consistent_and_covers_incomplete_paths():
             if record.attempt_purpose == "retry":
                 assert record.session_id != selected[record.required_task_id].session_id
     assert sorted(completed) == [0, 1, 2] + [3] * 12
+    assert len(manual_finishes) == 1
+    assert "post" in manual_finishes[0].questionnaires
+    assert not is_completed_protocol_task(manual_finishes[0])
     assert len(turn_counts) >= 3
     assert len(usefulness) >= 3
     assert min(changes) < 0 < max(changes)
+    _, _, dashboard = await pilot_dataset(repo)
+    assert dashboard["primary_outcome"]["completers"] == 12
+    assert dashboard["primary_outcome"]["denominator"] == 15
+    assert dashboard["primary_outcome"]["proportion"] == 0.8
+    assert dashboard["primary_outcome"]["preliminary_signal"] is True
+    assert dashboard["manual_finishes"] == 1
+    assert dashboard["confidence_analysis"]["overall"]["summary"]["n"] > 0
+    assert dashboard["rating_distributions"]["realism"]["overall"]["n"] > 0
+    assert dashboard["communication_indicator_distributions"]
+    assert dashboard["turn_count_distributions"]["overall"]["n"] == 42
+    assert len(dashboard["required_task_details"]) == 45

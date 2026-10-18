@@ -2,7 +2,7 @@ import base64
 import binascii
 import hashlib
 import hmac
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
@@ -92,6 +92,11 @@ from app.services.multimodal_service import (
 from app.services.preparation import action_card_draft, custom_scenario, prepare_brief, save_action_card
 from app.services.research_export import CSV_SCHEMA_VERSION, export_research_rows
 from app.services.roleplay_service import SCENARIOS
+from app.services.study_analysis import (
+    cluster_bootstrap_median_interval,
+    describe,
+    wilson_interval,
+)
 from app.services.study_tasks import (
     PROTOCOL_REQUIRED_SCENARIOS,
     PROTOCOL_TASK_ORDER,
@@ -594,10 +599,24 @@ async def pilot_dataset(repository):
     users = [user for user in cohort if has_current_study_consent(user)]
     all_records = await repository.list_study_records()
     metric_values: dict[str, list[float]] = defaultdict(list)
+    metric_distributions: dict[tuple[str, str], list[float]] = defaultdict(list)
     scenarios: dict[str, int] = defaultdict(int)
     difficulties: dict[str, int] = defaultdict(int)
     questionnaires: dict[str, list[float]] = defaultdict(list)
     generation_sources: dict[str, int] = defaultdict(int)
+    generation_event_sources: Counter[str] = Counter()
+    fallback_reasons: Counter[str] = Counter()
+    required_generation_sources: Counter[str] = Counter()
+    required_fallback_reasons: Counter[str] = Counter()
+    completion_reasons: Counter[str] = Counter()
+    missingness: Counter[str] = Counter()
+    turn_counts: dict[str, list[float]] = defaultdict(list)
+    rating_values: dict[str, dict[str, list[float]]] = {
+        "realism": defaultdict(list),
+        "usefulness": defaultdict(list),
+    }
+    confidence_pairs = []
+    task_details = []
     total_sessions = completed = manual_finishes = protocol_completers = 0
     activity_records = []
     for user in cohort:
@@ -605,7 +624,6 @@ async def pilot_dataset(repository):
         eligible = has_current_study_consent(user)
         if eligible: total_sessions += len(study_records)
         required_attempts = select_required_attempts(study_records)
-        selected_ids = {record.session_id for record in required_attempts.values()}
         user_completed = sum(is_completed_rehearsal(record) for record in required_attempts.values())
         user_manual_finishes = sum(
             record.completion_reason == "user_finished" for record in required_attempts.values()
@@ -634,26 +652,156 @@ async def pilot_dataset(repository):
             "withdrawn": bool(user.study_withdrawal),
             "exclusion_reason": user.study_exclusion_reason,
             "data_quality_notes": user.study_data_quality_notes,
-            "pre_questionnaires": sum("pre" in record.questionnaires for record in study_records),
-            "post_questionnaires": sum("post" in record.questionnaires for record in study_records),
+            "pre_questionnaires": sum("pre" in record.questionnaires for record in required_attempts.values()),
+            "post_questionnaires": sum("post" in record.questionnaires for record in required_attempts.values()),
         })
         if not eligible:
             continue
         for record in study_records:
-            selected = record.session_id in selected_ids
-            if selected and is_completed_rehearsal(record):
-                scenarios[record.scenario_id] += 1
-                if record.difficulty: difficulties[record.difficulty.value] += 1
             if record.feedback_generation_source:
                 generation_sources[record.feedback_generation_source] += 1
-            if selected and record.scoring_version == REQUIRED_SCORING_VERSION:
+            generation_event_sources.update(record.generation_source_counts or {})
+            fallback_reasons.update(record.fallback_reason_counts or {})
+        for scenario_id in PROTOCOL_TASK_ORDER:
+            record = required_attempts.get(scenario_id)
+            if record is None:
+                completion_reasons["not_started"] += 1
+                missingness["required_task_not_started"] += 1
+                task_details.append({
+                    "participant_id": str(user.participant_id), "scenario_id": scenario_id,
+                    "task_status": "not_started", "completion_reason": "not_started",
+                    "primary_complete": False, "pre_status": "not_started", "post_status": "not_started",
+                    "pre_confidence": None, "post_confidence": None, "confidence_change": None,
+                    "realism": None, "usefulness": None, "turn_count": None,
+                })
+                continue
+            reason = record.completion_reason or "in_progress"
+            completion_reasons[reason] += 1
+            events = {event.name for event in record.events}
+            pre = record.questionnaires.get("pre")
+            post = record.questionnaires.get("post")
+            pre_status = "submitted" if pre else "skipped" if "questionnaire_pre_skipped" in events else "missing"
+            if post:
+                post_status = "submitted"
+            elif "questionnaire_post_skipped" in events:
+                post_status = "skipped"
+            elif "questionnaire_post_closed" in events:
+                post_status = "closed"
+            elif is_ended_rehearsal(record):
+                post_status = "not_submitted"
+            else:
+                post_status = "not_available"
+            if pre_status != "submitted":
+                missingness[f"pre_questionnaire_{pre_status}"] += 1
+            if post_status != "submitted":
+                missingness[f"post_questionnaire_{post_status}"] += 1
+            pre_confidence = pre.confidence if pre else None
+            post_confidence = post.confidence if post else None
+            change = (
+                post_confidence - pre_confidence
+                if pre_confidence is not None and post_confidence is not None else None
+            )
+            if change is None:
+                missingness["paired_confidence_unavailable"] += 1
+            else:
+                confidence_pairs.append({
+                    "participant_id": str(user.participant_id), "scenario_id": scenario_id,
+                    "pre": pre_confidence, "post": post_confidence, "change": change,
+                })
+            for measure in ("realism", "usefulness"):
+                value = getattr(post, measure) if post else None
+                if value is None:
+                    missingness[f"post_{measure}_unavailable"] += 1
+                else:
+                    rating_values[measure][scenario_id].append(value)
+            primary_complete = is_completed_protocol_task(record)
+            if primary_complete:
+                task_status = "complete"
+            elif reason == "user_finished":
+                task_status = "manual_finish"
+            elif reason in {"success", "maximum_turns"}:
+                task_status = "questionnaire_incomplete"
+            elif reason == "in_progress":
+                task_status = "in_progress"
+            else:
+                task_status = reason
+            task_details.append({
+                "participant_id": str(user.participant_id), "scenario_id": scenario_id,
+                "task_status": task_status, "completion_reason": reason,
+                "primary_complete": primary_complete, "pre_status": pre_status,
+                "post_status": post_status, "pre_confidence": pre_confidence,
+                "post_confidence": post_confidence, "confidence_change": change,
+                "realism": post.realism if post else None,
+                "usefulness": post.usefulness if post else None,
+                "turn_count": record.turn_count,
+            })
+            turn_counts[scenario_id].append(record.turn_count)
+            required_generation_sources.update(record.generation_source_counts or {})
+            required_fallback_reasons.update(record.fallback_reason_counts or {})
+            if is_completed_rehearsal(record):
+                scenarios[scenario_id] += 1
+                if record.difficulty:
+                    difficulties[record.difficulty.value] += 1
+            if record.scoring_version == REQUIRED_SCORING_VERSION:
                 for metric in record.feedback_metrics:
-                    metric_values[f"{record.scenario_id}: {metric.name}"].append(metric.score)
-            if selected:
-                for answer in record.questionnaires.values():
-                    for name in ("confidence", "anxiety", "realism", "usefulness"):
-                        value = getattr(answer, name)
-                        if value is not None: questionnaires[f"{answer.phase}_{name}"].append(value)
+                    key = f"{scenario_id}: {metric.name}"
+                    metric_values[key].append(metric.score)
+                    metric_distributions[(scenario_id, metric.name)].append(metric.score)
+            for answer in record.questionnaires.values():
+                for name in ("confidence", "anxiety", "realism", "usefulness"):
+                    value = getattr(answer, name)
+                    if value is not None:
+                        questionnaires[f"{answer.phase}_{name}"].append(value)
+    for reason in (
+        "success", "maximum_turns", "user_finished", "safety_interruption",
+        "technical_failure", "in_progress", "not_started",
+    ):
+        completion_reasons.setdefault(reason, 0)
+    for missing_measure in (
+        "required_task_not_started", "pre_questionnaire_skipped", "pre_questionnaire_missing",
+        "post_questionnaire_skipped", "post_questionnaire_closed",
+        "post_questionnaire_not_submitted", "post_questionnaire_not_available",
+        "paired_confidence_unavailable", "post_realism_unavailable", "post_usefulness_unavailable",
+    ):
+        missingness.setdefault(missing_measure, 0)
+    confidence_by_scenario = {}
+    for scenario_id in PROTOCOL_TASK_ORDER:
+        rows = [row for row in confidence_pairs if row["scenario_id"] == scenario_id]
+        confidence_by_scenario[scenario_id] = {
+            "summary": describe(row["change"] for row in rows),
+            "median_ci_95": cluster_bootstrap_median_interval(
+                ((row["participant_id"], row["change"]) for row in rows),
+                seed_label=f"{settings.study_protocol_version}:confidence:{scenario_id}",
+            ),
+            "pairs": rows,
+        }
+    overall_confidence = {
+        "summary": describe(row["change"] for row in confidence_pairs),
+        "median_ci_95": cluster_bootstrap_median_interval(
+            ((row["participant_id"], row["change"]) for row in confidence_pairs),
+            seed_label=f"{settings.study_protocol_version}:confidence:overall",
+        ),
+    }
+    rating_distributions = {}
+    for measure, by_scenario in rating_values.items():
+        rating_distributions[measure] = {
+            "overall": describe(value for values in by_scenario.values() for value in values),
+            "by_scenario": {
+                scenario_id: describe(by_scenario.get(scenario_id, []))
+                for scenario_id in PROTOCOL_TASK_ORDER
+            },
+        }
+    indicator_distributions = [
+        {
+            "scenario_id": scenario_id, "indicator": indicator,
+            "scoring_version": REQUIRED_SCORING_VERSION, **describe(values),
+        }
+        for (scenario_id, indicator), values in sorted(metric_distributions.items())
+    ]
+    all_turns = [value for values in turn_counts.values() for value in values]
+    completion_interval = wilson_interval(protocol_completers, len(users))
+    recruitment_complete = len(users) >= settings.study_participant_target
+    target_met = bool(users and protocol_completers / len(users) >= 0.8)
     lifecycle = await repository.get_study_lifecycle(settings.study_protocol_version)
     frozen_export = (
         await repository.get_frozen_export(lifecycle.frozen_export_id)
@@ -670,6 +818,13 @@ async def pilot_dataset(repository):
         "protocol_completers": protocol_completers,
         "completer_target": settings.study_completer_target,
         "protocol_completion_rate": protocol_completers / len(users) if users else 0,
+        "primary_outcome": {
+            "completers": protocol_completers, "denominator": len(users),
+            "proportion": protocol_completers / len(users) if users else None,
+            "wilson_ci_95": completion_interval, "target_proportion": 0.8,
+            "target_met": target_met, "recruitment_complete": recruitment_complete,
+            "preliminary_signal": recruitment_complete and target_met,
+        },
         "completion_rate": completed / (len(users) * len(PROTOCOL_TASK_ORDER)) if users else 0,
         "scenario_completions": dict(scenarios), "difficulty_completions": dict(difficulties),
         "average_communication_indicators": {
@@ -677,6 +832,41 @@ async def pilot_dataset(repository):
         },
         "questionnaire_averages": {name: sum(values) / len(values) for name, values in questionnaires.items()},
         "generation_sources": dict(generation_sources),
+        "confidence_analysis": {
+            "change_definition": "post minus pre within the same required scenario",
+            "interval_method": "participant-cluster bootstrap percentile 95% CI for median; 5000 resamples",
+            "overall": overall_confidence, "by_scenario": confidence_by_scenario,
+        },
+        "rating_distributions": rating_distributions,
+        "communication_indicator_distributions": indicator_distributions,
+        "completion_reasons": dict(completion_reasons),
+        "missingness": dict(missingness),
+        "participant_flow": {
+            "protocol_cohort": len(cohort), "analysis_cohort": len(users),
+            "withdrawn": sum(bool(user.study_withdrawal) for user in cohort),
+            "excluded": sum(bool(user.study_excluded_at) for user in cohort),
+        },
+        "technical_feasibility": {
+            "scope": "all retained eligible study activity",
+            "generation_sources": dict(generation_event_sources),
+            "fallback_reasons": dict(fallback_reasons),
+            "generation_events": sum(generation_event_sources.values()),
+            "fallback_events": sum(fallback_reasons.values()),
+            "fallback_rate": (
+                sum(fallback_reasons.values()) / sum(generation_event_sources.values())
+                if generation_event_sources else None
+            ),
+            "required_task_generation_sources": dict(required_generation_sources),
+            "required_task_fallback_reasons": dict(required_fallback_reasons),
+        },
+        "turn_count_distributions": {
+            "overall": describe(all_turns),
+            "by_scenario": {
+                scenario_id: describe(turn_counts.get(scenario_id, []))
+                for scenario_id in PROTOCOL_TASK_ORDER
+            },
+        },
+        "required_task_details": task_details,
         "participant_activity": sorted(activity_records, key=lambda item: item["last_active_at"], reverse=True),
         "lifecycle": lifecycle.model_dump(mode="json") if lifecycle else {
             "protocol_version": settings.study_protocol_version,

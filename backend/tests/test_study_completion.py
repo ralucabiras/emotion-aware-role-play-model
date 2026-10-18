@@ -9,6 +9,7 @@ from app.api.routes import participant_study_progress, pilot_dataset
 from app.core.config import settings
 from app.models.domain import (
     Difficulty,
+    FeedbackMetric,
     StudyConsentRecord,
     StudyEligibilityRecord,
     StudyQuestionnaire,
@@ -101,6 +102,53 @@ async def test_partial_or_missing_post_ratings_do_not_complete_protocol(missing)
     assert dashboard["completed_rehearsals"] == 3
     assert dashboard["protocol_completers"] == 0
     assert rows[0]["protocol_complete"] is False
+
+
+@pytest.mark.asyncio
+async def test_dashboard_reports_protocol_v1_1_descriptive_analysis_without_imputation():
+    repository, user = await enrolled_cohort()
+    await add_task(
+        repository, user, "workload", turn_count=6,
+        scoring_version=REQUIRED_SCORING_VERSION,
+        feedback_metrics=[FeedbackMetric(name="clear request", score=0.5, evidence_turns=[1])],
+        generation_source_counts={"deterministic_roleplay": 3},
+        fallback_reason_counts={"roleplay_timeout": 1},
+        questionnaires={
+            "pre": StudyQuestionnaire(phase="pre", confidence=3, anxiety=5),
+            "post": StudyQuestionnaire(phase="post", confidence=5, realism=6, usefulness=7),
+        },
+    )
+    await add_task(
+        repository, user, "boundary", reason="user_finished", turn_count=4,
+        questionnaires={
+            "pre": StudyQuestionnaire(phase="pre", confidence=4, anxiety=4),
+            "post": StudyQuestionnaire(phase="post", confidence=4, realism=5, usefulness=6),
+        },
+    )
+    await add_task(repository, user, "relationship", reason="safety_interruption", post=False, turn_count=2)
+    _, _, dashboard = await pilot_dataset(repository)
+    assert dashboard["primary_outcome"]["proportion"] == 0
+    assert dashboard["primary_outcome"]["target_met"] is False
+    assert dashboard["primary_outcome"]["recruitment_complete"] is False
+    assert dashboard["confidence_analysis"]["by_scenario"]["workload"]["summary"]["mean"] == 2
+    assert dashboard["confidence_analysis"]["by_scenario"]["boundary"]["summary"]["median"] == 0
+    assert dashboard["confidence_analysis"]["by_scenario"]["relationship"]["summary"]["n"] == 0
+    assert dashboard["rating_distributions"]["realism"]["overall"]["median"] == 5.5
+    indicator = dashboard["communication_indicator_distributions"][0]
+    assert (indicator["scenario_id"], indicator["indicator"], indicator["mean"]) == (
+        "workload", "clear request", 0.5,
+    )
+    assert dashboard["completion_reasons"]["success"] == 1
+    assert dashboard["completion_reasons"]["user_finished"] == 1
+    assert dashboard["completion_reasons"]["safety_interruption"] == 1
+    assert dashboard["completion_reasons"]["technical_failure"] == 0
+    assert dashboard["missingness"]["post_questionnaire_not_available"] == 1
+    assert dashboard["missingness"]["paired_confidence_unavailable"] == 1
+    assert dashboard["technical_feasibility"]["generation_events"] == 3
+    assert dashboard["technical_feasibility"]["fallback_events"] == 1
+    assert dashboard["turn_count_distributions"]["overall"]["median"] == 4
+    assert len(dashboard["required_task_details"]) == 3
+    assert dashboard["required_task_details"][1]["task_status"] == "manual_finish"
 
 
 @pytest.mark.asyncio
