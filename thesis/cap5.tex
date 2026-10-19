@@ -129,7 +129,7 @@ The calibrated contextual model obtained pooled ECE 0.0311. This value describes
 \subsection{Exploratory Six-Class Comparison}
 \label{subsec:six-class-context-results}
 
-An exploratory task aligned additional source labels to anger, anxiety, frustration, joy, neutral, and sadness. Context again improved all aggregate measures, as shown in Table~\ref{tab:six-class-context-results}. The macro-F1 gain was 0.0732 with an interval from 0.0485 to 0.1009.
+An exploratory task aligned additional source labels to anger, anxiety, frustration, joy, neutral, and sadness. The five held-out sessions contained 7,420 examples: 1,103 anger, 40 anxiety, 1,849 frustration, 1,636 joy, 1,708 neutral, and 1,084 sadness. Thus, anxiety represented only 0.54\% of this exploratory dataset, whereas the other classes each contributed more than 1,000 examples. Context again improved all aggregate measures, as shown in Table~\ref{tab:six-class-context-results}. The pooled macro-F1 gain was 0.0732 with an interval from 0.0485 to 0.1009.
 
 \begin{table}[htbp]
 \centering
@@ -142,6 +142,25 @@ An exploratory task aligned additional source labels to anger, anxiety, frustrat
 Accuracy & 0.5674 & 0.6228 & +0.0554 & [0.0382, 0.0734] \\ \hline
 Macro F1 & 0.5490 & 0.6222 & +0.0732 & [0.0485, 0.1009] \\ \hline
 Weighted F1 & 0.5675 & 0.6205 & +0.0529 & [0.0359, 0.0702] \\ \hline
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:six-class-fold-results} makes the session-to-session variation explicit. Context produced higher macro F1 in every fold, with fold-specific gains from 0.0475 to 0.0972. The unweighted fold means were 0.5456 and 0.6157; their standard deviations were 0.0330 and 0.0304, respectively. These unweighted means differ slightly from the pooled values in Table~\ref{tab:six-class-context-results}, which recompute macro F1 after concatenating all held-out predictions. The fold counts also expose the fragility of the anxiety result: individual test sessions contained only 2--12 anxiety examples.
+
+\begin{table}[htbp]
+\centering
+\caption{Fold variation in macro F1 for the exploratory six-class comparison. Each fold holds out one complete IEMOCAP session.}
+\label{tab:six-class-fold-results}
+\footnotesize
+\begin{tabular}{|c|r|r|r|r|r|}
+\hline
+\textbf{Fold} & \textbf{Test $n$} & \textbf{Anxiety $n$} & \textbf{Utterance only} & \textbf{Three-turn context} & \textbf{Difference} \\ \hline
+1 & 1,377 & 12 & 0.5690 & 0.6180 & +0.0490 \\ \hline
+2 & 1,357 & 9 & 0.5683 & 0.6655 & +0.0972 \\ \hline
+3 & 1,535 & 2 & 0.4992 & 0.5813 & +0.0820 \\ \hline
+4 & 1,519 & 7 & 0.5792 & 0.6268 & +0.0475 \\ \hline
+5 & 1,632 & 10 & 0.5122 & 0.5870 & +0.0748 \\ \hline
+Mean $\pm$ SD & -- & -- & 0.5456 $\pm$ 0.0330 & 0.6157 $\pm$ 0.0304 & +0.0701 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -172,7 +191,7 @@ Table~\ref{tab:six-class-per-class} reports the complete class-level metrics for
 \end{tabular}
 \end{table}
 
-The anxiety F1 difference was comparatively large at 0.1650, but it had a wide interval $[0.0476, 0.3144]$ and arose from only 40 IEMOCAP fear annotations mapped to anxiety. Anger and neutral intervals included zero. Consequently, the six-class experiment is not used as the deployed classifier and does not support a strong conclusion about anxiety recognition.
+The class-level effects were heterogeneous. Frustration improved by 0.0402 ($[0.0158, 0.0647]$), joy by 0.1088 ($[0.0804, 0.1371]$), and sadness by 0.1232 ($[0.0926, 0.1557]$). The anxiety F1 difference was comparatively large at 0.1650, but it had a wide interval $[0.0476, 0.3144]$ and arose from only 40 IEMOCAP fear annotations mapped to anxiety. The anger difference of 0.0053 ($[-0.0288, 0.0339]$) and neutral difference of $-0.0033$ ($[-0.0316, 0.0241]$) both had intervals spanning zero. Consequently, the six-class experiment is not used as the deployed classifier and does not support a strong conclusion about anxiety recognition.
 
 \subsection{Answer to RQ1}
 \label{subsec:rq1-answer}

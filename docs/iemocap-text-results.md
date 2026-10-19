@@ -35,11 +35,26 @@ The anger interval includes zero; the data do not establish an anger-specific im
 
 ## AffectLab-aligned six-class task
 
+The pooled held-out set contains 7,420 examples: 1,103 anger, 40 anxiety, 1,849 frustration, 1,636 joy, 1,708 neutral, and 1,084 sadness. Anxiety therefore accounts for only 0.54% of the exploratory dataset.
+
 | Metric | Utterance baseline | Three-turn context | Difference | Dialogue-bootstrap 95% interval |
 | --- | ---: | ---: | ---: | ---: |
 | Accuracy | 0.5674 | 0.6228 | +0.0554 | [0.0382, 0.0734] |
 | Macro F1 | 0.5490 | 0.6222 | +0.0732 | [0.0485, 0.1009] |
 | Weighted F1 | 0.5675 | 0.6205 | +0.0529 | [0.0359, 0.0702] |
+
+Macro F1 varied across the five held-out sessions as follows:
+
+| Fold | Test n | Anxiety n | Utterance baseline | Three-turn context | Difference |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 1,377 | 12 | 0.5690 | 0.6180 | +0.0490 |
+| 2 | 1,357 | 9 | 0.5683 | 0.6655 | +0.0972 |
+| 3 | 1,535 | 2 | 0.4992 | 0.5813 | +0.0820 |
+| 4 | 1,519 | 7 | 0.5792 | 0.6268 | +0.0475 |
+| 5 | 1,632 | 10 | 0.5122 | 0.5870 | +0.0748 |
+| Mean ± SD | — | — | 0.5456 ± 0.0330 | 0.6157 ± 0.0304 | +0.0701 |
+
+Context produced higher macro F1 in every fold. The fold-specific gains ranged from 0.0475 to 0.0972. The unweighted fold means differ slightly from the pooled values above, which are recomputed after concatenating all held-out predictions. The 2–12 anxiety examples in individual test sessions make class-specific fold estimates unstable.
 
 Per-class F1 differences were:
 
