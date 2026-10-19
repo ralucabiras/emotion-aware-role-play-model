@@ -58,7 +58,9 @@ Validation-fitted per-class F1 was 0.7951 for anger, 0.8221 for happiness, 0.689
 
 The equal-weight result remains the predeclared confirmatory comparison for the hypothesis that audio adds information beyond contextual text. The validation-fitted result is the preferred operational configuration whenever confidence is exposed or used for thresholding. This distinction avoids selecting a scientific headline or deployment configuration from test-set performance after the fact.
 
-## Global out-of-fold deployment calibrator
+## Operational global deployment calibration (label-reused analysis)
+
+The two global summaries in this section are packaging analyses, not independent held-out results. Pooling the rotating folds means that all 5,531 utterance identities and labels enter the calibration fit in a validation role and the descriptive metrics again in a test role, using predictions from different trained models.
 
 An initial pooled analysis of the 5,531 unique out-of-fold validation predictions yielded text weight 0.59, audio weight 0.41, and fusion temperature 0.6009347778. Its metrics are retained below as an intermediate result. It still consumed modality probabilities produced with fold-specific temperatures, so it is not by itself the final deployment recipe. The final global pass additionally fits one text temperature and one audio temperature from pooled raw validation logits before fitting fusion.
 
@@ -71,7 +73,7 @@ An initial pooled analysis of the 5,531 unique out-of-fold validation prediction
 | NLL | 0.6059 |
 | Multiclass Brier | 0.3269 |
 
-The intermediate global calibrator slightly improves accuracy and macro F1 over fold-specific calibration while retaining low ECE. Its per-class F1 is 0.7984 for anger, 0.8228 for happiness, 0.6927 for neutral, and 0.7995 for sadness. Selection for the final full-data inference package requires the complete global modality-plus-fusion calibration chain; neither deployment analysis replaces the equal-weight confirmatory research comparison.
+The intermediate global calibrator's descriptive values are slightly higher for accuracy and macro F1 than those of fold-specific calibration while retaining low ECE. Because of the identity and label reuse described above, this is not evidence of an improvement. Its per-class F1 is 0.7984 for anger, 0.8228 for happiness, 0.6927 for neutral, and 0.7995 for sadness. Selection for the final full-data inference package requires the complete global modality-plus-fusion calibration chain; neither deployment analysis replaces the equal-weight confirmatory research comparison or the fold-specific held-out calibration result.
 
 ### Final global calibration chain
 
@@ -84,7 +86,7 @@ Fitting modality temperatures from pooled raw out-of-fold validation logits, fol
 - Fusion temperature: 0.5989429433
 - Calibration examples: 5,531 unique out-of-fold validation predictions
 
-Applied to the held-out fold predictions, the complete chain gives accuracy 0.7736, macro F1 0.7776, weighted F1 0.7728, ECE 0.0242, NLL 0.6075, and multiclass Brier score 0.3280. Per-class F1 is 0.7993 for anger, 0.8235 for happiness, 0.6936 for neutral, and 0.7942 for sadness. These are the parameters selected for full-data model packaging.
+For operational description, applying the complete chain to the pooled test-role predictions gives accuracy 0.7736, macro F1 0.7776, weighted F1 0.7728, ECE 0.0242, NLL 0.6075, and multiclass Brier score 0.3280. Per-class F1 is 0.7993 for anger, 0.8235 for happiness, 0.6936 for neutral, and 0.7942 for sadness. These values are **not an independent held-out performance estimate**. Across the rotating folds, each of the 5,531 utterance identities and labels entered the global fit once in a validation role and entered this summary again in a test role; different trained models produced the two predictions, but the label was reused. The chain is retained only to select parameters for full-data model packaging. Use the equal-weight comparison and fold-specific validation-fitted fusion for held-out performance claims.
 
 The paired context values above are reconstructed from the exact row-level artifacts used in fusion. They can differ slightly from an earlier run summary if nondeterministic GPU reruns overwrote the private fold artifacts; the paired analysis verifies every prediction file against its adjacent recorded fold metrics.
 

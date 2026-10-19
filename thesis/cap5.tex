@@ -166,11 +166,11 @@ Fusion per-class F1 was 0.8277 for anger, 0.8163 for happiness, 0.7014 for neutr
 
 Equal averaging improved classification but produced ECE 0.1619. Separately calibrated modality probabilities therefore did not remain calibrated after fusion. This result is important for AffectLab because confidence, not only the top class, is consumed by the pacing policy. Treating the equal-fusion probability as reliable would have contradicted the evaluation evidence.
 
-Fold-specific validation fitting selected text weights between 0.54 and 0.63 and then fitted a final temperature. This reduced ECE to 0.0283, while macro F1 decreased from 0.7883 to 0.7758. Table~\ref{tab:calibration-tradeoff} summarises the principal configurations. The complete global chain fitted text and audio temperatures and then fusion parameters on 5,531 pooled out-of-fold validation predictions. It selected text weight 0.59, audio weight 0.41, and final temperature 0.5989.
+Fold-specific validation fitting selected text weights between 0.54 and 0.63 and then fitted a final temperature. This reduced ECE to 0.0283, while macro F1 decreased from 0.7883 to 0.7758. Table~\ref{tab:calibration-tradeoff} summarises only configurations whose reported test session was excluded from fitting their parameters.
 
 \begin{table}[htbp]
 \centering
-\caption{Classification and calibration trade-off among multimodal configurations.}
+\caption{Classification and calibration trade-off for independently evaluated fold configurations.}
 \label{tab:calibration-tradeoff}
 \footnotesize
 \begin{tabular}{|l|r|r|r|r|}
@@ -180,7 +180,6 @@ Contextual text & 0.7304 & 0.7332 & 0.7300 & 0.0311 \\ \hline
 Audio only & 0.6279 & 0.6349 & 0.6229 & 0.0468 \\ \hline
 Equal-weight fusion & 0.7832 & 0.7883 & 0.7815 & 0.1619 \\ \hline
 Fold validation-fitted fusion & 0.7717 & 0.7758 & 0.7707 & 0.0283 \\ \hline
-Final global calibration chain & 0.7736 & 0.7776 & 0.7728 & 0.0242 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -189,20 +188,20 @@ Figure~\ref{fig:model-results} places the classification results and calibration
 \begin{figure}[p]
 \centering
 \input{figures/model_results}
-\caption{Aggregate four-class model results. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally.}
+\caption{Aggregate four-class results from independently evaluated fold configurations. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally.}
 \label{fig:model-results}
 \end{figure}
 
-The row-normalised confusion matrices in Figure~\ref{fig:model-confusion-matrices} expose the class-specific complementarity behind the aggregate result. Audio recognised anger more often than contextual text (78.1\% versus 69.6\% recall), whereas contextual text was substantially stronger for happiness and neutral. Equal fusion raised recall to 85.1\% for anger, 81.1\% for happiness, 66.6\% for neutral, and 85.8\% for sadness. The final global chain retained a more balanced pattern while using probabilities suitable for operational confidence.
+The row-normalised confusion matrices in Figure~\ref{fig:model-confusion-matrices} expose the class-specific complementarity behind the aggregate result. Audio recognised anger more often than contextual text (78.1\% versus 69.6\% recall), whereas contextual text was substantially stronger for happiness and neutral. Equal fusion raised recall to 85.1\% for anger, 81.1\% for happiness, 66.6\% for neutral, and 85.8\% for sadness. Fold-specific validation fitting retained a more balanced pattern while producing probabilities suitable for operational confidence.
 
 \begin{figure}[p]
 \centering
 \input{figures/confusion_matrices}
-\caption{Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. The fold-fitted matrix is omitted because its class pattern is nearly identical to the final global chain.}
+\caption{Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. Every fitted parameter represented here was estimated without the corresponding test session.}
 \label{fig:model-confusion-matrices}
 \end{figure}
 
-Figure~\ref{fig:model-reliability-curves} shows the corresponding bin-level calibration behaviour. Equal fusion lies systematically above the ideal diagonal through its populated mid-confidence region, indicating under-confidence despite its superior classification performance. Validation-fitted and global calibration move the fusion curve much closer to the diagonal. The isolated low-confidence points contain very few observations and should not be interpreted as stable local estimates.
+Figure~\ref{fig:model-reliability-curves} shows the corresponding bin-level calibration behaviour. Equal fusion lies systematically above the ideal diagonal through its populated mid-confidence region, indicating under-confidence despite its superior classification performance. Fold-specific validation fitting moves the fusion curve much closer to the diagonal. The isolated low-confidence points contain very few observations and should not be interpreted as stable local estimates.
 
 \begin{figure}[p]
 \centering
@@ -212,14 +211,37 @@ Figure~\ref{fig:model-reliability-curves} shows the corresponding bin-level cali
 \end{figure}
 \clearpage
 
-The final global chain also obtained negative log-likelihood 0.6075 and multiclass Brier score 0.3280. It is the configuration stored for full-data packaging because it provides the single parameter set required by one final text model and one final audio model. However, its pooled calibration fitting uses all out-of-fold validation rows and is an operational configuration analysis, not a new independent confirmatory comparison. The equal-weight result remains the classification headline.
+\subsubsection{Operational full-data packaging analysis}
+\label{subsubsec:global-packaging-analysis}
+
+The application requires one calibration chain for the final text and audio models rather than five fold-specific chains. For that purpose, the complete global chain fitted text and audio temperatures and then fusion parameters on 5,531 pooled validation-role predictions. It selected text weight 0.59, audio weight 0.41, and final temperature 0.5989.
+
+\begin{table}[htbp]
+\centering
+\caption{Operational global-chain summary; these descriptive values are not an independent held-out performance estimate.}
+\label{tab:global-packaging-analysis}
+\footnotesize
+\begin{tabular}{|l|r|}
+\hline
+\textbf{Quantity} & \textbf{Value} \\ \hline
+Accuracy on pooled test-role predictions & 0.7736 \\ \hline
+Macro F1 on pooled test-role predictions & 0.7776 \\ \hline
+Weighted F1 on pooled test-role predictions & 0.7728 \\ \hline
+ECE on pooled test-role predictions & 0.0242 \\ \hline
+Negative log-likelihood & 0.6075 \\ \hline
+Multiclass Brier score & 0.3280 \\ \hline
+\end{tabular}
+\end{table}
+
+These values describe the packaged transformation but are label-reused. Across the rotating folds, the global fit used a validation-role prediction and label for every one of the 5,531 utterance identities; the summary then used a test-role prediction and the same label for every one of those identities, generated by a different trained model. Changing the model that produced the prediction does not make the label independent of calibration fitting. The global row is therefore excluded from Table~\ref{tab:calibration-tradeoff} and from the held-out diagnostic figures. The equal-weight result remains the classification headline, while the fold-specific validation-fitted result supplies the held-out calibration evidence.
+\clearpage
 
 \subsection{Answer to RQ2}
 \label{subsec:rq2-answer}
 
 RQ2 is also answered positively within IEMOCAP. Equal-weight late fusion improved macro F1 by 0.0551 over contextual text and by 0.1534 over audio alone, showing complementary information in the textual and acoustic branches. The paired interval against contextual text excluded zero.
 
-The answer includes a material trade-off: the strongest classifier was poorly calibrated, whereas validation-fitted and global calibration configurations sacrificed approximately one percentage point of macro F1 while reducing ECE substantially. AffectLab therefore uses the global validation-derived chain for operational confidence and retains conservative presentation rules. Calibration under IEMOCAP does not guarantee calibration after distribution shift \,\cite{ovadia2019shift}.
+The answer includes a material trade-off: the strongest classifier was poorly calibrated, whereas fold-specific validation fitting sacrificed approximately one percentage point of macro F1 while reducing ECE substantially on held-out sessions. AffectLab uses the separately reported global chain as an operational packaging choice and retains conservative presentation rules; its label-reused summary is not additional held-out evidence. Calibration under IEMOCAP does not guarantee calibration after distribution shift \,\cite{ovadia2019shift}.
 
 \section{Application Verification and Readiness}
 \label{sec:engineering-evaluation}

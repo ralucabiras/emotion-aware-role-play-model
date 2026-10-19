@@ -47,8 +47,5 @@
 \addplot[teal!75!black, thick, mark=triangle*, mark size=2.1pt]
     table[x=mean_confidence,y=accuracy] {figures/data/reliability_validation_fitted.dat};
 \addlegendentry{Fold-fitted}
-\addplot[blue!75!black, thick, mark=diamond*, mark size=2.2pt]
-    table[x=mean_confidence,y=accuracy] {figures/data/reliability_global_calibrated.dat};
-\addlegendentry{Global chain}
 \end{groupplot}
 \end{tikzpicture}

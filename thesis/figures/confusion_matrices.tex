@@ -50,12 +50,12 @@
     nodes near coords style={font=\tiny}]
     table[x=predicted,y=expected,meta=percent] {figures/data/confusion_equal_fusion.dat};
 
-\nextgroupplot[title={(d) Final global chain},xlabel={Predicted label},yticklabels={}]
+\nextgroupplot[title={(d) Fold-fitted fusion},xlabel={Predicted label},yticklabels={}]
 \addplot[matrix plot*, mesh/cols=4, point meta=explicit]
-    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_global_calibrated.dat};
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_validation_fitted.dat};
 \addplot[only marks, mark=none, point meta=explicit,
     nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}\%},
     nodes near coords style={font=\tiny}]
-    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_global_calibrated.dat};
+    table[x=predicted,y=expected,meta=percent] {figures/data/confusion_validation_fitted.dat};
 \end{groupplot}
 \end{tikzpicture}
