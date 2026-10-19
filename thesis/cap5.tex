@@ -211,6 +211,15 @@ Weighted F1 & 0.7300 & 0.7815 & +0.0514 & [0.0366, 0.0671] \\ \hline
 
 The complete fusion class-level metrics are reported in Table~\ref{tab:multimodal-per-class}. Unlike the contextual-text comparison, the combined system showed substantial performance across all four categories. Because the fusion rule was fixed before inspection of the combined test outcome, this result is retained as the primary evidence that audio contributed complementary benchmark information.
 
+\subsection{Qualitative Error Analysis}
+\label{subsec:qualitative-error-analysis}
+
+Inspection of matched held-out predictions illustrates both the value and the limits of context and multimodal fusion. IEMOCAP dialogue is not reproduced because of its access conditions, so the examples below are identified by utterance ID. They were selected after evaluation to explain recurring behaviours and are illustrative cases, not estimates of their prevalence.
+
+Context sometimes corrected a locally plausible but wrong reading: for \texttt{Ses03M\_script01\_3\_M046} (gold happiness), the utterance-only model predicted neutral, whereas the contextual model predicted happiness. The reverse occurred for \texttt{Ses03F\_script02\_2\_M008} (gold neutral), which changed from a correct utterance-only neutral prediction to a contextual anger prediction. Context could also expose rather than resolve uncertainty. For \texttt{Ses05F\_impro08\_F028} (gold neutral), the utterance-only model predicted neutral, but the contextual posterior assigned exactly 0.4407 to both happiness and neutral; the stored argmax was happiness. Thus, a changed top label need not represent a decisive contextual interpretation.
+
+Text--audio disagreement was similarly bidirectional. For \texttt{Ses03M\_script02\_2\_F009} (gold anger), contextual text predicted neutral and audio predicted anger; equal fusion recovered anger. For \texttt{Ses03F\_script02\_1\_M020} (gold neutral), contextual text was correct but audio predicted anger, and equal fusion narrowly selected anger (0.4555 versus 0.4501 for neutral). Fusion therefore repaired some unimodal errors but could also let a strong wrong modality overturn a correct one. Finally, \texttt{Ses03F\_script01\_2\_M009} shows a shared failure: both modalities confidently predicted anger for a neutral annotation, so equal fusion reinforced the error. Together with neutral's lowest equal-fusion recall (66.6\%), these cases indicate representative failure modes of contextual carry-over, near-tied interpretations, modality dominance, and correlated errors that late averaging cannot correct.
+
 \subsection{Classification--Calibration Trade-Off}
 \label{subsec:fusion-calibration-results}
 
