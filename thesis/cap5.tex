@@ -216,22 +216,25 @@ The complete fusion class-level metrics are reported in Table~\ref{tab:multimoda
 
 Equal averaging improved classification but produced ECE 0.1619. Separately calibrated modality probabilities therefore did not remain calibrated after fusion. This result is important for AffectLab because confidence, not only the top class, is consumed by the pacing policy. Treating the equal-fusion probability as reliable would have contradicted the evaluation evidence.
 
-Fold-specific validation fitting selected text weights between 0.54 and 0.63 and then fitted a final temperature. This reduced ECE to 0.0283, while macro F1 decreased from 0.7883 to 0.7758. Table~\ref{tab:calibration-tradeoff} summarises only configurations whose reported test session was excluded from fitting their parameters.
+Fold-specific validation fitting selected text weights between 0.54 and 0.63 and then fitted a final temperature. This reduced ECE to 0.0283, while macro F1 decreased from 0.7883 to 0.7758. Table~\ref{tab:calibration-tradeoff} reports ECE together with negative log-likelihood (NLL) and the multiclass Brier score for every major calibrated configuration whose reported test session was excluded from fitting its parameters. Lower values are better for all three probability-quality measures.
 
 \begin{table}[htbp]
 \centering
-\caption{Classification and calibration trade-off for independently evaluated fold configurations.}
+\caption{Classification and probability-quality trade-off for independently evaluated fold configurations.}
 \label{tab:calibration-tradeoff}
-\footnotesize
-\begin{tabular}{|l|r|r|r|r|}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|l|r|r|r|r|r|r|}
 \hline
-\textbf{Configuration} & \textbf{Accuracy} & \textbf{Macro F1} & \textbf{Weighted F1} & \textbf{ECE} \\ \hline
-Contextual text & 0.7304 & 0.7332 & 0.7300 & 0.0311 \\ \hline
-Audio only & 0.6279 & 0.6349 & 0.6229 & 0.0468 \\ \hline
-Equal-weight fusion & 0.7832 & 0.7883 & 0.7815 & 0.1619 \\ \hline
-Fold validation-fitted fusion & 0.7717 & 0.7758 & 0.7707 & 0.0283 \\ \hline
+\textbf{Configuration} & \textbf{Accuracy} & \textbf{Macro F1} & \textbf{Weighted F1} & \textbf{ECE} & \textbf{NLL} & \textbf{Brier} \\ \hline
+Contextual text & 0.7304 & 0.7332 & 0.7300 & 0.0311 & 0.7061 & 0.3845 \\ \hline
+Audio only & 0.6279 & 0.6349 & 0.6229 & 0.0468 & 0.9441 & 0.5140 \\ \hline
+Equal-weight fusion & 0.7832 & 0.7883 & 0.7815 & 0.1619 & 0.6843 & 0.3619 \\ \hline
+Fold validation-fitted fusion & 0.7717 & 0.7758 & 0.7707 & 0.0283 & 0.6050 & 0.3273 \\ \hline
 \end{tabular}
 \end{table}
+
+The proper scores qualify the ECE-only view. Equal fusion was substantially under-confident, yet its NLL and Brier score were both better than those of either unimodal branch, indicating improvement in the full predictive distribution despite the large confidence--accuracy gap. The validation-fitted fusion achieved the best held-out NLL and Brier score as well as the lowest ECE, despite its modest reduction in classification F1. This agreement across the two proper scores supports its use when probabilities are consumed operationally.
 
 Table~\ref{tab:multimodal-per-class} gives the complete pooled class-level results for the acoustic and multimodal configurations. The repeated support values confirm that all three configurations were evaluated on the same 5,531 held-out utterances.
 

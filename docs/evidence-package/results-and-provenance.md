@@ -2,21 +2,21 @@
 
 Use this held-out-performance table for the dissertation presentation. Do not substitute training-sample smoke-test accuracy or the label-reused global packaging analysis reported separately below.
 
-| System | Accuracy | Macro F1 | Weighted F1 | ECE | Evaluation provenance |
-| --- | ---: | ---: | ---: | ---: | --- |
-| Utterance-only text | 0.6624 | 0.6651 | 0.6640 | — | Five session-held-out IEMOCAP folds |
-| Three-turn context text | 0.7304 | 0.7332 | 0.7300 | 0.0311 | Same folds; validation temperature scaling |
-| Audio only | 0.6279 | 0.6349 | 0.6229 | 0.0468 | Same folds; validation temperature scaling |
-| Equal-weight late fusion | 0.7832 | 0.7883 | 0.7815 | 0.1619 | Predeclared paired comparison; classification headline |
-| Validation-fitted fold fusion | 0.7717 | 0.7758 | 0.7707 | 0.0283 | Fold validation-selected weights and temperature |
+| System | Accuracy | Macro F1 | Weighted F1 | ECE | NLL | Multiclass Brier | Evaluation provenance |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Utterance-only text | 0.6624 | 0.6651 | 0.6640 | — | — | — | Five session-held-out IEMOCAP folds; no canonical calibrated probabilities reported |
+| Three-turn context text | 0.7304 | 0.7332 | 0.7300 | 0.0311 | 0.7061 | 0.3845 | Same folds; validation temperature scaling |
+| Audio only | 0.6279 | 0.6349 | 0.6229 | 0.0468 | 0.9441 | 0.5140 | Same folds; validation temperature scaling |
+| Equal-weight late fusion | 0.7832 | 0.7883 | 0.7815 | 0.1619 | 0.6843 | 0.3619 | Predeclared paired comparison; classification headline |
+| Validation-fitted fold fusion | 0.7717 | 0.7758 | 0.7707 | 0.0283 | 0.6050 | 0.3273 | Fold validation-selected weights and temperature |
 
 Context improved macro F1 over utterance-only text by 0.0681, with dialogue-bootstrap 95% interval [0.0504, 0.0857]. Equal fusion improved macro F1 over paired context text by 0.0551, interval [0.0407, 0.0713]. The equal fusion is the confirmatory classification result, and fold-specific validation-fitted fusion provides the held-out calibration result.
 
 ## Operational packaging analysis (not independent held-out performance)
 
-| Configuration | Accuracy | Macro F1 | Weighted F1 | ECE | Provenance limitation |
-| --- | ---: | ---: | ---: | ---: | --- |
-| Final global calibration chain, applied to pooled test-role predictions | 0.7736 | 0.7776 | 0.7728 | 0.0242 | All 5,531 utterance identities and labels were already used to fit the global chain through their validation-role predictions from other folds |
+| Configuration | Accuracy | Macro F1 | Weighted F1 | ECE | NLL | Multiclass Brier | Provenance limitation |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Final global calibration chain, applied to pooled test-role predictions | 0.7736 | 0.7776 | 0.7728 | 0.0242 | 0.6075 | 0.3280 | All 5,531 utterance identities and labels were already used to fit the global chain through their validation-role predictions from other folds |
 
 Different trained models produced the validation-role and test-role predictions, but that does not remove the label reuse. This row describes the single chain selected for full-data packaging and must not be combined with the held-out performance table or cited as additional confirmatory evidence.
 

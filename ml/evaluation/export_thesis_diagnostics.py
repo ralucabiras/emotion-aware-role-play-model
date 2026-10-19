@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 
@@ -47,6 +48,8 @@ def aggregate(rows: list[dict], reliability_bins: int = 10, ece_bins: int = 15) 
     matrix = [[0 for _ in LABELS] for _ in LABELS]
     bin_rows: list[list[tuple[float, bool]]] = [[] for _ in range(reliability_bins)]
     ece_rows: list[list[tuple[float, bool]]] = [[] for _ in range(ece_bins)]
+    nll_total = 0.0
+    brier_total = 0.0
 
     for row in rows:
         expected = row["expected"]
@@ -64,6 +67,11 @@ def aggregate(rows: list[dict], reliability_bins: int = 10, ece_bins: int = 15) 
         expected_index = LABELS.index(expected)
         predicted_index = LABELS.index(predicted)
         matrix[expected_index][predicted_index] += 1
+        nll_total -= math.log(max(values[expected], 1e-12))
+        brier_total += sum(
+            (values[label] - (1.0 if label == expected else 0.0)) ** 2
+            for label in LABELS
+        )
         confidence = values[predicted]
         bin_index = min(int(confidence * reliability_bins), reliability_bins - 1)
         bin_rows[bin_index].append((confidence, predicted == expected))
@@ -105,6 +113,8 @@ def aggregate(rows: list[dict], reliability_bins: int = 10, ece_bins: int = 15) 
         "n": len(rows),
         "accuracy": correct / len(rows),
         "ece": ece,
+        "nll": nll_total / len(rows),
+        "multiclass_brier": brier_total / len(rows),
         "reliability_diagram_ece": reliability_ece,
         "support": support,
         "confusion_counts": matrix,
@@ -179,7 +189,8 @@ def main() -> None:
     for system, result in results["systems"].items():
         print(
             f'{system}: n={result["n"]}, accuracy={result["accuracy"]:.4f}, '
-            f'ECE={result["ece"]:.4f}'
+            f'ECE={result["ece"]:.4f}, NLL={result["nll"]:.4f}, '
+            f'Brier={result["multiclass_brier"]:.4f}'
         )
 
 
