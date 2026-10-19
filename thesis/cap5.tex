@@ -246,7 +246,7 @@ The answer includes a material trade-off: the strongest classifier was poorly ca
 \section{Application Verification and Readiness}
 \label{sec:engineering-evaluation}
 
-Table~\ref{tab:requirements-traceability} provides a compact trace from the requirements in Chapter~\ref{chap:proposed-system-architecture} to their implementation and verification evidence. Requirements are grouped only where they share the same implementation boundary, verification method, outcome, and principal limitation. Here, ``passed'' means conformance under the cited developer-led checks, not universal validation beyond the tested configuration.
+Table~\ref{tab:requirements-traceability} provides a compact trace from the requirements in Chapter~\ref{chap:proposed-system-architecture} to their implementation and verification evidence. Requirements are grouped only where they share the same implementation boundary, verification method, outcome, and principal limitation. Here, ``passed'' means conformance under the cited developer-led checks, not universal validation beyond the tested configuration. For application-readiness claims, that configuration is the offline deterministic core: the default suite uses the memory repository, while the full-stack smoke journey adds a compiled frontend and disposable MongoDB instance; both disable live providers and trained inference. It is a verification configuration, not a validated production environment.
 
 \begin{table}[p]
 \centering
@@ -372,9 +372,9 @@ The authored cases and automated tests show that low confidence and disagreement
 \subsection{Answer to RQ4: Integrated Application Quality}
 \label{subsec:rq4-status}
 
-RQ4 is answered through the combined evidence traced in Table~\ref{tab:requirements-traceability}. The automated, browser, full-stack, recovery, and authored-policy checks passed in the tested configuration, while the locally controlled text-first operations remained below 7~ms at the 95th percentile. These results support readiness for a controlled production deployment with that configuration.
+RQ4 is answered through the combined evidence traced in Table~\ref{tab:requirements-traceability}. The automated, browser, full-stack, recovery, and authored-policy checks passed for the offline deterministic core defined above, while its locally controlled text-first operations remained below 7~ms at the 95th percentile. These results establish implementation completeness for the tested paths and make the system suitable for controlled deployment only after environment-specific validation.
 
-This conclusion is deliberately environment-specific. It does not claim internet-scale capacity or guarantee the latency of MongoDB, trained inference, or external providers. A public deployment should establish its own service-level objectives and repeat concurrent-load, network, backup, security, and observability checks in staging.
+That validation must exercise the intended MongoDB deployment, trained inference and external providers, real network transit, expected concurrency, backup and recovery, observability, and adversarial and independent security testing. It should establish service-level objectives and close the private model-file provenance gaps before deployment. The present evidence therefore does not claim production latency, internet-scale capacity, or security assurance.
 
 \subsection{Supplementary User-Pilot Results}
 \label{subsec:participant-results}
