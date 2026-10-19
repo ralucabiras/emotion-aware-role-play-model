@@ -341,11 +341,11 @@
 \newlabel{subsec:multimodal-late-fusion}{{4.3.4}{81}{Multimodal Late Fusion}{subsection.4.3.4}{}}
 \newlabel{eq:implementation-modality-calibration}{{4.2}{81}{Multimodal Late Fusion}{equation.4.2}{}}
 \citation{guo2017calibration}
-\citation{ovadia2019shift}
 \newlabel{eq:implementation-late-fusion}{{4.3}{82}{Multimodal Late Fusion}{equation.4.3}{}}
 \newlabel{eq:implementation-fusion-calibration}{{4.4}{82}{Multimodal Late Fusion}{equation.4.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3.5}Confidence Calibration and Uncertainty Handling}{82}{subsection.4.3.5}\protected@file@percent }
 \newlabel{subsec:confidence-calibration-uncertainty}{{4.3.5}{82}{Confidence Calibration and Uncertainty Handling}{subsection.4.3.5}{}}
+\citation{ovadia2019shift}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3.6}Model Artefacts, Provenance, and Inference Loading}{83}{subsection.4.3.6}\protected@file@percent }
 \newlabel{subsec:model-artefacts-provenance}{{4.3.6}{83}{Model Artefacts, Provenance, and Inference Loading}{subsection.4.3.6}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4.4}Backend Application}{84}{section.4.4}\protected@file@percent }
@@ -356,8 +356,8 @@
 \newlabel{subsec:backend-domain-models}{{4.4.2}{85}{Domain Models and API Schemas}{subsection.4.4.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4.3}Authentication and Account Management}{86}{subsection.4.4.3}\protected@file@percent }
 \newlabel{subsec:backend-authentication}{{4.4.3}{86}{Authentication and Account Management}{subsection.4.4.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.4}Session Persistence and Ownership Controls}{86}{subsection.4.4.4}\protected@file@percent }
-\newlabel{subsec:backend-session-persistence}{{4.4.4}{86}{Session Persistence and Ownership Controls}{subsection.4.4.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.4}Session Persistence and Ownership Controls}{87}{subsection.4.4.4}\protected@file@percent }
+\newlabel{subsec:backend-session-persistence}{{4.4.4}{87}{Session Persistence and Ownership Controls}{subsection.4.4.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4.5}Conversation Request Processing}{87}{subsection.4.4.5}\protected@file@percent }
 \newlabel{subsec:backend-conversation-processing}{{4.4.5}{87}{Conversation Request Processing}{subsection.4.4.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4.6}Optional Services and Deterministic Fallbacks}{88}{subsection.4.4.6}\protected@file@percent }
@@ -370,12 +370,12 @@
 \newlabel{subsec:scenario-representation}{{4.5.1}{90}{Scenario Representation and Configuration}{subsection.4.5.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.5.2}Dialogue State and Transition Logic}{91}{subsection.4.5.2}\protected@file@percent }
 \newlabel{subsec:dialogue-transitions}{{4.5.2}{91}{Dialogue State and Transition Logic}{subsection.4.5.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.3}Communication-Evidence Extraction}{91}{subsection.4.5.3}\protected@file@percent }
-\newlabel{subsec:communication-evidence}{{4.5.3}{91}{Communication-Evidence Extraction}{subsection.4.5.3}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Sequence of a version-bound conversation request, including safety precedence and failure-tolerant optional processing.}}{92}{figure.4.2}\protected@file@percent }
 \newlabel{fig:request-sequence}{{4.2}{92}{Sequence of a version-bound conversation request, including safety precedence and failure-tolerant optional processing}{figure.4.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Principal dialogue-state progression for workload, boundary, and relationship rehearsal.}}{92}{figure.4.3}\protected@file@percent }
 \newlabel{fig:dialogue-states}{{4.3}{92}{Principal dialogue-state progression for workload, boundary, and relationship rehearsal}{figure.4.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.3}Communication-Evidence Extraction}{93}{subsection.4.5.3}\protected@file@percent }
+\newlabel{subsec:communication-evidence}{{4.5.3}{93}{Communication-Evidence Extraction}{subsection.4.5.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.5.4}Affect-Aware Pacing Policy}{93}{subsection.4.5.4}\protected@file@percent }
 \newlabel{subsec:affect-pacing}{{4.5.4}{93}{Affect-Aware Pacing Policy}{subsection.4.5.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.5.5}Response Realisation}{94}{subsection.4.5.5}\protected@file@percent }
@@ -521,56 +521,62 @@
 \newlabel{tab:equal-fusion-results}{{5.4}{124}{Predeclared equal-weight fusion compared with contextual text}{table.5.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.5.3}Classification--Calibration Trade-Off}{124}{subsection.5.5.3}\protected@file@percent }
 \newlabel{subsec:fusion-calibration-results}{{5.5.3}{124}{Classification--Calibration Trade-Off}{subsection.5.5.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.5}{\ignorespaces Classification and calibration trade-off among multimodal configurations.}}{125}{table.5.5}\protected@file@percent }
-\newlabel{tab:calibration-tradeoff}{{5.5}{125}{Classification and calibration trade-off among multimodal configurations}{table.5.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Aggregate four-class model results. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally.}}{125}{figure.5.1}\protected@file@percent }
-\newlabel{fig:model-results}{{5.1}{125}{Aggregate four-class model results. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally}{figure.5.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5.2}{\ignorespaces Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. The fold-fitted matrix is omitted because its class pattern is nearly identical to the final global chain.}}{127}{figure.5.2}\protected@file@percent }
-\newlabel{fig:model-confusion-matrices}{{5.2}{127}{Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. The fold-fitted matrix is omitted because its class pattern is nearly identical to the final global chain}{figure.5.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.5}{\ignorespaces Classification and calibration trade-off for independently evaluated fold configurations.}}{124}{table.5.5}\protected@file@percent }
+\newlabel{tab:calibration-tradeoff}{{5.5}{124}{Classification and calibration trade-off for independently evaluated fold configurations}{table.5.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.6}{\ignorespaces Macro F1 by held-out IEMOCAP session, with unweighted variation across the five folds.}}{125}{table.5.6}\protected@file@percent }
+\newlabel{tab:session-fold-variation}{{5.6}{125}{Macro F1 by held-out IEMOCAP session, with unweighted variation across the five folds}{table.5.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Aggregate four-class results from independently evaluated fold configurations. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally.}}{126}{figure.5.1}\protected@file@percent }
+\newlabel{fig:model-results}{{5.1}{126}{Aggregate four-class results from independently evaluated fold configurations. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally}{figure.5.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.2}{\ignorespaces Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. Every fitted parameter represented here was estimated without the corresponding test session.}}{126}{figure.5.2}\protected@file@percent }
+\newlabel{fig:model-confusion-matrices}{{5.2}{126}{Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. Every fitted parameter represented here was estimated without the corresponding test session}{figure.5.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5.3}{\ignorespaces Reliability curves from pooled held-out predictions. Each point represents a non-empty equal-width bin of maximum class probability; the dashed diagonal denotes perfect calibration. Panel (a) compares the unimodal systems with predeclared equal fusion, and Panel (b) shows the effect of validation-derived fusion calibration. ECE values in Table~\ref {tab:calibration-tradeoff} use the prespecified 15-bin calculation, while the curves use ten bins for legibility.}}{127}{figure.5.3}\protected@file@percent }
 \newlabel{fig:model-reliability-curves}{{5.3}{127}{Reliability curves from pooled held-out predictions. Each point represents a non-empty equal-width bin of maximum class probability; the dashed diagonal denotes perfect calibration. Panel (a) compares the unimodal systems with predeclared equal fusion, and Panel (b) shows the effect of validation-derived fusion calibration. ECE values in Table~\ref {tab:calibration-tradeoff} use the prespecified 15-bin calculation, while the curves use ten bins for legibility}{figure.5.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Operational full-data packaging analysis}{128}{section*.11}\protected@file@percent }
+\newlabel{subsubsec:global-packaging-analysis}{{5.5.3}{128}{Operational full-data packaging analysis}{section*.11}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.7}{\ignorespaces Operational global-chain summary; these descriptive values are not an independent held-out performance estimate.}}{128}{table.5.7}\protected@file@percent }
+\newlabel{tab:global-packaging-analysis}{{5.7}{128}{Operational global-chain summary; these descriptive values are not an independent held-out performance estimate}{table.5.7}{}}
 \citation{ovadia2019shift}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.4}Answer to RQ2}{128}{subsection.5.5.4}\protected@file@percent }
-\newlabel{subsec:rq2-answer}{{5.5.4}{128}{Answer to RQ2}{subsection.5.5.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.6}Application Verification and Readiness}{128}{section.5.6}\protected@file@percent }
-\newlabel{sec:engineering-evaluation}{{5.6}{128}{Application Verification and Readiness}{section.5.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.1}Deterministic Dialogue Cases}{128}{subsection.5.6.1}\protected@file@percent }
-\newlabel{subsec:dialogue-case-results}{{5.6.1}{128}{Deterministic Dialogue Cases}{subsection.5.6.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.2}Cognitive-Heuristic and Support-Routing Cases}{128}{subsection.5.6.2}\protected@file@percent }
-\newlabel{subsec:cognitive-routing-results}{{5.6.2}{128}{Cognitive-Heuristic and Support-Routing Cases}{subsection.5.6.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.6}{\ignorespaces Compact requirement-to-evidence traceability matrix.}}{129}{table.5.6}\protected@file@percent }
-\newlabel{tab:requirements-traceability}{{5.6}{129}{Compact requirement-to-evidence traceability matrix}{table.5.6}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.7}{\ignorespaces Authored enhanced-dialogue trajectory results.}}{130}{table.5.7}\protected@file@percent }
-\newlabel{tab:dialogue-case-results}{{5.7}{130}{Authored enhanced-dialogue trajectory results}{table.5.7}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.8}{\ignorespaces Implemented cognitive-heuristic and support-routing checks.}}{130}{table.5.8}\protected@file@percent }
-\newlabel{tab:cognitive-routing-cases}{{5.8}{130}{Implemented cognitive-heuristic and support-routing checks}{table.5.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.3}Evidence Extraction and Affect-Pacing Cases}{131}{subsection.5.6.3}\protected@file@percent }
-\newlabel{subsec:policy-case-results}{{5.6.3}{131}{Evidence Extraction and Affect-Pacing Cases}{subsection.5.6.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.4}Automated and Full-Stack Verification Results}{131}{subsection.5.6.4}\protected@file@percent }
-\newlabel{subsec:automated-system-results}{{5.6.4}{131}{Automated and Full-Stack Verification Results}{subsection.5.6.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.5}Performance and Responsive-Interface Checks}{132}{subsection.5.6.5}\protected@file@percent }
-\newlabel{subsec:performance-results}{{5.6.5}{132}{Performance and Responsive-Interface Checks}{subsection.5.6.5}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.9}{\ignorespaces Local single-client application latency results.}}{132}{table.5.9}\protected@file@percent }
-\newlabel{tab:performance-results}{{5.9}{132}{Local single-client application latency results}{table.5.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.6}Answer to RQ3}{132}{subsection.5.6.6}\protected@file@percent }
-\newlabel{subsec:rq3-answer}{{5.6.6}{132}{Answer to RQ3}{subsection.5.6.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.7}Answer to RQ4: Integrated Application Quality}{133}{subsection.5.6.7}\protected@file@percent }
-\newlabel{subsec:rq4-status}{{5.6.7}{133}{Answer to RQ4: Integrated Application Quality}{subsection.5.6.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.8}Supplementary User-Pilot Results}{133}{subsection.5.6.8}\protected@file@percent }
-\newlabel{subsec:participant-results}{{5.6.8}{133}{Supplementary User-Pilot Results}{subsection.5.6.8}{}}
-\@writefile{toc}{\contentsline {paragraph}{Scope of the pilot result.}{133}{section*.11}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {5.10}{\ignorespaces Supplementary pilot questionnaire results from available first required attempts. Ratings use seven-point scales; paired change is post-confidence minus pre-confidence.}}{134}{table.5.10}\protected@file@percent }
-\newlabel{tab:pilot-questionnaire-results}{{5.10}{134}{Supplementary pilot questionnaire results from available first required attempts. Ratings use seven-point scales; paired change is post-confidence minus pre-confidence}{table.5.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.7}Threats to Validity and Limitations}{135}{section.5.7}\protected@file@percent }
-\newlabel{sec:evaluation-limitations}{{5.7}{135}{Threats to Validity and Limitations}{section.5.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.1}Model and Statistical Validity}{135}{subsection.5.7.1}\protected@file@percent }
-\newlabel{subsec:model-validity-threats}{{5.7.1}{135}{Model and Statistical Validity}{subsection.5.7.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.2}External and Construct Validity}{135}{subsection.5.7.2}\protected@file@percent }
-\newlabel{subsec:external-validity-threats}{{5.7.2}{135}{External and Construct Validity}{subsection.5.7.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.3}Supplementary User-Evidence Limitations}{136}{subsection.5.7.3}\protected@file@percent }
-\newlabel{subsec:participant-validity-threats}{{5.7.3}{136}{Supplementary User-Evidence Limitations}{subsection.5.7.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.8}Chapter Summary}{136}{section.5.8}\protected@file@percent }
-\newlabel{sec:evaluation-summary}{{5.8}{136}{Chapter Summary}{section.5.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.4}Answer to RQ2}{129}{subsection.5.5.4}\protected@file@percent }
+\newlabel{subsec:rq2-answer}{{5.5.4}{129}{Answer to RQ2}{subsection.5.5.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.6}Application Verification and Readiness}{129}{section.5.6}\protected@file@percent }
+\newlabel{sec:engineering-evaluation}{{5.6}{129}{Application Verification and Readiness}{section.5.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.1}Deterministic Dialogue Cases}{129}{subsection.5.6.1}\protected@file@percent }
+\newlabel{subsec:dialogue-case-results}{{5.6.1}{129}{Deterministic Dialogue Cases}{subsection.5.6.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.2}Cognitive-Heuristic and Support-Routing Cases}{129}{subsection.5.6.2}\protected@file@percent }
+\newlabel{subsec:cognitive-routing-results}{{5.6.2}{129}{Cognitive-Heuristic and Support-Routing Cases}{subsection.5.6.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.8}{\ignorespaces Compact requirement-to-evidence traceability matrix.}}{130}{table.5.8}\protected@file@percent }
+\newlabel{tab:requirements-traceability}{{5.8}{130}{Compact requirement-to-evidence traceability matrix}{table.5.8}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.9}{\ignorespaces Authored enhanced-dialogue trajectory results.}}{131}{table.5.9}\protected@file@percent }
+\newlabel{tab:dialogue-case-results}{{5.9}{131}{Authored enhanced-dialogue trajectory results}{table.5.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.10}{\ignorespaces Implemented cognitive-heuristic and support-routing checks.}}{131}{table.5.10}\protected@file@percent }
+\newlabel{tab:cognitive-routing-cases}{{5.10}{131}{Implemented cognitive-heuristic and support-routing checks}{table.5.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.3}Evidence Extraction and Affect-Pacing Cases}{132}{subsection.5.6.3}\protected@file@percent }
+\newlabel{subsec:policy-case-results}{{5.6.3}{132}{Evidence Extraction and Affect-Pacing Cases}{subsection.5.6.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.4}Automated and Full-Stack Verification Results}{132}{subsection.5.6.4}\protected@file@percent }
+\newlabel{subsec:automated-system-results}{{5.6.4}{132}{Automated and Full-Stack Verification Results}{subsection.5.6.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.5}Performance and Responsive-Interface Checks}{133}{subsection.5.6.5}\protected@file@percent }
+\newlabel{subsec:performance-results}{{5.6.5}{133}{Performance and Responsive-Interface Checks}{subsection.5.6.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.11}{\ignorespaces Local single-client application latency results.}}{133}{table.5.11}\protected@file@percent }
+\newlabel{tab:performance-results}{{5.11}{133}{Local single-client application latency results}{table.5.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.6}Answer to RQ3}{133}{subsection.5.6.6}\protected@file@percent }
+\newlabel{subsec:rq3-answer}{{5.6.6}{133}{Answer to RQ3}{subsection.5.6.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.7}Answer to RQ4: Integrated Application Quality}{134}{subsection.5.6.7}\protected@file@percent }
+\newlabel{subsec:rq4-status}{{5.6.7}{134}{Answer to RQ4: Integrated Application Quality}{subsection.5.6.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.8}Supplementary User-Pilot Results}{134}{subsection.5.6.8}\protected@file@percent }
+\newlabel{subsec:participant-results}{{5.6.8}{134}{Supplementary User-Pilot Results}{subsection.5.6.8}{}}
+\@writefile{toc}{\contentsline {paragraph}{Scope of the pilot result.}{134}{section*.12}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5.12}{\ignorespaces Supplementary pilot questionnaire results from available first required attempts. Ratings use seven-point scales; paired change is post-confidence minus pre-confidence.}}{135}{table.5.12}\protected@file@percent }
+\newlabel{tab:pilot-questionnaire-results}{{5.12}{135}{Supplementary pilot questionnaire results from available first required attempts. Ratings use seven-point scales; paired change is post-confidence minus pre-confidence}{table.5.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.7}Threats to Validity and Limitations}{136}{section.5.7}\protected@file@percent }
+\newlabel{sec:evaluation-limitations}{{5.7}{136}{Threats to Validity and Limitations}{section.5.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.1}Model and Statistical Validity}{136}{subsection.5.7.1}\protected@file@percent }
+\newlabel{subsec:model-validity-threats}{{5.7.1}{136}{Model and Statistical Validity}{subsection.5.7.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.2}External and Construct Validity}{136}{subsection.5.7.2}\protected@file@percent }
+\newlabel{subsec:external-validity-threats}{{5.7.2}{136}{External and Construct Validity}{subsection.5.7.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.3}Supplementary User-Evidence Limitations}{137}{subsection.5.7.3}\protected@file@percent }
+\newlabel{subsec:participant-validity-threats}{{5.7.3}{137}{Supplementary User-Evidence Limitations}{subsection.5.7.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.8}Chapter Summary}{137}{section.5.8}\protected@file@percent }
+\newlabel{sec:evaluation-summary}{{5.8}{137}{Chapter Summary}{section.5.8}{}}
 \@writefile{toc}{\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{139}{chapter.6}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
@@ -593,18 +599,18 @@
 \newlabel{sec:conclusion-contributions}{{6.4}{142}{Principal Contributions}{section.6.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.4.1}Empirical and Machine-Learning Contributions}{142}{subsection.6.4.1}\protected@file@percent }
 \newlabel{subsec:conclusion-ml-contributions}{{6.4.1}{142}{Empirical and Machine-Learning Contributions}{subsection.6.4.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.2}System and Interaction-Design Contributions}{142}{subsection.6.4.2}\protected@file@percent }
-\newlabel{subsec:conclusion-system-contributions}{{6.4.2}{142}{System and Interaction-Design Contributions}{subsection.6.4.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.2}System and Interaction-Design Contributions}{143}{subsection.6.4.2}\protected@file@percent }
+\newlabel{subsec:conclusion-system-contributions}{{6.4.2}{143}{System and Interaction-Design Contributions}{subsection.6.4.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.4.3}Application-Verification and Infrastructure Contributions}{143}{subsection.6.4.3}\protected@file@percent }
 \newlabel{subsec:conclusion-method-contributions}{{6.4.3}{143}{Application-Verification and Infrastructure Contributions}{subsection.6.4.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6.5}Limitations of the Conclusions}{143}{section.6.5}\protected@file@percent }
-\newlabel{sec:conclusion-limitations}{{6.5}{143}{Limitations of the Conclusions}{section.6.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.1}Model and Data Limitations}{143}{subsection.6.5.1}\protected@file@percent }
-\newlabel{subsec:conclusion-model-limitations}{{6.5.1}{143}{Model and Data Limitations}{subsection.6.5.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.5}Limitations of the Conclusions}{144}{section.6.5}\protected@file@percent }
+\newlabel{sec:conclusion-limitations}{{6.5}{144}{Limitations of the Conclusions}{section.6.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.1}Model and Data Limitations}{144}{subsection.6.5.1}\protected@file@percent }
+\newlabel{subsec:conclusion-model-limitations}{{6.5.1}{144}{Model and Data Limitations}{subsection.6.5.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.5.2}Application and Measurement Limitations}{144}{subsection.6.5.2}\protected@file@percent }
 \newlabel{subsec:conclusion-application-limitations}{{6.5.2}{144}{Application and Measurement Limitations}{subsection.6.5.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.3}Supporting User-Evidence Limitations}{144}{subsection.6.5.3}\protected@file@percent }
-\newlabel{subsec:conclusion-human-limitations}{{6.5.3}{144}{Supporting User-Evidence Limitations}{subsection.6.5.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.3}Supporting User-Evidence Limitations}{145}{subsection.6.5.3}\protected@file@percent }
+\newlabel{subsec:conclusion-human-limitations}{{6.5.3}{145}{Supporting User-Evidence Limitations}{subsection.6.5.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6.6}Future Work}{145}{section.6.6}\protected@file@percent }
 \newlabel{sec:conclusion-future-work}{{6.6}{145}{Future Work}{section.6.6}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {6.1}{\ignorespaces Prioritised future-work roadmap.}}{145}{table.6.1}\protected@file@percent }
@@ -615,15 +621,15 @@
 \newlabel{subsec:future-model-validation}{{6.6.2}{146}{Broaden Model Validation and Improve Uncertainty Handling}{subsection.6.6.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.6.3}Evaluate and Refine the Adaptation Policy}{146}{subsection.6.6.3}\protected@file@percent }
 \newlabel{subsec:future-adaptation-policy}{{6.6.3}{146}{Evaluate and Refine the Adaptation Policy}{subsection.6.6.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.6.4}Validate Feedback and Communication Measures}{146}{subsection.6.6.4}\protected@file@percent }
-\newlabel{subsec:future-feedback-validation}{{6.6.4}{146}{Validate Feedback and Communication Measures}{subsection.6.6.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6.4}Validate Feedback and Communication Measures}{147}{subsection.6.6.4}\protected@file@percent }
+\newlabel{subsec:future-feedback-validation}{{6.6.4}{147}{Validate Feedback and Communication Measures}{subsection.6.6.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.6.5}Study Transfer, Accessibility, and Long-Term Use}{147}{subsection.6.6.5}\protected@file@percent }
 \newlabel{subsec:future-transfer-accessibility}{{6.6.5}{147}{Study Transfer, Accessibility, and Long-Term Use}{subsection.6.6.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.6.6}Strengthen Deployment, Privacy, and Governance}{147}{subsection.6.6.6}\protected@file@percent }
-\newlabel{subsec:future-deployment-governance}{{6.6.6}{147}{Strengthen Deployment, Privacy, and Governance}{subsection.6.6.6}{}}
-\bibdata{myBib}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6.6}Strengthen Deployment, Privacy, and Governance}{148}{subsection.6.6.6}\protected@file@percent }
+\newlabel{subsec:future-deployment-governance}{{6.6.6}{148}{Strengthen Deployment, Privacy, and Governance}{subsection.6.6.6}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6.7}Final Conclusion}{148}{section.6.7}\protected@file@percent }
 \newlabel{sec:final-conclusion}{{6.7}{148}{Final Conclusion}{section.6.7}{}}
+\bibdata{myBib}
 \bibcite{baltrusaitis2019multimodal}{BAM19a}
 \bibcite{barrett2019expressions}{BAM{$^{+}$}19b}
 \bibcite{busso2008iemocap}{BBL{$^{+}$}08}
@@ -663,17 +669,17 @@
 \bibcite{who2025socialconnection}{{Wor}25}
 \bibcite{zhou2018ecm}{ZHZ{$^{+}$}18}
 \bibstyle{alpha}
-\@writefile{toc}{\contentsline {chapter}{Bibliography}{153}{chapter*.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{155}{appendix.A}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{Bibliography}{155}{chapter*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{157}{appendix.A}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{genAIUsage}{{A}{155}{Generative AI Tools Usage}{appendix.A}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {A.1}{\ignorespaces Overview of generative AI usage}}{155}{table.A.1}\protected@file@percent }
-\newlabel{tab:genAIOverview}{{A.1}{155}{Overview of generative AI usage}{table.A.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {A.1}ChatGPT Details}{155}{section.A.1}\protected@file@percent }
-\newlabel{sectionChatGPT}{{A.1}{155}{ChatGPT Details}{section.A.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.1.1}Literature Exploration}{156}{subsection.A.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.1.2}Academic Writing Assistance}{156}{subsection.A.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.1.3}LaTeX Formatting Assistance}{156}{subsection.A.1.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.1.4}Technical Guidance and Debugging}{156}{subsection.A.1.4}\protected@file@percent }
-\gdef \@abspage@last{157}
+\newlabel{genAIUsage}{{A}{157}{Generative AI Tools Usage}{appendix.A}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {A.1}{\ignorespaces Overview of generative AI usage}}{157}{table.A.1}\protected@file@percent }
+\newlabel{tab:genAIOverview}{{A.1}{157}{Overview of generative AI usage}{table.A.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {A.1}ChatGPT Details}{157}{section.A.1}\protected@file@percent }
+\newlabel{sectionChatGPT}{{A.1}{157}{ChatGPT Details}{section.A.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1.1}Literature Exploration}{158}{subsection.A.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1.2}Academic Writing Assistance}{158}{subsection.A.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1.3}LaTeX Formatting Assistance}{158}{subsection.A.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1.4}Technical Guidance and Debugging}{158}{subsection.A.1.4}\protected@file@percent }
+\gdef \@abspage@last{159}

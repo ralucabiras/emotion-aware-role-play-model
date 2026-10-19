@@ -183,6 +183,27 @@ Fold validation-fitted fusion & 0.7717 & 0.7758 & 0.7707 & 0.0283 \\ \hline
 \end{tabular}
 \end{table}
 
+The pooled values above are computed after concatenating the utterances from all five sessions, so they are not arithmetic means of the fold scores and sessions with more eligible utterances contribute more observations. Table~\ref{tab:session-fold-variation} complements them with the primary metric for each held-out session and an unweighted descriptive summary across the five folds. Thus, each session contributes equally to the reported mean and population standard deviation (SD); the range gives the observed minimum and maximum rather than an uncertainty interval.
+
+\begin{table}[htbp]
+\centering
+\caption{Macro F1 by held-out IEMOCAP session, with unweighted variation across the five folds.}
+\label{tab:session-fold-variation}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|l|r|r|r|r|r|r|r|c|}
+\hline
+\textbf{Configuration} & \textbf{S1} & \textbf{S2} & \textbf{S3} & \textbf{S4} & \textbf{S5} & \textbf{Mean} & \textbf{SD} & \textbf{Range} \\ \hline
+Utterance-only text & 0.6376 & 0.7125 & 0.6443 & 0.6575 & 0.6625 & 0.6629 & 0.0264 & 0.6376--0.7125 \\ \hline
+Three-turn context text & 0.6918 & 0.7556 & 0.7235 & 0.7310 & 0.7505 & 0.7305 & 0.0227 & 0.6918--0.7556 \\ \hline
+Audio only & 0.6450 & 0.6974 & 0.5870 & 0.6017 & 0.6224 & 0.6307 & 0.0386 & 0.5870--0.6974 \\ \hline
+Equal-weight fusion & 0.7517 & 0.8108 & 0.7708 & 0.8090 & 0.7922 & 0.7869 & 0.0227 & 0.7517--0.8108 \\ \hline
+Fold validation-fitted fusion & 0.7294 & 0.8070 & 0.7542 & 0.7932 & 0.7852 & 0.7738 & 0.0281 & 0.7294--0.8070 \\ \hline
+\end{tabular}
+\end{table}
+
+The session-level values preserve the aggregate ordering without implying uniform difficulty. Three-turn context exceeded utterance-only text in all five sessions, and equal-weight fusion achieved the highest macro F1 in every session. Audio varied most across sessions (SD 0.0386; range 0.5870--0.6974), whereas contextual text and equal fusion each had an SD of approximately 0.0227. These are descriptive results for five actor dyads, not estimates of population-level speaker variability; the dialogue-cluster bootstrap intervals remain the inferential comparison reported for RQ1 and RQ2.
+
 Figure~\ref{fig:model-results} places the classification results and calibration trade-off on common visual scales. The utterance-only condition is omitted from the calibration panel because no canonical ECE is reported for that configuration.
 
 \begin{figure}[p]

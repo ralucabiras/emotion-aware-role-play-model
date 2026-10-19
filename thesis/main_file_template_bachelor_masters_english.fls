@@ -546,8 +546,8 @@ INPUT figures\data\confusion_audio.dat
 INPUT figures\data\confusion_audio.dat
 INPUT figures\data\confusion_equal_fusion.dat
 INPUT figures\data\confusion_equal_fusion.dat
-INPUT figures\data\confusion_global_calibrated.dat
-INPUT figures\data\confusion_global_calibrated.dat
+INPUT figures\data\confusion_validation_fitted.dat
+INPUT figures\data\confusion_validation_fitted.dat
 INPUT .\figures\reliability_curves.tex
 INPUT .\figures\reliability_curves.tex
 INPUT .\figures\reliability_curves.tex
@@ -558,7 +558,6 @@ INPUT figures\data\reliability_audio.dat
 INPUT figures\data\reliability_equal_fusion.dat
 INPUT figures\data\reliability_equal_fusion.dat
 INPUT figures\data\reliability_validation_fitted.dat
-INPUT figures\data\reliability_global_calibrated.dat
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti10.tfm
 INPUT .\cap6.tex
 INPUT .\cap6.tex
