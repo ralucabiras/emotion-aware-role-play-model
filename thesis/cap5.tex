@@ -489,33 +489,74 @@ The deterministic evaluator recorded median in-process service latency of approx
 \subsection{Automated and Full-Stack Verification Results}
 \label{subsec:automated-system-results}
 
-The default backend run performed for the completed implementation reported 240 passing tests and 13 skipped tests. The skipped group contains opt-in checks requiring an external environment, including real MongoDB or private model conditions; it is not counted as a passing result. The frontend production TypeScript build, Vite build, ESLint check, and backend Ruff check completed successfully. These runs verify the current code paths but do not replace the versioned evidence artefacts.
+The final application verification was repeated on 19 October 2026 against commit \texttt{2e275767f412ea858d54ac2c507a189815581785}. The worktree was clean when testing began; the subsequent changes in this subsection alter reporting only. The machine ran Windows~11 build 26300 on an AMD Ryzen~5~3500U with eight logical processors and 5.9~GiB of physical memory. The relevant toolchain was Python~3.14.3, pytest~8.4.2, Ruff~0.14.10, Node.js~24.14.1, npm~11.12.1, Playwright~1.63.0, axe-core~4.13.0, and bundled Chromium~153.0.8010.12. No GPU-dependent path was measured. The separately saved full-stack manifest records MongoDB~8.0.1.
 
-The saved full-stack smoke manifest reports two passing browser journeys against a compiled frontend, actual FastAPI process, and disposable MongoDB 8.0.1 database. The journeys included account access, pre-consent exclusion, enrolment, a required task and questionnaire, researcher export, enhanced dialogue, network-failure recovery, replay, branching, comparison, and action-card persistence. The backend was stopped and relaunched twice while MongoDB remained active, and persisted state was verified after each relevant restart. The recorded total run time was 95.72 seconds; this is demonstration timing, not a capacity benchmark.
+The exact final verification commands, issued from the repository root unless the listing changes directory, were:
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible]
+.\.venv\Scripts\python.exe -m pytest backend\tests -rs
+.\.venv\Scripts\ruff.exe check backend scripts
+Set-Location frontend
+npm.cmd run build
+npm.cmd run lint
+$vite = Start-Process -FilePath node.exe -ArgumentList '.\node_modules\vite\bin\vite.js','--host','127.0.0.1','--port','4173' -WorkingDirectory (Get-Location) -WindowStyle Hidden -PassThru
+npx.cmd playwright test replay.spec.ts branching.spec.ts preparation.spec.ts practice.spec.ts workspace-recovery.spec.ts --workers=2
+Stop-Process -Id $vite.Id
+\end{lstlisting}
+
+Starting Vite separately avoided a Windows teardown wait observed when Playwright owned the web-server process; it did not change the tests or frontend source. The production TypeScript/Vite build, ESLint, and Ruff checks exited successfully. Pytest collected 258 backend cases: 245 passed and 13 were skipped in 88.07 seconds. The focused browser command expanded 38 logical cases across desktop Chromium and the Pixel~7 mobile profile, so 76 browser cases passed in 3.3 minutes. These totals count parameterisations and browser projects as executed test cases; skipped backend cases are not counted as passes.
+
+All 13 skips were the following real-MongoDB node IDs from \path{backend/tests/test_mongo_integration.py}; each had the explicit reason \texttt{Set TEST\_MONGODB\_URI to run real MongoDB tests}:
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible]
+test_prepared_brief_and_card_survive_restart_without_changing_feedback
+test_branch_restart_concurrent_creation_and_parent_deletion
+test_data_persists_when_repository_client_restarts
+test_ttl_index_and_logical_expiry_do_not_remove_research_record
+test_account_deletion_cascades_across_personal_collections
+test_concurrent_session_updates_reject_a_lost_update
+test_backup_can_be_restored_and_verified
+test_password_reset_rejection_preserves_link_and_concurrent_success_is_single_use
+test_enrolled_rehearsal_round_trip_and_restart
+test_enhanced_workload_state_survives_restart
+test_profiled_dialogue_reload_continue_and_rewind[boundary-I cannot take this on.-continuation0-boundary_held]
+test_profiled_dialogue_reload_continue_and_rewind[relationship-When we spend evenings apart, I feel lonely and need time together.-continuation1-next_step]
+test_exchange_bound_predictions_survive_restart_without_audio
+\end{lstlisting}
+
+The skips therefore represent one declared environmental boundary rather than failures distributed across unrelated functionality. Real-database behaviour is instead evidenced by the separately recorded smoke journeys and the earlier opt-in MongoDB run; the 19 October default-suite total does not silently treat those 13 cases as successful.
+
+Accessibility assertions used axe-core~4.13.0 through \texttt{@axe-core/playwright}~4.13.0. The selected tags were \texttt{wcag2a}, \texttt{wcag2aa}, \texttt{wcag21a}, and \texttt{wcag21aa}, corresponding to automated rules mapped to WCAG~2.0 and WCAG~2.1 Levels~A and AA. Ten distinct interface states were scanned in both browser projects, giving 20 scan executions: the restored reflection after voice submission; paused enhanced-workload progress; paused boundary-pressure progress; reviewed voice text with pacing; stored prediction provenance; editable preparation brief; saved action card; evidence-linked replay; uncertain multimodal replay; and branch comparison. These states covered \texttt{/app}, preparation and active-session variants of \texttt{/practice}, Replay, Compare, and Action Card views. Each assertion required an empty axe violation array, and all 20 returned zero violations. This result is limited to the rules, DOM states, fixtures, browsers, and viewports exercised; it is not a WCAG conformance certification and does not replace screen-reader, assistive-technology, or participatory testing.
+
+The saved full-stack smoke manifest was recorded on 4 October 2026 and incorporated with its source-hashed inputs at commit \texttt{00a7f54aecefec1d8bb6f53235ddc7ab8f4f0773}. It was generated from the repository root by the exact command \path{.\.venv\Scripts\python.exe scripts\engineering_smoke.py}. The manifest reports two passing browser journeys against a compiled frontend, actual FastAPI process, and disposable MongoDB 8.0.1 database. The journeys included account access, pre-consent exclusion, enrolment, a required task and questionnaire, researcher export, enhanced dialogue, network-failure recovery, replay, branching, comparison, and action-card persistence. The backend was stopped and relaunched twice while MongoDB remained active, and persisted state was verified after each relevant restart. The recorded total run time was 95.72 seconds; this is demonstration timing, not a capacity benchmark.
 
 Together, these complementary checks support the requirement outcomes summarised in Table~\ref{tab:requirements-traceability}; their principal scope limitations are reported in the same table.
 
 \subsection{Performance and Responsive-Interface Checks}
 \label{subsec:performance-results}
 
-A reproducible local benchmark exercised the HTTP boundary of the deterministic core using FastAPI's in-process transport and the memory repository. It included routing, bearer-token authentication, request validation, application services, and response serialisation. After warm-up, the benchmark collected 200 samples for read-only endpoints and 100 samples for each state-changing workflow operation. Table~\ref{tab:performance-results} reports the results from the recorded Windows~11 and Python~3.14.3 run.
+A reproducible local benchmark exercised the HTTP boundary of the deterministic core using FastAPI's in-process transport and the memory repository. It included routing, bearer-token authentication, request validation, application services, and response serialisation. The evidence was recorded on 11 October 2026, incorporated with its source-hashed inputs at commit \texttt{230073c6026f73b24c9162787f3ff493b7ed8a81}, and generated from the repository root by \path{.\.venv\Scripts\python.exe scripts\evaluate_performance.py}. After warm-up, the benchmark collected 200 samples for read-only endpoints and 100 samples for each state-changing workflow operation. Table~\ref{tab:performance-results} reports the results from the recorded Windows~11 and Python~3.14.3 run.
 
 \begin{table}[htbp]
 \centering
 \caption{Local single-client application latency results.}
 \label{tab:performance-results}
-\begin{tabular}{|l|r|r|r|}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{|X|r|r|r|r|}
 \hline
-\textbf{Operation} & \textbf{Samples} & \textbf{Median (ms)} & \textbf{95th percentile (ms)} \\ \hline
-Liveness endpoint & 200 & 1.332 & 1.866 \\ \hline
-Authenticated scenario catalogue & 200 & 2.942 & 3.922 \\ \hline
-Session creation & 100 & 2.988 & 3.961 \\ \hline
-Role-play start & 100 & 3.396 & 4.437 \\ \hline
-Deterministic conversation turn & 100 & 4.659 & 5.836 \\ \hline
-\end{tabular}
+\textbf{Operation} & \textbf{Samples} & \textbf{Median (ms)} & \textbf{P95 (ms)} & \textbf{P95 budget (ms)} \\ \hline
+Liveness endpoint & 200 & 1.332 & 1.866 & 25 \\ \hline
+Authenticated scenario catalogue & 200 & 2.942 & 3.922 & 50 \\ \hline
+Session creation & 100 & 2.988 & 3.961 & 50 \\ \hline
+Role-play start & 100 & 3.396 & 4.437 & 75 \\ \hline
+Deterministic conversation turn & 100 & 4.659 & 5.836 & 100 \\ \hline
+\end{tabularx}
 \end{table}
 
-The benchmark is a fast regression check for local application overhead, not a production-capacity test. It excludes network latency, MongoDB, external generation and transcription providers, trained multimodal inference, and concurrent clients. Those variables depend on the deployed environment and require a separate staged load test. Within its declared scope, however, the result shows that the locally controlled text-first path adds only a few milliseconds per request and that optional services are not on the critical path when deterministic fallbacks are used. All five measurements passed their predeclared 95th-percentile regression budgets. The JSON evidence artefact records the environment, sample counts, budgets, source hashes, individual scope exclusions, and summary statistics.
+Each sample was a sequential, single-client request timed with Python's \texttt{time.perf\_counter} around FastAPI \texttt{TestClient.request}; response status validation remained inside the measured operation. One liveness and one scenario-catalogue request warmed routing, schema, and service paths before collection. The median is Python's conventional sample median. P95 uses the nearest-rank rule: after ascending sort, the observation at one-indexed rank $\lceil0.95n\rceil$ is selected (rank 190 of 200 or 95 of 100). A check passes when this P95 is less than or equal to its budget. The five budgets in Table~\ref{tab:performance-results} were fixed in the benchmark script before execution as deliberately generous regression tripwires; they are not production service-level objectives derived from users or deployed traffic.
+
+The benchmark is a fast regression check for local application overhead, not a production-capacity test. It excludes network latency, MongoDB, external generation and transcription providers, trained multimodal inference, and concurrent clients. Those variables depend on the deployed environment and require a separate staged load test. Within its declared scope, however, the result shows that the locally controlled text-first path adds only a few milliseconds per request and that optional services are not on the critical path when deterministic fallbacks are used. All five measurements passed their P95 regression budgets. The JSON evidence artefact records the environment, sample counts, budgets, source hashes, individual scope exclusions, and summary statistics.
 
 Perceived responsiveness also depends on the browser rather than API latency alone. The frontend therefore runs as a compiled production build in both desktop Chromium and a Pixel~7 mobile profile. The browser suite verifies responsive layouts, keyboard interaction, focus behaviour, live status messages, preservation of unsent input after failure, and immediate recovery controls. These checks support the claim that the interface is responsive across the tested viewports; they do not replace field measurements of Core Web Vitals on the eventual hosting infrastructure.
 
@@ -596,6 +637,6 @@ The supplementary pilot was single-arm and included only 15 participants in the 
 
 The evaluation provides completed answers to the two machine-learning questions. Three-turn causal context improved the four-class text model from 0.6651 to 0.7332 macro F1, with a paired dialogue-bootstrap interval excluding zero. Equal-weight text--audio fusion further improved macro F1 to 0.7883, demonstrating complementary benchmark information. However, its ECE of 0.1619 exposed a classification--calibration trade-off. Validation-derived calibration reduced ECE substantially at a modest classification cost, motivating the global text-dominant configuration used for final packaging.
 
-The application evaluation answers RQ3 and RQ4 at the level of specified, reproducible system behaviour. All five authored enhanced dialogue trajectories and all seven affect-pacing decisions matched expectations. Diagnostic evidence cases exposed one false positive and two false negatives rather than concealing lexical limitations. A 240-test backend run, production frontend checks, desktop/mobile browser and accessibility tests, two full-stack journeys, persistence across backend restarts, and local HTTP timings verify complementary functional and non-functional boundaries. The deterministic conversation path recorded a median of 4.659~ms and a 95th percentile of 5.836~ms in the scoped local benchmark.
+The application evaluation answers RQ3 and RQ4 at the level of specified, reproducible system behaviour. All five authored enhanced dialogue trajectories and all seven affect-pacing decisions matched expectations. Diagnostic evidence cases exposed one false positive and two false negatives rather than concealing lexical limitations. A backend run with 245 passes and 13 explicitly identified environmental skips, 76 passing desktop/mobile browser cases, 20 zero-violation automated accessibility scans, production frontend checks, two full-stack journeys, persistence across backend restarts, and local HTTP timings verify complementary functional and non-functional boundaries. The deterministic conversation path recorded a median of 4.659~ms and a 95th percentile of 5.836~ms in the scoped local benchmark.
 
 The small pilot remains supporting evidence for the non-adaptive workflow: 12 of 15 participants completed the three required rehearsals and questionnaires, while mean scenario-realism and feedback-usefulness ratings were 4.85 and 5.33 out of seven. Because those required rehearsals bypassed multimodal inference and affect-aware pacing, these observations say nothing about the acceptability or benefit of emotion-aware adaptation. The evaluation therefore rests principally on the separate model benchmark and the authored, automated, browser, persistence, recovery, full-stack, accessibility, and performance tests. Overall, AffectLab is a fully implemented communication-practice system whose model behaviour, core policies, interfaces, persistence, accessibility, recovery, and local responsiveness have been tested extensively by the developer and through automation, with human evaluation of adaptation and deployment-scale performance appropriately reserved for future controlled and staging studies.
