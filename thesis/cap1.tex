@@ -173,7 +173,7 @@ A separate audio model is trained using the speech signal associated with each u
 
 Late fusion is used to combine the probability distributions produced by the contextual text and audio models. Both a predeclared equal-weight fusion and validation-fitted fusion configurations are considered. Temperature scaling and validation-derived modality weights are used to investigate confidence calibration. This separates the question of which configuration achieves the strongest classification performance from the question of which configuration produces the most reliable confidence estimates for operational use.
 
-The models are evaluated using five speaker-independent folds corresponding to the five IEMOCAP sessions. This prevents the speakers used for testing from appearing in the corresponding training data. Evaluation includes accuracy, macro-averaged F1, weighted F1, per-class measures, expected calibration error, negative log-likelihood, and the multiclass Brier score. Paired dialogue-level bootstrap comparisons are used to estimate the uncertainty surrounding differences between selected model configurations.
+The models are evaluated using five speaker-independent folds corresponding to the five IEMOCAP sessions. This prevents the speakers used for testing from appearing in the corresponding training data. Evaluation includes accuracy, macro-averaged F1, weighted F1, per-class measures, expected calibration error (ECE), negative log-likelihood (NLL), and the multiclass Brier score. Paired dialogue-level bootstrap comparisons are used to estimate the uncertainty surrounding differences between selected model configurations.
 
 \subsection{Structured Conversational Role-Play}
 
