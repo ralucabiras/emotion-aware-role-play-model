@@ -99,7 +99,30 @@ Weighted F1 & 0.6640 & 0.7300 & +0.0661 & [0.0477, 0.0842] \\ \hline
 \end{tabular}
 \end{table}
 
-The per-class differences were not uniform. Happiness improved by 0.0882, neutral by 0.0338, and sadness by 0.1307, with intervals above zero. Anger improved by 0.0198, but its interval $[-0.0073, 0.0449]$ included zero. The result therefore supports an aggregate benefit from context but does not establish an anger-specific improvement.
+Table~\ref{tab:context-text-per-class} reports the complete pooled class-level results underlying the aggregate scores.
+
+\begin{table}[H]
+\centering
+\caption{Per-class precision, recall, F1, and support for the four-class text configurations.}
+\label{tab:context-text-per-class}
+\footnotesize
+\begin{tabular}{|l|l|r|r|r|r|}
+\hline
+\textbf{Configuration} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Support} \\ \hline
+\multirow{4}{*}{Utterance-only text}
+& Anger & 0.7465 & 0.6863 & 0.7152 & 1,103 \\ \cline{2-6}
+& Happiness & 0.7392 & 0.6980 & 0.7180 & 1,636 \\ \cline{2-6}
+& Neutral & 0.6134 & 0.6001 & 0.6067 & 1,708 \\ \cline{2-6}
+& Sadness & 0.5688 & 0.6827 & 0.6205 & 1,084 \\ \hline
+\multirow{4}{*}{Three-turn context text}
+& Anger & 0.7781 & 0.6963 & 0.7349 & 1,103 \\ \cline{2-6}
+& Happiness & 0.7989 & 0.8136 & 0.8062 & 1,636 \\ \cline{2-6}
+& Neutral & 0.6421 & 0.6388 & 0.6404 & 1,708 \\ \cline{2-6}
+& Sadness & 0.7209 & 0.7841 & 0.7512 & 1,084 \\ \hline
+\end{tabular}
+\end{table}
+
+Support is the number of held-out examples after the five non-overlapping test sessions are concatenated and is therefore identical for configurations evaluated on the same rows. The per-class differences were not uniform. Happiness F1 improved by 0.0882, neutral by 0.0338, and sadness by 0.1307, with dialogue-bootstrap intervals above zero. Anger F1 improved by 0.0198, but its interval $[-0.0073, 0.0449]$ included zero. The result therefore supports an aggregate benefit from context but does not establish an anger-specific improvement.
 
 The calibrated contextual model obtained pooled ECE 0.0311. This value describes the benchmark distribution after validation-fitted temperature scaling and does not validate the 0.55 application threshold on real AffectLab conversations.
 
@@ -122,7 +145,34 @@ Weighted F1 & 0.5675 & 0.6205 & +0.0529 & [0.0359, 0.0702] \\ \hline
 \end{tabular}
 \end{table}
 
-The anxiety difference was comparatively large at 0.1650, but it had a wide interval $[0.0476, 0.3144]$ and arose from only 40 IEMOCAP fear annotations mapped to anxiety. Anger and neutral intervals included zero. Consequently, the six-class experiment is not used as the deployed classifier and does not support a strong conclusion about anxiety recognition.
+Table~\ref{tab:six-class-per-class} reports the complete class-level metrics for this exploratory task.
+
+\begin{table}[H]
+\centering
+\caption{Per-class precision, recall, F1, and support for the exploratory six-class text configurations.}
+\label{tab:six-class-per-class}
+\footnotesize
+\begin{tabular}{|l|l|r|r|r|r|}
+\hline
+\textbf{Configuration} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Support} \\ \hline
+\multirow{6}{*}{Utterance-only text}
+& Anger & 0.5857 & 0.5576 & 0.5713 & 1,103 \\ \cline{2-6}
+& Anxiety & 0.3889 & 0.5250 & 0.4468 & 40 \\ \cline{2-6}
+& Frustration & 0.5420 & 0.5165 & 0.5289 & 1,849 \\ \cline{2-6}
+& Joy & 0.7073 & 0.6779 & 0.6923 & 1,636 \\ \cline{2-6}
+& Neutral & 0.5102 & 0.4813 & 0.4953 & 1,708 \\ \cline{2-6}
+& Sadness & 0.5004 & 0.6347 & 0.5596 & 1,084 \\ \hline
+\multirow{6}{*}{Three-turn context text}
+& Anger & 0.6089 & 0.5476 & 0.5766 & 1,103 \\ \cline{2-6}
+& Anxiety & 0.5778 & 0.6500 & 0.6118 & 40 \\ \cline{2-6}
+& Frustration & 0.5579 & 0.5809 & 0.5692 & 1,849 \\ \cline{2-6}
+& Joy & 0.7996 & 0.8026 & 0.8011 & 1,636 \\ \cline{2-6}
+& Neutral & 0.5174 & 0.4690 & 0.4920 & 1,708 \\ \cline{2-6}
+& Sadness & 0.6333 & 0.7408 & 0.6828 & 1,084 \\ \hline
+\end{tabular}
+\end{table}
+
+The anxiety F1 difference was comparatively large at 0.1650, but it had a wide interval $[0.0476, 0.3144]$ and arose from only 40 IEMOCAP fear annotations mapped to anxiety. Anger and neutral intervals included zero. Consequently, the six-class experiment is not used as the deployed classifier and does not support a strong conclusion about anxiety recognition.
 
 \subsection{Answer to RQ1}
 \label{subsec:rq1-answer}
@@ -137,7 +187,7 @@ The result is evidence for contextual benchmark classification, not proof that c
 \subsection{Audio-Only Baseline}
 \label{subsec:audio-results}
 
-The wav2vec~2.0 audio classifier obtained accuracy 0.6279, macro F1 0.6349, weighted F1 0.6229, and calibrated ECE 0.0468. Its per-class F1 scores were 0.7142 for anger, 0.5782 for happiness, 0.5757 for neutral, and 0.6715 for sadness. Audio was weaker than contextual text in aggregate but stronger for anger than the overall pattern might suggest, indicating that the modalities contained different useful information.
+The wav2vec~2.0 audio classifier obtained accuracy 0.6279, macro F1 0.6349, weighted F1 0.6229, and calibrated ECE 0.0468. Its complete class-level precision, recall, F1, and support are reported with the fusion configurations in Table~\ref{tab:multimodal-per-class}. Audio was weaker than contextual text in aggregate but stronger for anger than the overall pattern might suggest, indicating that the modalities contained different useful information.
 
 The comparison does not imply that the acoustic model measured emotion independently of linguistic content: speech representations can encode phonetic, lexical, speaker, and recording characteristics as well as prosody. It establishes only that the audio branch produced non-redundant predictive information on the matched benchmark task.
 
@@ -159,7 +209,7 @@ Weighted F1 & 0.7300 & 0.7815 & +0.0514 & [0.0366, 0.0671] \\ \hline
 \end{tabular}
 \end{table}
 
-Fusion per-class F1 was 0.8277 for anger, 0.8163 for happiness, 0.7014 for neutral, and 0.8080 for sadness. Unlike the contextual-text comparison, the combined system showed substantial performance across all four categories. Because the fusion rule was fixed before inspection of the combined test outcome, this result is retained as the primary evidence that audio contributed complementary benchmark information.
+The complete fusion class-level metrics are reported in Table~\ref{tab:multimodal-per-class}. Unlike the contextual-text comparison, the combined system showed substantial performance across all four categories. Because the fusion rule was fixed before inspection of the combined test outcome, this result is retained as the primary evidence that audio contributed complementary benchmark information.
 
 \subsection{Classification--Calibration Trade-Off}
 \label{subsec:fusion-calibration-results}
@@ -180,6 +230,34 @@ Contextual text & 0.7304 & 0.7332 & 0.7300 & 0.0311 \\ \hline
 Audio only & 0.6279 & 0.6349 & 0.6229 & 0.0468 \\ \hline
 Equal-weight fusion & 0.7832 & 0.7883 & 0.7815 & 0.1619 \\ \hline
 Fold validation-fitted fusion & 0.7717 & 0.7758 & 0.7707 & 0.0283 \\ \hline
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:multimodal-per-class} gives the complete pooled class-level results for the acoustic and multimodal configurations. The repeated support values confirm that all three configurations were evaluated on the same 5,531 held-out utterances.
+
+\begin{table}[H]
+\centering
+\caption{Per-class precision, recall, F1, and support for the audio and fusion configurations.}
+\label{tab:multimodal-per-class}
+\footnotesize
+\begin{tabular}{|l|l|r|r|r|r|}
+\hline
+\textbf{Configuration} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Support} \\ \hline
+\multirow{4}{*}{Audio only}
+& Anger & 0.6583 & 0.7806 & 0.7142 & 1,103 \\ \cline{2-6}
+& Happiness & 0.6343 & 0.5312 & 0.5782 & 1,636 \\ \cline{2-6}
+& Neutral & 0.6214 & 0.5363 & 0.5757 & 1,708 \\ \cline{2-6}
+& Sadness & 0.5997 & 0.7629 & 0.6715 & 1,084 \\ \hline
+\multirow{4}{*}{Equal-weight fusion}
+& Anger & 0.8053 & 0.8513 & 0.8277 & 1,103 \\ \cline{2-6}
+& Happiness & 0.8221 & 0.8105 & 0.8163 & 1,636 \\ \cline{2-6}
+& Neutral & 0.7412 & 0.6657 & 0.7014 & 1,708 \\ \cline{2-6}
+& Sadness & 0.7635 & 0.8579 & 0.8080 & 1,084 \\ \hline
+\multirow{4}{*}{Fold validation-fitted fusion}
+& Anger & 0.8024 & 0.7879 & 0.7951 & 1,103 \\ \cline{2-6}
+& Happiness & 0.8208 & 0.8233 & 0.8221 & 1,636 \\ \cline{2-6}
+& Neutral & 0.7096 & 0.6710 & 0.6897 & 1,708 \\ \cline{2-6}
+& Sadness & 0.7601 & 0.8358 & 0.7961 & 1,084 \\ \hline
 \end{tabular}
 \end{table}
 

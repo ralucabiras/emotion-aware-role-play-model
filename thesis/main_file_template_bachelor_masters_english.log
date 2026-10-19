@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.6)  19 OCT 2026 10:22
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.6)  19 OCT 2026 10:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1634,7 +1634,7 @@ Underfull \hbox (badness 1286) in paragraph at lines 33--33
 \OT1/cmr/m/n/10 ments un-der re-pro-ducible
  []
 
-[120] [121] [122] [123] [124] (figures/model_results.tex
+[120] [121] [122] [123] [124] [125] (figures/model_results.tex
 Package pgfplots info on input line 26: Using 'lua backend=false' for axis: x c
 oord trafo unsupported.
 )
@@ -1653,92 +1653,92 @@ PGFPlots: reading {figures/data/reliability_audio.dat}
 PGFPlots: reading {figures/data/reliability_equal_fusion.dat}
 PGFPlots: reading {figures/data/reliability_equal_fusion.dat}
 PGFPlots: reading {figures/data/reliability_validation_fitted.dat}
-) [125]
-[126] [127] [128
+) [126]
+[127] [128] [129
 
 ]
-Underfull \hbox (badness 4378) in paragraph at lines 295--295
+Underfull \hbox (badness 4378) in paragraph at lines 373--373
 []|\OT1/cmr/m/n/8 No in-de-pen-dent us-abil-ity
  []
 
 
-Underfull \hbox (badness 4531) in paragraph at lines 295--295
+Underfull \hbox (badness 4531) in paragraph at lines 373--373
 []|\OT1/cmr/m/n/8 Three stan-dard sce-nar-ios
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 295--295
+Underfull \hbox (badness 10000) in paragraph at lines 373--373
 []|\OT1/cmr/m/n/8 Limited live-device,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 295--295
+Underfull \hbox (badness 10000) in paragraph at lines 373--373
 \OT1/cmr/m/n/8 provider, and private-
  []
 
 
-Underfull \hbox (badness 4556) in paragraph at lines 295--295
+Underfull \hbox (badness 4556) in paragraph at lines 373--373
 []|\OT1/cmr/m/n/8 No con-struct, pre-dic-tive,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 295--295
+Underfull \hbox (badness 10000) in paragraph at lines 373--373
 \OT1/cmr/m/n/8 clin-i-cal, comparative-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 295--295
+Underfull \hbox (badness 10000) in paragraph at lines 373--373
 \OT1/cmr/m/n/8 helpfulness, or harm
  []
 
 
-Underfull \hbox (badness 3428) in paragraph at lines 295--295
+Underfull \hbox (badness 3428) in paragraph at lines 373--373
 []|\OT1/cmr/m/n/8 Synthetic his-to-ries rather
  []
 
 
-Underfull \hbox (badness 1472) in paragraph at lines 295--295
+Underfull \hbox (badness 1472) in paragraph at lines 373--373
 []|\OT1/cmr/m/n/8 No net-worked concurrent-
  []
 
 
-Underfull \hbox (badness 1783) in paragraph at lines 295--295
+Underfull \hbox (badness 1783) in paragraph at lines 373--373
 []|\OT1/cmr/m/n/8 No eval-u-a-tion with users
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 295--295
+Underfull \hbox (badness 10000) in paragraph at lines 373--373
 []|\OT1/cmr/m/n/8 Maintainability was not
  []
 
 
-Underfull \hbox (badness 2368) in paragraph at lines 339--339
+Underfull \hbox (badness 2368) in paragraph at lines 417--417
 \OT1/cmr/m/n/10 peu-tic value, or ab-sence of
  []
 
-[129
+[130
 
-] [130] [131] [132]
-Overfull \hbox (40.34206pt too wide) in paragraph at lines 371--380
+] [131] [132] [133]
+Overfull \hbox (40.34206pt too wide) in paragraph at lines 449--458
  [][] 
  []
 
-[133] [134]
+[134] [135]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [135]
-[136]) (cap6.tex [137] [138]
-Chapter 6.
-[139
+ [136]
+[137]) (cap6.tex [138] [139] [140
 
-] [140] [141]
+]
+Chapter 6.
+[141] [142] [143]
 Underfull \vbox (badness 2617) has occurred while \output is active []
 
- [142]
+ [144]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [143]
-[144]
+ [145]
+[146]
 Underfull \hbox (badness 2698) in paragraph at lines 130--130
 []|\OT1/cmr/m/n/10 Response-time dis-tri-bu-tions, through-put,
  []
@@ -1768,24 +1768,24 @@ Underfull \hbox (badness 7722) in paragraph at lines 130--130
 \OT1/cmr/m/n/10 pref-er-ence, task com-ple-tion, per-ceived
  []
 
-[145] [146]
+[147] [148]
 Underfull \vbox (badness 1968) has occurred while \output is active []
 
- [147])
-[148] (main_file_template_bachelor_masters_english.bbl [149] [150
+ [149])
+[150] (main_file_template_bachelor_masters_english.bbl [151] [152
 
-] [151]
+] [153]
 Underfull \hbox (badness 1577) in paragraph at lines 112--120
 []\OT1/cmr/m/n/12 Deepanway Ghosal, Navonil Ma-jumder, Sou-janya Po-ria, Niy-at
 i
  []
 
-[152]
+[154]
 Underfull \hbox (badness 4582) in paragraph at lines 148--154
 []\OT1/cmr/m/n/12 Meelis Kull, Miquel Perello-Nieto, Markus K^^?angsepp, Telmo
  []
 
-[153] [154]) [155] [156
+[155] [156]) [157] [158
 
 ]
 Appendix A.
@@ -1849,7 +1849,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 170--170
 []|\OT1/cmr/m/n/12 Suggestions were
  []
 
-[157] [158] [159] (main_file_template_bachelor_masters_english.aux)
+[159] [160] [161] (main_file_template_bachelor_masters_english.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -1859,10 +1859,10 @@ out' has not changed.
 (rerunfilecheck)             Checksum: E03025BD157B73BF5F68B6B0FC5FDA2D;51915.
  ) 
 Here is how much of TeX's memory you used:
- 39551 strings out of 467871
- 911455 string characters out of 5418376
- 1521360 words of memory out of 5000000
- 67246 multiletter control sequences out of 15000+600000
+ 39560 strings out of 467871
+ 911589 string characters out of 5418376
+ 1522708 words of memory out of 5000000
+ 67250 multiletter control sequences out of 15000+600000
  644832 words of font info for 104 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,19n,104p,1994b,2868s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1895,10 +1895,10 @@ type1/public/amsfonts/cm/cmti12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKT
 eX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/raluc/AppData/Local/Prog
 rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/raluc/AppData/L
 ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on main_file_template_bachelor_masters_english.pdf (159 pages, 1
-472714 bytes).
+Output written on main_file_template_bachelor_masters_english.pdf (161 pages, 1
+479178 bytes).
 PDF statistics:
- 2445 PDF objects out of 2487 (max. 8388607)
- 505 named destinations out of 1000 (max. 500000)
+ 2461 PDF objects out of 2487 (max. 8388607)
+ 510 named destinations out of 1000 (max. 500000)
  1793 words of extra memory for PDF output out of 10000 (max. 10000000)
 
