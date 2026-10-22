@@ -6,28 +6,25 @@
 \addvspace {10\p@ }
 \contentsline {table}{\numberline {3.1}{\ignorespaces Grouped functional and non-functional requirements.}}{25}{table.3.1}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces Principal technologies used in the AffectLab implementation.}}{30}{table.4.1}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces IEMOCAP source-label mappings implemented for the two experimental tasks.}}{35}{table.4.2}%
-\contentsline {table}{\numberline {4.3}{\ignorespaces Distinction between the trained affect model and the application's deterministic analysis and decision components.}}{61}{table.4.3}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Mapping between research questions, evidence, and permitted conclusions.}}{76}{table.5.1}%
-\contentsline {table}{\numberline {5.2}{\ignorespaces Four-class contextual-text results on five held-out IEMOCAP sessions.}}{78}{table.5.2}%
-\contentsline {table}{\numberline {5.3}{\ignorespaces Per-class precision, recall, F1, and support for the four-class text configurations.}}{79}{table.5.3}%
-\contentsline {table}{\numberline {5.4}{\ignorespaces Exploratory six-class contextual-text comparison.}}{79}{table.5.4}%
-\contentsline {table}{\numberline {5.5}{\ignorespaces Fold variation in macro F1 for the exploratory six-class comparison. Each fold holds out one complete IEMOCAP session.}}{80}{table.5.5}%
-\contentsline {table}{\numberline {5.6}{\ignorespaces Per-class precision, recall, F1, and support for the exploratory six-class text configurations.}}{80}{table.5.6}%
-\contentsline {table}{\numberline {5.7}{\ignorespaces Predeclared equal-weight fusion compared with contextual text.}}{81}{table.5.7}%
-\contentsline {table}{\numberline {5.8}{\ignorespaces Classification and probability-quality trade-off for independently evaluated fold configurations.}}{82}{table.5.8}%
-\contentsline {table}{\numberline {5.9}{\ignorespaces Per-class precision, recall, F1, and support for the audio and fusion configurations.}}{83}{table.5.9}%
-\contentsline {table}{\numberline {5.10}{\ignorespaces Macro F1 by held-out IEMOCAP session, with unweighted variation across the five folds.}}{83}{table.5.10}%
-\contentsline {table}{\numberline {5.11}{\ignorespaces Operational global-chain summary; these descriptive values are not an independent held-out performance estimate.}}{87}{table.5.11}%
-\contentsline {table}{\numberline {5.12}{\ignorespaces Descriptive comparison with protocol-compatible four-class, session-held-out IEMOCAP results reported by Li et al. \cite {li2022contextaware}. Values are percentages.}}{88}{table.5.12}%
-\contentsline {table}{\numberline {5.13}{\ignorespaces Compact requirement-to-evidence traceability matrix.}}{90}{table.5.13}%
-\contentsline {table}{\numberline {5.14}{\ignorespaces Authored enhanced-dialogue trajectory results.}}{91}{table.5.14}%
-\contentsline {table}{\numberline {5.15}{\ignorespaces Implemented cognitive-heuristic and support-routing checks.}}{91}{table.5.15}%
-\contentsline {table}{\numberline {5.16}{\ignorespaces Local single-client application latency results.}}{94}{table.5.16}%
-\contentsline {table}{\numberline {5.17}{\ignorespaces Supplementary pilot questionnaire results from available first required attempts. Ratings use seven-point scales; paired change is post-confidence minus pre-confidence.}}{96}{table.5.17}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Mapping between research questions, evidence, and permitted conclusions.}}{38}{table.5.1}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Four-class contextual-text results on five held-out IEMOCAP sessions.}}{40}{table.5.2}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Per-class precision, recall, F1, and support for the four-class text configurations.}}{41}{table.5.3}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Exploratory six-class contextual-text comparison.}}{41}{table.5.4}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Fold variation in macro F1 for the exploratory six-class comparison. Each fold holds out one complete IEMOCAP session.}}{42}{table.5.5}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces Per-class precision, recall, F1, and support for the exploratory six-class text configurations.}}{42}{table.5.6}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Predeclared equal-weight fusion compared with contextual text.}}{43}{table.5.7}%
+\contentsline {table}{\numberline {5.8}{\ignorespaces Classification and probability-quality trade-off for independently evaluated fold configurations.}}{44}{table.5.8}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces Per-class precision, recall, F1, and support for the audio and fusion configurations.}}{45}{table.5.9}%
+\contentsline {table}{\numberline {5.10}{\ignorespaces Macro F1 by held-out IEMOCAP session, with unweighted variation across the five folds.}}{45}{table.5.10}%
+\contentsline {table}{\numberline {5.11}{\ignorespaces Operational global-chain summary; these descriptive values are not an independent held-out performance estimate.}}{49}{table.5.11}%
+\contentsline {table}{\numberline {5.12}{\ignorespaces Descriptive comparison with protocol-compatible four-class, session-held-out IEMOCAP results reported by Li et al. \cite {li2022contextaware}. Values are percentages.}}{50}{table.5.12}%
+\contentsline {table}{\numberline {5.13}{\ignorespaces Compact requirement-to-evidence traceability matrix.}}{52}{table.5.13}%
+\contentsline {table}{\numberline {5.14}{\ignorespaces Authored enhanced-dialogue trajectory results.}}{53}{table.5.14}%
+\contentsline {table}{\numberline {5.15}{\ignorespaces Implemented cognitive-heuristic and support-routing checks.}}{53}{table.5.15}%
+\contentsline {table}{\numberline {5.16}{\ignorespaces Local single-client application latency results.}}{56}{table.5.16}%
+\contentsline {table}{\numberline {5.17}{\ignorespaces Supplementary pilot questionnaire results from available first required attempts. Ratings use seven-point scales; paired change is post-confidence minus pre-confidence.}}{58}{table.5.17}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {6.1}{\ignorespaces Prioritised future-work roadmap.}}{107}{table.6.1}%
+\contentsline {table}{\numberline {6.1}{\ignorespaces Prioritised future-work roadmap.}}{69}{table.6.1}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces Overview of generative AI usage}}{119}{table.A.1}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces Overview of generative AI usage}}{81}{table.A.1}%

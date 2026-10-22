@@ -1,7 +1,7 @@
 # Dissertation Reduction Plan
 
 Last updated: 2026-10-22  
-Overall status: Chapters 1 and 3 complete and verified; Chapter 4 rewrite next
+Overall status: Chapters 1, 3, and 4 complete and verified; Chapter 2 rewrite next
 Coordinator guidance: approximately **30--40 pages of content**, excluding the covers, abstract, table of contents, bibliography, and appendices  
 Working target: **36--37 pages of numbered chapter content**  
 Hard ceiling: **40 pages of numbered chapter content**
@@ -21,14 +21,14 @@ The reduction must preserve the research argument and evidence. Detailed softwar
 
 ## Baseline and target
 
-The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1 and Chapter 3 rewrites, the estimated current total is approximately 40,147 source words.
+The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1, Chapter 3, and Chapter 4 rewrites, the estimated current total is approximately 26,229 source words.
 
 | Part | Baseline pages | Baseline source words | Target pages | Target words | Status |
 |---|---:|---:|---:|---:|---|
 | Chapter 1: Introduction | 22 | 8,232 | 4 | 1,400--1,600 | `[x]` |
 | Chapter 2: State of the Art | 18 | 6,860 | 6 | 2,300--2,600 | `[ ]` |
 | Chapter 3: Proposed System Architecture | 22 | 7,889 | 5 | 1,700--2,000 | `[x]` |
-| Chapter 4: Implementation | 46 | 16,934 | 8 | 3,000--3,500 | `[ ]` |
+| Chapter 4: Implementation | 46 | 16,934 | 8 | 3,000--3,500 | `[x]` |
 | Chapter 5: Evaluation and Results | 22 | 9,289 | 10--11 | 4,000--4,500 | `[ ]` |
 | Chapter 6: Conclusions and Future Work | 10 | 3,951 | 3 | 1,000--1,300 | `[ ]` |
 | **Total main content** | **about 140** | **53,155** | **36--37** | **13,400--15,500** | `[ ]` |
@@ -232,38 +232,40 @@ Planned structure:
 
 Tasks:
 
-- [ ] Replace the technology inventory with a short stack overview.
-- [ ] Remove repository-structure and configuration-file narration.
-- [ ] Keep implementation choices that distinguish the contextual text, speech, fusion, calibration, and inference pipeline.
-- [ ] Remove evaluation-protocol repetition; the definitive protocol belongs in Chapter 5.
-- [ ] Condense domain models and API schemas to their architectural role.
-- [ ] Remove routine authentication and account-management mechanics.
-- [ ] Keep one concise request-processing description and its sequence diagram.
-- [ ] Preserve the deterministic dialogue, evidence-extraction, and affect-pacing mechanisms.
-- [ ] Condense feedback, replay, branching, and action cards into one section.
-- [ ] Replace multiple interface screenshots with one combined figure or one representative screen.
-- [ ] Reduce optional research-support implementation to one paragraph.
-- [ ] Reduce security, privacy, and deployment controls to the decisions relevant to the dissertation contribution.
-- [ ] Remove the Implementation Verification section; evaluation results belong in Chapter 5.
-- [ ] Remove the repetitive chapter summary.
+- [x] Replace the technology inventory with a short stack overview.
+- [x] Remove repository-structure and configuration-file narration.
+- [x] Keep implementation choices that distinguish the contextual text, speech, fusion, calibration, and inference pipeline.
+- [x] Remove evaluation-protocol repetition; the definitive protocol belongs in Chapter 5.
+- [x] Condense domain models and API schemas to their architectural role.
+- [x] Remove routine authentication and account-management mechanics.
+- [x] Keep one concise request-processing description and its sequence diagram.
+- [x] Preserve the deterministic dialogue, evidence-extraction, and affect-pacing mechanisms.
+- [x] Condense feedback, replay, branching, and action cards into one section.
+- [x] Replace multiple interface screenshots with one combined figure or one representative screen.
+- [x] Reduce optional research-support implementation to one paragraph.
+- [x] Reduce security, privacy, and deployment controls to the decisions relevant to the dissertation contribution.
+- [x] Remove the Implementation Verification section; evaluation results belong in Chapter 5.
+- [x] Remove the repetitive chapter summary.
 
 Main-text visual budget:
 
-- [ ] Emotion pipeline.
-- [ ] Request sequence.
-- [ ] Dialogue-state or affect-policy diagram; retain one unless both are essential.
-- [ ] One combined or representative interface figure.
+- [x] Emotion pipeline.
+- [x] Request sequence.
+- [x] Dialogue-state or affect-policy diagram; retained the affect-policy diagram.
+- [x] One combined or representative interface figure.
 
 Candidates for appendix or repository documentation:
 
-- [ ] Complete repository and configuration description.
-- [ ] Detailed API/domain-model information.
-- [ ] Research-data lifecycle diagram.
-- [ ] Deployment topology.
-- [ ] Additional screenshots.
-- [ ] Detailed test architecture and provenance procedures.
+- [x] Complete repository and configuration description retained only in repository documentation.
+- [x] Detailed API/domain-model information retained only in repository documentation.
+- [x] Research-data lifecycle diagram removed from the main chapter; the lifecycle boundary remains in concise prose.
+- [x] Deployment topology removed from the main chapter; operational detail remains in repository documentation.
+- [x] Additional screenshots excluded rather than moved automatically.
+- [x] Detailed test architecture and provenance procedures removed from Chapter 4; evidence remains in Chapter 5 and repository artefacts.
 
 Completion condition: the chapter explains the technically original implementation choices, not every implemented feature.
+
+Current result: the chapter now follows the planned six-section structure and contains 3,016 words by `texcount`, down from the 16,934-word baseline. It retains four visuals: the emotion pipeline, request sequence, affect-pacing policy, and one representative role-play screen. The chapter occupies numbered pages 29--36, and Chapter 5 begins on page 37 with no intervening blank page. A clean `latexmk` build contains no undefined citations or references, LaTeX errors, or Chapter 4 overfull boxes; visual inspection of all eight rendered pages found no clipping or poor page breaks, and the full PDF is 97 physical pages.
 
 ## Chapter 5: Evaluation and Results -- target 10--11 pages
 
@@ -352,7 +354,7 @@ The following claims currently recur across several chapters. Retain the full ex
 - [x] Phase 0: freeze the evidence and principal claims from Chapter 5.
 - [x] Rewrite and verify Chapter 1.
 - [x] Rewrite and verify Chapter 3.
-- [ ] Rewrite Chapter 4.
+- [x] Rewrite Chapter 4.
 - [ ] Condense Chapter 2.
 - [ ] Refine Chapter 5 and extract appendix material.
 - [ ] Rewrite Chapter 6.
@@ -394,6 +396,7 @@ The following claims currently recur across several chapters. Retain the full ex
 | 2026-10-22 | Replaced Chapter 1's nine sections, fifteen subsections, nineteen objectives, and eleven contributions with the planned five-part structure. Preserved all four research questions and externally used labels. | Approximately 1,456 source words, down from the 8,232-word baseline and within target. Static reference and delimiter checks passed. Compilation is pending because MiKTeX reports incomplete first-run setup. | Complete MiKTeX setup, compile and visually check Chapter 1, record its rendered page count, then mark the chapter complete and begin Chapter 3. |
 | 2026-10-22 | Completed MiKTeX compilation and the Chapter 1 layout pass. Tightened list spacing and shortened only the dissertation-navigation sentence after the first render showed a two-line spill onto page 5. Regenerated the PDF, table of contents, List of Figures, and List of Tables; checked the final log and visually inspected all four chapter pages. | Chapter 1 is 1,401 words and occupies numbered pages 1--4; Chapter 2 starts on page 5, so the former blank verso is gone and the full PDF falls from 155 to 153 physical pages. No undefined citations/references or LaTeX errors remain, and no Chapter 1 clipping, overflow, or poor page break was found. | Rewrite Chapter 3 to its five-page, 1,700--2,000-word target, preserving one principal architecture diagram and moving the complete requirement inventory out of the main narrative. |
 | 2026-10-22 | Rewrote Chapter 3 from 29 headings to the planned four-section argument. Retained the principal architecture diagram, consolidated all FR1--FR29 and NFR1--NFR14 identifiers into nine requirement groups, centralised the dialogue/affect/safety authority boundaries, and reduced ethics and limitations to design-relevant constraints. | Chapter 3 is 1,712 words, down from the 7,889-word baseline, and occupies five content pages (23--27). The full PDF falls from 153 to 137 physical pages. Compilation, cross-references, warning audit, and visual inspection passed; the intentional page 28 verso remains before Chapter 4. The atomic requirement wording is designated for Appendix B. | Rewrite Chapter 4 to its eight-page, 3,000--3,500-word target, retaining only technically significant implementation mechanisms and the four planned visuals. |
+| 2026-10-22 | Rewrote Chapter 4 from 12 sections and 45 subsections to the planned six-section implementation argument. Removed the technology inventory, repository/configuration tour, routine account mechanics, detailed research lifecycle, separate verification section, chapter summary, six surplus diagrams/screenshots, and repeated evaluation material. | Chapter 4 is 3,016 words, down from the 16,934-word baseline, and occupies numbered pages 29--36. It retains the four planned visuals and preserves compatibility labels still used by Chapter 5. The clean build, cross-reference audit, warning audit, and visual inspection passed; Chapter 5 starts on page 37, and the full PDF falls from 137 to 97 physical pages. | Condense Chapter 2 to its six-page, 2,300--2,600-word target, retaining only literature that directly supports the research gap, method, or design rationale. |
 
 ## Decisions and open questions
 
@@ -405,7 +408,8 @@ The following claims currently recur across several chapters. Retain the full ex
 | 2026-10-22 | Use Chapter 5 as the authoritative source for all scores, test counts, pilot results, and limitations. | Accepted; frozen checklist added above. |
 | 2026-10-22 | The standardised template contains Lists of Figures/Tables and an appendix mechanism, while no accessible rule requires chapter-end summaries. | Retain the lists and appendix structure; summaries may be removed, subject to supervisor confirmation of any unpublished programme-specific rule. |
 | 2026-10-22 | Chapter 1 should state the problem and contribution without previewing numerical results, test counts, or detailed implementation. | Accepted and implemented; exact evidence remains in Chapter 5. |
+| 2026-10-22 | Chapter 4 should explain only the technically significant mechanisms and preserve compatibility labels until Chapter 5 is condensed. | Accepted and implemented; detailed software, deployment, research-workflow, and verification material remains in repository documentation or Chapter 5 rather than the main implementation narrative. |
 
 ## Current next action
 
-Rewrite Chapter 4 to the planned six-part structure and its eight-page, 3,000--3,500-word target. Retain the emotion pipeline, request sequence, one dialogue-state or affect-policy diagram, and one combined or representative interface figure; remove repository/configuration narration, evaluation results, routine account mechanics, and duplicated protocol or limitation material. Preserve the deterministic dialogue, evidence-extraction, affect-pacing, feedback, security, persistence, and failure-boundary mechanisms needed to understand the contribution.
+Condense Chapter 2 to the planned five-theme structure and its six-page, 2,300--2,600-word target. Retain only literature that directly motivates a research question or design choice; compress textbook explanations, remove AffectLab implementation detail, delete or relocate the secondary-dataset catalogue and synthesis table, and end with a precise integration-and-evaluation research gap.
