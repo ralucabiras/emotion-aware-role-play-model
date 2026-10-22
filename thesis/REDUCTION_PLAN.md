@@ -1,7 +1,7 @@
 # Dissertation Reduction Plan
 
 Last updated: 2026-10-22  
-Overall status: Planning complete; content editing not started  
+Overall status: Chapter 1 restructured; compile and rendered-page verification pending
 Coordinator guidance: approximately **30--40 pages of content**, excluding the covers, abstract, table of contents, bibliography, and appendices  
 Working target: **36--37 pages of numbered chapter content**  
 Hard ceiling: **40 pages of numbered chapter content**
@@ -21,11 +21,11 @@ The reduction must preserve the research argument and evidence. Detailed softwar
 
 ## Baseline and target
 
-The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. The current chapter sources contain approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count.
+The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1 rewrite, the estimated current total is approximately 46,379 source words.
 
 | Part | Baseline pages | Baseline source words | Target pages | Target words | Status |
 |---|---:|---:|---:|---:|---|
-| Chapter 1: Introduction | 22 | 8,232 | 4 | 1,400--1,600 | `[ ]` |
+| Chapter 1: Introduction | 22 | 8,232 | 4 | 1,400--1,600 | `[~]` |
 | Chapter 2: State of the Art | 18 | 6,860 | 6 | 2,300--2,600 | `[ ]` |
 | Chapter 3: Proposed System Architecture | 22 | 7,889 | 5 | 1,700--2,000 | `[ ]` |
 | Chapter 4: Implementation | 46 | 16,934 | 8 | 3,000--3,500 | `[ ]` |
@@ -77,13 +77,71 @@ Moving material to an appendix is not the default. The appendices should remain 
 
 ## Phase 0: Establish the evidence source of truth
 
-- [ ] Extract the final numerical claims from Chapter 5 into a short working checklist.
-- [ ] Record which tables and figures directly support RQ1--RQ4.
-- [ ] Mark Chapter 5 as the authoritative source for scores, test counts, pilot results, and limitations.
-- [ ] Identify any results in the abstract that no longer match Chapter 5.
-- [ ] Confirm whether the university requires chapter summaries, lists of figures/tables, or a particular appendix structure.
+- [x] Extract the final numerical claims from Chapter 5 into a short working checklist.
+- [x] Record which tables and figures directly support RQ1--RQ4.
+- [x] Mark Chapter 5 as the authoritative source for scores, test counts, pilot results, and limitations.
+- [x] Identify any results in the abstract that no longer match Chapter 5.
+- [x] Check the current Faculty of Informatics completion page and the standardised thesis template for chapter-summary, list, and appendix expectations.
 
 Completion condition: all essential claims and their supporting evidence are known before duplicated passages are removed elsewhere.
+
+### Frozen evidence checklist
+
+Chapter 5 is the source of truth for every score, test count, pilot result, and limitation below. Later chapters may summarise the conclusion but must not introduce a different value or a stronger interpretation.
+
+#### Model protocol and principal results
+
+- [x] Primary task: 5,531 matched text--audio utterances from 151 dialogues, four classes, and five speaker-independent IEMOCAP session folds; one session is held out for test and another for validation in each fold.
+- [x] RQ1 headline: three-turn causal context improved accuracy from 0.6624 to 0.7304, macro F1 from 0.6651 to 0.7332, and weighted F1 from 0.6640 to 0.7300. The macro-F1 difference was +0.0681 with a dialogue-bootstrap 95\% interval of 0.0504--0.0857.
+- [x] Audio baseline: accuracy 0.6279, macro F1 0.6349, weighted F1 0.6229, and ECE 0.0468.
+- [x] RQ2 classification headline: predeclared equal-weight fusion reached accuracy 0.7832, macro F1 0.7883, and weighted F1 0.7815. Its macro-F1 improvement over contextual text was +0.0551 with a 95\% interval of 0.0407--0.0713; all 10,000 dialogue-bootstrap replicates favoured fusion on the three aggregate metrics.
+- [x] Calibration trade-off: contextual text ECE was 0.0311; equal fusion ECE was 0.1619; fold-specific validation-fitted fusion reduced ECE to 0.0283 while retaining accuracy 0.7717 and macro F1 0.7758. Classification and calibration must remain separate claims.
+- [x] Operational packaging: the global chain selected text/audio weights 0.59/0.41 and temperature 0.5989. Its macro F1 0.7776 and ECE 0.0242 are label-reused descriptive values, not independent held-out evidence.
+- [x] The exploratory six-class experiment is secondary evidence only: 7,420 examples, macro F1 0.5490 to 0.6222, but only 40 mapped anxiety examples. It must not support a deployed anxiety-recognition claim.
+
+#### Application-verification claims
+
+- [x] RQ3 policy evidence: all five authored enhanced-dialogue trajectories and all seven controlled affect-pacing cases matched their declared outcomes. Twelve diagnostic extraction cases produced five true positives, four true negatives, one false positive, and two false negatives; these are examples, not an accuracy estimate.
+- [x] Cognitive/support-routing cases establish rule conformance only; they do not establish psychological construct validity, clinical validity, comparative helpfulness, or absence of harm.
+- [x] RQ4 automated evidence: 258 backend cases were collected, with 245 passes and 13 explicitly identified real-MongoDB skips; Ruff, the production frontend build, and frontend linting passed.
+- [x] Browser evidence: 38 logical cases across desktop Chromium and a Pixel 7 profile produced 76 passes; 10 interface states in both projects produced 20 axe scans with zero detected violations. This is not WCAG certification.
+- [x] Full-stack evidence: two compiled-frontend/FastAPI/MongoDB smoke journeys passed, including persistence checks across two backend restarts. Live providers and trained inference were disabled.
+- [x] Local performance evidence: all five regression budgets passed. The deterministic conversation turn had median 4.659 ms and P95 5.836 ms. The in-process, single-client benchmark excludes network transit, MongoDB, trained inference, providers, and concurrency.
+
+#### Supplementary pilot claims
+
+- [x] Fifteen participants were included; 12 completed all three required tasks and questionnaires, giving 80.0\% protocol completion with a 95\% Wilson interval of 54.8\%--93.0\%.
+- [x] The first-required-attempt export contained 42 required attempts, 39 completed tasks, and 40 available realism/usefulness ratings. Scenario realism averaged 4.85/7 (median 5), and feedback usefulness averaged 5.33/7 (median 5).
+- [x] Thirty-eight paired ratings from 14 participants produced a mean immediate confidence change of +0.97 and median +1, with a participant-cluster bootstrap 95\% interval of +0.67 to +1.26.
+- [x] Required tasks bypassed multimodal inference and affect-aware pacing. The pilot describes the baseline deterministic workflow only and cannot establish adaptation benefit, causal benefit, sustained skill acquisition, or transfer to real conversations.
+
+#### Limitations that must survive reduction
+
+- [x] IEMOCAP contains ten actors and acted or improvised English dialogue; speaker-independent folds prevent identity leakage but do not provide external, demographic, cultural, device, or deployment validation.
+- [x] Emotion labels are annotated expressive categories rather than direct measurements of internal state; thresholds of 0.55 and 0.75 are operational presentation settings rather than psychological boundaries.
+- [x] One primary training seed leaves optimisation variance incompletely characterised; ECE is bin-dependent and calibration can deteriorate under domain shift.
+- [x] Full-data packages have no independent test partition, and private model-file provenance remains incomplete.
+- [x] Deterministic lexical feedback and cognitive fields are auditable implementation constructs, not validated measures of general communication ability, cognition, intent, cause, readiness, resistance, or clinical state.
+- [x] Engineering tests use controlled inputs and synthetic accounts; they do not establish live-provider behaviour, trained-model latency, real-microphone robustness, concurrent capacity, production security, or human benefit.
+- [x] The pilot is small, single-arm, uncontrolled, incomplete in places, and uses study-specific ordinal ratings; no causal or generalisable effectiveness claim is permitted.
+
+#### Direct evidence retained for each research question
+
+| Research question | Principal Chapter 5 evidence to retain in the main text | Secondary material suitable for an appendix or deletion |
+|---|---|---|
+| RQ1 | `tab:context-text-results`; four-class protocol and paired dialogue-bootstrap method; context limitation paragraph | `tab:context-text-per-class`; all six-class tables; illustrative error cases |
+| RQ2 | `tab:equal-fusion-results`; `tab:calibration-tradeoff`; `fig:model-results` or one equivalent combined visual | Full per-class/fold tables; confusion matrices; reliability curves if the combined visual and prose preserve the claim; global-packaging detail; published-score comparison |
+| RQ3 | Concise authored-policy aggregate covering five dialogue and seven affect cases; bounded-policy and failure/safety interpretation | Detailed trajectory, cognitive-routing, and diagnostic-case tables; exhaustive traceability rows |
+| RQ4 | One aggregate verification table; scoped backend/browser/accessibility/full-stack totals; concise local P95 result and deployment caveat | Commands, node IDs, environment inventory, individual latency rows, and full requirement-to-test traceability |
+
+The pilot is supplementary and does not answer RQ1--RQ4 directly. Its completion, median realism/usefulness, and non-adaptive-scope caveat should remain together.
+
+#### Abstract and format audit
+
+- [x] The abstract matches Chapter 5 for contextual-text macro F1, equal-fusion macro F1 and accuracy, the fusion improvement interval, equal-fusion ECE, 245 backend passes, 76 browser cases, two full-stack journeys, 5.836 ms local P95, participant completion, and median realism/usefulness. No numerical correction is currently required.
+- [x] The abstract already states the decisive pilot limitation and the need for target-environment validation. Keep those qualifications when later prose is reduced.
+- [x] The Faculty of Informatics [2025--2026 master-completion page](https://info.uvt.ro/en/finalizarea-studiilor-universitare-master/) links a standardised English LaTeX template. The local copy of that template includes a table of contents, List of Figures, List of Tables, and standard `\\appendix` handling, so retain those structures unless the supervisor directs otherwise.
+- [x] No accessible official instruction or template command requires chapter-end summaries. They may therefore be removed where the plan calls for removal, subject to supervisor confirmation of any programme-specific unpublished rule.
 
 ## Chapter 1: Introduction -- target 4 pages
 
@@ -97,18 +155,20 @@ Planned structure:
 
 Tasks:
 
-- [ ] Rewrite Context and Motivation as a short problem-led opening.
-- [ ] Remove literature discussion of role-play, IMBUE, IEMOCAP, emotion theory, and calibration; retain it only in Chapter 2.
-- [ ] Merge Aim and Objectives into a compact section.
-- [ ] Preserve the four research questions without extended commentary.
-- [ ] Replace the five Proposed Approach subsections with a compact overview.
-- [ ] Reduce Contributions to four or five concrete contributions.
-- [ ] Replace the ten Scope and Limitations subsections with one short scope section.
-- [ ] Remove numerical results, test counts, and detailed implementation descriptions.
-- [ ] Reduce Dissertation Structure to one paragraph.
-- [ ] Verify that no claim is stronger than the evidence later presented in Chapter 5.
+- [x] Rewrite Context and Motivation as a short problem-led opening.
+- [x] Remove literature discussion of role-play, IMBUE, IEMOCAP, emotion theory, and calibration; retain it only in Chapter 2.
+- [x] Merge Aim and Objectives into a compact section.
+- [x] Preserve the four research questions without extended commentary.
+- [x] Replace the five Proposed Approach subsections with a compact overview.
+- [x] Reduce Contributions to four or five concrete contributions.
+- [x] Replace the ten Scope and Limitations subsections with one short scope section.
+- [x] Remove numerical results, test counts, and detailed implementation descriptions.
+- [x] Reduce Dissertation Structure to one paragraph.
+- [x] Verify that no claim is stronger than the evidence later presented in Chapter 5.
 
 Completion condition: a reader can understand the problem, questions, approach, contribution, and scope without receiving a preview of every later chapter.
+
+Current result: the chapter has five sections and approximately 1,456 source words, within the 1,400--1,600-word target. Static checks found balanced braces and environments and no undefined references across the thesis. Rendered page count, table-of-contents regeneration, and visual inspection remain pending because the local MiKTeX installation requires first-run setup before `latexmk` can execute.
 
 ## Chapter 2: State of the Art -- target 6 pages
 
@@ -287,8 +347,8 @@ The following claims currently recur across several chapters. Retain the full ex
 
 ## Execution order
 
-- [ ] Phase 0: freeze the evidence and principal claims from Chapter 5.
-- [ ] Rewrite Chapter 1.
+- [x] Phase 0: freeze the evidence and principal claims from Chapter 5.
+- [~] Rewrite Chapter 1; content complete, compile verification pending.
 - [ ] Rewrite Chapter 3.
 - [ ] Rewrite Chapter 4.
 - [ ] Condense Chapter 2.
@@ -328,6 +388,8 @@ The following claims currently recur across several chapters. Retain the full ex
 |---|---|---|---|
 | 2026-10-21 | Audited the 161-page PDF, six chapter sources, heading structure, page distribution, figures, tables, and major cross-chapter repetition. | Identified Chapters 1, 3, and 4 as the largest structural-cut opportunities; Chapter 5 should be protected as the evidence centre. | Update the plan after receiving the coordinator's expected length. |
 | 2026-10-22 | Incorporated the coordinator's recommendation of approximately 30--40 content pages and created this living tracker. | Set a 36--37-page working target and chapter-level budgets. No dissertation content changed. | Complete Phase 0 by freezing the essential Chapter 5 claims and evidence. |
+| 2026-10-22 | Completed the Phase 0 evidence freeze from Chapter 5, mapped the principal evidence to RQ1--RQ4, audited the abstract, and checked the Faculty's 2025--2026 completion page and local standardised template. | Established a source-of-truth checklist for model, application, pilot, and limitation claims. The abstract requires no numerical correction. Retain the Lists of Figures/Tables and appendix structure; chapter summaries may be removed unless the supervisor identifies a programme-specific rule. | Rewrite Chapter 1 to the 1,400--1,600-word target while checking every retained claim against the frozen evidence. |
+| 2026-10-22 | Replaced Chapter 1's nine sections, fifteen subsections, nineteen objectives, and eleven contributions with the planned five-part structure. Preserved all four research questions and externally used labels. | Approximately 1,456 source words, down from the 8,232-word baseline and within target. Static reference and delimiter checks passed. Compilation is pending because MiKTeX reports incomplete first-run setup. | Complete MiKTeX setup, compile and visually check Chapter 1, record its rendered page count, then mark the chapter complete and begin Chapter 3. |
 
 ## Decisions and open questions
 
@@ -336,8 +398,10 @@ The following claims currently recur across several chapters. Retain the full ex
 | 2026-10-22 | Treat the coordinator's 30--40 pages as applying to numbered Chapters 1--6 only. | Accepted based on the quoted guidance. |
 | 2026-10-22 | Use 36--37 pages as the working target rather than aiming directly at the 40-page ceiling. | Accepted. |
 | 2026-10-22 | Preserve Chapter 5 as the principal evidence chapter and cut descriptive chapters more aggressively. | Accepted. |
-| 2026-10-22 | Confirm whether chapter summaries and Lists of Figures/Tables are mandatory under faculty formatting rules. | Open. |
+| 2026-10-22 | Use Chapter 5 as the authoritative source for all scores, test counts, pilot results, and limitations. | Accepted; frozen checklist added above. |
+| 2026-10-22 | The standardised template contains Lists of Figures/Tables and an appendix mechanism, while no accessible rule requires chapter-end summaries. | Retain the lists and appendix structure; summaries may be removed, subject to supervisor confirmation of any unpublished programme-specific rule. |
+| 2026-10-22 | Chapter 1 should state the problem and contribution without previewing numerical results, test counts, or detailed implementation. | Accepted and implemented; exact evidence remains in Chapter 5. |
 
 ## Current next action
 
-Create the Phase 0 evidence checklist from Chapter 5: principal numerical findings, supporting tables/figures, application-verification claims, pilot results, and the limitations that must survive every later reduction.
+Finish Chapter 1 verification after MiKTeX first-run setup: compile the thesis, measure the chapter's rendered page span, inspect page breaks and list formatting, and confirm cross-references. If the chapter is within its four-page budget, mark it complete and proceed to Chapter 3.
