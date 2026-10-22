@@ -1,17 +1,16 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Relationship between the reviewed research streams, the AffectLab integration gap, and its complementary model, application, and supporting user evidence.}}{21}{figure.2.1}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Logical architecture of AffectLab and separation between probabilistic evidence and authoritative application control.}}{24}{figure.3.1}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Logical architecture of AffectLab and separation between probabilistic evidence and authoritative application control.}}{12}{figure.3.1}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Emotion-recognition evaluation and deployment pipeline. Full-data packaging creates application artefacts, not additional held-out evidence.}}{30}{figure.4.1}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Version-bound conversation request with safety precedence and failure-tolerant optional processing.}}{32}{figure.4.2}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Bounded affect-aware pacing. Every terminal action preserves the authoritative dialogue state and evidence.}}{34}{figure.4.3}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Representative role-play workspace with transcript, scenario state, message composer, and optional voice interaction.}}{35}{figure.4.4}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Emotion-recognition evaluation and deployment pipeline. Full-data packaging creates application artefacts, not additional held-out evidence.}}{18}{figure.4.1}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Version-bound conversation request with safety precedence and failure-tolerant optional processing.}}{20}{figure.4.2}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Bounded affect-aware pacing. Every terminal action preserves the authoritative dialogue state and evidence.}}{22}{figure.4.3}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Representative role-play workspace with transcript, scenario state, message composer, and optional voice interaction.}}{23}{figure.4.4}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Aggregate four-class results from independently evaluated fold configurations. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally.}}{46}{figure.5.1}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. Every fitted parameter represented here was estimated without the corresponding test session.}}{46}{figure.5.2}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Reliability curves from pooled held-out predictions. Each point represents a non-empty equal-width bin of maximum class probability; the dashed diagonal denotes perfect calibration. Panel (a) compares the unimodal systems with predeclared equal fusion, and Panel (b) shows the effect of validation-derived fusion calibration. ECE values in Table~\ref {tab:calibration-tradeoff} use the prespecified 15-bin calculation, while the curves use ten bins for legibility.}}{48}{figure.5.3}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Aggregate four-class results from independently evaluated fold configurations. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally.}}{34}{figure.5.1}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. Every fitted parameter represented here was estimated without the corresponding test session.}}{34}{figure.5.2}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Reliability curves from pooled held-out predictions. Each point represents a non-empty equal-width bin of maximum class probability; the dashed diagonal denotes perfect calibration. Panel (a) compares the unimodal systems with predeclared equal fusion, and Panel (b) shows the effect of validation-derived fusion calibration. ECE values in Table~\ref {tab:calibration-tradeoff} use the prespecified 15-bin calculation, while the curves use ten bins for legibility.}}{36}{figure.5.3}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }

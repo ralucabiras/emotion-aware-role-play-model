@@ -1,19 +1,11 @@
 \newcommand{\etalchar}[1]{$^{#1}$}
 \begin{thebibliography}{KPNK{\etalchar{+}}19}
 
-\bibitem[BAM19a]{baltrusaitis2019multimodal}
+\bibitem[BAM19]{baltrusaitis2019multimodal}
 Tadas Baltru{\v{s}}aitis, Chaitanya Ahuja, and Louis-Philippe Morency.
 \newblock Multimodal machine learning: A survey and taxonomy.
 \newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
   41(2):423--443, 2019.
-
-\bibitem[BAM{\etalchar{+}}19b]{barrett2019expressions}
-Lisa~Feldman Barrett, Ralph Adolphs, Stacy Marsella, Aleix~M. Martinez, and
-  Seth~D. Pollak.
-\newblock Emotional expressions reconsidered: Challenges to inferring emotion
-  from human facial movements.
-\newblock {\em Psychological Science in the Public Interest}, 20(1):1--68,
-  2019.
 
 \bibitem[BBL{\etalchar{+}}08]{busso2008iemocap}
 Carlos Busso, Murtaza Bulut, Chi-Chun Lee, Abe Kazemzadeh, Emily Mower, Samuel
@@ -65,12 +57,6 @@ Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
 Julian De~Freitas and I.~Glenn Cohen.
 \newblock The health risks of generative {AI}-based wellness apps.
 \newblock {\em Nature Medicine}, 30:1269--1275, 2024.
-
-\bibitem[EAKK11]{elayadi2011ser}
-Moataz El~Ayadi, Mohamed~S. Kamel, and Fakhri Karray.
-\newblock Survey on speech emotion recognition: Features, classification
-  schemes, and databases.
-\newblock {\em Pattern Recognition}, 44(3):572--587, 2011.
 
 \bibitem[Ekm92]{ekman1992basic}
 Paul Ekman.

@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main_file_template_bachelor_masters_english"] 1792687743.86396 "main_file_template_bachelor_masters_english.aux" "main_file_template_bachelor_masters_english.bbl" "main_file_template_bachelor_masters_english" 1792687803.03578 0
+["bibtex main_file_template_bachelor_masters_english"] 1792688089.24623 "main_file_template_bachelor_masters_english.aux" "main_file_template_bachelor_masters_english.bbl" "main_file_template_bachelor_masters_english" 1792688098.44964 0
   "./myBib.bib" 1792399181 19188 0576cf3be1d03fb8ba85dadd2dc1aab9 ""
   "C:/Users/raluc/AppData/Local/Programs/MiKTeX/bibtex/bst/bibtex/alpha.bst" 1291864736 23907 a5f93555796fb564b924339521f10a7c ""
-  "main_file_template_bachelor_masters_english.aux" 1792687801 51546 47235d7fe8d9dcb1cc0dbadec30e7a42 "pdflatex"
+  "main_file_template_bachelor_masters_english.aux" 1792688096 42266 19a0475b95192bea9f55505134c39a9c "pdflatex"
   (generated)
   "main_file_template_bachelor_masters_english.bbl"
   "main_file_template_bachelor_masters_english.blg"
   (rewritten before read)
-["pdflatex"] 1792687793.84763 "main_file_template_bachelor_masters_english.tex" "main_file_template_bachelor_masters_english.pdf" "main_file_template_bachelor_masters_english" 1792687803.03702 0
+["pdflatex"] 1792688089.72586 "main_file_template_bachelor_masters_english.tex" "main_file_template_bachelor_masters_english.pdf" "main_file_template_bachelor_masters_english" 1792688098.45094 0
   "C:/Users/raluc/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1792686251 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/raluc/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/tctt0800.pk" 1792398099 7416 5f11f67334d1dfc3f2359d4013940235 ""
   "C:/Users/raluc/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1792686029 13333488 cb990e7943314ff801ef20700ba1f33e ""
@@ -270,7 +270,7 @@
   "C:/Users/raluc/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
   "FI.png" 1791307006 52065 24e585ff0616d5f8463ac45775ba3019 ""
   "cap1.tex" 1792686179 12105 74eb03f7e044069bf4e74ab99a511083 ""
-  "cap2.tex" 1792349908 56304 f0f4a827143c93f22283f98910f676e6 ""
+  "cap2.tex" 1792688072 19229 a6de40fc0d7baa04daced6ece8809c7a ""
   "cap3.tex" 1792686732 15952 15bb5d5323531d06e381778e54d6969b ""
   "cap4.tex" 1792687782 25409 500126924bce03b0a5201096a558a306 ""
   "cap5.tex" 1792399116 75998 10b6dd6fa780888d91122ea475f1759b ""
@@ -287,18 +287,17 @@
   "figures/data/reliability_equal_fusion.dat" 1792395299 362 d742ab8c47aa52341bbab308b0a52733 ""
   "figures/data/reliability_validation_fitted.dat" 1792395299 360 80224c00e5df8f41d4e5370ae007599e ""
   "figures/emotion_pipeline.tex" 1791568910 2616 ca5b89003d4214817a33a4ec89779f15 ""
-  "figures/literature_gap.tex" 1791706115 2019 8e962f58f48ca3dbdca332166ae41000 ""
   "figures/model_results.tex" 1792392874 2285 47f0f3911a8a91e888ce1bde2b0cb2cb ""
   "figures/reliability_curves.tex" 1792392876 1926 03191debe377111a1d800a2a5cb29a88 ""
   "figures/request_sequence.tex" 1791569129 2532 7a76606169347fd5411454a7120cdb38 ""
   "figures/system_architecture.tex" 1791569146 2687 bf659d87dfb1a9a6c41ef90854764882 ""
-  "main_file_template_bachelor_masters_english.aux" 1792687801 51546 47235d7fe8d9dcb1cc0dbadec30e7a42 "pdflatex"
-  "main_file_template_bachelor_masters_english.bbl" 1792687744 12935 e9eb7dc3d261c12c93f1dcecf9e345ce "bibtex main_file_template_bachelor_masters_english"
-  "main_file_template_bachelor_masters_english.lof" 1792687801 2658 85fdf478bd5ceaba385821bc039a00e8 "pdflatex"
-  "main_file_template_bachelor_masters_english.lot" 1792687801 3546 253b2ec03889cbb106769ce875e29752 "pdflatex"
-  "main_file_template_bachelor_masters_english.out" 1792687801 31336 aac2f00a1ccb3092641003e5427648b8 "pdflatex"
+  "main_file_template_bachelor_masters_english.aux" 1792688096 42266 19a0475b95192bea9f55505134c39a9c "pdflatex"
+  "main_file_template_bachelor_masters_english.bbl" 1792688089 12332 910a487bd1170a9aff7ed9309e94740e "bibtex main_file_template_bachelor_masters_english"
+  "main_file_template_bachelor_masters_english.lof" 1792688096 2429 ce3d60b34bc4724fc6f5b7baac640219 "pdflatex"
+  "main_file_template_bachelor_masters_english.lot" 1792688096 3228 324a5f703e77c6776308efee352f195a "pdflatex"
+  "main_file_template_bachelor_masters_english.out" 1792688096 21153 071f7e545995c83b1235502b2fdd9a09 "pdflatex"
   "main_file_template_bachelor_masters_english.tex" 1792399118 11524 202f0ed4c0f6daf34eb814442d3db63b ""
-  "main_file_template_bachelor_masters_english.toc" 1792687801 13210 929f0b836183d1c95b5ab0075ed8c17b "pdflatex"
+  "main_file_template_bachelor_masters_english.toc" 1792688096 9170 b37252d106fb75191fa7d9cf3cd71efd "pdflatex"
   (generated)
   "main_file_template_bachelor_masters_english.aux"
   "main_file_template_bachelor_masters_english.lof"

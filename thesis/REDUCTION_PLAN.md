@@ -1,7 +1,7 @@
 # Dissertation Reduction Plan
 
 Last updated: 2026-10-22  
-Overall status: Chapters 1, 3, and 4 complete and verified; Chapter 2 rewrite next
+Overall status: Chapters 1--4 complete and verified; Chapter 5 refinement next
 Coordinator guidance: approximately **30--40 pages of content**, excluding the covers, abstract, table of contents, bibliography, and appendices  
 Working target: **36--37 pages of numbered chapter content**  
 Hard ceiling: **40 pages of numbered chapter content**
@@ -21,12 +21,12 @@ The reduction must preserve the research argument and evidence. Detailed softwar
 
 ## Baseline and target
 
-The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1, Chapter 3, and Chapter 4 rewrites, the estimated current total is approximately 26,229 source words.
+The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1--4 rewrites, the estimated current total is approximately 21,682 source words.
 
 | Part | Baseline pages | Baseline source words | Target pages | Target words | Status |
 |---|---:|---:|---:|---:|---|
 | Chapter 1: Introduction | 22 | 8,232 | 4 | 1,400--1,600 | `[x]` |
-| Chapter 2: State of the Art | 18 | 6,860 | 6 | 2,300--2,600 | `[ ]` |
+| Chapter 2: State of the Art | 18 | 6,860 | 6 | 2,300--2,600 | `[x]` |
 | Chapter 3: Proposed System Architecture | 22 | 7,889 | 5 | 1,700--2,000 | `[x]` |
 | Chapter 4: Implementation | 46 | 16,934 | 8 | 3,000--3,500 | `[x]` |
 | Chapter 5: Evaluation and Results | 22 | 9,289 | 10--11 | 4,000--4,500 | `[ ]` |
@@ -182,17 +182,19 @@ Planned structure:
 
 Tasks:
 
-- [ ] Merge the many short subsections into the five themes above.
-- [ ] Retain only literature that directly motivates a research question or design decision.
-- [ ] Compress textbook-style explanations of BERT, wav2vec, emotion taxonomies, and calibration.
-- [ ] Remove or move the secondary-dataset catalogue and comparison table.
-- [ ] Reduce legal, privacy, and safety literature to the constraints relevant to the design.
-- [ ] Remove descriptions of AffectLab implementation that belong in Chapters 3 and 4.
-- [ ] Replace the large synthesis table with concise prose unless it adds unique comparative value.
-- [ ] End with a precise integration-and-evaluation research gap.
-- [ ] Keep the chapter summary to one short paragraph or remove it if permitted.
+- [x] Merge the many short subsections into the five themes above.
+- [x] Retain only literature that directly motivates a research question or design decision.
+- [x] Compress textbook-style explanations of BERT, wav2vec, emotion taxonomies, and calibration.
+- [x] Remove or move the secondary-dataset catalogue and comparison table.
+- [x] Reduce legal, privacy, and safety literature to the constraints relevant to the design.
+- [x] Remove descriptions of AffectLab implementation that belong in Chapters 3 and 4.
+- [x] Replace the large synthesis table with concise prose unless it adds unique comparative value.
+- [x] End with a precise integration-and-evaluation research gap.
+- [x] Keep the chapter summary to one short paragraph or remove it if permitted.
 
 Completion condition: every retained source contributes directly to the research gap, method, or design rationale.
+
+Current result: the chapter now has the planned five-section structure and 2,313 words by `texcount`, down from the 6,860-word baseline. It removes the dataset catalogue, synthesis table, literature-gap figure, textbook-style model explanations, and implementation-specific narration while preserving the literature needed for the research questions and design boundaries. The chapter occupies numbered pages 5--10, and Chapter 3 begins on page 11. A clean `latexmk` build contains no undefined citations or references, LaTeX errors, or Chapter 2 overfull boxes; visual inspection of all six rendered pages found no clipping or poor page breaks. The full PDF is 83 physical pages.
 
 ## Chapter 3: Proposed System Architecture -- target 5 pages
 
@@ -355,7 +357,7 @@ The following claims currently recur across several chapters. Retain the full ex
 - [x] Rewrite and verify Chapter 1.
 - [x] Rewrite and verify Chapter 3.
 - [x] Rewrite Chapter 4.
-- [ ] Condense Chapter 2.
+- [x] Condense Chapter 2.
 - [ ] Refine Chapter 5 and extract appendix material.
 - [ ] Rewrite Chapter 6.
 - [ ] Reduce the AI-use appendix and organise supplementary appendices.
@@ -397,6 +399,7 @@ The following claims currently recur across several chapters. Retain the full ex
 | 2026-10-22 | Completed MiKTeX compilation and the Chapter 1 layout pass. Tightened list spacing and shortened only the dissertation-navigation sentence after the first render showed a two-line spill onto page 5. Regenerated the PDF, table of contents, List of Figures, and List of Tables; checked the final log and visually inspected all four chapter pages. | Chapter 1 is 1,401 words and occupies numbered pages 1--4; Chapter 2 starts on page 5, so the former blank verso is gone and the full PDF falls from 155 to 153 physical pages. No undefined citations/references or LaTeX errors remain, and no Chapter 1 clipping, overflow, or poor page break was found. | Rewrite Chapter 3 to its five-page, 1,700--2,000-word target, preserving one principal architecture diagram and moving the complete requirement inventory out of the main narrative. |
 | 2026-10-22 | Rewrote Chapter 3 from 29 headings to the planned four-section argument. Retained the principal architecture diagram, consolidated all FR1--FR29 and NFR1--NFR14 identifiers into nine requirement groups, centralised the dialogue/affect/safety authority boundaries, and reduced ethics and limitations to design-relevant constraints. | Chapter 3 is 1,712 words, down from the 7,889-word baseline, and occupies five content pages (23--27). The full PDF falls from 153 to 137 physical pages. Compilation, cross-references, warning audit, and visual inspection passed; the intentional page 28 verso remains before Chapter 4. The atomic requirement wording is designated for Appendix B. | Rewrite Chapter 4 to its eight-page, 3,000--3,500-word target, retaining only technically significant implementation mechanisms and the four planned visuals. |
 | 2026-10-22 | Rewrote Chapter 4 from 12 sections and 45 subsections to the planned six-section implementation argument. Removed the technology inventory, repository/configuration tour, routine account mechanics, detailed research lifecycle, separate verification section, chapter summary, six surplus diagrams/screenshots, and repeated evaluation material. | Chapter 4 is 3,016 words, down from the 16,934-word baseline, and occupies numbered pages 29--36. It retains the four planned visuals and preserves compatibility labels still used by Chapter 5. The clean build, cross-reference audit, warning audit, and visual inspection passed; Chapter 5 starts on page 37, and the full PDF falls from 137 to 97 physical pages. | Condense Chapter 2 to its six-page, 2,300--2,600-word target, retaining only literature that directly supports the research gap, method, or design rationale. |
+| 2026-10-22 | Rewrote Chapter 2 from 14 sections and numerous short subsections to the planned five-theme argument. Removed the secondary-dataset catalogue, two comparison tables, the literature-gap figure, the standalone chapter summary, implementation detail, and extended textbook explanations; retained 33 directly relevant citation keys. | Chapter 2 is 2,313 words, down from the 6,860-word baseline, and occupies numbered pages 5--10. The full PDF falls from 97 to 83 physical pages, and Chapter 3 now begins on page 11. The clean build, citation and cross-reference audit, Chapter 2 warning audit, and visual inspection of all six pages passed. | Refine Chapter 5 to its 10--11-page, 4,000--4,500-word target and extract only genuinely useful supplementary evidence for Appendices C and D. |
 
 ## Decisions and open questions
 
@@ -409,7 +412,8 @@ The following claims currently recur across several chapters. Retain the full ex
 | 2026-10-22 | The standardised template contains Lists of Figures/Tables and an appendix mechanism, while no accessible rule requires chapter-end summaries. | Retain the lists and appendix structure; summaries may be removed, subject to supervisor confirmation of any unpublished programme-specific rule. |
 | 2026-10-22 | Chapter 1 should state the problem and contribution without previewing numerical results, test counts, or detailed implementation. | Accepted and implemented; exact evidence remains in Chapter 5. |
 | 2026-10-22 | Chapter 4 should explain only the technically significant mechanisms and preserve compatibility labels until Chapter 5 is condensed. | Accepted and implemented; detailed software, deployment, research-workflow, and verification material remains in repository documentation or Chapter 5 rather than the main implementation narrative. |
+| 2026-10-22 | Chapter 2's dataset catalogue, synthesis table, and literature-gap figure should be deleted rather than moved because concise prose preserves their argument and the removed presentation adds no unique supporting evidence. | Accepted and implemented. |
 
 ## Current next action
 
-Condense Chapter 2 to the planned five-theme structure and its six-page, 2,300--2,600-word target. Retain only literature that directly motivates a research question or design choice; compress textbook explanations, remove AffectLab implementation detail, delete or relocate the secondary-dataset catalogue and synthesis table, and end with a precise integration-and-evaluation research gap.
+Refine Chapter 5 to the planned six-part structure and its 10--11-page, 4,000--4,500-word target. Preserve the frozen RQ1--RQ4 evidence, classification/calibration distinction, application-verification totals, pilot scope limitation, and consolidated threats to validity; move only useful six-class, per-class, per-fold, and traceability evidence to Appendices C and D.
