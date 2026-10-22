@@ -1,7 +1,7 @@
 # Dissertation Reduction Plan
 
 Last updated: 2026-10-22  
-Overall status: Chapter 1 complete and verified; Chapter 3 rewrite next
+Overall status: Chapters 1 and 3 complete and verified; Chapter 4 rewrite next
 Coordinator guidance: approximately **30--40 pages of content**, excluding the covers, abstract, table of contents, bibliography, and appendices  
 Working target: **36--37 pages of numbered chapter content**  
 Hard ceiling: **40 pages of numbered chapter content**
@@ -21,13 +21,13 @@ The reduction must preserve the research argument and evidence. Detailed softwar
 
 ## Baseline and target
 
-The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1 rewrite and layout pass, the estimated current total is approximately 46,324 source words.
+The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1 and Chapter 3 rewrites, the estimated current total is approximately 40,147 source words.
 
 | Part | Baseline pages | Baseline source words | Target pages | Target words | Status |
 |---|---:|---:|---:|---:|---|
 | Chapter 1: Introduction | 22 | 8,232 | 4 | 1,400--1,600 | `[x]` |
 | Chapter 2: State of the Art | 18 | 6,860 | 6 | 2,300--2,600 | `[ ]` |
-| Chapter 3: Proposed System Architecture | 22 | 7,889 | 5 | 1,700--2,000 | `[ ]` |
+| Chapter 3: Proposed System Architecture | 22 | 7,889 | 5 | 1,700--2,000 | `[x]` |
 | Chapter 4: Implementation | 46 | 16,934 | 8 | 3,000--3,500 | `[ ]` |
 | Chapter 5: Evaluation and Results | 22 | 9,289 | 10--11 | 4,000--4,500 | `[ ]` |
 | Chapter 6: Conclusions and Future Work | 10 | 3,951 | 3 | 1,000--1,300 | `[ ]` |
@@ -205,17 +205,19 @@ Planned structure:
 
 Tasks:
 
-- [ ] Keep one principal architecture diagram.
-- [ ] Explain the separation between inference, dialogue control, generation, feedback, and safety once.
-- [ ] Replace 29 functional and 14 non-functional requirement descriptions with 8--10 grouped requirements.
-- [ ] Move the complete requirement list to an appendix.
-- [ ] Merge scope, assumptions, and boundaries into a concise passage or table.
-- [ ] Reduce the ethics section to the safeguards that materially shaped the architecture.
-- [ ] Remove the detailed Limitations of the Proposed System subsections; consolidate limitations in Chapter 5.
-- [ ] Remove repeated pilot, IEMOCAP, generative-AI, and deployment caveats.
-- [ ] Remove the repetitive chapter summary.
+- [x] Keep one principal architecture diagram.
+- [x] Explain the separation between inference, dialogue control, generation, feedback, and safety once.
+- [x] Replace 29 functional and 14 non-functional requirement descriptions with 8--10 grouped requirements.
+- [~] Move the complete requirement list to an appendix. The 43 atomic requirements are designated for Appendix B; insertion is deferred to the appendix phase.
+- [x] Merge scope, assumptions, and boundaries into a concise passage or table.
+- [x] Reduce the ethics section to the safeguards that materially shaped the architecture.
+- [x] Remove the detailed Limitations of the Proposed System subsections; consolidate empirical limitations in Chapter 5.
+- [x] Remove repeated pilot, IEMOCAP, generative-AI, and deployment caveats.
+- [x] Remove the repetitive chapter summary.
 
 Completion condition: the chapter explains why the architecture is structured as it is without duplicating implementation or evaluation material.
+
+Current result: the chapter has the planned four sections, one architecture figure, and one table containing nine grouped requirement families. It contains 1,712 words by `texcount`, down from the 7,889-word baseline, and occupies numbered pages 23--27. Chapter 4 begins on page 29 after the standard template's intentional blank verso. A clean `latexmk` build contains no undefined citations or references, LaTeX errors, or Chapter 3 overfull boxes; visual inspection of all five content pages found the diagram and table legible with no clipping or poor page breaks. The full 43-item requirement wording is identified for Appendix B but has not yet been inserted.
 
 ## Chapter 4: Implementation -- target 8 pages
 
@@ -323,7 +325,7 @@ Appendices do not count toward the coordinator's recommended 30--40 content page
 | Appendix | Proposed contents | Status |
 |---|---|---|
 | A | Generative AI declaration, reduced to the required disclosure | `[ ]` |
-| B | Complete functional and non-functional requirements | `[ ]` |
+| B | Complete functional and non-functional requirements | `[~]` Identified from the former Chapter 3 inventory; insertion deferred to the appendix phase |
 | C | Supplementary model results: six-class, per-class, and per-fold tables | `[ ]` |
 | D | Application-verification details and requirement traceability | `[ ]` |
 | E | Additional interface or deployment figures, only if required | `[ ]` |
@@ -349,7 +351,7 @@ The following claims currently recur across several chapters. Retain the full ex
 
 - [x] Phase 0: freeze the evidence and principal claims from Chapter 5.
 - [x] Rewrite and verify Chapter 1.
-- [ ] Rewrite Chapter 3.
+- [x] Rewrite and verify Chapter 3.
 - [ ] Rewrite Chapter 4.
 - [ ] Condense Chapter 2.
 - [ ] Refine Chapter 5 and extract appendix material.
@@ -391,6 +393,7 @@ The following claims currently recur across several chapters. Retain the full ex
 | 2026-10-22 | Completed the Phase 0 evidence freeze from Chapter 5, mapped the principal evidence to RQ1--RQ4, audited the abstract, and checked the Faculty's 2025--2026 completion page and local standardised template. | Established a source-of-truth checklist for model, application, pilot, and limitation claims. The abstract requires no numerical correction. Retain the Lists of Figures/Tables and appendix structure; chapter summaries may be removed unless the supervisor identifies a programme-specific rule. | Rewrite Chapter 1 to the 1,400--1,600-word target while checking every retained claim against the frozen evidence. |
 | 2026-10-22 | Replaced Chapter 1's nine sections, fifteen subsections, nineteen objectives, and eleven contributions with the planned five-part structure. Preserved all four research questions and externally used labels. | Approximately 1,456 source words, down from the 8,232-word baseline and within target. Static reference and delimiter checks passed. Compilation is pending because MiKTeX reports incomplete first-run setup. | Complete MiKTeX setup, compile and visually check Chapter 1, record its rendered page count, then mark the chapter complete and begin Chapter 3. |
 | 2026-10-22 | Completed MiKTeX compilation and the Chapter 1 layout pass. Tightened list spacing and shortened only the dissertation-navigation sentence after the first render showed a two-line spill onto page 5. Regenerated the PDF, table of contents, List of Figures, and List of Tables; checked the final log and visually inspected all four chapter pages. | Chapter 1 is 1,401 words and occupies numbered pages 1--4; Chapter 2 starts on page 5, so the former blank verso is gone and the full PDF falls from 155 to 153 physical pages. No undefined citations/references or LaTeX errors remain, and no Chapter 1 clipping, overflow, or poor page break was found. | Rewrite Chapter 3 to its five-page, 1,700--2,000-word target, preserving one principal architecture diagram and moving the complete requirement inventory out of the main narrative. |
+| 2026-10-22 | Rewrote Chapter 3 from 29 headings to the planned four-section argument. Retained the principal architecture diagram, consolidated all FR1--FR29 and NFR1--NFR14 identifiers into nine requirement groups, centralised the dialogue/affect/safety authority boundaries, and reduced ethics and limitations to design-relevant constraints. | Chapter 3 is 1,712 words, down from the 7,889-word baseline, and occupies five content pages (23--27). The full PDF falls from 153 to 137 physical pages. Compilation, cross-references, warning audit, and visual inspection passed; the intentional page 28 verso remains before Chapter 4. The atomic requirement wording is designated for Appendix B. | Rewrite Chapter 4 to its eight-page, 3,000--3,500-word target, retaining only technically significant implementation mechanisms and the four planned visuals. |
 
 ## Decisions and open questions
 
@@ -405,4 +408,4 @@ The following claims currently recur across several chapters. Retain the full ex
 
 ## Current next action
 
-Rewrite Chapter 3 to the planned four-part structure and its five-page, 1,700--2,000-word target. Preserve the principal architecture diagram and the separation between inference, dialogue control, generation, feedback, and safety; replace the detailed functional and non-functional requirement narration with 8--10 grouped requirements, and identify the complete requirement inventory for Appendix B without moving material automatically.
+Rewrite Chapter 4 to the planned six-part structure and its eight-page, 3,000--3,500-word target. Retain the emotion pipeline, request sequence, one dialogue-state or affect-policy diagram, and one combined or representative interface figure; remove repository/configuration narration, evaluation results, routine account mechanics, and duplicated protocol or limitation material. Preserve the deterministic dialogue, evidence-extraction, affect-pacing, feedback, security, persistence, and failure-boundary mechanisms needed to understand the contribution.

@@ -463,13 +463,12 @@ INPUT .\figures\system_architecture.tex
 INPUT .\figures\system_architecture.tex
 INPUT figures\system_architecture.tex
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmss8.tfm
-INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\tcrm1200.tfm
-INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt12.tfm
 INPUT .\cap4.tex
 INPUT .\cap4.tex
 INPUT .\cap4.tex
 INPUT .\cap4.tex
 INPUT cap4.tex
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt12.tfm
 INPUT .\figures\emotion_pipeline.tex
 INPUT .\figures\emotion_pipeline.tex
 INPUT .\figures\emotion_pipeline.tex
@@ -581,8 +580,6 @@ INPUT .\main_file_template_bachelor_masters_english.out
 INPUT .\main_file_template_bachelor_masters_english.out
 INPUT C:\Users\raluc\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tctt0800.pk
 INPUT C:\Users\raluc\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tctt0800.pk
-INPUT C:\Users\raluc\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1200.pk
-INPUT C:\Users\raluc\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1200.pk
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb
