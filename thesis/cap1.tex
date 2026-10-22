@@ -20,7 +20,7 @@ The aim of this dissertation is to design, implement, and evaluate AffectLab, an
 
 The objectives are:
 
-\begin{enumerate}
+\begin{enumerate}[itemsep=0.2em, topsep=0.4em, parsep=0pt]
     \item to establish, from relevant research, the design constraints for structured communication rehearsal, contextual and multimodal affect recognition, calibrated uncertainty, and responsible human--AI interaction;
     \item to develop and compare utterance-only text, contextual text, audio, and late-fusion models under a speaker-independent protocol, evaluating classification and probability quality as distinct concerns;
     \item to design and implement scenario-specific dialogue policies and a bounded adaptation policy in which model confidence, modality agreement, availability, user preference, and safety determine only permitted, inspectable actions;
@@ -33,7 +33,7 @@ The objectives are:
 
 The dissertation is guided by four research questions:
 
-\begin{description}
+\begin{description}[itemsep=0.25em, topsep=0.4em, parsep=0pt]
     \item[\textbf{RQ1.}] \textbf{Does incorporating preceding conversational turns improve text-based emotion recognition compared with classifying each utterance independently?}
 
     \item[\textbf{RQ2.}] \textbf{Does combining contextual textual information with acoustic information improve emotion-classification performance compared with the individual text and audio modalities, and what trade-off exists between classification performance and confidence calibration?}
@@ -59,7 +59,7 @@ Evaluation follows the same separation of responsibilities. The model study addr
 
 The dissertation makes five principal contributions:
 
-\begin{enumerate}
+\begin{enumerate}[itemsep=0.2em, topsep=0.4em, parsep=0pt]
     \item \textbf{A controlled evaluation of causal conversational context and multimodal complementarity.} Utterance-only text, contextual text, speech, and fused configurations are compared on matched speaker-independent data, with dialogue-level uncertainty estimates.
 
     \item \textbf{An explicit separation between classification performance and operational confidence.} Predeclared fusion and validation-fitted calibration expose the trade-off between the strongest classifier and the probability estimates used by an interactive policy.
@@ -83,4 +83,4 @@ The empirical model claims are limited to the defined IEMOCAP protocol. Its ten 
 
 Application evaluation establishes behaviour only for the tested cases and configurations. It does not replace independent security review, target-environment load and recovery testing, live-provider evaluation, participatory accessibility work, or validation of trained inference under deployment conditions. The small, uncontrolled pilot concerns the non-adaptive baseline workflow and cannot establish causal benefit, sustained skill development, or transfer to real conversations. AffectLab is therefore presented as an implementation-complete, deployment-oriented research application whose wider use remains conditional on further technical, ethical, and human evaluation.
 
-The remainder of the dissertation assigns each topic one principal location. Chapter 2 reviews the literature and defines the research gap. Chapter 3 presents the architecture, requirements, and design boundaries. Chapter 4 explains the technically significant implementation mechanisms. Chapter 5 defines the evaluation protocol and reports model, application, and pilot evidence together with threats to validity. Chapter 6 answers the research questions, states the contributions and limitations, and identifies future work.
+Chapters 2--6 cover the literature, architecture, implementation, evaluation, and conclusions, respectively.

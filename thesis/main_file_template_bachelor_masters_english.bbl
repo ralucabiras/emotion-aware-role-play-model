@@ -263,13 +263,6 @@ Hovhannes Tamoyan, Hendrik Schuff, and Iryna Gurevych.
 \newblock In {\em Proceedings of the Third Workshop on Social Influence in
   Conversations}, pages 1--26. Association for Computational Linguistics, 2025.
 
-\bibitem[{Wor}25]{who2025socialconnection}
-{World Health Organization}.
-\newblock From loneliness to social connection: Charting a path to healthier
-  societies.
-\newblock Technical report, World Health Organization, Geneva, Switzerland,
-  June 2025.
-
 \bibitem[ZHZ{\etalchar{+}}18]{zhou2018ecm}
 Hao Zhou, Minlie Huang, Tianyang Zhang, Xiaoyan Zhu, and Bing Liu.
 \newblock Emotional chatting machine: Emotional conversation generation with

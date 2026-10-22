@@ -1,7 +1,7 @@
 # Dissertation Reduction Plan
 
 Last updated: 2026-10-22  
-Overall status: Chapter 1 restructured; compile and rendered-page verification pending
+Overall status: Chapter 1 complete and verified; Chapter 3 rewrite next
 Coordinator guidance: approximately **30--40 pages of content**, excluding the covers, abstract, table of contents, bibliography, and appendices  
 Working target: **36--37 pages of numbered chapter content**  
 Hard ceiling: **40 pages of numbered chapter content**
@@ -21,11 +21,11 @@ The reduction must preserve the research argument and evidence. Detailed softwar
 
 ## Baseline and target
 
-The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1 rewrite, the estimated current total is approximately 46,379 source words.
+The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1 rewrite and layout pass, the estimated current total is approximately 46,324 source words.
 
 | Part | Baseline pages | Baseline source words | Target pages | Target words | Status |
 |---|---:|---:|---:|---:|---|
-| Chapter 1: Introduction | 22 | 8,232 | 4 | 1,400--1,600 | `[~]` |
+| Chapter 1: Introduction | 22 | 8,232 | 4 | 1,400--1,600 | `[x]` |
 | Chapter 2: State of the Art | 18 | 6,860 | 6 | 2,300--2,600 | `[ ]` |
 | Chapter 3: Proposed System Architecture | 22 | 7,889 | 5 | 1,700--2,000 | `[ ]` |
 | Chapter 4: Implementation | 46 | 16,934 | 8 | 3,000--3,500 | `[ ]` |
@@ -168,7 +168,7 @@ Tasks:
 
 Completion condition: a reader can understand the problem, questions, approach, contribution, and scope without receiving a preview of every later chapter.
 
-Current result: the chapter has five sections and approximately 1,456 source words, within the 1,400--1,600-word target. Static checks found balanced braces and environments and no undefined references across the thesis. Rendered page count, table-of-contents regeneration, and visual inspection remain pending because the local MiKTeX installation requires first-run setup before `latexmk` can execute.
+Current result: the chapter has five sections and 1,401 words by `texcount`, within the 1,400--1,600-word target. A clean `latexmk` build places Chapter 1 on numbered pages 1--4 and Chapter 2 on page 5. The regenerated table of contents and lists are current, the final log contains no undefined citations or references or LaTeX errors, and visual inspection of all four rendered pages found no clipping, overflow, or poor list/page breaks.
 
 ## Chapter 2: State of the Art -- target 6 pages
 
@@ -348,7 +348,7 @@ The following claims currently recur across several chapters. Retain the full ex
 ## Execution order
 
 - [x] Phase 0: freeze the evidence and principal claims from Chapter 5.
-- [~] Rewrite Chapter 1; content complete, compile verification pending.
+- [x] Rewrite and verify Chapter 1.
 - [ ] Rewrite Chapter 3.
 - [ ] Rewrite Chapter 4.
 - [ ] Condense Chapter 2.
@@ -390,6 +390,7 @@ The following claims currently recur across several chapters. Retain the full ex
 | 2026-10-22 | Incorporated the coordinator's recommendation of approximately 30--40 content pages and created this living tracker. | Set a 36--37-page working target and chapter-level budgets. No dissertation content changed. | Complete Phase 0 by freezing the essential Chapter 5 claims and evidence. |
 | 2026-10-22 | Completed the Phase 0 evidence freeze from Chapter 5, mapped the principal evidence to RQ1--RQ4, audited the abstract, and checked the Faculty's 2025--2026 completion page and local standardised template. | Established a source-of-truth checklist for model, application, pilot, and limitation claims. The abstract requires no numerical correction. Retain the Lists of Figures/Tables and appendix structure; chapter summaries may be removed unless the supervisor identifies a programme-specific rule. | Rewrite Chapter 1 to the 1,400--1,600-word target while checking every retained claim against the frozen evidence. |
 | 2026-10-22 | Replaced Chapter 1's nine sections, fifteen subsections, nineteen objectives, and eleven contributions with the planned five-part structure. Preserved all four research questions and externally used labels. | Approximately 1,456 source words, down from the 8,232-word baseline and within target. Static reference and delimiter checks passed. Compilation is pending because MiKTeX reports incomplete first-run setup. | Complete MiKTeX setup, compile and visually check Chapter 1, record its rendered page count, then mark the chapter complete and begin Chapter 3. |
+| 2026-10-22 | Completed MiKTeX compilation and the Chapter 1 layout pass. Tightened list spacing and shortened only the dissertation-navigation sentence after the first render showed a two-line spill onto page 5. Regenerated the PDF, table of contents, List of Figures, and List of Tables; checked the final log and visually inspected all four chapter pages. | Chapter 1 is 1,401 words and occupies numbered pages 1--4; Chapter 2 starts on page 5, so the former blank verso is gone and the full PDF falls from 155 to 153 physical pages. No undefined citations/references or LaTeX errors remain, and no Chapter 1 clipping, overflow, or poor page break was found. | Rewrite Chapter 3 to its five-page, 1,700--2,000-word target, preserving one principal architecture diagram and moving the complete requirement inventory out of the main narrative. |
 
 ## Decisions and open questions
 
@@ -404,4 +405,4 @@ The following claims currently recur across several chapters. Retain the full ex
 
 ## Current next action
 
-Finish Chapter 1 verification after MiKTeX first-run setup: compile the thesis, measure the chapter's rendered page span, inspect page breaks and list formatting, and confirm cross-references. If the chapter is within its four-page budget, mark it complete and proceed to Chapter 3.
+Rewrite Chapter 3 to the planned four-part structure and its five-page, 1,700--2,000-word target. Preserve the principal architecture diagram and the separation between inference, dialogue control, generation, feedback, and safety; replace the detailed functional and non-functional requirement narration with 8--10 grouped requirements, and identify the complete requirement inventory for Appendix B without moving material automatically.
