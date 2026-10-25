@@ -1,0 +1,105 @@
+\chapter{Application Verification Details}
+\label{app:verification-details}
+
+This appendix preserves supporting verification evidence removed from the main evaluation narrative. Routine command listings, environment inventories, and individual test node identifiers remain in repository documentation and saved evidence artefacts.
+
+\section{Requirement Traceability}
+
+Table~\ref{tab:requirements-traceability} connects the grouped requirements from Chapter~\ref{chap:proposed-system-architecture} to implementation and verification boundaries. ``Passed'' means conformance under the cited checks, not universal validation outside the tested configuration.
+
+\begin{table}[p]
+\centering
+\caption{Grouped requirement-to-evidence traceability matrix.}
+\label{tab:requirements-traceability}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.96}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.15\textwidth}|>{\raggedright\arraybackslash}p{0.20\textwidth}|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.09\textwidth}|X|}
+\hline
+\textbf{Requirement IDs} & \textbf{Implementation boundary} & \textbf{Verification method} & \textbf{Result} & \textbf{Principal limitation} \\ \hline
+FR1, FR26; NFR5, NFR13 & Authentication, persistence, isolation, and deletion & API, security, ownership, stale-write, deletion, and recovery tests & Passed & No independent penetration or deployed-backup exercise \\ \hline
+FR2, FR3, FR25; NFR3 & Onboarding, preferences, takeaways, and action cards & API and browser onboarding, preference, reflection, and recovery journeys & Passed & No independent usability assessment \\ \hline
+FR4--FR8, FR15, FR19 & Preparation, configuration, lifecycle, and dialogue policies & Unit, API, desktop/mobile browser, authored-trajectory, and smoke tests & Passed & Three standard scenarios and controlled inputs \\ \hline
+FR9, FR11--FR13; NFR2, NFR4 & Voice, causal context, fusion, and fallbacks & Context, multimodal, transcription, transient-audio, missing-service, and browser tests & Passed in scope & Limited live-device, provider, and private-model execution \\ \hline
+FR10; NFR1 & Crisis interruption and safety precedence & Crisis paraphrase, false-positive, precedence, API, and conversation tests & Passed & Lexical detection cannot cover every expression \\ \hline
+FR29 & Cognitive heuristics and strategy selection & Authored rule, extraction, pushback, selection, and precedence cases & Rule conformance & No construct, clinical, helpfulness, or harm evaluation \\ \hline
+FR14; NFR14 & Bounded pacing and uncertainty presentation & Seven authored cases plus preference, disagreement, failure, and replay tests & Passed & Controlled probabilities; no evidence of user benefit \\ \hline
+FR16--FR18, FR20--FR21; NFR6, NFR8 & Evidence, response realisation, fallback, and feedback & Determinism, evidence-linking, generation, fallback, feedback, and concurrency tests & Passed & Designed cases do not exhaust language variation \\ \hline
+FR22--FR24 & Replay, retry, branching, and comparison & Backend, browser, stale-state, restart, and full-stack smoke tests & Passed & Synthetic histories rather than longitudinal use \\ \hline
+FR27--FR28; NFR7 & Consent, study progress, export, and versioning & Protocol, eligibility, withdrawal, export-exclusion, provenance, and smoke tests & Passed & No independent privacy or reproduction audit \\ \hline
+NFR9 & Health, bounded failures, recovery, and responsiveness & Recovery journeys, health checks, restart, and performance artefact & Passed locally & No networked concurrent-load or provider-latency test \\ \hline
+NFR10 & Accessible and responsive interface & axe-core, keyboard, and desktop/mobile browser checks & Passed tested views & No evaluation with assistive-technology users \\ \hline
+NFR11--NFR12 & Modular and testable architecture & Interface inspection, provider substitution, and component-boundary suites & Shown & Maintainability not measured longitudinally \\ \hline
+\end{tabularx}
+\end{table}
+
+\section{Authored Policy Cases}
+
+\begin{table}[htbp]
+\centering
+\caption{Enhanced-dialogue trajectory results.}
+\label{tab:dialogue-case-results}
+\footnotesize
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.20\textwidth}|X|>{\raggedright\arraybackslash}p{0.20\textwidth}|}
+\hline
+\textbf{Case} & \textbf{Expected and observed stages} & \textbf{Final state} \\ \hline
+Workload agreement & constraints $\rightarrow$ agree $\rightarrow$ resolved & Completed: success \\ \hline
+Workload non-confirmation & constraints $\rightarrow$ agree $\rightarrow$ agree & Active; no false agreement \\ \hline
+Boundary maintained & pressure $\rightarrow$ resolved & Completed: success \\ \hline
+Relationship next step & perspective $\rightarrow$ agree $\rightarrow$ resolved & Completed: success \\ \hline
+Relationship unresolved & perspective $\rightarrow$ unresolved & Completed: unresolved \\ \hline
+\end{tabularx}
+\end{table}
+
+The fixed controller stopped according to its earlier completion conditions and was used only to expose the enhanced policy's additional evidence states, not as a human-performance baseline.
+
+\begin{table}[htbp]
+\centering
+\caption{Implemented cognitive-heuristic and support-routing checks.}
+\label{tab:cognitive-routing-cases}
+\footnotesize
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.27\textwidth}|>{\raggedright\arraybackslash}p{0.31\textwidth}|X|}
+\hline
+\textbf{Input or condition} & \textbf{Verified result} & \textbf{Not established} \\ \hline
+Combined failure prediction and request for advice & Pattern rule matches; practical-help intent wins precedence; clause after ``because'' is copied as possible context & Psychological distortion, true cause, or actual preference for advice \\ \hline
+Explicit pushback vocabulary & Resistance value exceeds the routing threshold & Psychological resistance, degree, persistence, or cause \\ \hline
+Practical-help question with default lexical affect & Practical suggestion receives the highest strategy score & Helpfulness, timing, or superiority to alternatives \\ \hline
+Crisis flag with high arousal & Safety escalation overrides ordinary strategy scores & Detector sensitivity/specificity or adequacy of response \\ \hline
+Two emotional-support messages & Analyser, selector, and offline template compose emotion-specific responses & Affect accuracy, therapeutic value, preference, or absence of harm \\ \hline
+\end{tabularx}
+\end{table}
+
+The cognitive cases cover selected positive paths and one precedence condition. They do not systematically test every pattern combination, tie, negation, quotation, malformed clause, dialect, or correction of a wrong inference. The appropriate result is rule conformance rather than accuracy.
+
+The twelve-case lexical-extraction fixture produced five true positives, four true negatives, one false positive, and two false negatives. The seven affect-pacing cases covered confident agreement, disagreement, low confidence, missing audio, unavailable inference, disabled adaptation, and explicit preference; all seven matched the declared action. Safety, task completion, study eligibility, and required-task status were tested as higher-priority guards.
+
+\section{Automated, Full-Stack, and Accessibility Evidence}
+
+The final backend suite collected 258 cases, with 245 passes and 13 skips from the opt-in real-MongoDB module. All skips reported that the real-database test URI was not configured. Ruff, the production frontend build, and frontend linting passed. The browser suite executed 38 logical cases in both desktop Chromium and a Pixel~7 profile, producing 76 passes.
+
+Ten interface states were scanned in both profiles with axe-core rules mapped to WCAG~2.0 and 2.1 Levels A and AA. All 20 scan executions returned no detected violation. The result covers the exercised DOM states and automated rules only; it is not a WCAG certification.
+
+Two full-stack journeys ran against a compiled frontend, FastAPI process, and disposable MongoDB~8.0.1 instance. They covered account access, pre-consent exclusion, enrolment, a required task and questionnaire, export, enhanced dialogue, network-failure recovery, replay, branching, comparison, and action-card persistence. State was verified after two backend restarts. Providers and trained inference were disabled.
+
+\section{Local Performance Detail}
+
+The local benchmark used FastAPI's in-process transport and memory repository. It included routing, authentication, request validation, services, and response serialisation, but excluded network transit, MongoDB, providers, trained inference, and concurrent clients. Read-only endpoints used 200 post-warm-up samples and state-changing operations used 100.
+
+\begin{table}[htbp]
+\centering
+\caption{Local single-client application latency.}
+\label{tab:performance-results}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{|X|r|r|r|r|}
+\hline
+\textbf{Operation} & \textbf{Samples} & \textbf{Median (ms)} & \textbf{P95 (ms)} & \textbf{Budget (ms)} \\ \hline
+Liveness endpoint & 200 & 1.332 & 1.866 & 25 \\ \hline
+Authenticated scenario catalogue & 200 & 2.942 & 3.922 & 50 \\ \hline
+Session creation & 100 & 2.988 & 3.961 & 50 \\ \hline
+Role-play start & 100 & 3.396 & 4.437 & 75 \\ \hline
+Deterministic conversation turn & 100 & 4.659 & 5.836 & 100 \\ \hline
+\end{tabularx}
+\end{table}
+
+P95 uses the nearest-rank observation after ascending sort. The budgets were predeclared regression tripwires rather than production service-level objectives. All five passed within the benchmark's deliberately narrow local scope.

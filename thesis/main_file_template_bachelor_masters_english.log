@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 OCT 2026 19:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  25 OCT 2026 09:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1111,7 +1111,7 @@ Package hyperref Info: Link coloring OFF on input line 33.
 \@outlinefile=\write4
 \openout4 = `main_file_template_bachelor_masters_english.out'.
 
-<FI.png, id=374, 578.8827pt x 290.0436pt>
+<FI.png, id=218, 578.8827pt x 290.0436pt>
 File: FI.png Graphic file (type png)
 <use FI.png>
 Package pdftex.def Info: FI.png  used on input line 42.
@@ -1134,33 +1134,32 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 {C:/Users/raluc/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./FI.png>] [
 2] [3] [4] (main_file_template_bachelor_masters_english.toc [5
 
-] [6])
+])
 \tf@toc=\write5
 \openout5 = `main_file_template_bachelor_masters_english.toc'.
 
- [7]
-[8
-
-] (main_file_template_bachelor_masters_english.lof)
+ [6]
+(main_file_template_bachelor_masters_english.lof)
 \tf@lof=\write6
 \openout6 = `main_file_template_bachelor_masters_english.lof'.
 
- [9
+ [7
 
-] [10
+
+] [8
 
 ]
 (main_file_template_bachelor_masters_english.lot)
 \tf@lot=\write7
 \openout7 = `main_file_template_bachelor_masters_english.lot'.
 
- [11
+ [9
 
-] [12
+] [10
 
-] [13
+] [11
 
-] [14] (cap1.tex
+] [12] (cap1.tex
 Chapter 1.
 [1
 
@@ -1222,7 +1221,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [17]
 (figures/emotion_pipeline.tex) [18] [19] (figures/request_sequence.tex)
 [20] [21] (figures/affect_policy.tex) [22]
-<figures/app-roleplay.png, id=835, 696.80325pt x 558.888pt>
+<figures/app-roleplay.png, id=577, 696.80325pt x 558.888pt>
 File: figures/app-roleplay.png Graphic file (type png)
 <use figures/app-roleplay.png>
 Package pdftex.def Info: figures/app-roleplay.png  used on input line 135.
@@ -1230,251 +1229,34 @@ Package pdftex.def Info: figures/app-roleplay.png  used on input line 135.
  [23 <./figures/app-roleplay.png>])
 (cap5.tex [24]
 Chapter 5.
+[25
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [25
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-[]|\OT1/cmr/m/n/10 Whether un-cer-tain es-ti-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-\OT1/cmr/m/n/10 the spec-i-fied bounded,
- []
-
-
-Underfull \hbox (badness 5231) in paragraph at lines 33--33
-\OT1/cmr/m/n/10 ex-plain-able, and failure-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-[]|\OT1/cmr/m/n/10 Whether the com-pleted
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-\OT1/cmr/m/n/10 sys-tem sat-is-fies its de-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-\OT1/cmr/m/n/10 clared func-tional and
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-\OT1/cmr/m/n/10 non-functional re-quire-
- []
-
-
-Underfull \hbox (badness 1286) in paragraph at lines 33--33
-\OT1/cmr/m/n/10 ments un-der re-pro-ducible
- []
-
-[26] [27] [28]
-Overfull \hbox (6.2374pt too wide) in paragraph at lines 155--165
- [][] 
- []
-
-[29]
-Underfull \hbox (badness 2932) in paragraph at lines 194--195
-\OT1/cmr/m/n/12 ($[0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 0158\OML/cmm/m/it/12 ; \O
-T1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 0647]$), joy by 0.1088 ($[0\OM
-L/cmm/m/it/12 :\OT1/cmr/m/n/12 0804\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm
-/m/it/12 :\OT1/cmr/m/n/12 1371]$), and sad-ness by 0.1232
- []
-
-[30] [31] [32] (figures/model_results.tex
+] [26] [27] [28] [29] (figures/model_results.tex
 Package pgfplots info on input line 26: Using 'lua backend=false' for axis: x c
 oord trafo unsupported.
-) (figures/confusion_matrices.tex
-PGFPlots: reading {figures/data/confusion_context_text.dat}
-PGFPlots: reading {figures/data/confusion_context_text.dat}
-PGFPlots: reading {figures/data/confusion_audio.dat}
-PGFPlots: reading {figures/data/confusion_audio.dat}
-PGFPlots: reading {figures/data/confusion_equal_fusion.dat}
-PGFPlots: reading {figures/data/confusion_equal_fusion.dat}
-PGFPlots: reading {figures/data/confusion_validation_fitted.dat}
-PGFPlots: reading {figures/data/confusion_validation_fitted.dat}
-)
-[33] [34] (figures/reliability_curves.tex
-PGFPlots: reading {figures/data/reliability_context_text.dat}
-PGFPlots: reading {figures/data/reliability_audio.dat}
-PGFPlots: reading {figures/data/reliability_equal_fusion.dat}
-PGFPlots: reading {figures/data/reliability_equal_fusion.dat}
-PGFPlots: reading {figures/data/reliability_validation_fitted.dat}
-) [35] [36] [37
-
-] [38
-
-]
-Underfull \hbox (badness 4378) in paragraph at lines 432--432
-[]|\OT1/cmr/m/n/8 No in-de-pen-dent us-abil-ity
+) [30]
+Underfull \hbox (badness 1248) in paragraph at lines 167--167
+[]|\OT1/cmr/m/n/10 In-process, sin-gle client; ex-cludes net-work,
  []
 
-
-Underfull \hbox (badness 4531) in paragraph at lines 432--432
-[]|\OT1/cmr/m/n/8 Three stan-dard sce-nar-ios
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 432--432
-[]|\OT1/cmr/m/n/8 Limited live-device,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 432--432
-\OT1/cmr/m/n/8 provider, and private-
- []
-
-
-Underfull \hbox (badness 4556) in paragraph at lines 432--432
-[]|\OT1/cmr/m/n/8 No con-struct, pre-dic-tive,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 432--432
-\OT1/cmr/m/n/8 clin-i-cal, comparative-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 432--432
-\OT1/cmr/m/n/8 helpfulness, or harm
- []
-
-
-Underfull \hbox (badness 3428) in paragraph at lines 432--432
-[]|\OT1/cmr/m/n/8 Synthetic his-to-ries rather
- []
-
-
-Underfull \hbox (badness 1472) in paragraph at lines 432--432
-[]|\OT1/cmr/m/n/8 No net-worked concurrent-
- []
-
-
-Underfull \hbox (badness 1783) in paragraph at lines 432--432
-[]|\OT1/cmr/m/n/8 No eval-u-a-tion with users
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 432--432
-[]|\OT1/cmr/m/n/8 Maintainability was not
- []
-
-[39] [40]
-Underfull \hbox (badness 2368) in paragraph at lines 476--476
-\OT1/cmr/m/n/10 peu-tic value, or ab-sence of
- []
-
-[41] [42]
-Underfull \hbox (badness 10000) in paragraph at lines 530--531
-[]\OT1/cmr/m/n/12 Accessibility as-ser-tions used axe-core 4.13.0 through
- []
-
-
-Underfull \hbox (badness 1796) in paragraph at lines 530--531
-\OT1/cmtt/m/n/12 @axe-core/playwright \OT1/cmr/m/n/12 4.13.0. The se-lected tag
-s were \OT1/cmtt/m/n/12 wcag2a\OT1/cmr/m/n/12 , \OT1/cmtt/m/n/12 wcag2aa\OT1/cm
-r/m/n/12 ,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 532--533
-[]\OT1/cmr/m/n/12 The saved full-stack smoke man-i-fest was recorded on 4 Oc-to
--
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 532--533
-\OT1/cmr/m/n/12 ber 2026 and in-cor-po-rated with its source-hashed in-puts at 
-com-mit
- []
-
-
-Underfull \hbox (badness 1755) in paragraph at lines 532--533
-\OT1/cmtt/m/n/12 00a7f54aecefec1d8bb6f53235ddc7ab8f4f0773\OT1/cmr/m/n/12 . It w
-as gen-er-ated from the
- []
-
-[43]
-Underfull \hbox (badness 1259) in paragraph at lines 539--540
-\OT1/cmr/m/n/12 A re-pro-ducible lo-cal bench-mark ex-er-cised the HTTP bound-a
-ry of the de-
- []
-
-
-Underfull \hbox (badness 1297) in paragraph at lines 539--540
-\OT1/cmr/m/n/12 i-tory. It in-cluded rout-ing, bearer-token au-then-ti-ca-tion,
- re-quest val-i-da-tion,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 555--555
-[]|\OT1/cmr/m/n/10.95 Authenticated sce-nario
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 555--555
-[]|\OT1/cmr/m/n/10.95 Deterministic con-ver-sa-
- []
-
-[44] [45] [46] [47] [48]) (cap6.tex [49] [50
+[31] [32] [33] [34]) (cap6.tex [35] [36
 
 ]
 Chapter 6.
-[51] [52] [53] [54] [55] [56]
-Underfull \hbox (badness 2698) in paragraph at lines 130--130
-[]|\OT1/cmr/m/n/10 Response-time dis-tri-bu-tions, through-put,
- []
+[37] [38]) (main_file_template_bachelor_masters_english.bbl [39] [40
 
-
-Underfull \hbox (badness 2469) in paragraph at lines 130--130
-\OT1/cmr/m/n/10 source use with pro-duc-tion per-sis-tence,
- []
-
-
-Underfull \hbox (badness 1910) in paragraph at lines 130--130
-\OT1/cmr/m/n/10 nam-ing, ex-pert and user re-view, false-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 130--130
-[]|\OT1/cmr/m/n/10 Supporting ev-i-dence about whether
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 130--130
-\OT1/cmr/m/n/10 bounded adap-ta-tion changes pac-ing
- []
-
-
-Underfull \hbox (badness 7722) in paragraph at lines 130--130
-\OT1/cmr/m/n/10 pref-er-ence, task com-ple-tion, per-ceived
- []
-
-[57] [58]
-Underfull \vbox (badness 1968) has occurred while \output is active []
-
- [59])
-[60] (main_file_template_bachelor_masters_english.bbl [61] [62
-
-] [63]
+] [41]
 Underfull \hbox (badness 1577) in paragraph at lines 98--106
 []\OT1/cmr/m/n/12 Deepanway Ghosal, Navonil Ma-jumder, Sou-janya Po-ria, Niy-at
 i
  []
 
-[64]
+[42]
 Underfull \hbox (badness 4582) in paragraph at lines 134--140
 []\OT1/cmr/m/n/12 Meelis Kull, Miquel Perello-Nieto, Markus K^^?angsepp, Telmo
  []
 
-[65]) [66]
+[43]) [44]
 Appendix A.
 
 Underfull \hbox (badness 10000) in paragraph at lines 226--226
@@ -1536,57 +1318,54 @@ Underfull \hbox (badness 10000) in paragraph at lines 226--226
 []|\OT1/cmr/m/n/12 Suggestions were
  []
 
-[67
+[45
 
-] [68] [69] (main_file_template_bachelor_masters_english.aux)
+] [46] [47] (main_file_template_bachelor_masters_english.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main_file_template_bachelor_masters_english.
 out' has not changed.
-(rerunfilecheck)             Checksum: 071F7E545995C83B1235502B2FDD9A09;21153.
+(rerunfilecheck)             Checksum: D7903E3FAA98AD97691D41E61E86F969;11004.
  ) 
 Here is how much of TeX's memory you used:
- 38879 strings out of 467871
- 897570 string characters out of 5418375
- 1510543 words of memory out of 5000000
- 66807 multiletter control sequences out of 15000+600000
- 644319 words of font info for 102 fonts, out of 8000000 for 9000
+ 38261 strings out of 467871
+ 887472 string characters out of 5418375
+ 1415259 words of memory out of 5000000
+ 66310 multiletter control sequences out of 15000+600000
+ 641652 words of font info for 92 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,19n,104p,1997b,2868s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\raluc\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tctt
-0800.pk><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
-ts/cm/cmbx10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/publ
-ic/amsfonts/cm/cmbx12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/t
-ype1/public/amsfonts/cm/cmbx8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX
-/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/raluc/AppData/Local/Progra
-ms/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/raluc/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/raluc/Ap
-pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/
-raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C
-:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr1
-0.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
-/cm/cmr12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/
-amsfonts/cm/cmr6.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
-public/amsfonts/cm/cmr7.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts
-/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTe
-X/fonts/type1/public/amsfonts/cm/cmsl12.pfb><C:/Users/raluc/AppData/Local/Progr
-ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><C:/Users/raluc/AppData/Lo
-cal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss8.pfb><C:/Users/raluc/Ap
-pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Use
-rs/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pf
-b><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
-cmsy6.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
-onts/cm/cmsy8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/pub
-lic/amsfonts/cm/cmti10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/amsfonts/cm/cmti12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKT
-eX/fonts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/raluc/AppData/Local/Prog
-rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on main_file_template_bachelor_masters_english.pdf (83 pages, 90
-5595 bytes).
+ 84i,15n,104p,1997b,2456s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
+cmbx10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
+fonts/cm/cmbx12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/p
+ublic/amsfonts/cm/cmbx8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts
+/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/raluc/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/raluc/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/raluc/AppData/
+Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/raluc/
+AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/User
+s/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb>
+<C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cm
+r12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
+ts/cm/cmr6.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public
+/amsfonts/cm/cmr7.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1
+/public/amsfonts/cm/cmr8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/font
+s/type1/public/amsfonts/cm/cmsl12.pfb><C:/Users/raluc/AppData/Local/Programs/Mi
+KTeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><C:/Users/raluc/AppData/Local/Pr
+ograms/MiKTeX/fonts/type1/public/amsfonts/cm/cmss8.pfb><C:/Users/raluc/AppData/
+Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/ral
+uc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/
+Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.
+pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/c
+m/cmsy8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
+sfonts/cm/cmti12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
+public/amsfonts/cm/cmtt12.pfb>
+Output written on main_file_template_bachelor_masters_english.pdf (59 pages, 72
+5194 bytes).
 PDF statistics:
- 1366 PDF objects out of 1440 (max. 8388607)
- 282 named destinations out of 1000 (max. 500000)
- 759 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 848 PDF objects out of 1000 (max. 8388607)
+ 187 named destinations out of 1000 (max. 500000)
+ 447 words of extra memory for PDF output out of 10000 (max. 10000000)
 

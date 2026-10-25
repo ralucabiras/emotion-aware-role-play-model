@@ -9,8 +9,6 @@
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Bounded affect-aware pacing. Every terminal action preserves the authoritative dialogue state and evidence.}}{22}{figure.4.3}%
 \contentsline {figure}{\numberline {4.4}{\ignorespaces Representative role-play workspace with transcript, scenario state, message composer, and optional voice interaction.}}{23}{figure.4.4}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Aggregate four-class results from independently evaluated fold configurations. Panel (a) compares macro F1, while Panel (b) shows why the highest-classification equal-weight fusion is not the preferred configuration when confidence is consumed operationally.}}{34}{figure.5.1}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Pooled row-normalised confusion matrices over the five held-out IEMOCAP sessions ($n=5{,}531$). Rows are true labels and columns are predicted labels; cell values are percentages of the corresponding true-label row. All panels use the same 0--100\% colour scale. Every fitted parameter represented here was estimated without the corresponding test session.}}{34}{figure.5.2}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Reliability curves from pooled held-out predictions. Each point represents a non-empty equal-width bin of maximum class probability; the dashed diagonal denotes perfect calibration. Panel (a) compares the unimodal systems with predeclared equal fusion, and Panel (b) shows the effect of validation-derived fusion calibration. ECE values in Table~\ref {tab:calibration-tradeoff} use the prespecified 15-bin calculation, while the curves use ten bins for legibility.}}{36}{figure.5.3}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Four-class held-out results. Panel (a) compares macro F1; Panel (b) shows the calibration cost of equal fusion and the effect of validation-derived fitting.}}{30}{figure.5.1}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }

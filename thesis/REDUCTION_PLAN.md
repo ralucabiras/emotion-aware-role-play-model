@@ -1,7 +1,7 @@
 # Dissertation Reduction Plan
 
-Last updated: 2026-10-22  
-Overall status: Chapters 1--4 complete and verified; Chapter 5 refinement next
+Last updated: 2026-10-25  
+Overall status: Chapters 1--6 complete and verified; appendix reduction and organisation next
 Coordinator guidance: approximately **30--40 pages of content**, excluding the covers, abstract, table of contents, bibliography, and appendices  
 Working target: **36--37 pages of numbered chapter content**  
 Hard ceiling: **40 pages of numbered chapter content**
@@ -21,7 +21,7 @@ The reduction must preserve the research argument and evidence. Detailed softwar
 
 ## Baseline and target
 
-The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1--4 rewrites, the estimated current total is approximately 21,682 source words.
+The baseline PDF contains 161 physical pages. Based on its table of contents, the six numbered chapters occupy approximately 140 pages, including chapter-opening layout and intervening blank pages. At the initial audit, the chapter sources contained approximately 53,155 source words; this count includes some LaTeX and table content and is therefore an approximate tracking measure rather than a polished-prose count. After the Chapter 1--6 rewrites, the current total is approximately 13,483 source words. The current build contains 37 numbered-chapter content pages, meeting the working target.
 
 | Part | Baseline pages | Baseline source words | Target pages | Target words | Status |
 |---|---:|---:|---:|---:|---|
@@ -29,9 +29,9 @@ The baseline PDF contains 161 physical pages. Based on its table of contents, th
 | Chapter 2: State of the Art | 18 | 6,860 | 6 | 2,300--2,600 | `[x]` |
 | Chapter 3: Proposed System Architecture | 22 | 7,889 | 5 | 1,700--2,000 | `[x]` |
 | Chapter 4: Implementation | 46 | 16,934 | 8 | 3,000--3,500 | `[x]` |
-| Chapter 5: Evaluation and Results | 22 | 9,289 | 10--11 | 4,000--4,500 | `[ ]` |
-| Chapter 6: Conclusions and Future Work | 10 | 3,951 | 3 | 1,000--1,300 | `[ ]` |
-| **Total main content** | **about 140** | **53,155** | **36--37** | **13,400--15,500** | `[ ]` |
+| Chapter 5: Evaluation and Results | 22 | 9,289 | 10--11 | 4,000--4,500 | `[x]` |
+| Chapter 6: Conclusions and Future Work | 10 | 3,951 | 3 | 1,000--1,300 | `[x]` |
+| **Total main content** | **about 140** | **53,155** | **36--37** | **13,400--15,500** | `[x]` |
 
 The working target deliberately stays below 40 pages to allow for LaTeX reflow, figures, tables, and chapter-opening whitespace.
 
@@ -219,7 +219,7 @@ Tasks:
 
 Completion condition: the chapter explains why the architecture is structured as it is without duplicating implementation or evaluation material.
 
-Current result: the chapter has the planned four sections, one architecture figure, and one table containing nine grouped requirement families. It contains 1,712 words by `texcount`, down from the 7,889-word baseline, and occupies numbered pages 23--27. Chapter 4 begins on page 29 after the standard template's intentional blank verso. A clean `latexmk` build contains no undefined citations or references, LaTeX errors, or Chapter 3 overfull boxes; visual inspection of all five content pages found the diagram and table legible with no clipping or poor page breaks. The full 43-item requirement wording is identified for Appendix B but has not yet been inserted.
+Current result: the chapter has the planned four sections, one architecture figure, and one table containing nine grouped requirement families. It contains 1,712 words by `texcount`, down from the 7,889-word baseline, and occupies numbered pages 11--15 in the current build. Chapter 4 begins on page 17 after the standard template's intentional blank verso. A clean `latexmk` build contains no undefined citations or references, LaTeX errors, or Chapter 3 overfull boxes; visual inspection of all five content pages found the diagram and table legible with no clipping or poor page breaks. The full 43-item requirement wording is identified for Appendix B but has not yet been inserted.
 
 ## Chapter 4: Implementation -- target 8 pages
 
@@ -267,7 +267,7 @@ Candidates for appendix or repository documentation:
 
 Completion condition: the chapter explains the technically original implementation choices, not every implemented feature.
 
-Current result: the chapter now follows the planned six-section structure and contains 3,016 words by `texcount`, down from the 16,934-word baseline. It retains four visuals: the emotion pipeline, request sequence, affect-pacing policy, and one representative role-play screen. The chapter occupies numbered pages 29--36, and Chapter 5 begins on page 37 with no intervening blank page. A clean `latexmk` build contains no undefined citations or references, LaTeX errors, or Chapter 4 overfull boxes; visual inspection of all eight rendered pages found no clipping or poor page breaks, and the full PDF is 97 physical pages.
+Current result: the chapter now follows the planned six-section structure and contains 3,016 words by `texcount`, down from the 16,934-word baseline. It retains four visuals: the emotion pipeline, request sequence, affect-pacing policy, and one representative role-play screen. In the current build, the chapter occupies numbered pages 17--24 and Chapter 5 begins on page 25. A clean `latexmk` build contains no undefined citations or references, LaTeX errors, or Chapter 4 overfull boxes; visual inspection of all eight rendered pages found no clipping or poor page breaks.
 
 ## Chapter 5: Evaluation and Results -- target 10--11 pages
 
@@ -282,23 +282,25 @@ Planned structure:
 
 Tasks:
 
-- [ ] Retain the speaker-independent task, folds, metrics, and dialogue-level statistical comparison.
-- [ ] Retain the primary four-class contextual-text experiment.
-- [ ] Retain the audio, equal-weight fusion, and calibration trade-off results.
-- [ ] Select only the tables and figures required to support the principal claims.
-- [ ] Move the exploratory six-class experiment to an appendix.
-- [ ] Move full per-class and per-fold tables to an appendix.
-- [ ] Reduce the operational packaging analysis to one short paragraph or move it.
-- [ ] Condense the comparison with published IEMOCAP results.
-- [ ] Replace detailed authored-case and test-suite tables with one aggregate verification table.
-- [ ] Move the complete requirement-to-test traceability matrix to an appendix.
-- [ ] Report exact test counts once.
-- [ ] Keep the pilot results and state their scope limitation once, immediately beside them.
-- [ ] Consolidate model, construct, external, pilot, and application limitations in Threats to Validity.
-- [ ] Remove the separate Answer to RQ1--RQ4 subsections; final answers belong in Chapter 6.
-- [ ] Remove or reduce the chapter summary to a transition paragraph.
+- [x] Retain the speaker-independent task, folds, metrics, and dialogue-level statistical comparison.
+- [x] Retain the primary four-class contextual-text experiment.
+- [x] Retain the audio, equal-weight fusion, and calibration trade-off results.
+- [x] Select only the tables and figures required to support the principal claims.
+- [~] Move the exploratory six-class experiment to an appendix. Extracted to `appendix_c_supplementary_model_results.tex`; insertion is deferred until Appendix B fixes the final ordering.
+- [~] Move full per-class and per-fold tables to an appendix. Extracted to the prepared Appendix C source; insertion is deferred until the appendix phase.
+- [x] Reduce the operational packaging analysis to one short paragraph or move it.
+- [x] Condense the comparison with published IEMOCAP results.
+- [x] Replace detailed authored-case and test-suite tables with one aggregate verification table.
+- [~] Move the complete requirement-to-test traceability matrix to an appendix. Extracted to `appendix_d_verification_details.tex`; insertion is deferred until the appendix phase.
+- [x] Report exact test counts once.
+- [x] Keep the pilot results and state their scope limitation once, immediately beside them.
+- [x] Consolidate model, construct, external, pilot, and application limitations in Threats to Validity.
+- [x] Remove the separate Answer to RQ1--RQ4 subsections; final answers belong in Chapter 6.
+- [x] Remove or reduce the chapter summary to a transition paragraph.
 
 Completion condition: every principal conclusion is supported by visible evidence, while secondary and audit-level evidence remains available outside the main narrative.
+
+Current result: the chapter now follows the planned six-part structure and contains 4,027 words by `texcount`, down from the 9,289-word baseline. It retains the principal contextual-text, equal-fusion, calibration, aggregate application-verification, and pilot tables plus one combined model figure. The chapter occupies numbered pages 25--35; Chapter 6 begins on page 37 after the template's intentional blank verso. The clean `latexmk` build contains no undefined citations or references, LaTeX errors, or Chapter 5 overfull boxes. Visual inspection of all eleven rendered pages found no clipping, illegible material, or poor float/page breaks. The full PDF is 67 physical pages. Secondary model tables and detailed application-verification evidence have been extracted to prepared Appendix C and D sources without inserting them ahead of the still-pending Appendix B.
 
 ## Chapter 6: Conclusions and Future Work -- target 3 pages
 
@@ -311,16 +313,18 @@ Planned structure:
 
 Tasks:
 
-- [ ] Delete Chapter Overview.
-- [ ] Delete the long Summary of the Dissertation.
-- [ ] Answer the four research questions in compact paragraphs or one table.
-- [ ] Merge the three contribution subsections.
-- [ ] Summarise only the limitations that materially qualify the final conclusions.
-- [ ] Keep the future-work roadmap but remove the six subsections that restate it.
-- [ ] Avoid repeating detailed scores, test counts, and implementation descriptions.
-- [ ] End with one restrained conclusion paragraph.
+- [x] Delete Chapter Overview.
+- [x] Delete the long Summary of the Dissertation.
+- [x] Answer the four research questions in compact paragraphs or one table.
+- [x] Merge the three contribution subsections.
+- [x] Summarise only the limitations that materially qualify the final conclusions.
+- [x] Keep the future-work roadmap but remove the six subsections that restate it.
+- [x] Avoid repeating detailed scores, test counts, and implementation descriptions.
+- [x] End with one restrained conclusion paragraph.
 
 Completion condition: the chapter answers the research questions and states what the work establishes without summarising the dissertation chapter by chapter.
+
+Current result: the chapter now follows the planned four-part structure and contains 1,014 words by `texcount`, down from the 3,951-word baseline. It answers RQ1--RQ4 directly, merges the contributions and material limitations, replaces the table-plus-six-subsection future-work roadmap with three prioritised paragraphs, and ends with one bounded conclusion. The chapter occupies numbered pages 37--39, bringing Chapters 1--6 to the 37-page working target. The clean `latexmk` build contains no undefined citations or references, LaTeX errors, or overfull boxes; visual inspection of all three rendered pages found no clipping or poor page breaks. The full PDF is 59 physical pages.
 
 ## Appendices plan
 
@@ -330,8 +334,8 @@ Appendices do not count toward the coordinator's recommended 30--40 content page
 |---|---|---|
 | A | Generative AI declaration, reduced to the required disclosure | `[ ]` |
 | B | Complete functional and non-functional requirements | `[~]` Identified from the former Chapter 3 inventory; insertion deferred to the appendix phase |
-| C | Supplementary model results: six-class, per-class, and per-fold tables | `[ ]` |
-| D | Application-verification details and requirement traceability | `[ ]` |
+| C | Supplementary model results: six-class, per-class, and per-fold tables | `[~]` Selective source prepared in `appendix_c_supplementary_model_results.tex`; insertion deferred until Appendix B is assembled |
+| D | Application-verification details and requirement traceability | `[~]` Selective source prepared in `appendix_d_verification_details.tex`; insertion deferred until Appendix B is assembled |
 | E | Additional interface or deployment figures, only if required | `[ ]` |
 
 Items should not be moved automatically. Each proposed appendix item must first pass the reproducibility/supporting-evidence test.
@@ -358,8 +362,8 @@ The following claims currently recur across several chapters. Retain the full ex
 - [x] Rewrite and verify Chapter 3.
 - [x] Rewrite Chapter 4.
 - [x] Condense Chapter 2.
-- [ ] Refine Chapter 5 and extract appendix material.
-- [ ] Rewrite Chapter 6.
+- [x] Refine Chapter 5 and extract appendix material.
+- [x] Rewrite Chapter 6.
 - [ ] Reduce the AI-use appendix and organise supplementary appendices.
 - [ ] Recompile and measure numbered chapter pages.
 - [ ] Perform a final cross-reference, citation, terminology, and claim-strength audit.
@@ -400,6 +404,8 @@ The following claims currently recur across several chapters. Retain the full ex
 | 2026-10-22 | Rewrote Chapter 3 from 29 headings to the planned four-section argument. Retained the principal architecture diagram, consolidated all FR1--FR29 and NFR1--NFR14 identifiers into nine requirement groups, centralised the dialogue/affect/safety authority boundaries, and reduced ethics and limitations to design-relevant constraints. | Chapter 3 is 1,712 words, down from the 7,889-word baseline, and occupies five content pages (23--27). The full PDF falls from 153 to 137 physical pages. Compilation, cross-references, warning audit, and visual inspection passed; the intentional page 28 verso remains before Chapter 4. The atomic requirement wording is designated for Appendix B. | Rewrite Chapter 4 to its eight-page, 3,000--3,500-word target, retaining only technically significant implementation mechanisms and the four planned visuals. |
 | 2026-10-22 | Rewrote Chapter 4 from 12 sections and 45 subsections to the planned six-section implementation argument. Removed the technology inventory, repository/configuration tour, routine account mechanics, detailed research lifecycle, separate verification section, chapter summary, six surplus diagrams/screenshots, and repeated evaluation material. | Chapter 4 is 3,016 words, down from the 16,934-word baseline, and occupies numbered pages 29--36. It retains the four planned visuals and preserves compatibility labels still used by Chapter 5. The clean build, cross-reference audit, warning audit, and visual inspection passed; Chapter 5 starts on page 37, and the full PDF falls from 137 to 97 physical pages. | Condense Chapter 2 to its six-page, 2,300--2,600-word target, retaining only literature that directly supports the research gap, method, or design rationale. |
 | 2026-10-22 | Rewrote Chapter 2 from 14 sections and numerous short subsections to the planned five-theme argument. Removed the secondary-dataset catalogue, two comparison tables, the literature-gap figure, the standalone chapter summary, implementation detail, and extended textbook explanations; retained 33 directly relevant citation keys. | Chapter 2 is 2,313 words, down from the 6,860-word baseline, and occupies numbered pages 5--10. The full PDF falls from 97 to 83 physical pages, and Chapter 3 now begins on page 11. The clean build, citation and cross-reference audit, Chapter 2 warning audit, and visual inspection of all six pages passed. | Refine Chapter 5 to its 10--11-page, 4,000--4,500-word target and extract only genuinely useful supplementary evidence for Appendices C and D. |
+| 2026-10-25 | Rewrote Chapter 5 from eight sections and numerous evidence/audit subsections to the planned six-part evaluation argument. Retained the speaker-independent protocol, principal RQ1--RQ4 evidence, calibration distinction, aggregate application verification, bounded pilot interpretation, and consolidated threats to validity. Extracted selected six-class, per-class, per-fold, policy, traceability, and performance detail into prepared Appendix C and D source files. | Chapter 5 is 4,027 words, down from the 9,289-word baseline, and occupies numbered pages 25--35. It retains five necessary tables and one combined model figure. The full PDF is 67 physical pages. The clean build, citation/reference audit, warning audit, and visual inspection of all eleven pages passed; Appendix C/D insertion remains deferred so Appendix B can establish the intended ordering. | Rewrite Chapter 6 to its three-page, 1,000--1,300-word target, answering RQ1--RQ4 directly without repeating Chapter 5's evidence detail. |
+| 2026-10-25 | Rewrote Chapter 6 from seven sections, thirteen subsections, and a large future-work table to the planned four-part conclusion. Removed the chapter overview and chapter-by-chapter summary, answered RQ1--RQ4 directly, merged contributions with material limitations, and reduced future work to immediate, next, and longer-term priorities. | Chapter 6 is 1,014 words, down from the 3,951-word baseline, and occupies numbered pages 37--39. Chapters 1--6 now total 37 content pages and approximately 13,483 words. The full PDF is 59 physical pages. The clean build, reference/error/overfull-box audit, and visual inspection of all three pages passed. | Reduce the generative-AI declaration to the required disclosure, assemble selective Appendices B--D in order, and omit Appendix E unless a concrete need emerges. |
 
 ## Decisions and open questions
 
@@ -413,7 +419,10 @@ The following claims currently recur across several chapters. Retain the full ex
 | 2026-10-22 | Chapter 1 should state the problem and contribution without previewing numerical results, test counts, or detailed implementation. | Accepted and implemented; exact evidence remains in Chapter 5. |
 | 2026-10-22 | Chapter 4 should explain only the technically significant mechanisms and preserve compatibility labels until Chapter 5 is condensed. | Accepted and implemented; detailed software, deployment, research-workflow, and verification material remains in repository documentation or Chapter 5 rather than the main implementation narrative. |
 | 2026-10-22 | Chapter 2's dataset catalogue, synthesis table, and literature-gap figure should be deleted rather than moved because concise prose preserves their argument and the removed presentation adds no unique supporting evidence. | Accepted and implemented. |
+| 2026-10-25 | Chapter 5 should retain five evidence tables and one combined model figure; confusion matrices, reliability curves, exhaustive case tables, commands, environment details, and node IDs are not required in the main narrative. | Accepted and implemented. Selective reproducibility evidence is preserved in prepared Appendix C/D sources; routine operational detail remains in repository artefacts. |
+| 2026-10-25 | Prepared Appendix C and D sources should not yet be inserted because Appendix B has not been assembled and inserting them now would assign the wrong appendix letters. | Accepted. The files are ready for the later appendix phase, when A--D will be ordered and compiled together. |
+| 2026-10-25 | Chapter 6 should answer each research question qualitatively and refer detailed values back to Chapter 5 rather than reproducing score and test-count inventories. | Accepted and implemented. The conclusion preserves the decisive findings and qualifications without duplicating Chapter 5's evidence tables. |
 
 ## Current next action
 
-Refine Chapter 5 to the planned six-part structure and its 10--11-page, 4,000--4,500-word target. Preserve the frozen RQ1--RQ4 evidence, classification/calibration distinction, application-verification totals, pilot scope limitation, and consolidated threats to validity; move only useful six-class, per-class, per-fold, and traceability evidence to Appendices C and D.
+Begin the appendix phase: reduce Appendix A to the required generative-AI disclosure, assemble the complete atomic requirement inventory as Appendix B, then insert and verify the prepared selective Appendix C and D sources in that order. Add Appendix E only if a specific figure is required for reproducibility or supporting evidence.

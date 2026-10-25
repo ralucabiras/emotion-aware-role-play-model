@@ -1,7 +1,7 @@
 \babel@toc {english}{}\relax 
-\contentsline {chapter}{List of Figures}{ix}{section*.4}%
-\contentsline {chapter}{List of Tables}{xi}{section*.6}%
-\contentsline {chapter}{List of Abbreviations}{xiii}{section*.9}%
+\contentsline {chapter}{List of Figures}{vii}{section*.4}%
+\contentsline {chapter}{List of Tables}{ix}{section*.6}%
+\contentsline {chapter}{List of Abbreviations}{xi}{section*.9}%
 \contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Context and Problem}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Aim and Objectives}{2}{section.1.2}%
@@ -27,69 +27,36 @@
 \contentsline {section}{\numberline {4.5}Feedback and Frontend Workflow}{22}{section.4.5}%
 \contentsline {section}{\numberline {4.6}Security, Persistence, and Deployment}{24}{section.4.6}%
 \contentsline {chapter}{\numberline {5}Evaluation and Results}{25}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Chapter Overview}{25}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Evaluation Scope and Evidence Hierarchy}{26}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Research Questions and Evaluation Levels}{26}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Separation of Development, Evaluation, and Deployment Evidence}{26}{subsection.5.2.2}%
-\contentsline {section}{\numberline {5.3}Emotion-Recognition Evaluation Methodology}{27}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Benchmark Task and Speaker-Independent Splits}{27}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Classification and Calibration Measures}{27}{subsection.5.3.2}%
-\contentsline {subsection}{\numberline {5.3.3}Paired Dialogue-Level Statistical Comparison}{28}{subsection.5.3.3}%
-\contentsline {section}{\numberline {5.4}Contextual Text-Emotion Results}{28}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}Primary Four-Class Comparison}{28}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}Exploratory Six-Class Comparison}{29}{subsection.5.4.2}%
-\contentsline {subsection}{\numberline {5.4.3}Answer to RQ1}{30}{subsection.5.4.3}%
-\contentsline {section}{\numberline {5.5}Speech and Multimodal Results}{31}{section.5.5}%
-\contentsline {subsection}{\numberline {5.5.1}Audio-Only Baseline}{31}{subsection.5.5.1}%
-\contentsline {subsection}{\numberline {5.5.2}Predeclared Equal-Weight Late Fusion}{31}{subsection.5.5.2}%
-\contentsline {subsection}{\numberline {5.5.3}Qualitative Error Analysis}{31}{subsection.5.5.3}%
-\contentsline {subsection}{\numberline {5.5.4}Classification--Calibration Trade-Off}{32}{subsection.5.5.4}%
-\contentsline {subsubsection}{Operational full-data packaging analysis}{37}{section*.10}%
-\contentsline {subsection}{\numberline {5.5.5}Comparison with Published IEMOCAP Results}{38}{subsection.5.5.5}%
-\contentsline {subsection}{\numberline {5.5.6}Answer to RQ2}{39}{subsection.5.5.6}%
-\contentsline {section}{\numberline {5.6}Application Verification and Readiness}{39}{section.5.6}%
-\contentsline {subsection}{\numberline {5.6.1}Deterministic Dialogue Cases}{39}{subsection.5.6.1}%
-\contentsline {subsection}{\numberline {5.6.2}Cognitive-Heuristic and Support-Routing Cases}{41}{subsection.5.6.2}%
-\contentsline {subsection}{\numberline {5.6.3}Evidence Extraction and Affect-Pacing Cases}{42}{subsection.5.6.3}%
-\contentsline {subsection}{\numberline {5.6.4}Automated and Full-Stack Verification Results}{42}{subsection.5.6.4}%
-\contentsline {subsection}{\numberline {5.6.5}Performance and Responsive-Interface Checks}{44}{subsection.5.6.5}%
-\contentsline {subsection}{\numberline {5.6.6}Answer to RQ3}{45}{subsection.5.6.6}%
-\contentsline {subsection}{\numberline {5.6.7}Answer to RQ4: Integrated Application Quality}{45}{subsection.5.6.7}%
-\contentsline {subsection}{\numberline {5.6.8}Supplementary User-Pilot Results}{45}{subsection.5.6.8}%
-\contentsline {paragraph}{Scope of the pilot result.}{45}{section*.11}%
-\contentsline {section}{\numberline {5.7}Threats to Validity and Limitations}{47}{section.5.7}%
-\contentsline {subsection}{\numberline {5.7.1}Model and Statistical Validity}{47}{subsection.5.7.1}%
-\contentsline {subsection}{\numberline {5.7.2}External and Construct Validity}{47}{subsection.5.7.2}%
-\contentsline {subsection}{\numberline {5.7.3}Supplementary User-Evidence Limitations}{48}{subsection.5.7.3}%
-\contentsline {section}{\numberline {5.8}Chapter Summary}{48}{section.5.8}%
-\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{51}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Chapter Overview}{51}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Summary of the Dissertation}{51}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Conclusions for the Research Questions}{52}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}RQ1: The Contribution of Conversational Context}{52}{subsection.6.3.1}%
-\contentsline {subsection}{\numberline {6.3.2}RQ2: Multimodal Complementarity and Calibration}{53}{subsection.6.3.2}%
-\contentsline {subsection}{\numberline {6.3.3}RQ3: Bounded Integration of Affective Evidence}{53}{subsection.6.3.3}%
-\contentsline {subsection}{\numberline {6.3.4}RQ4: Integrated Application Quality and Readiness}{54}{subsection.6.3.4}%
-\contentsline {section}{\numberline {6.4}Principal Contributions}{54}{section.6.4}%
-\contentsline {subsection}{\numberline {6.4.1}Empirical and Machine-Learning Contributions}{54}{subsection.6.4.1}%
-\contentsline {subsection}{\numberline {6.4.2}System and Interaction-Design Contributions}{55}{subsection.6.4.2}%
-\contentsline {subsection}{\numberline {6.4.3}Application-Verification and Infrastructure Contributions}{55}{subsection.6.4.3}%
-\contentsline {section}{\numberline {6.5}Limitations of the Conclusions}{56}{section.6.5}%
-\contentsline {subsection}{\numberline {6.5.1}Model and Data Limitations}{56}{subsection.6.5.1}%
-\contentsline {subsection}{\numberline {6.5.2}Application and Measurement Limitations}{56}{subsection.6.5.2}%
-\contentsline {subsection}{\numberline {6.5.3}Supporting User-Evidence Limitations}{57}{subsection.6.5.3}%
-\contentsline {section}{\numberline {6.6}Future Work}{57}{section.6.6}%
-\contentsline {subsection}{\numberline {6.6.1}Validate Deployment Performance and Reliability}{57}{subsection.6.6.1}%
-\contentsline {subsection}{\numberline {6.6.2}Broaden Model Validation and Improve Uncertainty Handling}{58}{subsection.6.6.2}%
-\contentsline {subsection}{\numberline {6.6.3}Evaluate and Refine the Adaptation Policy}{58}{subsection.6.6.3}%
-\contentsline {subsection}{\numberline {6.6.4}Validate Feedback and Communication Measures}{59}{subsection.6.6.4}%
-\contentsline {subsection}{\numberline {6.6.5}Study Transfer, Accessibility, and Long-Term Use}{59}{subsection.6.6.5}%
-\contentsline {subsection}{\numberline {6.6.6}Strengthen Deployment, Privacy, and Governance}{60}{subsection.6.6.6}%
-\contentsline {section}{\numberline {6.7}Final Conclusion}{60}{section.6.7}%
-\contentsline {chapter}{Bibliography}{66}{chapter*.12}%
-\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{67}{appendix.A}%
-\contentsline {section}{\numberline {A.1}ChatGPT Details}{67}{section.A.1}%
-\contentsline {subsection}{\numberline {A.1.1}Literature Exploration}{68}{subsection.A.1.1}%
-\contentsline {subsection}{\numberline {A.1.2}Academic Writing Assistance}{68}{subsection.A.1.2}%
-\contentsline {subsection}{\numberline {A.1.3}LaTeX Formatting Assistance}{68}{subsection.A.1.3}%
-\contentsline {subsection}{\numberline {A.1.4}Technical Guidance and Debugging}{68}{subsection.A.1.4}%
+\contentsline {section}{\numberline {5.1}Evaluation Methodology}{25}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Evidence Scope and Decision Rules}{25}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Benchmark Task and Speaker-Independent Protocol}{26}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Measures and Statistical Comparison}{27}{subsection.5.1.3}%
+\contentsline {section}{\numberline {5.2}Contextual Text Results}{27}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Speech, Fusion, and Calibration Results}{28}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Audio and Predeclared Fusion}{28}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Classification--Calibration Trade-off}{29}{subsection.5.3.2}%
+\contentsline {section}{\numberline {5.4}Application Verification}{31}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Bounded Policy Behaviour}{32}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Integrated Quality and Local Responsiveness}{32}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Supplementary Pilot Results}{33}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Threats to Validity}{34}{section.5.6}%
+\contentsline {paragraph}{Model and statistical validity.}{34}{section*.10}%
+\contentsline {paragraph}{Construct and external validity.}{34}{section*.11}%
+\contentsline {paragraph}{Application and deployment validity.}{35}{section*.12}%
+\contentsline {paragraph}{Pilot validity.}{35}{section*.13}%
+\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{37}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Conclusions for the Research Questions}{37}{section.6.1}%
+\contentsline {paragraph}{RQ1: conversational context.}{37}{section*.14}%
+\contentsline {paragraph}{RQ2: multimodal complementarity and calibration.}{37}{section*.15}%
+\contentsline {paragraph}{RQ3: bounded use of affective evidence.}{37}{section*.16}%
+\contentsline {paragraph}{RQ4: integrated application quality.}{38}{section*.17}%
+\contentsline {section}{\numberline {6.2}Contributions and Material Limitations}{38}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Prioritised Future Work}{39}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Final Conclusion}{39}{section.6.4}%
+\contentsline {chapter}{Bibliography}{44}{chapter*.18}%
+\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{45}{appendix.A}%
+\contentsline {section}{\numberline {A.1}ChatGPT Details}{45}{section.A.1}%
+\contentsline {subsection}{\numberline {A.1.1}Literature Exploration}{46}{subsection.A.1.1}%
+\contentsline {subsection}{\numberline {A.1.2}Academic Writing Assistance}{46}{subsection.A.1.2}%
+\contentsline {subsection}{\numberline {A.1.3}LaTeX Formatting Assistance}{46}{subsection.A.1.3}%
+\contentsline {subsection}{\numberline {A.1.4}Technical Guidance and Debugging}{46}{subsection.A.1.4}%

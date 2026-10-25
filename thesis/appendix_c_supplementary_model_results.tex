@@ -1,0 +1,141 @@
+\chapter{Supplementary Model Results}
+\label{app:supplementary-model-results}
+
+This appendix preserves secondary results useful for reproducibility but unnecessary for the main argument in Chapter~\ref{chap5}. Pooled metrics are computed after concatenating the five non-overlapping held-out sessions; fold means are unweighted descriptive summaries and therefore need not equal the pooled values.
+
+\section{Four-Class Per-Class Results}
+
+\begin{table}[htbp]
+\centering
+\caption{Per-class results for the four-class text configurations.}
+\label{tab:context-text-per-class}
+\footnotesize
+\begin{tabular}{|l|l|r|r|r|r|}
+\hline
+\textbf{Configuration} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Support} \\ \hline
+\multirow{4}{*}{Utterance-only text}
+& Anger & 0.7465 & 0.6863 & 0.7152 & 1,103 \\ \cline{2-6}
+& Happiness & 0.7392 & 0.6980 & 0.7180 & 1,636 \\ \cline{2-6}
+& Neutral & 0.6134 & 0.6001 & 0.6067 & 1,708 \\ \cline{2-6}
+& Sadness & 0.5688 & 0.6827 & 0.6205 & 1,084 \\ \hline
+\multirow{4}{*}{Three-turn context}
+& Anger & 0.7781 & 0.6963 & 0.7349 & 1,103 \\ \cline{2-6}
+& Happiness & 0.7989 & 0.8136 & 0.8062 & 1,636 \\ \cline{2-6}
+& Neutral & 0.6421 & 0.6388 & 0.6404 & 1,708 \\ \cline{2-6}
+& Sadness & 0.7209 & 0.7841 & 0.7512 & 1,084 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Per-class results for the audio and fusion configurations.}
+\label{tab:multimodal-per-class}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{|l|l|r|r|r|r|}
+\hline
+\textbf{Configuration} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Support} \\ \hline
+\multirow{4}{*}{Audio only}
+& Anger & 0.6583 & 0.7806 & 0.7142 & 1,103 \\ \cline{2-6}
+& Happiness & 0.6343 & 0.5312 & 0.5782 & 1,636 \\ \cline{2-6}
+& Neutral & 0.6214 & 0.5363 & 0.5757 & 1,708 \\ \cline{2-6}
+& Sadness & 0.5997 & 0.7629 & 0.6715 & 1,084 \\ \hline
+\multirow{4}{*}{Equal-weight fusion}
+& Anger & 0.8053 & 0.8513 & 0.8277 & 1,103 \\ \cline{2-6}
+& Happiness & 0.8221 & 0.8105 & 0.8163 & 1,636 \\ \cline{2-6}
+& Neutral & 0.7412 & 0.6657 & 0.7014 & 1,708 \\ \cline{2-6}
+& Sadness & 0.7635 & 0.8579 & 0.8080 & 1,084 \\ \hline
+\multirow{4}{*}{Validation-fitted fusion}
+& Anger & 0.8024 & 0.7879 & 0.7951 & 1,103 \\ \cline{2-6}
+& Happiness & 0.8208 & 0.8233 & 0.8221 & 1,636 \\ \cline{2-6}
+& Neutral & 0.7096 & 0.6710 & 0.6897 & 1,708 \\ \cline{2-6}
+& Sadness & 0.7601 & 0.8358 & 0.7961 & 1,084 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Macro F1 by held-out IEMOCAP session.}
+\label{tab:session-fold-variation}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|l|r|r|r|r|r|r|r|c|}
+\hline
+\textbf{Configuration} & \textbf{S1} & \textbf{S2} & \textbf{S3} & \textbf{S4} & \textbf{S5} & \textbf{Mean} & \textbf{SD} & \textbf{Range} \\ \hline
+Utterance-only text & 0.6376 & 0.7125 & 0.6443 & 0.6575 & 0.6625 & 0.6629 & 0.0264 & 0.6376--0.7125 \\ \hline
+Three-turn context & 0.6918 & 0.7556 & 0.7235 & 0.7310 & 0.7505 & 0.7305 & 0.0227 & 0.6918--0.7556 \\ \hline
+Audio only & 0.6450 & 0.6974 & 0.5870 & 0.6017 & 0.6224 & 0.6307 & 0.0386 & 0.5870--0.6974 \\ \hline
+Equal-weight fusion & 0.7517 & 0.8108 & 0.7708 & 0.8090 & 0.7922 & 0.7869 & 0.0227 & 0.7517--0.8108 \\ \hline
+Validation-fitted fusion & 0.7294 & 0.8070 & 0.7542 & 0.7932 & 0.7852 & 0.7738 & 0.0281 & 0.7294--0.8070 \\ \hline
+\end{tabular}
+\end{table}
+
+Context exceeded utterance-only text in all five sessions, and equal fusion produced the highest macro F1 in every session. Audio varied most across sessions. With only five actor dyads, these values show observed fold variation rather than population-level speaker variability.
+
+\section{Exploratory Six-Class Experiment}
+
+The exploratory mapping used anger, anxiety, frustration, joy, neutral, and sadness. Its five held-out sessions contained 7,420 examples, but only 40 were IEMOCAP fear annotations mapped to anxiety. The experiment is retained to document secondary analysis, not to justify an anxiety-recognition feature.
+
+\begin{table}[htbp]
+\centering
+\caption{Exploratory six-class contextual-text comparison.}
+\label{tab:six-class-context-results}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|l|r|r|r|c|}
+\hline
+\textbf{Metric} & \textbf{Utterance only} & \textbf{Three-turn context} & \textbf{Difference} & \textbf{95\% interval} \\ \hline
+Accuracy & 0.5674 & 0.6228 & +0.0554 & [0.0382, 0.0734] \\ \hline
+Macro F1 & 0.5490 & 0.6222 & +0.0732 & [0.0485, 0.1009] \\ \hline
+Weighted F1 & 0.5675 & 0.6205 & +0.0529 & [0.0359, 0.0702] \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Fold variation for the exploratory six-class comparison.}
+\label{tab:six-class-fold-results}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|c|r|r|r|r|r|}
+\hline
+\textbf{Fold} & \textbf{Test $n$} & \textbf{Anxiety $n$} & \textbf{Utterance only} & \textbf{Context} & \textbf{Difference} \\ \hline
+1 & 1,377 & 12 & 0.5690 & 0.6180 & +0.0490 \\ \hline
+2 & 1,357 & 9 & 0.5683 & 0.6655 & +0.0972 \\ \hline
+3 & 1,535 & 2 & 0.4992 & 0.5813 & +0.0820 \\ \hline
+4 & 1,519 & 7 & 0.5792 & 0.6268 & +0.0475 \\ \hline
+5 & 1,632 & 10 & 0.5122 & 0.5870 & +0.0748 \\ \hline
+Mean $\pm$ SD & -- & -- & 0.5456 $\pm$ 0.0330 & 0.6157 $\pm$ 0.0304 & +0.0701 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Per-class results for the exploratory six-class task.}
+\label{tab:six-class-per-class}
+\scriptsize
+\begin{tabular}{|l|l|r|r|r|r|}
+\hline
+\textbf{Configuration} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Support} \\ \hline
+\multirow{6}{*}{Utterance only}
+& Anger & 0.5857 & 0.5576 & 0.5713 & 1,103 \\ \cline{2-6}
+& Anxiety & 0.3889 & 0.5250 & 0.4468 & 40 \\ \cline{2-6}
+& Frustration & 0.5420 & 0.5165 & 0.5289 & 1,849 \\ \cline{2-6}
+& Joy & 0.7073 & 0.6779 & 0.6923 & 1,636 \\ \cline{2-6}
+& Neutral & 0.5102 & 0.4813 & 0.4953 & 1,708 \\ \cline{2-6}
+& Sadness & 0.5004 & 0.6347 & 0.5596 & 1,084 \\ \hline
+\multirow{6}{*}{Three-turn context}
+& Anger & 0.6089 & 0.5476 & 0.5766 & 1,103 \\ \cline{2-6}
+& Anxiety & 0.5778 & 0.6500 & 0.6118 & 40 \\ \cline{2-6}
+& Frustration & 0.5579 & 0.5809 & 0.5692 & 1,849 \\ \cline{2-6}
+& Joy & 0.7996 & 0.8026 & 0.8011 & 1,636 \\ \cline{2-6}
+& Neutral & 0.5174 & 0.4690 & 0.4920 & 1,708 \\ \cline{2-6}
+& Sadness & 0.6333 & 0.7408 & 0.6828 & 1,084 \\ \hline
+\end{tabular}
+\end{table}
+
+Context improved frustration, joy, and sadness with intervals above zero. Anger and neutral intervals spanned zero. Although anxiety F1 increased by 0.1650, the interval was wide and the result arose from only 40 examples. It cannot support a strong class-specific or deployment claim.
+
+\section{Operational Packaging Diagnostic}
+
+The single chain packaged for full-data models selected text/audio weights of 0.59/0.41 and temperature 0.5989. On pooled test-role predictions it produced accuracy 0.7736, macro F1 0.7776, weighted F1 0.7728, ECE 0.0242, NLL 0.6075, and Brier score 0.3280. Across rotating folds, however, each utterance label participated in a validation role before the same label was used with a prediction from a different test-role model. The values describe the packaged transformation but are not an independent held-out performance estimate.
