@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  25 OCT 2026 10:06
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  25 OCT 2026 10:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1159,10 +1159,12 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 ] [11
 
-] [12] (cap1.tex
+] [12
+
+
+] (cap1.tex
 Chapter 1.
 [1
-
 
 ]
 Underfull \vbox (badness 3168) has occurred while \output is active []
@@ -1406,8 +1408,8 @@ pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/c
 m/cmsy8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
 sfonts/cm/cmti12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
 public/amsfonts/cm/cmtt12.pfb>
-Output written on main_file_template_bachelor_masters_english.pdf (72 pages, 78
-0598 bytes).
+Output written on main_file_template_bachelor_masters_english.pdf (72 pages, 77
+9756 bytes).
 PDF statistics:
  975 PDF objects out of 1000 (max. 8388607)
  216 named destinations out of 1000 (max. 500000)
