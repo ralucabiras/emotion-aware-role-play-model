@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  25 OCT 2026 09:53
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  25 OCT 2026 10:06
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1174,7 +1174,13 @@ Chapter 2.
 
 ] [6] [7] [8] [9]) (cap3.tex [10]
 Chapter 3.
-(figures/system_architecture.tex) [11
+(figures/system_architecture.tex)
+Underfull \hbox (badness 1275) in paragraph at lines 20--21
+[]\OT1/cmr/m/n/12 The three en-hanced scenarios---workload ne-go-ti-a-tion, per
+-sonal boundary-
+ []
+
+[11
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 51--51
@@ -1283,6 +1289,11 @@ Underfull \hbox (badness 3849) in paragraph at lines 33--33
  []
 
 
+Underfull \hbox (badness 1769) in paragraph at lines 33--33
+[]|\OT1/cmr/m/n/8 Three en-hanced sce-nario
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 33--33
 []|\OT1/cmr/m/n/8 Limited live-device,
  []
@@ -1318,34 +1329,38 @@ Underfull \hbox (badness 10000) in paragraph at lines 33--33
  []
 
 
-Underfull \hbox (badness 3623) in paragraph at lines 69--69
+Underfull \hbox (badness 3623) in paragraph at lines 71--71
 []|\OT1/cmr/m/n/10 Psychological dis-tor-tion, true
  []
 
 
-Underfull \hbox (badness 7759) in paragraph at lines 69--69
+Underfull \hbox (badness 7759) in paragraph at lines 71--71
 []|\OT1/cmr/m/n/10 Detector sen-si-tiv-ity/specificity
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 69--69
+Underfull \hbox (badness 10000) in paragraph at lines 71--71
 []|\OT1/cmr/m/n/10 Affect ac-cu-racy, ther-a-peu-tic
  []
 
 
-Underfull \hbox (badness 1342) in paragraph at lines 76--76
+Underfull \hbox (badness 1342) in paragraph at lines 78--78
 []\OT1/cmr/bx/n/17.28 Automated, Full-Stack, and Ac-ces-si-bil-ity
  []
 
-[57
 
-] [58]
-Underfull \hbox (badness 1231) in paragraph at lines 102--102
+Underfull \vbox (badness 2617) has occurred while \output is active []
+
+ [57
+
+]
+[58]
+Underfull \hbox (badness 1231) in paragraph at lines 104--104
 []|\OT1/cmr/m/n/10.95 Authenticated sce-nario cat-a-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 102--102
+Underfull \hbox (badness 10000) in paragraph at lines 104--104
 []|\OT1/cmr/m/n/10.95 Deterministic con-ver-sa-tion
  []
 
@@ -1361,11 +1376,11 @@ out' has not changed.
 Here is how much of TeX's memory you used:
  38347 strings out of 467871
  889712 string characters out of 5418375
- 1424072 words of memory out of 5000000
+ 1425072 words of memory out of 5000000
  66355 multiletter control sequences out of 15000+600000
  643508 words of font info for 99 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,13n,104p,1997b,2456s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,13n,104p,2015b,2456s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmbx10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmbx12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/p
@@ -1391,10 +1406,10 @@ pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/c
 m/cmsy8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
 sfonts/cm/cmti12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
 public/amsfonts/cm/cmtt12.pfb>
-Output written on main_file_template_bachelor_masters_english.pdf (72 pages, 77
-7516 bytes).
+Output written on main_file_template_bachelor_masters_english.pdf (72 pages, 78
+0598 bytes).
 PDF statistics:
- 963 PDF objects out of 1000 (max. 8388607)
+ 975 PDF objects out of 1000 (max. 8388607)
  216 named destinations out of 1000 (max. 500000)
  503 words of extra memory for PDF output out of 10000 (max. 10000000)
 

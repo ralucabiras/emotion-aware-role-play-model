@@ -60,10 +60,10 @@
 \contentsline {section}{\numberline {B.2}Non-Functional Requirements}{50}{section.B.2}%
 \contentsline {chapter}{\numberline {C}Supplementary Model Results}{53}{appendix.C}%
 \contentsline {section}{\numberline {C.1}Four-Class Per-Class Results}{53}{section.C.1}%
-\contentsline {section}{\numberline {C.2}Exploratory Six-Class Experiment}{54}{section.C.2}%
+\contentsline {section}{\numberline {C.2}Exploratory Six-Class Experiment}{53}{section.C.2}%
 \contentsline {section}{\numberline {C.3}Operational Packaging Diagnostic}{56}{section.C.3}%
 \contentsline {chapter}{\numberline {D}Application Verification Details}{57}{appendix.D}%
 \contentsline {section}{\numberline {D.1}Requirement Traceability}{57}{section.D.1}%
 \contentsline {section}{\numberline {D.2}Authored Policy Cases}{57}{section.D.2}%
-\contentsline {section}{\numberline {D.3}Automated, Full-Stack, and Accessibility Evidence}{57}{section.D.3}%
+\contentsline {section}{\numberline {D.3}Automated, Full-Stack, and Accessibility Evidence}{59}{section.D.3}%
 \contentsline {section}{\numberline {D.4}Local Performance Detail}{59}{section.D.4}%

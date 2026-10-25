@@ -69,7 +69,7 @@ The pattern is consistent with context resolving labels whose interpretation dep
 
 The comparison also isolates only the combined effect of the contextual input representation. It does not determine whether the improvement came from additional lexical content, the identity-relative speaker tokens, sequential emotional consistency, or interaction structure. Component ablations would be required to attribute the gain among those mechanisms. Because both conditions share the same folds and training configuration, however, the aggregate paired difference remains a direct answer to the narrower question asked by RQ1.
 
-An exploratory six-class task also improved from 0.5490 to 0.6222 macro F1, but only 40 of its 7,420 examples were mapped anxiety cases. The result is retained in the prepared Appendix~C source with the per-class and fold tables. It is secondary evidence and does not support a deployed anxiety-recognition claim.
+An exploratory six-class task also improved from 0.5490 to 0.6222 macro F1, but only 40 of its 7,420 examples were mapped anxiety cases. Appendix~\ref{app:supplementary-model-results} retains the result with the per-class and fold tables. It is secondary evidence and does not support a deployed anxiety-recognition claim.
 
 Within this protocol, RQ1 is therefore answered positively: causal dialogue history improved aggregate text classification while architecture, data splits, and training settings were held constant. The experiment does not reveal whether the gain comes from additional lexical material, speaker markers, or discourse history, and it cannot show that a predicted category represents a user's internal emotional state.
 
@@ -97,7 +97,7 @@ Weighted F1 & 0.7300 & 0.7815 & +0.0514 & [0.0366, 0.0671] \\ \hline
 \end{tabular}
 \end{table}
 
-The pooled class results reinforce that interpretation. Equal fusion reached F1 values of 0.8277 for anger, 0.8163 for happiness, 0.7014 for neutral, and 0.8080 for sadness. Neutral remained the hardest class. Inspection of matched errors showed why fusion is not uniformly corrective: a strong audio error could overturn a correct text decision, and agreement between two wrong branches could reinforce a shared error. These cases are explanatory examples rather than prevalence estimates; complete class and session results are preserved in the prepared Appendix~C source.
+The pooled class results reinforce that interpretation. Equal fusion reached F1 values of 0.8277 for anger, 0.8163 for happiness, 0.7014 for neutral, and 0.8080 for sadness. Neutral remained the hardest class. Inspection of matched errors showed why fusion is not uniformly corrective: a strong audio error could overturn a correct text decision, and agreement between two wrong branches could reinforce a shared error. These cases are explanatory examples rather than prevalence estimates; Appendix~\ref{app:supplementary-model-results} preserves the complete class and session results.
 
 Matched predictions illustrate both directions. For one anger utterance, contextual text selected neutral while audio selected anger, and fusion recovered the annotated class. For a neutral utterance, text was correct but audio favoured anger strongly enough that fusion narrowly selected anger. In another neutral case, both modalities predicted anger and averaging reinforced the shared error. Late fusion can therefore exploit complementary mistakes but cannot correct correlated ones, and a fixed average can allow an overconfident branch to dominate a better counterpart.
 
@@ -146,7 +146,7 @@ RQ2 is thus answered positively within IEMOCAP: acoustic information improved cl
 \section{Application Verification}
 \label{sec:engineering-evaluation}
 
-Application evidence addresses conformance of the bounded integration policy and the complete implementation, not psychological or clinical validity. Table~\ref{tab:application-verification} consolidates the principal results. Detailed requirement traceability, authored cases, test commands, and performance rows are preserved in the prepared Appendix~D source.
+Application evidence addresses conformance of the bounded integration policy and the complete implementation, not psychological or clinical validity. Table~\ref{tab:application-verification} consolidates the principal results. Appendix~\ref{app:verification-details} preserves detailed requirement traceability, authored cases, and performance rows; routine commands remain in repository documentation.
 
 \begin{table}[htbp]
 \centering
@@ -160,7 +160,7 @@ Application evidence addresses conformance of the bounded integration policy and
 Authored policy cases & 5/5 dialogue trajectories and 7/7 affect-pacing cases matched declared outcomes & Rule conformance on controlled inputs, not comparative helpfulness or human benefit \\ \hline
 Diagnostic extraction fixture & 5 true positives, 4 true negatives, 1 false positive, 2 false negatives & Twelve designed examples; not an accuracy estimate \\ \hline
 Backend and static checks & 245/258 backend cases passed; 13 declared real-MongoDB skips; Ruff passed & Default suite used controlled inputs and a memory repository \\ \hline
-Frontend and browser & Production build and lint passed; 76/76 desktop/mobile cases passed & Bundled Chromium and two declared viewports \\ \hline
+Frontend and browser & Production build and lint passed; 76/76 browser-profile executions passed & 38 logical cases in bundled Chromium at two declared viewports \\ \hline
 Automated accessibility & 20 scans across 10 states returned zero detected axe violations & Automated rules only; not WCAG certification or assistive-technology testing \\ \hline
 Integrated stack smoke & 2/2 compiled-stack journeys passed, including two backend restarts & Live providers and trained inference disabled \\ \hline
 Local performance & 5/5 budgets passed; conversation turn median 4.659~ms, P95 5.836~ms & In-process, single client; excludes network, MongoDB, models, providers, and concurrency \\ \hline

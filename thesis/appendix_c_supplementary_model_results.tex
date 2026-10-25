@@ -5,6 +5,8 @@ This appendix preserves secondary results useful for reproducibility but unneces
 
 \section{Four-Class Per-Class Results}
 
+Tables~\ref{tab:context-text-per-class} and \ref{tab:multimodal-per-class} retain the class-level results behind the aggregate text, audio, and fusion comparisons. They show which categories contributed to each gain and prevent an aggregate score from being read as uniform performance across classes. Table~\ref{tab:session-fold-variation} retains the corresponding session-level variation needed to show whether the aggregate ordering depended on a single held-out actor dyad.
+
 \begin{table}[htbp]
 \centering
 \caption{Per-class results for the four-class text configurations.}
@@ -74,7 +76,7 @@ Context exceeded utterance-only text in all five sessions, and equal fusion prod
 
 \section{Exploratory Six-Class Experiment}
 
-The exploratory mapping used anger, anxiety, frustration, joy, neutral, and sadness. Its five held-out sessions contained 7,420 examples, but only 40 were IEMOCAP fear annotations mapped to anxiety. The experiment is retained to document secondary analysis, not to justify an anxiety-recognition feature.
+The exploratory mapping used anger, anxiety, frustration, joy, neutral, and sadness. Its five held-out sessions contained 7,420 examples, but only 40 were IEMOCAP fear annotations mapped to anxiety. Tables~\ref{tab:six-class-context-results}, \ref{tab:six-class-fold-results}, and \ref{tab:six-class-per-class} retain the aggregate, fold, and class results needed to expose that sparsity and observed variation. The experiment documents secondary analysis; it does not justify an anxiety-recognition feature.
 
 \begin{table}[htbp]
 \centering

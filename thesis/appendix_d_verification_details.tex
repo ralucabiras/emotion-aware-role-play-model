@@ -19,7 +19,7 @@ Table~\ref{tab:requirements-traceability} connects the grouped requirements from
 \textbf{Requirement IDs} & \textbf{Implementation boundary} & \textbf{Verification method} & \textbf{Result} & \textbf{Principal limitation} \\ \hline
 FR1, FR26; NFR5, NFR13 & Authentication, persistence, isolation, and deletion & API, security, ownership, stale-write, deletion, and recovery tests & Passed & No independent penetration or deployed-backup exercise \\ \hline
 FR2, FR3, FR25; NFR3 & Onboarding, preferences, takeaways, and action cards & API and browser onboarding, preference, reflection, and recovery journeys & Passed & No independent usability assessment \\ \hline
-FR4--FR8, FR15, FR19 & Preparation, configuration, lifecycle, and dialogue policies & Unit, API, desktop/mobile browser, authored-trajectory, and smoke tests & Passed & Three standard scenarios and controlled inputs \\ \hline
+FR4--FR8, FR15, FR19 & Preparation, configuration, lifecycle, and dialogue policies & Unit, API, desktop/mobile browser, authored-trajectory, and smoke tests & Passed & Three enhanced scenario policies and controlled inputs \\ \hline
 FR9, FR11--FR13; NFR2, NFR4 & Voice, causal context, fusion, and fallbacks & Context, multimodal, transcription, transient-audio, missing-service, and browser tests & Passed in scope & Limited live-device, provider, and private-model execution \\ \hline
 FR10; NFR1 & Crisis interruption and safety precedence & Crisis paraphrase, false-positive, precedence, API, and conversation tests & Passed & Lexical detection cannot cover every expression \\ \hline
 FR29 & Cognitive heuristics and strategy selection & Authored rule, extraction, pushback, selection, and precedence cases & Rule conformance & No construct, clinical, helpfulness, or harm evaluation \\ \hline
@@ -34,6 +34,8 @@ NFR11--NFR12 & Modular and testable architecture & Interface inspection, provide
 \end{table}
 
 \section{Authored Policy Cases}
+
+Table~\ref{tab:dialogue-case-results} records the five trajectory outcomes used to check scenario progression and legitimate unresolved closure across the three enhanced policies.
 
 \begin{table}[htbp]
 \centering
@@ -51,7 +53,7 @@ Relationship unresolved & perspective $\rightarrow$ unresolved & Completed: unre
 \end{tabularx}
 \end{table}
 
-The fixed controller stopped according to its earlier completion conditions and was used only to expose the enhanced policy's additional evidence states, not as a human-performance baseline.
+The fixed controller stopped according to its earlier completion conditions and was used only to expose the enhanced policy's additional evidence states, not as a human-performance baseline. Table~\ref{tab:cognitive-routing-cases} separately records what the selected cognitive-heuristic and support-routing cases did and, just as importantly, what those checks cannot establish.
 
 \begin{table}[htbp]
 \centering
@@ -83,7 +85,7 @@ Two full-stack journeys ran against a compiled frontend, FastAPI process, and di
 
 \section{Local Performance Detail}
 
-The local benchmark used FastAPI's in-process transport and memory repository. It included routing, authentication, request validation, services, and response serialisation, but excluded network transit, MongoDB, providers, trained inference, and concurrent clients. Read-only endpoints used 200 post-warm-up samples and state-changing operations used 100.
+The local benchmark used FastAPI's in-process transport and memory repository. It included routing, authentication, request validation, services, and response serialisation, but excluded network transit, MongoDB, providers, trained inference, and concurrent clients. Read-only endpoints used 200 post-warm-up samples and state-changing operations used 100. Table~\ref{tab:performance-results} retains the individual operations and predeclared budgets behind the aggregate performance claim.
 
 \begin{table}[htbp]
 \centering
