@@ -1,0 +1,141 @@
+\chapter{Complete System Requirements}
+\label{app:complete-requirements}
+
+This appendix preserves the atomic requirements consolidated into the nine architectural groups in Chapter~\ref{chap:proposed-system-architecture}. The identifiers are also used by the verification traceability matrix in Appendix~\ref{app:verification-details}.
+
+\section{Functional Requirements}
+
+\begin{description}[leftmargin=!,labelwidth=3.7cm,style=nextline]
+    \item[\textbf{FR1. User authentication and ownership}]
+    The system shall provide account-based access and shall associate every conversation, rehearsal, feedback record, branch, preparation record, and personal takeaway with its owning user. A user shall not be able to access another user's resources.
+
+    \item[\textbf{FR2. Onboarding and disclosure}]
+    The system shall explain its purpose, limitations, data handling, optional use of voice, and non-clinical status before the user begins the main workflow. It shall not present itself as a therapist, diagnostic instrument, mediator, or emergency service.
+
+    \item[\textbf{FR3. User preferences and practice goals}]
+    The system shall allow users to select and update practice goals and relevant interaction preferences. Optional microphone use and affect adaptation shall remain under user control.
+
+    \item[\textbf{FR4. Scenario preparation}]
+    The system shall allow the user to prepare for a conversation by recording its context, the intended outcome, relevant concerns, and a possible objection or source of resistance. Preparation information shall be available to the corresponding rehearsal without becoming an authoritative assessment of the situation.
+
+    \item[\textbf{FR5. Scenario selection}]
+    The system shall provide standard scenarios for workload negotiation, personal boundary-setting, and expressing a relationship need. It may also allow account-owned custom scenarios constructed from the supported communication objectives and observable features.
+
+    \item[\textbf{FR6. Difficulty and character configuration}]
+    The system shall support multiple difficulty levels and character profiles. These settings may vary cooperation, resistance, scepticism, time pressure, or willingness to clarify, but shall not modify the safety rules or the meaning of the scenario's communication objectives.
+
+    \item[\textbf{FR7. Rehearsal lifecycle}]
+    The user shall be able to start, pause, resume, manually finish, and leave a rehearsal. The system shall preserve the current state when continuation is permitted and shall record the reason for completion or interruption.
+
+    \item[\textbf{FR8. Text-first interaction}]
+    The system shall accept a textual message for each conversational turn. All core scenario, safety, feedback, and reflection functions shall remain available without microphone access or audio input.
+
+    \item[\textbf{FR9. Optional voice input}]
+    Where voice functions are enabled, the system shall allow the user to record a short audio sample. A transcript produced from the recording shall be presented for review and editing before it is submitted as a conversational turn.
+
+    \item[\textbf{FR10. Safety precedence}]
+    The system shall examine textual input for supported crisis-related indicators before applying ordinary affect adaptation or response generation. When a safety condition is detected, it shall interrupt the ordinary role-play path, return the predefined safety response, and record the rehearsal as safety-interrupted.
+
+    \item[\textbf{FR11. Contextual text inference}]
+    Where trained inference is enabled, the system shall construct the text-model input from the current utterance and a fixed causal window of preceding conversational turns. It shall not use future dialogue turns or unavailable annotation information.
+
+    \item[\textbf{FR12. Acoustic inference and multimodal fusion}]
+    When valid audio is supplied, the system shall produce separate textual and acoustic probability distributions and may combine them using the declared late-fusion configuration. It shall retain modality availability, confidence, agreement, calibration, and model-version information needed to interpret the result.
+
+    \item[\textbf{FR13. Missing-modality handling}]
+    The system shall handle missing, rejected, invalid, or failed audio without terminating the text-based rehearsal. The absence of audio shall not be interpreted as negative evidence about the user's affect.
+
+    \item[\textbf{FR14. Bounded affect adaptation}]
+    Where affect adaptation is enabled and permitted, the system shall translate model confidence, modality agreement, inference availability, user preference, and dialogue state into a limited set of predefined actions. Affect predictions shall not determine crisis handling, scenario success, feedback scores, participant eligibility, or research inclusion.
+
+    \item[\textbf{FR15. Deterministic dialogue progression}]
+    The system shall use scenario-specific policies to detect observable communication features, update the dialogue stage, select the simulated character's intended action, and determine whether a completion condition has been reached.
+
+    \item[\textbf{FR16. Evidence recording}]
+    For every relevant user turn, the system shall record the observable features detected by the active scenario policy and link those features to the corresponding conversation turn. The system shall preserve the policy and scoring versions used to produce the evidence.
+
+    \item[\textbf{FR17. Constrained response realisation}]
+    The system shall transform the selected dialogue action into a simulated-character response. A configured language model may phrase the response, but it shall not alter the authoritative dialogue action, completion decision, safety result, or recorded evidence.
+
+    \item[\textbf{FR18. Deterministic fallback}]
+    If generative response production is disabled, unavailable, rejected, times out, or produces an invalid result, the system shall return a deterministic response associated with the same dialogue action. The source of the response and any fallback reason shall be recorded.
+
+    \item[\textbf{FR19. Explicit rehearsal outcomes}]
+    The system shall distinguish between relevant completion outcomes, including achievement of a practical next step, maintenance of a boundary, unresolved closure, manual completion, maximum-turn completion, and safety interruption. Scenario success shall not always require agreement from the simulated character.
+
+    \item[\textbf{FR20. Evidence-grounded feedback}]
+    At the end of a rehearsal, the system shall calculate scenario-specific communication metrics from recorded evidence. Feedback shall identify supported strengths and areas for further practice without making claims about personality, diagnosis, or general communication competence.
+
+    \item[\textbf{FR21. Controlled feedback phrasing}]
+    A language model may improve the wording of deterministic feedback when configured, but it shall not introduce a strength, weakness, score, or supporting example that is absent from the authoritative feedback record.
+
+    \item[\textbf{FR22. Replay and evidence inspection}]
+    The system shall allow the user to review the completed conversation and identify the turns associated with feedback evidence, dialogue decisions, and permitted affect-adaptation actions.
+
+    \item[\textbf{FR23. Retry and branching}]
+    The system shall support retrying an eligible exchange and creating an alternative branch from a supported point in the conversation. Branching shall preserve the copied context while distinguishing it from newly generated continuation turns.
+
+    \item[\textbf{FR24. Attempt comparison}]
+    The system shall allow comparison only between compatible attempts, such as rehearsals using the same scenario and scoring version. For a branch, feedback shall evaluate the new continuation separately from the copied context.
+
+    \item[\textbf{FR25. Personal reflection}]
+    The system shall allow the user to save a personal takeaway and create an action-oriented summary of wording or next steps they wish to remember. User-authored reflections shall remain distinct from system-generated feedback.
+
+    \item[\textbf{FR26. Session persistence and deletion}]
+    The system shall retain the textual and structural information required for session recovery, replay, branching, and feedback for the configured retention period. Users shall be able to delete eligible sessions and their account-owned data.
+
+    \item[\textbf{FR27. Research participation controls}]
+    When the research workflow is enabled, the system shall record versioned consent, eligibility confirmation, questionnaire status, required-task progress, and withdrawal. Research collection shall begin only after the applicable consent and eligibility requirements have been satisfied.
+
+    \item[\textbf{FR28. Pseudonymous research access}]
+    The system shall provide authorised researchers with aggregate monitoring and pseudonymous exports containing only the fields required by the study protocol. Research exports shall exclude names, email addresses, passwords, raw conversation text, raw audio, custom scenario wording, feedback prose, and personal takeaways.
+
+    \item[\textbf{FR29. Bounded general support routing}]
+    Outside active role-play, the system may use deterministic lexical rules to select among a declared set of general support strategies. Any intent, cognitive-pattern, possible-context, readiness, or resistance output shall be presented as a tentative rule match rather than a psychological measurement. The subsystem shall not determine crisis detection, eligibility, research inclusion, scenario progression, completion, or feedback scores, and its rule-priority values shall not be presented as probabilities.
+\end{description}
+
+\section{Non-Functional Requirements}
+
+\begin{description}[leftmargin=!,labelwidth=3.7cm,style=nextline]
+    \item[\textbf{NFR1. Safety}]
+    Safety handling shall remain independent of the trained affect classifier and shall take precedence over affect adaptation and generative response production. Failure of a probabilistic component shall not suppress a deterministic safety response.
+
+    \item[\textbf{NFR2. Graceful degradation}]
+    The core text-based rehearsal shall remain operational when microphone permission is denied, audio is unavailable, trained inference cannot be loaded, transcription fails, or an external generative service is disabled or unreachable.
+
+    \item[\textbf{NFR3. User control}]
+    Users shall be able to decline optional voice processing, disable eligible adaptation, select an available pacing preference, pause a rehearsal, finish it manually, or leave it without being required to accept an inferred emotional interpretation.
+
+    \item[\textbf{NFR4. Privacy and data minimisation}]
+    The system shall collect and retain only information required for the declared application and research functions. Raw audio shall be processed transiently and shall not be stored as part of the conversation record.
+
+    \item[\textbf{NFR5. Security}]
+    The system shall protect accounts and sessions through secure password storage, authenticated access, resource-ownership checks, restricted configuration secrets, session expiry, and deployment-appropriate transport and host controls.
+
+    \item[\textbf{NFR6. Explainability and auditability}]
+    Consequential system behaviour shall be traceable to an explicit policy, evidence record, reason code, configuration, or safety rule. The system shall distinguish model predictions, dialogue decisions, generated wording, fallback responses, and feedback metrics.
+
+    \item[\textbf{NFR7. Reproducibility}]
+    Model, policy, scenario, scoring, consent, study-protocol, and export-schema versions shall be recorded where they affect interpretation. Evaluation configurations shall be preserved so that reported results can be reproduced without selecting settings from final test outcomes.
+
+    \item[\textbf{NFR8. Reliability and consistency}]
+    Repeated execution with the same deterministic state and input shall produce the same dialogue transition, completion decision, evidence record, and feedback score. Concurrent or duplicate submissions shall not silently produce contradictory session states.
+
+    \item[\textbf{NFR9. Responsiveness and failure recovery}]
+    Model-dependent operations shall use bounded execution and expose appropriate busy, error, or fallback states. Failure of an optional operation shall return control to the user rather than leaving the session in an indeterminate state. The locally controlled text-first path shall be measurable independently of provider and model latency so that responsiveness regressions can be detected reproducibly.
+
+    \item[\textbf{NFR10. Accessibility}]
+    Core workflows shall support keyboard navigation, visible focus, accessible form labels, understandable status announcements, sufficient contrast, reduced-motion preferences, and layouts suitable for desktop and mobile interaction.
+
+    \item[\textbf{NFR11. Maintainability and modularity}]
+    Persistence, affect inference, dialogue policy, safety, generation, feedback, and research-data functions shall be separated through explicit interfaces. It shall be possible to replace an optional model or external provider without rewriting the authoritative scenario logic.
+
+    \item[\textbf{NFR12. Testability}]
+    The architecture shall permit automated tests of dialogue transitions, safety precedence, affect-policy decisions, missing-modality behaviour, fallback generation, feedback evidence, access control, persistence, replay, branching, and research export.
+
+    \item[\textbf{NFR13. Data integrity}]
+    Stored sessions shall preserve the relationship between turns, dialogue decisions, evidence, feedback, branches, and version information. Invalid or stale updates shall be rejected rather than silently overwriting newer session state.
+
+    \item[\textbf{NFR14. Appropriate presentation of uncertainty}]
+    Affect outputs shall be presented as model estimates rather than verified facts. Low-confidence, conflicting, or unavailable results shall be distinguishable from supported predictions and shall not be converted into stronger psychological claims.
+\end{description}

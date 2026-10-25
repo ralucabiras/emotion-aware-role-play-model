@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  25 OCT 2026 09:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  25 OCT 2026 09:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1111,7 +1111,7 @@ Package hyperref Info: Link coloring OFF on input line 33.
 \@outlinefile=\write4
 \openout4 = `main_file_template_bachelor_masters_english.out'.
 
-<FI.png, id=218, 578.8827pt x 290.0436pt>
+<FI.png, id=246, 578.8827pt x 290.0436pt>
 File: FI.png Graphic file (type png)
 <use FI.png>
 Package pdftex.def Info: FI.png  used on input line 42.
@@ -1221,7 +1221,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [17]
 (figures/emotion_pipeline.tex) [18] [19] (figures/request_sequence.tex)
 [20] [21] (figures/affect_policy.tex) [22]
-<figures/app-roleplay.png, id=577, 696.80325pt x 558.888pt>
+<figures/app-roleplay.png, id=630, 696.80325pt x 558.888pt>
 File: figures/app-roleplay.png Graphic file (type png)
 <use figures/app-roleplay.png>
 Package pdftex.def Info: figures/app-roleplay.png  used on input line 135.
@@ -1256,87 +1256,116 @@ Underfull \hbox (badness 4582) in paragraph at lines 134--140
 []\OT1/cmr/m/n/12 Meelis Kull, Miquel Perello-Nieto, Markus K^^?angsepp, Telmo
  []
 
-[43]) [44]
+[43]) (appendix_a_ai_usage.tex [44]
 Appendix A.
+) (appendix_b_requirements.tex [45
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-[]|\OT1/cmr/m/n/12 Literature ex-plo-
+] [46
+
+]
+Appendix B.
+[47] [48] [49] [50] [51]) (appendix_c_supplementary_model_results.tex [52]
+Appendix C.
+[53
+
+] [54] [55]) (appendix_d_verification_details.tex [56
+
+]
+Appendix D.
+
+Underfull \hbox (badness 1210) in paragraph at lines 33--33
+[]|\OT1/cmr/m/n/8 No in-de-pen-dent pen-e-tra-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-\OT1/cmr/m/n/12 ration and iden-ti-
+Underfull \hbox (badness 3849) in paragraph at lines 33--33
+\OT1/cmr/m/n/8 tion or deployed-backup
  []
 
 
-Underfull \hbox (badness 2875) in paragraph at lines 226--226
-\OT1/cmr/m/n/12 fi-ca-tion of rel-e-vant
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+[]|\OT1/cmr/m/n/8 Limited live-device,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-\OT1/cmr/m/n/12 sci-en-tific pub-li-ca-
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+\OT1/cmr/m/n/8 provider, and private-
  []
 
 
-Underfull \hbox (badness 7907) in paragraph at lines 226--226
-\OT1/cmr/m/n/12 were in-de-pen-dently
+Underfull \hbox (badness 2285) in paragraph at lines 33--33
+[]|\OT1/cmr/m/n/8 Lexical de-tec-tion can-not
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-[]|\OT1/cmr/m/n/12 Improvement of
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+[]|\OT1/cmr/m/n/8 No con-struct, clin-i-cal,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-\OT1/cmr/m/n/12 aca-demic phras-ing,
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+[]|\OT1/cmr/m/n/8 Controlled prob-a-bil-i-ties;
  []
 
 
-Underfull \hbox (badness 1430) in paragraph at lines 226--226
-\OT1/cmr/m/n/12 gram-mar, and text
+Underfull \hbox (badness 4429) in paragraph at lines 33--33
+\OT1/cmr/m/n/8 load or provider-latency
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-[]|\OT1/cmr/m/n/12 Formatting sug-ges-
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+[]|\OT1/cmr/m/n/8 No eval-u-a-tion with
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-[]|\OT1/cmr/m/n/12 Technical guid-ance
+Underfull \hbox (badness 3623) in paragraph at lines 69--69
+[]|\OT1/cmr/m/n/10 Psychological dis-tor-tion, true
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-[]|\OT1/cmr/m/n/12 Implementation
+Underfull \hbox (badness 7759) in paragraph at lines 69--69
+[]|\OT1/cmr/m/n/10 Detector sen-si-tiv-ity/specificity
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-[]|\OT1/cmr/m/n/12 Suggestions were
+Underfull \hbox (badness 10000) in paragraph at lines 69--69
+[]|\OT1/cmr/m/n/10 Affect ac-cu-racy, ther-a-peu-tic
  []
 
-[45
 
-] [46] [47] (main_file_template_bachelor_masters_english.aux)
+Underfull \hbox (badness 1342) in paragraph at lines 76--76
+[]\OT1/cmr/bx/n/17.28 Automated, Full-Stack, and Ac-ces-si-bil-ity
+ []
+
+[57
+
+] [58]
+Underfull \hbox (badness 1231) in paragraph at lines 102--102
+[]|\OT1/cmr/m/n/10.95 Authenticated sce-nario cat-a-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 102--102
+[]|\OT1/cmr/m/n/10.95 Deterministic con-ver-sa-tion
+ []
+
+) [59] [60] (main_file_template_bachelor_masters_english.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main_file_template_bachelor_masters_english.
 out' has not changed.
-(rerunfilecheck)             Checksum: D7903E3FAA98AD97691D41E61E86F969;11004.
+(rerunfilecheck)             Checksum: A05ABAE36AD128AE22F0DBF4BCD261BA;12501.
  ) 
 Here is how much of TeX's memory you used:
- 38261 strings out of 467871
- 887472 string characters out of 5418375
- 1415259 words of memory out of 5000000
- 66310 multiletter control sequences out of 15000+600000
- 641652 words of font info for 92 fonts, out of 8000000 for 9000
+ 38347 strings out of 467871
+ 889712 string characters out of 5418375
+ 1424072 words of memory out of 5000000
+ 66355 multiletter control sequences out of 15000+600000
+ 643508 words of font info for 99 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,15n,104p,1997b,2456s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,13n,104p,1997b,2456s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmbx10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmbx12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/p
@@ -1362,10 +1391,10 @@ pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/c
 m/cmsy8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
 sfonts/cm/cmti12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
 public/amsfonts/cm/cmtt12.pfb>
-Output written on main_file_template_bachelor_masters_english.pdf (59 pages, 72
-5194 bytes).
+Output written on main_file_template_bachelor_masters_english.pdf (72 pages, 77
+7516 bytes).
 PDF statistics:
- 848 PDF objects out of 1000 (max. 8388607)
- 187 named destinations out of 1000 (max. 500000)
- 447 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 963 PDF objects out of 1000 (max. 8388607)
+ 216 named destinations out of 1000 (max. 500000)
+ 503 words of extra memory for PDF output out of 10000 (max. 10000000)
 
