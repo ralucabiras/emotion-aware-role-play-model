@@ -20,6 +20,8 @@
 \usepackage{algorithm, algpseudocode}%algorithmic
 \usepackage[inline]{enumitem}
 \usepackage{hyperref}
+\usepackage{etoolbox}
+\apptocmd{\thebibliography}{\setlength{\itemsep}{0pt}}{}{}
 %\usepackage{...insert other packages here...}
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
@@ -172,9 +174,11 @@ I used generative AI during the writing and research process. The details are in
 \input{cap6}
 
 
-\bibliography{myBib}
 \bibliographystyle{alpha}
+\cleardoublepage
+\phantomsection
 \addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{myBib}
 
 
 \appendix

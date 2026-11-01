@@ -2,47 +2,47 @@ This is BibTeX, Version 0.99e
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main_file_template_bachelor_masters_english.aux
 Reallocating 'name_of_file' (item size: 1) to 6 items.
-Reallocating 'name_of_file' (item size: 1) to 6 items.
 The style file: alpha.bst
+Reallocating 'name_of_file' (item size: 1) to 6 items.
 Database file #1: myBib.bib
 You've used 35 entries,
             2543 wiz_defined-function locations,
-            762 strings with 13480 characters,
-and the built_in function-call counts, 19724 in all, are:
-= -- 1956
+            772 strings with 13746 characters,
+and the built_in function-call counts, 20418 in all, are:
+= -- 2056
 > -- 1190
-< -- 26
+< -- 29
 + -- 447
 - -- 440
-* -- 1571
-:= -- 3160
-add.period$ -- 119
+* -- 1646
+:= -- 3228
+add.period$ -- 118
 call.type$ -- 35
 change.case$ -- 315
 chr.to.int$ -- 35
 cite$ -- 35
-duplicate$ -- 683
-empty$ -- 1268
+duplicate$ -- 718
+empty$ -- 1299
 format.name$ -- 462
-if$ -- 4059
+if$ -- 4228
 int.to.chr$ -- 1
 int.to.str$ -- 0
 missing$ -- 31
-newline$ -- 180
+newline$ -- 179
 num.names$ -- 105
-pop$ -- 313
+pop$ -- 310
 preamble$ -- 1
 purify$ -- 350
 quote$ -- 0
-skip$ -- 602
+skip$ -- 644
 stack$ -- 0
-substring$ -- 1137
-swap$ -- 207
-text.length$ -- 26
+substring$ -- 1265
+swap$ -- 232
+text.length$ -- 29
 text.prefix$ -- 5
 top$ -- 0
 type$ -- 280
 warning$ -- 0
-while$ -- 171
+while$ -- 180
 width$ -- 40
-write$ -- 474
+write$ -- 485

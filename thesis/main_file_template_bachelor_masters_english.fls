@@ -519,6 +519,7 @@ INPUT .\appendix_c_supplementary_model_results.tex
 INPUT .\appendix_c_supplementary_model_results.tex
 INPUT .\appendix_c_supplementary_model_results.tex
 INPUT appendix_c_supplementary_model_results.tex
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt8.tfm
 INPUT .\appendix_d_verification_details.tex
 INPUT .\appendix_d_verification_details.tex
 INPUT .\appendix_d_verification_details.tex
@@ -578,3 +579,5 @@ INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\c
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti12.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt12.pfb
 INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt12.pfb
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt8.pfb
+INPUT C:\Users\raluc\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt8.pfb

@@ -5,7 +5,7 @@
 Tadas Baltru{\v{s}}aitis, Chaitanya Ahuja, and Louis-Philippe Morency.
 \newblock Multimodal machine learning: A survey and taxonomy.
 \newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
-  41(2):423--443, 2019.
+  41(2):423--443, February 2019.
 
 \bibitem[BBL{\etalchar{+}}08]{busso2008iemocap}
 Carlos Busso, Murtaza Bulut, Chi-Chun Lee, Abe Kazemzadeh, Emily Mower, Samuel
@@ -33,7 +33,7 @@ Alexei Baevski, Yuhao Zhou, Abdelrahman Mohamed, and Michael Auli.
 \newblock wav2vec 2.0: A framework for self-supervised learning of speech
   representations.
 \newblock In {\em Advances in Neural Information Processing Systems},
-  volume~33, 2020.
+  volume~33, pages 12449--12460, 2020.
 
 \bibitem[CWC{\etalchar{+}}22]{chen2022wavlm}
 Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu~Wu, Shujie Liu, Zhuo Chen, Jinyu
@@ -42,7 +42,7 @@ Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu~Wu, Shujie Liu, Zhuo Chen, Jinyu
 \newblock {WavLM}: Large-scale self-supervised pre-training for full stack
   speech processing.
 \newblock {\em IEEE Journal of Selected Topics in Signal Processing},
-  16(6):1505--1518, 2022.
+  16(6):1505--1518, October 2022.
 
 \bibitem[DCLT19]{devlin2019bert}
 Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
@@ -50,8 +50,8 @@ Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
   understanding.
 \newblock In {\em Proceedings of the 2019 Conference of the North American
   Chapter of the Association for Computational Linguistics: Human Language
-  Technologies}, pages 4171--4186. Association for Computational Linguistics,
-  2019.
+  Technologies, Volume 1 (Long and Short Papers)}, pages 4171--4186,
+  Minneapolis, Minnesota, June 2019. Association for Computational Linguistics.
 
 \bibitem[DFC24]{defreitas2024wellness}
 Julian De~Freitas and I.~Glenn Cohen.
@@ -67,23 +67,24 @@ Paul Ekman.
 Florian Eyben, Klaus~R. Scherer, Bj{\"o}rn~W. Schuller, Johan Sundberg,
   Elisabeth Andr{\'e}, Carlos Busso, Laurence~Y. Devillers, Julien Epps, Petri
   Laukka, Shrikanth~S. Narayanan, and Khiet~P. Truong.
-\newblock The geneva minimalistic acoustic parameter set ({GeMAPS}) for voice
+\newblock The {Geneva Minimalistic Acoustic Parameter Set} ({GeMAPS}) for voice
   research and affective computing.
 \newblock {\em IEEE Transactions on Affective Computing}, 7(2):190--202, 2016.
 
 \bibitem[{Eur}16]{eu2016gdpr}
 {European Parliament and Council of the European Union}.
-\newblock Regulation (eu) 2016/679 on the protection of natural persons with
+\newblock Regulation ({EU}) 2016/679 on the protection of natural persons with
   regard to the processing of personal data and on the free movement of such
-  data (general data protection regulation).
-\newblock Official Journal of the European Union, L 119, 2016.
-\newblock Accessed 6 October 2026.
+  data ({General Data Protection Regulation}).
+\newblock Official Journal of the European Union, L 119, 4 May 2016, pp. 1--88,
+  2016.
 
 \bibitem[{Eur}24]{eu2024aiact}
 {European Parliament and Council of the European Union}.
 \newblock Regulation ({EU}) 2024/1689 laying down harmonised rules on
   artificial intelligence ({Artificial Intelligence Act}).
-\newblock Official Journal of the European Union, 2024.
+\newblock Official Journal of the European Union, L, 2024/1689, 12 July 2024,
+  2024.
 
 \bibitem[GMG{\etalchar{+}}20]{ghosal2020cosmic}
 Deepanway Ghosal, Navonil Majumder, Alexander Gelbukh, Rada Mihalcea, and
@@ -91,8 +92,8 @@ Deepanway Ghosal, Navonil Majumder, Alexander Gelbukh, Rada Mihalcea, and
 \newblock {COSMIC}: {CO}mmon{S}ense knowledge for e{M}otion identification in
   conversations.
 \newblock In {\em Findings of the Association for Computational Linguistics:
-  EMNLP 2020}, pages 2470--2481. Association for Computational Linguistics,
-  2020.
+  {EMNLP} 2020}, pages 2470--2481, Online, November 2020. Association for
+  Computational Linguistics.
 
 \bibitem[GMP{\etalchar{+}}19]{ghosal2019dialoguegcn}
 Deepanway Ghosal, Navonil Majumder, Soujanya Poria, Niyati Chhaya, and
@@ -101,8 +102,8 @@ Deepanway Ghosal, Navonil Majumder, Soujanya Poria, Niyati Chhaya, and
   recognition in conversation.
 \newblock In {\em Proceedings of the 2019 Conference on Empirical Methods in
   Natural Language Processing and the 9th International Joint Conference on
-  Natural Language Processing}, pages 154--164. Association for Computational
-  Linguistics, 2019.
+  Natural Language Processing ({EMNLP}-{IJCNLP})}, pages 154--164, Hong Kong,
+  China, November 2019. Association for Computational Linguistics.
 
 \bibitem[GPSW17]{guo2017calibration}
 Chuan Guo, Geoff Pleiss, Yu~Sun, and Kilian~Q. Weinberger.
@@ -134,7 +135,7 @@ John Hattie and Helen Timperley.
 Meelis Kull, Miquel Perello-Nieto, Markus K{\"a}ngsepp, Telmo Silva~Filho, Hao
   Song, and Peter Flach.
 \newblock Beyond temperature scaling: Obtaining well-calibrated multi-class
-  probabilities with dirichlet calibration.
+  probabilities with {Dirichlet} calibration.
 \newblock In {\em Advances in Neural Information Processing Systems},
   volume~32, pages 12316--12326, 2019.
 
@@ -143,8 +144,8 @@ Dongxu Lu, Johan Jeuring, and Albert Gatt.
 \newblock Evaluating {LLM}-generated versus human-authored responses in
   role-play dialogues.
 \newblock In {\em Proceedings of the 18th International Natural Language
-  Generation Conference}, pages 20--40. Association for Computational
-  Linguistics, 2025.
+  Generation Conference}, pages 20--40, Hanoi, Vietnam, October 2025.
+  Association for Computational Linguistics.
 
 \bibitem[LKK{\etalchar{+}}20]{lee2020virtualpatients}
 Juhye Lee, Haerim Kim, Kyoung~Hwa Kim, Daesung Jung, Tanisha Jowsey, and
@@ -159,8 +160,8 @@ Joosung Lee and Wooin Lee.
   for emotion recognition in conversation.
 \newblock In {\em Proceedings of the 2022 Conference of the North American
   Chapter of the Association for Computational Linguistics: Human Language
-  Technologies}, pages 5669--5679. Association for Computational Linguistics,
-  2022.
+  Technologies}, pages 5669--5679, Seattle, United States, July 2022.
+  Association for Computational Linguistics.
 
 \bibitem[LOG{\etalchar{+}}19]{liu2019roberta}
 Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer
@@ -181,8 +182,8 @@ Inna Lin, Ashish Sharma, Christopher Rytting, Adam Miner, Jina Suh, and Tim
 Yanran Li, Hui Su, Xiaoyu Shen, Wenjie Li, Ziqiang Cao, and Shuzi Niu.
 \newblock {DailyDialog}: A manually labelled multi-turn dialogue dataset.
 \newblock In {\em Proceedings of the Eighth International Joint Conference on
-  Natural Language Processing (Volume 1: Long Papers)}, pages 986--995. Asian
-  Federation of Natural Language Processing, 2017.
+  Natural Language Processing (Volume 1: Long Papers)}, pages 986--995, Taipei,
+  Taiwan, November 2017. Asian Federation of Natural Language Processing.
 
 \bibitem[LWC{\etalchar{+}}22]{li2022contextaware}
 Jinchao Li, Shuai Wang, Yang Chao, Xunying Liu, and Helen Meng.
@@ -202,10 +203,10 @@ Navonil Majumder, Soujanya Poria, Devamanyu Hazarika, Rada Mihalcea, Alexander
 \bibitem[OFR{\etalchar{+}}19]{ovadia2019shift}
 Yaniv Ovadia, Emily Fertig, Jie Ren, Zachary Nado, D.~Sculley, Sebastian
   Nowozin, Joshua Dillon, Balaji Lakshminarayanan, and Jasper Snoek.
-\newblock Can you trust your model's uncertainty? evaluating predictive
+\newblock Can you trust your model's uncertainty? {Evaluating} predictive
   uncertainty under dataset shift.
 \newblock In {\em Advances in Neural Information Processing Systems},
-  volume~32, 2019.
+  volume~32, pages 13991--14002, 2019.
 
 \bibitem[PHM{\etalchar{+}}19]{poria2019meld}
 Soujanya Poria, Devamanyu Hazarika, Navonil Majumder, Gautam Naik, Erik
@@ -213,16 +214,16 @@ Soujanya Poria, Devamanyu Hazarika, Navonil Majumder, Gautam Naik, Erik
 \newblock {MELD}: A multimodal multi-party dataset for emotion recognition in
   conversations.
 \newblock In {\em Proceedings of the 57th Annual Meeting of the Association for
-  Computational Linguistics}, pages 527--536. Association for Computational
-  Linguistics, 2019.
+  Computational Linguistics}, pages 527--536, Florence, Italy, July 2019.
+  Association for Computational Linguistics.
 
 \bibitem[RSLB19]{rashkin2019empathetic}
 Hannah Rashkin, Eric~Michael Smith, Margaret Li, and Y-Lan Boureau.
 \newblock Towards empathetic open-domain conversation models: A new benchmark
   and dataset.
 \newblock In {\em Proceedings of the 57th Annual Meeting of the Association for
-  Computational Linguistics}, pages 5370--5381. Association for Computational
-  Linguistics, 2019.
+  Computational Linguistics}, pages 5370--5381, Florence, Italy, July 2019.
+  Association for Computational Linguistics.
 
 \bibitem[Rus80]{russell1980circumplex}
 James~A. Russell.
@@ -232,7 +233,7 @@ James~A. Russell.
 
 \bibitem[Sch05]{scherer2005emotions}
 Klaus~R. Scherer.
-\newblock What are emotions? and how can they be measured?
+\newblock What are emotions? {And} how can they be measured?
 \newblock {\em Social Science Information}, 44(4):695--729, 2005.
 
 \bibitem[TBL{\etalchar{+}}19]{tsai2019mult}
@@ -240,20 +241,21 @@ Yao-Hung~Hubert Tsai, Shaojie Bai, Paul~Pu Liang, J.~Zico Kolter,
   Louis-Philippe Morency, and Ruslan Salakhutdinov.
 \newblock Multimodal transformer for unaligned multimodal language sequences.
 \newblock In {\em Proceedings of the 57th Annual Meeting of the Association for
-  Computational Linguistics}, pages 6558--6569. Association for Computational
-  Linguistics, 2019.
+  Computational Linguistics}, pages 6558--6569, Florence, Italy, July 2019.
+  Association for Computational Linguistics.
 
 \bibitem[TSG25]{tamoyan2025roleplay}
 Hovhannes Tamoyan, Hendrik Schuff, and Iryna Gurevych.
 \newblock {LLM} roleplay: Simulating human-chatbot interaction.
 \newblock In {\em Proceedings of the Third Workshop on Social Influence in
-  Conversations}, pages 1--26. Association for Computational Linguistics, 2025.
+  Conversations ({SIC}on 2025)}, pages 1--26, Vienna, Austria, July 2025.
+  Association for Computational Linguistics.
 
 \bibitem[ZHZ{\etalchar{+}}18]{zhou2018ecm}
 Hao Zhou, Minlie Huang, Tianyang Zhang, Xiaoyan Zhu, and Bing Liu.
 \newblock Emotional chatting machine: Emotional conversation generation with
   internal and external memory.
 \newblock In {\em Proceedings of the AAAI Conference on Artificial
-  Intelligence}, volume~32, 2018.
+  Intelligence}, volume~32, pages 730--739, 2018.
 
 \end{thebibliography}
