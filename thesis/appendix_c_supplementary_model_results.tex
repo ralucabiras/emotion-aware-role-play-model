@@ -3,6 +3,36 @@
 
 This appendix preserves secondary results useful for reproducibility but unnecessary for the main argument in Chapter~\ref{chap5}. Pooled metrics are computed after concatenating the five non-overlapping held-out sessions; fold means are unweighted descriptive summaries and therefore need not equal the pooled values.
 
+\section{Reproduction Provenance}
+
+Table~\ref{tab:model-reproduction-provenance} fixes the exact configuration behind the principal four-class results and the final private inference package. The evaluation models and the later full-data package have different evidential roles: only the rotating held-out-session models support performance claims.
+
+\begin{table}[htbp]
+\centering
+\caption{Compact provenance for the principal IEMOCAP experiments and packaging run.}
+\label{tab:model-reproduction-provenance}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|X|}
+\hline
+\textbf{Field} & \textbf{Frozen value} \\ \hline
+Model identifiers & \path{iemocap_benchmark4_deberta_v3_small} and \path{iemocap_benchmark4_context3_deberta_v3_small}, both \path{microsoft/deberta-v3-small}; \path{iemocap_benchmark4_audio_wav2vec2_base}, using \path{facebook/wav2vec2-base}; package \path{iemocap_benchmark4_final_multimodal}. \\ \hline
+Seeds & Training and data order: 42. Paired dialogue bootstrap: 20260808, 10,000 replicates. \\ \hline
+Session-role schedule & Test S1/validation S5/train S2--S4; test S2/validation S1/train S3--S5; test S3/validation S2/train S1,S4,S5; test S4/validation S3/train S1,S2,S5; test S5/validation S4/train S1--S3. \\ \hline
+Optimisation & Recorded Transformers environment default \path{adamw_torch_fused} (fused PyTorch AdamW); text learning rate $2\times10^{-5}$, audio $1\times10^{-5}$; weight decay 0.01 and linear 10\% warm-up for both. \\ \hline
+Batching & Text train/evaluation batch 16/32, one accumulation step. Audio 4/8, four accumulation steps (effective training batch 16). \\ \hline
+Epoch selection & Evaluation and checkpointing after each epoch; retain highest validation macro F1; maxima 8 text and 10 audio epochs, with early stopping after two non-improving evaluations. Full-data package counts were frozen from the completed experiment histories at 7 text and 10 audio epochs. \\ \hline
+Input limits & Utterance-only text: 128 tokens. Three-turn causal context: 256 tokens. Audio: mono 16~kHz and at most 20 seconds; 16 of 5,531 files were truncated. \\ \hline
+Calibration and fusion & Each scalar temperature minimises validation NLL by 80-step golden-section search over $\log T\in[-3,3]$. Confirmatory fusion fixes text/audio weights at 0.5/0.5. The calibration-oriented variant searches text weight 0.00--1.00 in 0.01 steps on each validation session, then fits a scalar fusion temperature before testing. \\ \hline
+ECE definition & Maximum-probability ECE with 15 equal-width bins on $[0,1]$; bins use $(l,u]$, and each absolute confidence--accuracy gap is weighted by its sample fraction. \\ \hline
+Recorded environment & Final packaging manifests: Python 3.12.13; PyTorch 2.11.0+cu128; Transformers 5.13.1; mixed FP16 on an NVIDIA Tesla T4. Each restricted fold's metrics file separately records its run environment. \\ \hline
+Revision and configuration & Preparation commit \href{https://github.com/ralucabiras/emotion-aware-role-play-model/tree/0411ee550318e6031b5edccce13db74640e99d74}{\texttt{0411ee550318e6031b5edccce13db74640e99d74}}; SHA-256 of \path{configs/iemocap_final_multimodal.json}: \path{d1a29a886293d5ed7398afc3208b4e866ef50d78b03b5792c5c66fb4693e0914}. \\ \hline
+Evidence archive & Training code/configuration: the preparation commit linked above. Canonical repository evidence: \href{https://github.com/ralucabiras/emotion-aware-role-play-model/tree/79ea347376537b781cdf6b4b5fa5311ae13ee838/docs/evidence-package}{\texttt{docs/evidence-package} at commit \texttt{79ea347376537b781cdf6b4b5fa5311ae13ee838}}. Restricted reports and artefacts: \path{gs://affectlab-research-raluca-biras/runs/} and \path{gs://affectlab-research-raluca-biras/models/iemocap-benchmark4-final-v1/}. \\ \hline
+\end{tabularx}
+\end{table}
+
+IEMOCAP media, row-level predictions, and weights cannot be redistributed, so access to the private evidence archive requires authorisation. At the audit cut-off, the repository revision, configuration digest, environment, and archive locations were recorded, but individual and aggregate hashes for the downloaded final model files had not yet been captured. The supplied provenance script must generate and archive that manifest before any claim of complete independent reproduction.
+
 \section{Four-Class Per-Class Results}
 
 Tables~\ref{tab:context-text-per-class} and \ref{tab:multimodal-per-class} retain the class-level results behind the aggregate text, audio, and fusion comparisons. They show which categories contributed to each gain and prevent an aggregate score from being read as uniform performance across classes. Table~\ref{tab:session-fold-variation} retains the corresponding session-level variation needed to show whether the aggregate ordering depended on a single held-out actor dyad.
