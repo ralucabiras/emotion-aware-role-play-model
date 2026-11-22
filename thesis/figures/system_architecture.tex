@@ -1,49 +1,33 @@
-\begin{tikzpicture}[
-    font=\sffamily\scriptsize,
-    component/.style={draw=blue!65!black, fill=blue!7, rounded corners=2pt,
-        align=center, minimum width=3.1cm, minimum height=0.9cm},
-    authority/.style={draw=red!70!black, fill=red!7, rounded corners=2pt,
-        align=center, minimum width=3.1cm, minimum height=0.9cm},
-    evidence/.style={draw=teal!70!black, fill=teal!9, rounded corners=2pt,
-        align=center, minimum width=3.1cm, minimum height=0.9cm},
-    store/.style={cylinder, shape border rotate=90, aspect=0.25,
-        draw=violet!70!black, fill=violet!8, align=center,
-        minimum width=2.8cm, minimum height=1.05cm},
-    optional/.style={draw=black!55, fill=black!3, dashed, rounded corners=2pt,
-        align=center, minimum width=3.0cm, minimum height=0.9cm},
-    flow/.style={-{Latex[length=2.2mm]}, thick, draw=black!65},
-    signal/.style={-{Latex[length=2.2mm]}, thick, dashed, draw=teal!70!black}
-]
-\node[component] (ui) at (0,0) {Browser interaction layer\\text and optional voice};
-\node[component] (app) at (4.1,0) {Application and session layer\\authentication, ownership, state};
-\node[authority] (safety) at (8.2,2.25) {Safety layer\\authoritative interruption};
-\node[evidence] (affect) at (8.2,0.75) {Affect-inference layer\\text, audio, fusion, uncertainty};
-\node[authority] (policy) at (8.2,-0.9) {Dialogue-policy layer\\state, evidence, completion};
-\node[component] (realise) at (12.3,0) {Response realisation\\constrained generation or template};
-\node[component] (feedback) at (8.2,-2.65) {Feedback and reflection\\replay, branch, comparison};
-\node[store] (store) at (4.1,-2.65) {Persistence and\\research records};
-\node[optional] (external) at (12.3,-2.65) {Optional external services\\generation, transcription, email};
-
-\draw[flow] (ui) -- (app);
-\draw[flow] (app) -- (safety);
-\draw[flow] (app) -- (affect);
-\draw[flow] (app) -- (policy);
-\draw[signal] (affect) -- (policy);
-\draw[flow] (policy) -- (realise);
-\draw[flow] (safety.east) -| (realise.north);
-\draw[flow] (realise.west) -- ++(-0.45,0) |- (app.east);
-\draw[flow] (app) -- (ui);
-\draw[flow] (policy) -- (feedback);
-\draw[flow] (feedback) -- (store);
-\draw[flow] (app) -- (store);
-\draw[signal] (external) -- (realise);
-\draw[signal] (external.west) -- ++(-0.4,0) |- (app.south);
-
-\begin{scope}[on background layer]
-  \node[fit=(safety)(affect)(policy), draw=black!35, rounded corners=4pt,
-      fill=white, inner sep=6pt, label={[font=\sffamily\scriptsize]above:Decision boundary}] {};
-\end{scope}
-
-\node[align=center, text=red!70!black] at (8.2,-3.7)
-    {Probabilistic components provide evidence; deterministic components retain authority.};
+\input{figures/technical_diagram_styles}
+\begin{tikzpicture}[td diagram]
+\node[td box, text width=3.3cm] (ui) at (6.8,0)
+    {Browser\\text or voice};
+\node[td box, text width=3.3cm] (app) at (6.8,-1.4)
+    {Application\\session control};
+\node[td safety, text width=3.3cm] (safety) at (6.8,-2.8)
+    {Safety policy\\fixed interruption};
+\node[td action, text width=3.3cm] (policy) at (6.8,-4.2)
+    {Dialogue policy\\state and evidence};
+\node[td box, text width=3.3cm] (realise) at (6.8,-5.6)
+    {Reply realisation\\action to wording};
+\node[td optional, text width=3.0cm] (affect) at (1.8,-4.2)
+    {Affect inference\\text and audio};
+\node[td box, text width=3.0cm] (store) at (11.7,-1.4)
+    {Persistence\\turns and decisions};
+\node[td box, text width=3.0cm] (feedback) at (11.7,-2.8)
+    {Feedback and replay\\recorded evidence};
+\node[td optional, text width=3.0cm] (external) at (11.7,-5.6)
+    {Optional generator\\wording only};
+\draw[td flow] (ui) -- (app);
+\draw[td flow] (app) -- (safety);
+\draw[td flow] (safety) -- (policy);
+\draw[td flow] (policy) -- (realise);
+\draw[td flow] (app) -- (store);
+\draw[td flow] (store) -- (feedback);
+\draw[td signal] (app.west) -| (affect.north);
+\draw[td signal] (affect) -- node[td label, above]{evidence} (policy);
+\draw[td signal] (external) -- node[td label, above]{wording} (realise);
+\draw[td flow, draw=red!70!black] (safety.east) -- (9.35,-2.8)
+    -- node[td label, right, text=red!70!black]{interrupt} (9.35,-4.9)
+    -- (realise.north east);
 \end{tikzpicture}

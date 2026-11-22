@@ -6,12 +6,12 @@
 
 AffectLab is a text-first application for rehearsing difficult interpersonal conversations. Its architecture combines deterministic application logic, trained affect-recognition models, optional generative services, and a browser interface, but it is not an end-to-end conversational model. The central design principle is separation of authority: probabilistic components may provide affective evidence or flexible wording, whereas explicit policies retain control of safety, dialogue progression, completion, and feedback evidence. This division makes consequential decisions inspectable and allows the core rehearsal to continue when a model or provider is unavailable.
 
-Figure~\ref{fig:system-architecture} shows the resulting information and authority flow. The interaction layer supports scenario selection, text and optional voice input, conversation display, and reflection. The application layer authenticates the request, validates ownership, coordinates the active session, and persists its state. Within the decision boundary, safety and dialogue policies are authoritative; affect inference supplies bounded evidence to the dialogue policy but cannot replace either authority. Response realisation converts a selected action into text using a constrained generator or its deterministic template. Feedback and reflection operate on recorded policy evidence rather than on unverified generated claims.
+Figure~\ref{fig:system-architecture} separates authoritative safety and dialogue control from optional model contributions. The interaction layer supports scenario selection, text and optional voice input, conversation display, and reflection. The application layer authenticates the request, validates ownership, coordinates the active session, and persists its state. Safety and dialogue policies are authoritative; affect inference supplies bounded evidence to the dialogue policy but cannot replace either authority. Response realisation converts a selected action into text using a constrained generator or its deterministic template. Feedback and reflection operate on recorded policy evidence rather than on unverified generated claims.
 
 \begin{figure}[htbp]
 \centering
-\resizebox{\textwidth}{!}{\input{figures/system_architecture}}
-\caption{Logical architecture of AffectLab and separation between probabilistic evidence and authoritative application control.}
+\input{figures/system_architecture}
+\caption[Component dependencies and decision authority in AffectLab.]{Component dependencies and decision authority. Dashed arrows carry optional model contributions; safety bypasses dialogue policy.}
 \label{fig:system-architecture}
 \end{figure}
 

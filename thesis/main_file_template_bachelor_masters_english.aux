@@ -89,8 +89,8 @@
 \newlabel{chap:proposed-system-architecture}{{3}{11}{Proposed System Architecture}{chapter.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3.1}Architecture and Design Principles}{11}{section.3.1}\protected@file@percent }
 \newlabel{sec:system-overview}{{3.1}{11}{Architecture and Design Principles}{section.3.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces Logical architecture of AffectLab and separation between probabilistic evidence and authoritative application control.}}{12}{figure.3.1}\protected@file@percent }
-\newlabel{fig:system-architecture}{{3.1}{12}{Logical architecture of AffectLab and separation between probabilistic evidence and authoritative application control}{figure.3.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces Component dependencies and decision authority in AffectLab.}}{12}{figure.3.1}\protected@file@percent }
+\newlabel{fig:system-architecture}{{3.1}{12}{Component dependencies and decision authority in AffectLab}{figure.3.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3.2}Grouped System Requirements}{12}{section.3.2}\protected@file@percent }
 \newlabel{sec:system-requirements-scope}{{3.2}{12}{Grouped System Requirements}{section.3.2}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Grouped functional and non-functional requirements.}}{13}{table.3.1}\protected@file@percent }
@@ -115,11 +115,11 @@
 \newlabel{sec:emotion-recognition-pipeline}{{4.2}{16}{Emotion-Recognition Pipeline}{section.4.2}{}}
 \citation{he2021debertav3}
 \citation{baevski2020wav2vec}
-\citation{baltrusaitis2019multimodal}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Emotion-recognition evaluation and deployment pipeline. Full-data packaging creates application artefacts, not additional held-out evidence.}}{17}{figure.4.1}\protected@file@percent }
-\newlabel{fig:emotion-pipeline}{{4.1}{17}{Emotion-recognition evaluation and deployment pipeline. Full-data packaging creates application artefacts, not additional held-out evidence}{figure.4.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Separate evaluation and application-packaging paths.}}{17}{figure.4.1}\protected@file@percent }
+\newlabel{fig:emotion-pipeline}{{4.1}{17}{Separate evaluation and application-packaging paths}{figure.4.1}{}}
 \newlabel{subsec:contextual-text-emotion-model}{{4.2}{17}{Emotion-Recognition Pipeline}{figure.4.1}{}}
 \newlabel{subsec:speech-emotion-model}{{4.2}{17}{Emotion-Recognition Pipeline}{figure.4.1}{}}
+\citation{baltrusaitis2019multimodal}
 \citation{guo2017calibration}
 \citation{ovadia2019shift}
 \newlabel{eq:implementation-late-fusion}{{4.1}{18}{Emotion-Recognition Pipeline}{equation.4.1}{}}
@@ -129,39 +129,39 @@
 \newlabel{subsec:reproducibility-provenance}{{4.2}{18}{Emotion-Recognition Pipeline}{equation.4.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4.3}Backend and Request Processing}{18}{section.4.3}\protected@file@percent }
 \newlabel{sec:backend-application}{{4.3}{18}{Backend and Request Processing}{section.4.3}{}}
-\newlabel{subsec:backend-service-architecture}{{4.3}{18}{Backend and Request Processing}{section.4.3}{}}
-\newlabel{subsec:backend-domain-models}{{4.3}{18}{Backend and Request Processing}{section.4.3}{}}
+\newlabel{subsec:backend-service-architecture}{{4.3}{19}{Backend and Request Processing}{section.4.3}{}}
+\newlabel{subsec:backend-domain-models}{{4.3}{19}{Backend and Request Processing}{section.4.3}{}}
 \newlabel{subsec:backend-authentication}{{4.3}{19}{Backend and Request Processing}{section.4.3}{}}
 \newlabel{subsec:backend-session-persistence}{{4.3}{19}{Backend and Request Processing}{section.4.3}{}}
 \newlabel{subsec:backend-conversation-processing}{{4.3}{19}{Backend and Request Processing}{section.4.3}{}}
 \newlabel{subsec:safety-precedence}{{4.3}{19}{Backend and Request Processing}{section.4.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Version-bound conversation request with safety precedence and failure-tolerant optional processing.}}{19}{figure.4.2}\protected@file@percent }
-\newlabel{fig:request-sequence}{{4.2}{19}{Version-bound conversation request with safety precedence and failure-tolerant optional processing}{figure.4.2}{}}
-\newlabel{subsec:backend-fallbacks}{{4.3}{20}{Backend and Request Processing}{figure.4.2}{}}
-\newlabel{subsec:cognitive-support-routing}{{4.3}{20}{Backend and Request Processing}{figure.4.2}{}}
+\newlabel{subsec:backend-fallbacks}{{4.3}{19}{Backend and Request Processing}{figure.4.2}{}}
+\newlabel{subsec:cognitive-support-routing}{{4.3}{19}{Backend and Request Processing}{figure.4.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Conversation request with safety precedence and a shared commit step.}}{20}{figure.4.2}\protected@file@percent }
+\newlabel{fig:request-sequence}{{4.2}{20}{Conversation request with safety precedence and a shared commit step}{figure.4.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4.4}Role-Play and Affect-Adaptation Engine}{20}{section.4.4}\protected@file@percent }
 \newlabel{sec:roleplay-adaptation}{{4.4}{20}{Role-Play and Affect-Adaptation Engine}{section.4.4}{}}
 \newlabel{subsec:scenario-representation}{{4.4}{20}{Role-Play and Affect-Adaptation Engine}{section.4.4}{}}
 \newlabel{subsec:frontend-preparation}{{4.4}{20}{Role-Play and Affect-Adaptation Engine}{section.4.4}{}}
 \newlabel{subsec:dialogue-transitions}{{4.4}{20}{Role-Play and Affect-Adaptation Engine}{section.4.4}{}}
-\newlabel{subsec:communication-evidence}{{4.4}{20}{Role-Play and Affect-Adaptation Engine}{section.4.4}{}}
+\newlabel{subsec:communication-evidence}{{4.4}{21}{Role-Play and Affect-Adaptation Engine}{section.4.4}{}}
 \newlabel{subsec:affect-pacing}{{4.4}{21}{Role-Play and Affect-Adaptation Engine}{section.4.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Bounded affect-aware pacing. Every terminal action preserves the authoritative dialogue state and evidence.}}{21}{figure.4.3}\protected@file@percent }
-\newlabel{fig:affect-policy}{{4.3}{21}{Bounded affect-aware pacing. Every terminal action preserves the authoritative dialogue state and evidence}{figure.4.3}{}}
 \newlabel{subsec:response-realisation}{{4.4}{21}{Role-Play and Affect-Adaptation Engine}{figure.4.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4.5}Feedback and Frontend Workflow}{21}{section.4.5}\protected@file@percent }
 \newlabel{sec:feedback-reflection}{{4.5}{21}{Feedback and Frontend Workflow}{section.4.5}{}}
 \newlabel{sec:frontend-application}{{4.5}{21}{Feedback and Frontend Workflow}{section.4.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Ordered checks for bounded affect-aware pacing.}}{22}{figure.4.3}\protected@file@percent }
+\newlabel{fig:affect-policy}{{4.3}{22}{Ordered checks for bounded affect-aware pacing}{figure.4.3}{}}
 \newlabel{subsec:evidence-feedback}{{4.5}{22}{Feedback and Frontend Workflow}{section.4.5}{}}
 \newlabel{subsec:conversation-replay}{{4.5}{22}{Feedback and Frontend Workflow}{section.4.5}{}}
 \newlabel{subsec:rewind-branching}{{4.5}{22}{Feedback and Frontend Workflow}{section.4.5}{}}
 \newlabel{subsec:takeaways-action-cards}{{4.5}{22}{Feedback and Frontend Workflow}{section.4.5}{}}
-\newlabel{subsec:frontend-navigation}{{4.5}{22}{Feedback and Frontend Workflow}{section.4.5}{}}
-\newlabel{subsec:frontend-roleplay-workspace}{{4.5}{22}{Feedback and Frontend Workflow}{section.4.5}{}}
-\newlabel{subsec:frontend-feedback-interfaces}{{4.5}{22}{Feedback and Frontend Workflow}{section.4.5}{}}
-\newlabel{subsec:frontend-testing}{{4.5}{22}{Feedback and Frontend Workflow}{section.4.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Representative role-play workspace with transcript, scenario state, message composer, and optional voice interaction.}}{22}{figure.4.4}\protected@file@percent }
-\newlabel{fig:app-roleplay}{{4.4}{22}{Representative role-play workspace with transcript, scenario state, message composer, and optional voice interaction}{figure.4.4}{}}
+\newlabel{subsec:frontend-navigation}{{4.5}{23}{Feedback and Frontend Workflow}{section.4.5}{}}
+\newlabel{subsec:frontend-roleplay-workspace}{{4.5}{23}{Feedback and Frontend Workflow}{section.4.5}{}}
+\newlabel{subsec:frontend-feedback-interfaces}{{4.5}{23}{Feedback and Frontend Workflow}{section.4.5}{}}
+\newlabel{subsec:frontend-testing}{{4.5}{23}{Feedback and Frontend Workflow}{section.4.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Representative role-play workspace with transcript, scenario state, message composer, and optional voice interaction.}}{23}{figure.4.4}\protected@file@percent }
+\newlabel{fig:app-roleplay}{{4.4}{23}{Representative role-play workspace with transcript, scenario state, message composer, and optional voice interaction}{figure.4.4}{}}
 \newlabel{subsec:frontend-voice}{{4.5}{23}{Feedback and Frontend Workflow}{figure.4.4}{}}
 \newlabel{subsec:audio-conversation-data}{{4.5}{23}{Feedback and Frontend Workflow}{figure.4.4}{}}
 \newlabel{subsec:frontend-affect-presentation}{{4.5}{23}{Feedback and Frontend Workflow}{figure.4.4}{}}
@@ -169,81 +169,81 @@
 \@writefile{toc}{\contentsline {section}{\numberline {4.6}Security, Persistence, and Deployment}{23}{section.4.6}\protected@file@percent }
 \newlabel{sec:security-privacy-data-protection}{{4.6}{23}{Security, Persistence, and Deployment}{section.4.6}{}}
 \newlabel{sec:deployment-configuration}{{4.6}{23}{Security, Persistence, and Deployment}{section.4.6}{}}
-\newlabel{subsec:health-failure-handling}{{4.6}{23}{Security, Persistence, and Deployment}{section.4.6}{}}
-\newlabel{sec:implementation-verification}{{4.6}{23}{Security, Persistence, and Deployment}{section.4.6}{}}
-\newlabel{subsec:performance-testing}{{4.6}{23}{Security, Persistence, and Deployment}{section.4.6}{}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}Evaluation and Results}{24}{chapter.5}\protected@file@percent }
+\newlabel{subsec:health-failure-handling}{{4.6}{24}{Security, Persistence, and Deployment}{section.4.6}{}}
+\newlabel{sec:implementation-verification}{{4.6}{24}{Security, Persistence, and Deployment}{section.4.6}{}}
+\newlabel{subsec:performance-testing}{{4.6}{24}{Security, Persistence, and Deployment}{section.4.6}{}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Evaluation and Results}{25}{chapter.5}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{chap5}{{5}{24}{Evaluation and Results}{chapter.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.1}Evaluation Methodology}{24}{section.5.1}\protected@file@percent }
-\newlabel{sec:model-evaluation-methodology}{{5.1}{24}{Evaluation Methodology}{section.5.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.1}Evidence Scope and Decision Rules}{24}{subsection.5.1.1}\protected@file@percent }
-\newlabel{subsec:evaluation-scope}{{5.1.1}{24}{Evidence Scope and Decision Rules}{subsection.5.1.1}{}}
+\newlabel{chap5}{{5}{25}{Evaluation and Results}{chapter.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}Evaluation Methodology}{25}{section.5.1}\protected@file@percent }
+\newlabel{sec:model-evaluation-methodology}{{5.1}{25}{Evaluation Methodology}{section.5.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.1}Evidence Scope and Decision Rules}{25}{subsection.5.1.1}\protected@file@percent }
+\newlabel{subsec:evaluation-scope}{{5.1.1}{25}{Evidence Scope and Decision Rules}{subsection.5.1.1}{}}
 \citation{busso2008iemocap}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.2}Benchmark Task and Speaker-Independent Protocol}{25}{subsection.5.1.2}\protected@file@percent }
-\newlabel{subsec:evaluation-benchmark-splits}{{5.1.2}{25}{Benchmark Task and Speaker-Independent Protocol}{subsection.5.1.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.2}Benchmark Task and Speaker-Independent Protocol}{26}{subsection.5.1.2}\protected@file@percent }
+\newlabel{subsec:evaluation-benchmark-splits}{{5.1.2}{26}{Benchmark Task and Speaker-Independent Protocol}{subsection.5.1.2}{}}
 \citation{guo2017calibration}
 \citation{kull2019dirichlet}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.3}Measures and Statistical Comparison}{26}{subsection.5.1.3}\protected@file@percent }
-\newlabel{subsec:evaluation-measures}{{5.1.3}{26}{Measures and Statistical Comparison}{subsection.5.1.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.2}Contextual Text Results}{26}{section.5.2}\protected@file@percent }
-\newlabel{sec:context-text-results}{{5.2}{26}{Contextual Text Results}{section.5.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.1}{\ignorespaces Four-class contextual-text results on five held-out IEMOCAP sessions.}}{26}{table.5.1}\protected@file@percent }
-\newlabel{tab:context-text-results}{{5.1}{26}{Four-class contextual-text results on five held-out IEMOCAP sessions}{table.5.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.3}Speech, Fusion, and Calibration Results}{27}{section.5.3}\protected@file@percent }
-\newlabel{sec:multimodal-results}{{5.3}{27}{Speech, Fusion, and Calibration Results}{section.5.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.1}Audio and Predeclared Fusion}{27}{subsection.5.3.1}\protected@file@percent }
-\newlabel{subsec:equal-fusion-results}{{5.3.1}{27}{Audio and Predeclared Fusion}{subsection.5.3.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.2}{\ignorespaces Predeclared equal-weight fusion compared with contextual text.}}{28}{table.5.2}\protected@file@percent }
-\newlabel{tab:equal-fusion-results}{{5.2}{28}{Predeclared equal-weight fusion compared with contextual text}{table.5.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.2}Classification--Calibration Trade-off}{28}{subsection.5.3.2}\protected@file@percent }
-\newlabel{subsec:fusion-calibration-results}{{5.3.2}{28}{Classification--Calibration Trade-off}{subsection.5.3.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.3}Measures and Statistical Comparison}{27}{subsection.5.1.3}\protected@file@percent }
+\newlabel{subsec:evaluation-measures}{{5.1.3}{27}{Measures and Statistical Comparison}{subsection.5.1.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.2}Contextual Text Results}{27}{section.5.2}\protected@file@percent }
+\newlabel{sec:context-text-results}{{5.2}{27}{Contextual Text Results}{section.5.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.1}{\ignorespaces Four-class contextual-text results on five held-out IEMOCAP sessions.}}{27}{table.5.1}\protected@file@percent }
+\newlabel{tab:context-text-results}{{5.1}{27}{Four-class contextual-text results on five held-out IEMOCAP sessions}{table.5.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.3}Speech, Fusion, and Calibration Results}{28}{section.5.3}\protected@file@percent }
+\newlabel{sec:multimodal-results}{{5.3}{28}{Speech, Fusion, and Calibration Results}{section.5.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.1}Audio and Predeclared Fusion}{28}{subsection.5.3.1}\protected@file@percent }
+\newlabel{subsec:equal-fusion-results}{{5.3.1}{28}{Audio and Predeclared Fusion}{subsection.5.3.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.2}{\ignorespaces Predeclared equal-weight fusion compared with contextual text.}}{29}{table.5.2}\protected@file@percent }
+\newlabel{tab:equal-fusion-results}{{5.2}{29}{Predeclared equal-weight fusion compared with contextual text}{table.5.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.2}Classification--Calibration Trade-off}{29}{subsection.5.3.2}\protected@file@percent }
+\newlabel{subsec:fusion-calibration-results}{{5.3.2}{29}{Classification--Calibration Trade-off}{subsection.5.3.2}{}}
 \citation{li2022contextaware}
-\@writefile{lot}{\contentsline {table}{\numberline {5.3}{\ignorespaces Classification and probability quality for independently evaluated fold configurations.}}{29}{table.5.3}\protected@file@percent }
-\newlabel{tab:calibration-tradeoff}{{5.3}{29}{Classification and probability quality for independently evaluated fold configurations}{table.5.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Four-class held-out results. Panel (a) compares macro F1; Panel (b) shows the calibration cost of equal fusion and the effect of validation-derived fitting.}}{29}{figure.5.1}\protected@file@percent }
-\newlabel{fig:model-results}{{5.1}{29}{Four-class held-out results. Panel (a) compares macro F1; Panel (b) shows the calibration cost of equal fusion and the effect of validation-derived fitting}{figure.5.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.3}{\ignorespaces Classification and probability quality for independently evaluated fold configurations.}}{30}{table.5.3}\protected@file@percent }
+\newlabel{tab:calibration-tradeoff}{{5.3}{30}{Classification and probability quality for independently evaluated fold configurations}{table.5.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Four-class held-out results. Panel (a) compares macro F1; Panel (b) shows the calibration cost of equal fusion and the effect of validation-derived fitting.}}{30}{figure.5.1}\protected@file@percent }
+\newlabel{fig:model-results}{{5.1}{30}{Four-class held-out results. Panel (a) compares macro F1; Panel (b) shows the calibration cost of equal fusion and the effect of validation-derived fitting}{figure.5.1}{}}
 \citation{ovadia2019shift}
-\@writefile{toc}{\contentsline {section}{\numberline {5.4}Application Verification}{30}{section.5.4}\protected@file@percent }
-\newlabel{sec:engineering-evaluation}{{5.4}{30}{Application Verification}{section.5.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.4}{\ignorespaces Aggregate application-verification evidence.}}{30}{table.5.4}\protected@file@percent }
-\newlabel{tab:application-verification}{{5.4}{30}{Aggregate application-verification evidence}{table.5.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.1}Bounded Policy Behaviour}{31}{subsection.5.4.1}\protected@file@percent }
-\newlabel{subsec:policy-case-results}{{5.4.1}{31}{Bounded Policy Behaviour}{subsection.5.4.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.2}Integrated Quality and Local Responsiveness}{31}{subsection.5.4.2}\protected@file@percent }
-\newlabel{subsec:automated-system-results}{{5.4.2}{31}{Integrated Quality and Local Responsiveness}{subsection.5.4.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.5}Supplementary Pilot Results}{32}{section.5.5}\protected@file@percent }
-\newlabel{subsec:participant-results}{{5.5}{32}{Supplementary Pilot Results}{section.5.5}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.5}{\ignorespaces Supplementary pilot results for the non-adaptive required workflow. Ratings use seven-point scales.}}{33}{table.5.5}\protected@file@percent }
-\newlabel{tab:pilot-questionnaire-results}{{5.5}{33}{Supplementary pilot results for the non-adaptive required workflow. Ratings use seven-point scales}{table.5.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.6}Threats to Validity}{33}{section.5.6}\protected@file@percent }
-\newlabel{sec:evaluation-limitations}{{5.6}{33}{Threats to Validity}{section.5.6}{}}
-\@writefile{toc}{\contentsline {paragraph}{Model and statistical validity.}{33}{section*.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Construct and external validity.}{33}{section*.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Application and deployment validity.}{34}{section*.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Pilot validity.}{34}{section*.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{35}{chapter.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.4}Application Verification}{31}{section.5.4}\protected@file@percent }
+\newlabel{sec:engineering-evaluation}{{5.4}{31}{Application Verification}{section.5.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.4}{\ignorespaces Aggregate application-verification evidence.}}{31}{table.5.4}\protected@file@percent }
+\newlabel{tab:application-verification}{{5.4}{31}{Aggregate application-verification evidence}{table.5.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.1}Bounded Policy Behaviour}{32}{subsection.5.4.1}\protected@file@percent }
+\newlabel{subsec:policy-case-results}{{5.4.1}{32}{Bounded Policy Behaviour}{subsection.5.4.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.2}Integrated Quality and Local Responsiveness}{32}{subsection.5.4.2}\protected@file@percent }
+\newlabel{subsec:automated-system-results}{{5.4.2}{32}{Integrated Quality and Local Responsiveness}{subsection.5.4.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.5}Supplementary Pilot Results}{33}{section.5.5}\protected@file@percent }
+\newlabel{subsec:participant-results}{{5.5}{33}{Supplementary Pilot Results}{section.5.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.5}{\ignorespaces Supplementary pilot results for the non-adaptive required workflow. Ratings use seven-point scales.}}{34}{table.5.5}\protected@file@percent }
+\newlabel{tab:pilot-questionnaire-results}{{5.5}{34}{Supplementary pilot results for the non-adaptive required workflow. Ratings use seven-point scales}{table.5.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.6}Threats to Validity}{34}{section.5.6}\protected@file@percent }
+\newlabel{sec:evaluation-limitations}{{5.6}{34}{Threats to Validity}{section.5.6}{}}
+\@writefile{toc}{\contentsline {paragraph}{Model and statistical validity.}{34}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Construct and external validity.}{34}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Application and deployment validity.}{35}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Pilot validity.}{35}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{36}{chapter.6}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{chap6}{{6}{35}{Conclusions and Future Work}{chapter.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6.1}Conclusions for the Research Questions}{35}{section.6.1}\protected@file@percent }
-\newlabel{sec:conclusion-research-questions}{{6.1}{35}{Conclusions for the Research Questions}{section.6.1}{}}
-\newlabel{subsec:conclusion-rq1}{{6.1}{35}{RQ1: conversational context}{section*.14}{}}
-\@writefile{toc}{\contentsline {paragraph}{RQ1: conversational context.}{35}{section*.14}\protected@file@percent }
-\newlabel{subsec:conclusion-rq2}{{6.1}{35}{RQ2: multimodal complementarity and calibration}{section*.15}{}}
-\@writefile{toc}{\contentsline {paragraph}{RQ2: multimodal complementarity and calibration.}{35}{section*.15}\protected@file@percent }
-\newlabel{subsec:conclusion-rq3}{{6.1}{35}{RQ3: bounded use of affective evidence}{section*.16}{}}
-\@writefile{toc}{\contentsline {paragraph}{RQ3: bounded use of affective evidence.}{35}{section*.16}\protected@file@percent }
-\newlabel{subsec:conclusion-rq4}{{6.1}{36}{RQ4: integrated application quality}{section*.17}{}}
-\@writefile{toc}{\contentsline {paragraph}{RQ4: integrated application quality.}{36}{section*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6.2}Contributions and Material Limitations}{36}{section.6.2}\protected@file@percent }
-\newlabel{sec:conclusion-contributions}{{6.2}{36}{Contributions and Material Limitations}{section.6.2}{}}
+\newlabel{chap6}{{6}{36}{Conclusions and Future Work}{chapter.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.1}Conclusions for the Research Questions}{36}{section.6.1}\protected@file@percent }
+\newlabel{sec:conclusion-research-questions}{{6.1}{36}{Conclusions for the Research Questions}{section.6.1}{}}
+\newlabel{subsec:conclusion-rq1}{{6.1}{36}{RQ1: conversational context}{section*.14}{}}
+\@writefile{toc}{\contentsline {paragraph}{RQ1: conversational context.}{36}{section*.14}\protected@file@percent }
+\newlabel{subsec:conclusion-rq2}{{6.1}{36}{RQ2: multimodal complementarity and calibration}{section*.15}{}}
+\@writefile{toc}{\contentsline {paragraph}{RQ2: multimodal complementarity and calibration.}{36}{section*.15}\protected@file@percent }
+\newlabel{subsec:conclusion-rq3}{{6.1}{36}{RQ3: bounded use of affective evidence}{section*.16}{}}
+\@writefile{toc}{\contentsline {paragraph}{RQ3: bounded use of affective evidence.}{36}{section*.16}\protected@file@percent }
+\newlabel{subsec:conclusion-rq4}{{6.1}{37}{RQ4: integrated application quality}{section*.17}{}}
+\@writefile{toc}{\contentsline {paragraph}{RQ4: integrated application quality.}{37}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.2}Contributions and Material Limitations}{37}{section.6.2}\protected@file@percent }
+\newlabel{sec:conclusion-contributions}{{6.2}{37}{Contributions and Material Limitations}{section.6.2}{}}
 \bibstyle{alpha}
-\@writefile{toc}{\contentsline {section}{\numberline {6.3}Prioritised Future Work}{37}{section.6.3}\protected@file@percent }
-\newlabel{sec:conclusion-future-work}{{6.3}{37}{Prioritised Future Work}{section.6.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6.4}Final Conclusion}{37}{section.6.4}\protected@file@percent }
-\newlabel{sec:final-conclusion}{{6.4}{37}{Final Conclusion}{section.6.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.3}Prioritised Future Work}{38}{section.6.3}\protected@file@percent }
+\newlabel{sec:conclusion-future-work}{{6.3}{38}{Prioritised Future Work}{section.6.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.4}Final Conclusion}{38}{section.6.4}\protected@file@percent }
+\newlabel{sec:final-conclusion}{{6.4}{38}{Final Conclusion}{section.6.4}{}}
 \bibdata{myBib}
 \bibcite{baltrusaitis2019multimodal}{BAM19}
 \bibcite{busso2008iemocap}{BBL{$^{+}$}08}
@@ -253,7 +253,7 @@
 \bibcite{chen2022wavlm}{CWC{$^{+}$}22}
 \bibcite{devlin2019bert}{DCLT19}
 \bibcite{defreitas2024wellness}{DFC24}
-\@writefile{toc}{\contentsline {chapter}{Bibliography}{38}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{Bibliography}{39}{section*.18}\protected@file@percent }
 \bibcite{ekman1992basic}{Ekm92}
 \bibcite{eyben2016gemaps}{ESS{$^{+}$}16}
 \bibcite{eu2016gdpr}{{Eur}16}
@@ -281,52 +281,52 @@
 \bibcite{tsai2019mult}{TBL{$^{+}$}19}
 \bibcite{tamoyan2025roleplay}{TSG25}
 \bibcite{zhou2018ecm}{ZHZ{$^{+}$}18}
-\@writefile{toc}{\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{42}{appendix.A}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{43}{appendix.A}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{genAIUsage}{{A}{42}{Generative AI Tools Usage}{appendix.A}{}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {B}Complete System Requirements}{43}{appendix.B}\protected@file@percent }
+\newlabel{genAIUsage}{{A}{43}{Generative AI Tools Usage}{appendix.A}{}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {B}Complete System Requirements}{44}{appendix.B}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{app:complete-requirements}{{B}{43}{Complete System Requirements}{appendix.B}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {B.1}Functional Requirements}{43}{section.B.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {B.2}Non-Functional Requirements}{46}{section.B.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {C}Supplementary Model Results}{49}{appendix.C}\protected@file@percent }
+\newlabel{app:complete-requirements}{{B}{44}{Complete System Requirements}{appendix.B}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {B.1}Functional Requirements}{44}{section.B.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {B.2}Non-Functional Requirements}{47}{section.B.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {C}Supplementary Model Results}{50}{appendix.C}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{app:supplementary-model-results}{{C}{49}{Supplementary Model Results}{appendix.C}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {C.1}Reproduction Provenance}{49}{section.C.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {C.2}Four-Class Per-Class Results}{49}{section.C.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {C.3}Exploratory Six-Class Experiment}{49}{section.C.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {C.1}{\ignorespaces Compact provenance for the principal IEMOCAP experiments and packaging run.}}{50}{table.C.1}\protected@file@percent }
-\newlabel{tab:model-reproduction-provenance}{{C.1}{50}{Compact provenance for the principal IEMOCAP experiments and packaging run}{table.C.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {C.2}{\ignorespaces Per-class results for the four-class text configurations.}}{50}{table.C.2}\protected@file@percent }
-\newlabel{tab:context-text-per-class}{{C.2}{50}{Per-class results for the four-class text configurations}{table.C.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {C.3}{\ignorespaces Per-class results for the audio and fusion configurations.}}{51}{table.C.3}\protected@file@percent }
-\newlabel{tab:multimodal-per-class}{{C.3}{51}{Per-class results for the audio and fusion configurations}{table.C.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {C.4}{\ignorespaces Macro F1 by held-out IEMOCAP session.}}{51}{table.C.4}\protected@file@percent }
-\newlabel{tab:session-fold-variation}{{C.4}{51}{Macro F1 by held-out IEMOCAP session}{table.C.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {C.5}{\ignorespaces Exploratory six-class contextual-text comparison.}}{51}{table.C.5}\protected@file@percent }
-\newlabel{tab:six-class-context-results}{{C.5}{51}{Exploratory six-class contextual-text comparison}{table.C.5}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {C.6}{\ignorespaces Fold variation for the exploratory six-class comparison.}}{52}{table.C.6}\protected@file@percent }
-\newlabel{tab:six-class-fold-results}{{C.6}{52}{Fold variation for the exploratory six-class comparison}{table.C.6}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {C.7}{\ignorespaces Per-class results for the exploratory six-class task.}}{52}{table.C.7}\protected@file@percent }
-\newlabel{tab:six-class-per-class}{{C.7}{52}{Per-class results for the exploratory six-class task}{table.C.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {C.4}Operational Packaging Diagnostic}{53}{section.C.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {D}Application Verification Details}{54}{appendix.D}\protected@file@percent }
+\newlabel{app:supplementary-model-results}{{C}{50}{Supplementary Model Results}{appendix.C}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {C.1}Reproduction Provenance}{50}{section.C.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {C.2}Four-Class Per-Class Results}{50}{section.C.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {C.3}Exploratory Six-Class Experiment}{50}{section.C.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {C.1}{\ignorespaces Compact provenance for the principal IEMOCAP experiments and packaging run.}}{51}{table.C.1}\protected@file@percent }
+\newlabel{tab:model-reproduction-provenance}{{C.1}{51}{Compact provenance for the principal IEMOCAP experiments and packaging run}{table.C.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {C.2}{\ignorespaces Per-class results for the four-class text configurations.}}{51}{table.C.2}\protected@file@percent }
+\newlabel{tab:context-text-per-class}{{C.2}{51}{Per-class results for the four-class text configurations}{table.C.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {C.3}{\ignorespaces Per-class results for the audio and fusion configurations.}}{52}{table.C.3}\protected@file@percent }
+\newlabel{tab:multimodal-per-class}{{C.3}{52}{Per-class results for the audio and fusion configurations}{table.C.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {C.4}{\ignorespaces Macro F1 by held-out IEMOCAP session.}}{52}{table.C.4}\protected@file@percent }
+\newlabel{tab:session-fold-variation}{{C.4}{52}{Macro F1 by held-out IEMOCAP session}{table.C.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {C.5}{\ignorespaces Exploratory six-class contextual-text comparison.}}{52}{table.C.5}\protected@file@percent }
+\newlabel{tab:six-class-context-results}{{C.5}{52}{Exploratory six-class contextual-text comparison}{table.C.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {C.6}{\ignorespaces Fold variation for the exploratory six-class comparison.}}{53}{table.C.6}\protected@file@percent }
+\newlabel{tab:six-class-fold-results}{{C.6}{53}{Fold variation for the exploratory six-class comparison}{table.C.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {C.7}{\ignorespaces Per-class results for the exploratory six-class task.}}{53}{table.C.7}\protected@file@percent }
+\newlabel{tab:six-class-per-class}{{C.7}{53}{Per-class results for the exploratory six-class task}{table.C.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {C.4}Operational Packaging Diagnostic}{54}{section.C.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {D}Application Verification Details}{55}{appendix.D}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{app:verification-details}{{D}{54}{Application Verification Details}{appendix.D}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {D.1}Requirement Traceability}{54}{section.D.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {D.2}Authored Policy Cases}{54}{section.D.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {D.1}{\ignorespaces Grouped requirement-to-evidence traceability matrix.}}{55}{table.D.1}\protected@file@percent }
-\newlabel{tab:requirements-traceability}{{D.1}{55}{Grouped requirement-to-evidence traceability matrix}{table.D.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {D.2}{\ignorespaces Enhanced-dialogue trajectory results.}}{55}{table.D.2}\protected@file@percent }
-\newlabel{tab:dialogue-case-results}{{D.2}{55}{Enhanced-dialogue trajectory results}{table.D.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {D.3}{\ignorespaces Implemented cognitive-heuristic and support-routing checks.}}{56}{table.D.3}\protected@file@percent }
-\newlabel{tab:cognitive-routing-cases}{{D.3}{56}{Implemented cognitive-heuristic and support-routing checks}{table.D.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {D.3}Automated, Full-Stack, and Accessibility Evidence}{56}{section.D.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {D.4}Local Performance Detail}{56}{section.D.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {D.4}{\ignorespaces Local single-client application latency.}}{57}{table.D.4}\protected@file@percent }
-\newlabel{tab:performance-results}{{D.4}{57}{Local single-client application latency}{table.D.4}{}}
-\gdef \@abspage@last{66}
+\newlabel{app:verification-details}{{D}{55}{Application Verification Details}{appendix.D}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {D.1}Requirement Traceability}{55}{section.D.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {D.2}Authored Policy Cases}{55}{section.D.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {D.1}{\ignorespaces Grouped requirement-to-evidence traceability matrix.}}{56}{table.D.1}\protected@file@percent }
+\newlabel{tab:requirements-traceability}{{D.1}{56}{Grouped requirement-to-evidence traceability matrix}{table.D.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {D.2}{\ignorespaces Enhanced-dialogue trajectory results.}}{56}{table.D.2}\protected@file@percent }
+\newlabel{tab:dialogue-case-results}{{D.2}{56}{Enhanced-dialogue trajectory results}{table.D.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {D.3}{\ignorespaces Implemented cognitive-heuristic and support-routing checks.}}{57}{table.D.3}\protected@file@percent }
+\newlabel{tab:cognitive-routing-cases}{{D.3}{57}{Implemented cognitive-heuristic and support-routing checks}{table.D.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {D.3}Automated, Full-Stack, and Accessibility Evidence}{57}{section.D.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {D.4}Local Performance Detail}{57}{section.D.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {D.4}{\ignorespaces Local single-client application latency.}}{58}{table.D.4}\protected@file@percent }
+\newlabel{tab:performance-results}{{D.4}{58}{Local single-client application latency}{table.D.4}{}}
+\gdef \@abspage@last{67}

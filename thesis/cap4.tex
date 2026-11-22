@@ -16,12 +16,12 @@ Typed boundaries carry the distinctions through the application. A conversation 
 
 The model pipeline converts a private IEMOCAP release into separate text and speech classifiers and then packages compatible full-data artefacts for optional application inference. Preprocessing joins annotations, transcripts, and sentence-level waveforms by utterance identifier, rejects duplicates or missing inputs, and records source and manifest digests. The principal task maps anger, happiness plus excitement, neutrality, and sadness to a fixed four-class order, producing 5,531 matched text--audio utterances. Licensed media and row-level derived data are kept outside the repository. An exploratory six-class mapping is retained only as a secondary research configuration and is not used by the deployed multimodal service.
 
-Figure~\ref{fig:emotion-pipeline} distinguishes evaluation from deployment packaging. Five speaker-independent folds are constructed from complete IEMOCAP sessions: one session is held out for testing, one for validation, and three for training. Because each actor occurs in one session, preprocessing can verify that speakers do not cross split boundaries. These folds provide the evidence reported in Chapter~\ref{chap5}. Only after the experimental configuration is frozen are final text and audio models trained on all eligible examples for application use; their training outputs are not treated as a new held-out result.
+Figure~\ref{fig:emotion-pipeline} separates held-out evaluation from application packaging into two paths from the same matched data. Five speaker-independent folds are constructed from complete IEMOCAP sessions: one session is held out for testing, one for validation, and three for training. Because each actor occurs in one session, preprocessing can verify that speakers do not cross split boundaries. These folds provide the evidence reported in Chapter~\ref{chap5}. Only after the experimental configuration is frozen are final text and audio models trained on all eligible examples for application use; their training outputs are not treated as a new held-out result.
 
 \begin{figure}[htbp]
 \centering
-\resizebox{0.86\textwidth}{!}{\input{figures/emotion_pipeline}}
-\caption{Emotion-recognition evaluation and deployment pipeline. Full-data packaging creates application artefacts, not additional held-out evidence.}
+\input{figures/emotion_pipeline}
+\caption[Separate evaluation and application-packaging paths.]{Separate evaluation and application-packaging paths. The dashed arrow transfers operational calibration and fusion settings fitted from pooled validation-role predictions. Full-data models support application inference, not additional held-out evidence.}
 \label{fig:emotion-pipeline}
 \end{figure}
 
@@ -63,14 +63,14 @@ Authentication and routine account operations use the same service boundary but 
 
 Request schemas enforce message, title, reflection, and encoded-audio limits before service execution. Enhanced exchanges must pair their expected version with a unique request identifier, and received probability vectors are accepted only when all values are finite, bounded, normalised, and consistent with the declared leading label. The backend derives agreement and confidence bands again instead of trusting client-authored summaries. These checks keep a malformed enhancement from contaminating the authoritative session even when ordinary text processing can continue.
 
-Figure~\ref{fig:request-sequence} shows the processing order for a conversation exchange. After validation, authentication, ownership, duplication, and version checks, a local crisis-language detector runs before affect inference or response generation. A safety match interrupts the rehearsal through fixed wording and skips optional processing. Otherwise, eligible requests may obtain a multimodal estimate; failure is recorded as unavailability and does not abort the message. The service then appends the user turn, advances the deterministic controller, records evidence, applies any permitted pacing action, realises the authorised reply, and persists the complete transition atomically. The response contains the committed version and server-owned state so the browser does not need to infer what succeeded.
+Figure~\ref{fig:request-sequence} shows the processing order for a conversation exchange, grouping internal backend steps in one lane. After validation, authentication, ownership, duplication, and version checks, a local crisis-language detector runs before affect inference or response generation. A safety match interrupts the rehearsal through fixed wording and skips optional processing. Otherwise, eligible requests may obtain a multimodal estimate; failure is recorded as unavailability and does not abort the message. The service then appends the user turn, advances the deterministic controller, records evidence, applies any permitted pacing action, realises the authorised reply, and persists the complete transition atomically. The response contains the committed version and server-owned state so the browser does not need to infer what succeeded.
 \label{subsec:backend-conversation-processing}
 \label{subsec:safety-precedence}
 
-\begin{figure}[htbp]
+\begin{figure}[!htbp]
 \centering
-\resizebox{0.84\textwidth}{!}{\input{figures/request_sequence}}
-\caption{Version-bound conversation request with safety precedence and failure-tolerant optional processing.}
+\input{figures/request_sequence}
+\caption[Conversation request with safety precedence and a shared commit step.]{Conversation request with grouped backend steps. Safety and ordinary branches rejoin at the atomic commit; optional processing failures use deterministic fallbacks.}
 \label{fig:request-sequence}
 \end{figure}
 
@@ -100,8 +100,8 @@ When automatic adaptation is eligible, missing audio, inference failure, or an u
 
 \begin{figure}[htbp]
 \centering
-\resizebox{0.64\textwidth}{!}{\input{figures/affect_policy}}
-\caption{Bounded affect-aware pacing. Every terminal action preserves the authoritative dialogue state and evidence.}
+\input{figures/affect_policy}
+\caption[Ordered checks for bounded affect-aware pacing.]{Ordered pacing checks. Side branches terminate; only confident, agreeing estimates reach the emotion groups. All actions preserve dialogue state, evidence, success conditions, feedback scores, and research eligibility.}
 \label{fig:affect-policy}
 \end{figure}
 

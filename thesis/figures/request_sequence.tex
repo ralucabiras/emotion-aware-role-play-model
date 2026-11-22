@@ -1,48 +1,36 @@
-\begin{tikzpicture}[
-    font=\sffamily\scriptsize,
-    actor/.style={draw=blue!65!black, fill=blue!7, rounded corners=2pt,
-        align=center, minimum width=1.8cm, minimum height=0.7cm},
-    msg/.style={-{Latex[length=2mm]}, draw=black!70, thick},
-    optional/.style={-{Latex[length=2mm]}, draw=teal!75!black, dashed, thick},
-    return/.style={-{Latex[length=2mm]}, draw=violet!70!black, thick},
-    note/.style={font=\sffamily\tiny, fill=white, inner sep=1pt}
-]
-\foreach \name/\label/\x in {
- ui/Browser/0,
- api/API/2.4,
- safety/Safety/4.8,
- affect/Affect/7.2,
- policy/Policy/9.6,
- realise/Realiser/12.0,
- repo/Repository/14.4}
+\input{figures/technical_diagram_styles}
+\begin{tikzpicture}[td diagram]
+\foreach \name/\title/\x in {
+    ui/Browser/1.2, app/Backend/7.1, repo/Repository/13.0}
 {
-  \node[actor] (\name) at (\x,0) {\label};
-  \draw[densely dashed, black!35] (\x,-0.38) -- (\x,-8.2);
+  \node[td box, text width=2.3cm] (\name) at (\x,0) {\title};
+  \draw[densely dashed, black!35] (\x,-0.5) -- (\x,-8.6);
 }
-
-\draw[msg] (0,-0.85) -- node[note, above]{message, expected version, request ID, optional audio} (2.4,-0.85);
-\draw[msg] (2.4,-1.45) -- node[note, above]{owned lookup; duplicate and stale checks} (14.4,-1.45);
-\draw[return] (14.4,-2.05) -- node[note, above]{current session} (2.4,-2.05);
-\draw[msg] (2.4,-2.65) -- node[note, above]{text-first check} (4.8,-2.65);
-
-\fill[red!6] (-0.9,-3.05) rectangle (15.3,-4.35);
-\node[anchor=west, text=red!70!black, font=\sffamily\bfseries\scriptsize]
-    at (-0.75,-3.25) {Crisis branch};
-\draw[msg, draw=red!70!black] (4.8,-3.65) -- node[note, above]{fixed interruption} (12.0,-3.65);
-\draw[msg, draw=red!70!black] (12.0,-4.05) -- node[note, above]{persist interrupted state} (14.4,-4.05);
-\draw[return] (14.4,-4.35) -- ++(0,-0.15) -| node[pos=0.75, note, below]{committed safety response} (0,-4.65);
-
-\fill[teal!5] (-0.9,-4.85) rectangle (15.3,-7.45);
-\node[anchor=west, text=teal!70!black, font=\sffamily\bfseries\scriptsize]
-    at (-0.75,-5.05) {Ordinary branch};
-\draw[optional] (2.4,-5.45) -- node[note, above]{eligible request} (7.2,-5.45);
-\draw[return] (7.2,-5.95) -- node[note, above]{probabilities or unavailable} (2.4,-5.95);
-\draw[msg] (2.4,-6.45) -- node[note, above]{user turn and bounded evidence} (9.6,-6.45);
-\draw[msg] (9.6,-6.95) -- node[note, above]{authoritative action and fallback} (12.0,-6.95);
-\draw[optional] (12.0,-7.35) -- ++(-2.4,0) node[midway, note, below]{optional wording only};
-\draw[msg] (12.0,-7.75) -- node[note, above]{turns, decisions, provenance} (14.4,-7.75);
-\draw[return] (14.4,-8.15) -- node[note, below]{committed version and response} (0,-8.15);
-
-\node[align=center, text=black!60] at (7.2,-8.75)
-    {Inference and generation fail softly; authority, ownership, and safety fail closed.};
+\draw[td flow] (1.2,-0.9) -- node[td label, above]
+    {Text, version, request ID} (7.1,-0.9);
+\draw[td flow] (7.1,-1.6) -- node[td label, above]
+    {Check owner, version, request ID} (13.0,-1.6);
+\draw[td flow] (13.0,-2.25) -- node[td label, above]
+    {Current session} (7.1,-2.25);
+\node[td safety, text width=4.9cm, minimum height=0.7cm]
+    at (7.1,-2.9) {Text safety check};
+\begin{scope}[on background layer]
+  \fill[red!5] (-0.2,-3.4) rectangle (14.4,-4.8);
+  \fill[teal!4] (-0.2,-4.8) rectangle (14.4,-6.7);
+\end{scope}
+\draw[black!35] (-0.2,-3.4) rectangle (14.4,-6.7);
+\draw[dashed, black!35] (-0.2,-4.8) -- (14.4,-4.8);
+\node[td heading, anchor=north west, fill=red!5, text=red!70!black]
+    at (0,-3.55) {Safety match};
+\node[td safety, text width=4.9cm] at (7.1,-4.1)
+    {Fixed interruption\\skip inference and generation};
+\node[td heading, anchor=north west, fill=teal!4] at (0,-4.95) {Otherwise};
+\node[td box, text width=4.9cm] at (7.1,-5.75)
+    {Optional affect estimate\\Deterministic policy and pacing\\Constrained reply or template};
+\draw[td flow] (7.1,-7.25) -- node[td label, above]
+    {Commit turns and decisions} (13.0,-7.25);
+\draw[td flow] (13.0,-7.9) -- node[td label, above]
+    {Committed version} (7.1,-7.9);
+\draw[td flow] (7.1,-8.55) -- node[td label, above]
+    {Response and committed version} (1.2,-8.55);
 \end{tikzpicture}

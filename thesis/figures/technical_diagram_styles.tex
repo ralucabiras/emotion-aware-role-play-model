@@ -1,0 +1,19 @@
+% Shared styles for Figures 3.1 and 4.1--4.3. Render at native size:
+% footnotesize is 10 pt in the dissertation's 12 pt document class.
+\tikzset{
+    td diagram/.style={font=\sffamily\footnotesize},
+    td box/.style={draw=blue!65!black, fill=blue!6, rounded corners=2pt,
+        align=center, inner xsep=5pt, inner ysep=5pt, minimum height=0.95cm},
+    td evidence/.style={td box, draw=teal!70!black, fill=teal!7},
+    td decision/.style={td evidence, rounded corners=0pt},
+    td action/.style={td box, draw=orange!75!black, fill=orange!9},
+    td safety/.style={td box, draw=red!70!black, fill=red!6},
+    td package/.style={td box, draw=violet!70!black, fill=violet!6},
+    td optional/.style={td evidence, dashed},
+    td flow/.style={-{Latex[length=2mm]}, semithick, draw=black!70},
+    td signal/.style={td flow, dashed, draw=teal!70!black},
+    td transfer/.style={td flow, dashed, draw=violet!70!black},
+    td label/.style={font=\sffamily\footnotesize, fill=white, inner sep=1.5pt},
+    td heading/.style={font=\sffamily\footnotesize\bfseries, align=center},
+    td panel/.style={draw=black!30, rounded corners=3pt, inner sep=8pt}
+}

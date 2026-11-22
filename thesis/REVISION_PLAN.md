@@ -1,7 +1,7 @@
 # Dissertation Revision Plan
 
 Created: 2026-11-22  
-Status: Revision in progress; Notes 1, 2, 3, 4, and 6 completed and checked. Note 5 partially addressed; final length review remains open.
+Status: Revision in progress; Notes 1, 2, 3, 4, 6, and 7 completed and checked. Note 5 partially addressed; final length review remains open.
 
 This tracker covers the author's 20 reading notes and the changes proposed in the accompanying review. Use it to record what remains to be revised and checked.
 
@@ -75,7 +75,7 @@ Working direction: approximately 30–32 chapter-content pages and roughly 50–
 
 Checked progress (2026-11-22): rebuilt the PDF after removing one redundant 64-word overview paragraph from Section 4.1. Its points about deterministic control, optional models, and fallback behaviour remain explained in the preceding overview and the relevant implementation sections. This eliminates Chapter 4's short final continuation, formerly numbered page 24 (the corresponding sparse continuation in the reviewed baseline was page 25), without changing pilot material, typography, margins, or figure sizes.
 
-| Part | Current pages |
+| Part | Pages at the Note 5 check (before Note 7) |
 | --- | --- |
 | Front matter | 9 |
 | Chapters 1–6 | 37 content pages: 4 + 6 + 5 + 8 + 11 + 3 |
@@ -101,11 +101,15 @@ Complete when the opening explains system requirements rather than the history o
 
 Locations: `figures/system_architecture.tex`, `emotion_pipeline.tex`, `request_sequence.tex`, and `affect_policy.tex`.
 
-- [ ] Redesign Figure 3.1 to separate components and avoid crossing or overlapping connections.
-- [ ] Redesign Figure 4.1 with fewer crowded boxes, shorter labels, and clearly separated evaluation and packaging paths.
-- [ ] Simplify Figure 4.2 so message labels are readable at normal PDF viewing size.
-- [ ] Redesign Figure 4.3 to separate the lower decision branches and their labels.
-- [ ] Use consistent typography, spacing, and visual conventions; revise captions and surrounding discussion to match.
+- [x] Redesign Figure 3.1 to separate components and avoid crossing or overlapping connections.
+- [x] Redesign Figure 4.1 with fewer crowded boxes, shorter labels, and clearly separated evaluation and packaging paths.
+- [x] Simplify Figure 4.2 so message labels are readable at normal PDF viewing size.
+- [x] Redesign Figure 4.3 to separate the lower decision branches and their labels.
+- [x] Use consistent typography, spacing, and visual conventions; revise captions and surrounding discussion to match.
+
+Checked result (2026-11-22): rebuilt all four TikZ diagrams with shared styles in `figures/technical_diagram_styles.tex`, native 10-point sans-serif labels, and no resizing. Figure 3.1 uses a central control path with separate evidence, wording, storage, and feedback connections. Figure 4.1 uses seven boxes in distinct evaluation and application-packaging paths; its dashed transfer and caption identify operational settings fitted from pooled validation-role predictions. Figure 4.2 reduces seven lanes to browser, backend, and repository, groups internal backend steps, and rejoins the safety and ordinary branches before commit and reply. Figure 4.3 uses ordered checks with separate terminal actions and two lower emotion groups; explicit preference precedes the automatic-enabled and estimate checks, matching the implementation. Updated captions, concise List of Figures entries, and the directly related discussion.
+
+Rebuilt successfully and visually checked all 14 Chapter 3 and 4 pages, including the diagrams on numbered pages 12, 17, 20, and 22 at 95 dpi. No overlapping boxes, arrows, or labels, clipping, isolated figure page, or one-word continuation remains. No LaTeX errors, undefined citations/references, or overfull boxes; all 35 bibliography entries remain cited. Source hashes and exact text comparisons confirm that all pilot material, numerical findings, other chapter text, other thesis sources, and `REDUCTION_PLAN.md` are unchanged. The PDF now has 67 physical pages and 38 chapter-content pages (4 + 6 + 5 + 9 + 11 + 3): one additional Chapter 4 page compared with the Note 5/6 build. Note 5 remains open for consolidation and the final page-budget review; the screenshot and model-results revisions remain assigned to Notes 9 and 11.
 
 Complete when boxes, arrows, and text do not overlap and every retained label is readable without substantial zooming. Enlarging the current diagrams alone is insufficient.
 
@@ -265,3 +269,4 @@ Complete when repetition is limited to necessary orientation and final conclusio
 | 2026-11-22 | Note 4: Equations | Replaced Chapter 2's causal-context notation with prose about the current and preceding turns, excluding future turns and annotated neighbouring labels. Replaced its duplicate fusion formula with a weighted-average explanation. Retained the implementation fusion equation and defined all distributions, the weight range, and equal weighting. Explained temperature scaling in prose, including validation-only NLL fitting and unchanged application to held-out test logits; removed the obsolete temperature-equation label. | Rebuilt the 67-page PDF with no LaTeX errors, undefined citations/references, or overfull boxes. Visually checked the affected pages and their continuations (numbered pages 8–9, 18–19, and 27–28). Confirmed that only one displayed equation remains, with no obsolete equation references, and checked the temperature-fitting account against the implementation. Citation commands are unchanged. Source comparisons confirm that all Chapter 5 results and pilot material, all other thesis sources, the bibliography, and REDUCTION_PLAN.md are unchanged. Other pending notes remain open. |
 | 2026-11-22 | Note 5: Length audit and local reduction; partially addressed | Removed one repeated 64-word overview paragraph from Section 4.1, eliminating Chapter 4's sparse final continuation. Recorded the current page breakdown and the remaining dependencies on appendix reduction, prose consolidation, and readable replacement figures. | Rebuilt successfully: 66 physical pages and 37 chapter-content pages, down from 67 and 38 before this change. Visually checked numbered pages 16–23. No LaTeX errors, undefined citations/references, or overfull boxes; all 35 bibliography entries remain cited. Source hashes confirm that every other thesis source, figure, the bibliography, and REDUCTION_PLAN.md are unchanged; an exact source comparison confirms that all other Chapter 4 text, including pilot passages, is unchanged. Note 5 remains open for the remaining reductions and the final pagination review. |
 | 2026-11-22 | Note 6: Opening of Section 3.2 | Replaced the specification-history opening with the capabilities users need: preparation, private rehearsal, feedback, control over data and optional features, text-only access, and clear interruption and service-failure handling. Introduced the nine requirement groups and FR/NFR identifiers after their purpose, with references to the full requirements and verification evidence. Removed editorial justification from the opening and the later acceptance-criteria explanation. | Rebuilt successfully: 66 physical pages and 37 chapter-content pages, unchanged. Visually checked numbered pages 12-15; the opening fits before the unchanged requirements table, with no sparse continuation page. No LaTeX errors, undefined citations/references, or overfull boxes. Source hashes and exact comparisons confirm that only Section 3.2 prose changed; all requirements, identifiers, citations, pilot material, other thesis sources, and REDUCTION_PLAN.md are unchanged. Other pending notes remain open. |
+| 2026-11-22 | Note 7: Technical figures | Rebuilt Figures 3.1 and 4.1–4.3 with shared styles and native 10-point labels. Separated architecture connections, reduced the pipeline to seven boxes in two paths, reduced the request sequence to three lanes with a shared commit step, and separated pacing outcomes and lower emotion branches. Updated captions, List of Figures entries, and directly related discussion. | Rebuilt successfully: 67 physical pages and 38 chapter-content pages, one more than before because of readable Chapter 4 diagrams. Visually checked all 14 Chapter 3/4 pages and each diagram at 95 dpi; no overlaps, clipping, isolated figure page, or one-word continuation remains. No LaTeX errors, undefined citations/references, or overfull boxes; all 35 bibliography entries remain cited. Source hashes and exact comparisons confirm that pilot material, numerical findings, all other chapter text, other thesis sources, and REDUCTION_PLAN.md are unchanged. Note 5 and other pending notes remain open. |

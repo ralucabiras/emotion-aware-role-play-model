@@ -1,47 +1,28 @@
-\begin{tikzpicture}[
-    font=\sffamily\scriptsize,
-    pipelineStep/.style={draw=blue!65!black, fill=blue!7, rounded corners=2pt,
-        align=center, minimum width=2.35cm, minimum height=0.85cm},
-    model/.style={draw=teal!70!black, fill=teal!10, rounded corners=2pt,
-        align=center, minimum width=2.35cm, minimum height=0.85cm},
-    result/.style={draw=orange!75!black, fill=orange!12, rounded corners=2pt,
-        align=center, minimum width=2.5cm, minimum height=0.85cm},
-    deploy/.style={draw=violet!70!black, fill=violet!9, rounded corners=2pt,
-        align=center, minimum width=2.45cm, minimum height=0.85cm},
-    flow/.style={-{Latex[length=2.2mm]}, thick, draw=black!65},
-    freeze/.style={-{Latex[length=2.2mm]}, thick, dashed, draw=violet!75!black}
-]
-\node[pipelineStep] (raw) at (0,1.5) {Private IEMOCAP\\text and audio};
-\node[pipelineStep] (prep) at (3.0,1.5) {Validated preprocessing\\and label mapping};
-\node[pipelineStep] (folds) at (6.0,1.5) {Five session-held-out folds\\train / validation / test};
-\node[model] (text) at (9.0,2.25) {Contextual text model\\three causal turns};
-\node[model] (audio) at (9.0,0.75) {Audio model\\16 kHz waveform};
-\node[pipelineStep] (cal) at (12.0,1.5) {Validation-only calibration\\and fusion fitting};
-\node[result] (eval) at (15.0,1.5) {Held-out evaluation\\classification and calibration};
-
-\draw[flow] (raw) -- (prep);
-\draw[flow] (prep) -- (folds);
-\draw[flow] (folds) -- (text);
-\draw[flow] (folds) -- (audio);
-\draw[flow] (text) -- (cal);
-\draw[flow] (audio) -- (cal);
-\draw[flow] (cal) -- (eval);
-
-\node[deploy] (frozen) at (6.0,-1.25) {Frozen architecture, epochs,\\labels, and calibration chain};
-\node[deploy] (full) at (9.2,-1.25) {Train final text and audio\\models on all eligible rows};
-\node[deploy] (package) at (12.3,-1.25) {Private versioned\\model package};
-\node[deploy] (inference) at (15.25,-1.25) {Optional application inference\\with explicit provenance};
-
-\draw[freeze] (folds.south) -- (frozen.north);
-\draw[freeze] (cal.south) -- (frozen.north east);
-\draw[flow] (frozen) -- (full);
-\draw[flow] (full) -- (package);
-\draw[flow] (package) -- (inference);
-
+\input{figures/technical_diagram_styles}
+\begin{tikzpicture}[td diagram]
+\node[td box, text width=8.0cm] (data) at (7.0,0)
+    {Private IEMOCAP: matched text and audio\\fixed four-class label order};
+\node[td box, text width=5.7cm] (folds) at (3.3,-2.1)
+    {\textbf{Evaluation}\\Train text and audio in five folds\\3 train / 1 validate / 1 test session};
+\node[td evidence, text width=5.7cm] (cal) at (3.3,-3.9)
+    {Fit calibration and fusion\\validation predictions only};
+\node[td box, text width=5.7cm] (eval) at (3.3,-5.7)
+    {Held-out test metrics\\classification and calibration};
+\node[td package, text width=5.7cm] (full) at (10.7,-2.1)
+    {\textbf{Application packaging}\\Freeze configuration, then retrain\\final models on all eligible utterances};
+\node[td package, text width=5.7cm] (package) at (10.7,-3.9)
+    {Private inference package\\full-data models and calibration settings};
+\node[td optional, text width=5.7cm] (inference) at (10.7,-5.7)
+    {Optional application inference\\no new held-out performance claim};
+\draw[td flow] (data.south) -- (7.0,-0.75) -| (folds.north);
+\draw[td flow] (data.south) -- (7.0,-0.75) -| (full.north);
+\draw[td flow] (folds) -- (cal);
+\draw[td flow] (cal) -- (eval);
+\draw[td flow] (full) -- (package);
+\draw[td flow] (package) -- (inference);
+\draw[td transfer] (cal) -- (package);
 \begin{scope}[on background layer]
-  \node[fit=(raw)(eval), draw=black!30, rounded corners=4pt, inner sep=7pt,
-      label={[font=\sffamily\scriptsize]above:Evaluation path --- supports performance claims}] {};
-  \node[fit=(frozen)(inference), draw=violet!45, rounded corners=4pt, inner sep=7pt,
-      label={[font=\sffamily\scriptsize, text=violet!75!black]below:Deployment path --- supports inference, not a new held-out result}] {};
+  \node[td panel, fit=(folds)(eval), inner xsep=7pt] {};
+  \node[td panel, draw=violet!40, fit=(full)(inference), inner xsep=7pt] {};
 \end{scope}
 \end{tikzpicture}
