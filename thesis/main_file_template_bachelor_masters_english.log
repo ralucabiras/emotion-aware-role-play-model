@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 19:18
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 19:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1257,18 +1257,14 @@ Chapter 5.
 [27
 
 ] [28] [29] [30] [31] (figures/model_results.tex
-Package pgfplots info on input line 26: Using 'lua backend=false' for axis: x c
+Package pgfplots info on input line 35: Using 'lua backend=false' for axis: x c
 oord trafo unsupported.
 ) [32]
 Underfull \hbox (badness 1248) in paragraph at lines 162--162
 []|\OT1/cmr/m/n/10 In-process, sin-gle client; ex-cludes net-work,
  []
 
-
-Underfull \vbox (badness 5403) has occurred while \output is active []
-
- [33]
-[34] [35] [36]) (cap6.tex [37]
+[33] [34] [35] [36]) (cap6.tex [37]
 Chapter 6.
 [38
 
@@ -1453,41 +1449,40 @@ out' has not changed.
 (rerunfilecheck)             Checksum: 942AB77D6616C8B06AAE401E35716EC6;12675.
  ) 
 Here is how much of TeX's memory you used:
- 38216 strings out of 467871
- 888348 string characters out of 5418375
- 1421276 words of memory out of 5000000
- 66212 multiletter control sequences out of 15000+600000
+ 38217 strings out of 467871
+ 888435 string characters out of 5418375
+ 1426221 words of memory out of 5000000
+ 66213 multiletter control sequences out of 15000+600000
  642450 words of font info for 96 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,13n,104p,1279b,2455s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,13n,104p,1279b,2677s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmbx10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmbx12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/p
 ublic/amsfonts/cm/cmbx8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts
 /type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/raluc/AppData/Local/Programs/MiK
 TeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/raluc/AppData/Local/Pro
-grams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/raluc/AppData/L
-ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/raluc/A
-ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users
-/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><
-C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr
-6.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
-/cm/cmr7.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/a
-msfonts/cm/cmr8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/p
-ublic/amsfonts/cm/cmsl12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/font
-s/type1/public/amsfonts/cm/cmss10.pfb><C:/Users/raluc/AppData/Local/Programs/Mi
-KTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/raluc/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/raluc/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/ral
-uc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/U
-sers/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.
-pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/c
-m/cmtt12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/a
-msfonts/cm/cmtt8.pfb>
-Output written on main_file_template_bachelor_masters_english.pdf (69 pages, 96
-6587 bytes).
+grams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/raluc/AppData/L
+ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/raluc/A
+ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users
+/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C
+:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7
+.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/
+cm/cmr8.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
+sfonts/cm/cmsl12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
+public/amsfonts/cm/cmss10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fon
+ts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/raluc/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/raluc/AppData/Local
+/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/raluc/AppDa
+ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/ral
+uc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/
+Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12
+.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/
+cm/cmtt8.pfb>
+Output written on main_file_template_bachelor_masters_english.pdf (69 pages, 95
+2997 bytes).
 PDF statistics:
- 988 PDF objects out of 1000 (max. 8388607)
+ 983 PDF objects out of 1000 (max. 8388607)
  216 named destinations out of 1000 (max. 500000)
  551 words of extra memory for PDF output out of 10000 (max. 10000000)
 

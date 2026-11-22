@@ -1,58 +1,50 @@
-\begin{minipage}[t]{0.47\textwidth}
-\centering
+% One group fixes both plot rectangles and titles to the same geometry.
 \begin{tikzpicture}
-\begin{axis}[
-    width=0.88\linewidth,
-    height=6.4cm,
-    ybar,
-    bar width=8pt,
+\begin{groupplot}[
+    group style={group size=2 by 1, horizontal sep=1.25cm},
+    width=5.5cm,
+    height=5.1cm,
+    scale only axis,
     ymin=0.60,
     ymax=0.82,
+    ytick={0.60,0.65,0.70,0.75,0.80},
     ylabel={Macro F1},
-    symbolic x coords={Utterance,Context,Audio,Equal,Fold-fit},
-    xtick=data,
-    xticklabels={Utterance text,Context text,Audio only,Equal fusion,Fold-fitted},
-    x tick label style={rotate=40,anchor=east,font=\scriptsize},
-    y tick label style={font=\scriptsize},
-    ylabel style={font=\scriptsize},
+    tick label style={font=\sffamily\footnotesize},
+    label style={font=\sffamily\footnotesize},
+    yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2,
+        /pgf/number format/zerofill},
     grid=major,
     grid style={draw=black!10},
     axis line style={draw=black!50},
     tick style={draw=black!50},
-    nodes near coords,
-    nodes near coords style={font=\tiny, rotate=90, anchor=west},
+    title style={font=\sffamily\footnotesize, at={(0.5,1)}, anchor=south, yshift=8pt}
+]
+\nextgroupplot[
     title={(a) Classification performance},
-    title style={font=\sffamily\small}
+    ybar,
+    bar width=11pt,
+    symbolic x coords={Utterance,Context,Audio,Equal,Fold-fit},
+    xtick=data,
+    xticklabels={Utterance text,Context text,Audio only,Equal fusion,Fold-fitted},
+    x tick label style={rotate=45,anchor=north east},
+    enlarge x limits=0.16,
+    nodes near coords,
+    nodes near coords style={font=\sffamily\footnotesize, anchor=south,
+        /pgf/number format/fixed, /pgf/number format/precision=4,
+        /pgf/number format/zerofill}
 ]
 \addplot[fill=blue!45, draw=blue!70!black] coordinates {
     (Utterance,0.6651) (Context,0.7332) (Audio,0.6349)
     (Equal,0.7883) (Fold-fit,0.7758)
 };
-\end{axis}
-\end{tikzpicture}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.40\textwidth}
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-    width=0.88\linewidth,
-    height=6.4cm,
-    xmin=0.015,
-    xmax=0.175,
-    ymin=0.62,
-    ymax=0.80,
-    xlabel={Expected calibration error},
-    ylabel={Macro F1},
-    x tick label style={font=\scriptsize},
-    y tick label style={font=\scriptsize},
-    xlabel style={font=\scriptsize},
-    ylabel style={font=\scriptsize},
-    grid=major,
-    grid style={draw=black!10},
-    axis line style={draw=black!50},
-    tick style={draw=black!50},
+\nextgroupplot[
     title={(b) Calibration trade-off},
-    title style={font=\sffamily\small}
+    xmin=0.01,
+    xmax=0.18,
+    xtick={0.04,0.08,0.12,0.16},
+    xlabel={Expected calibration error},
+    xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2},
+    ylabel={}
 ]
 \addplot[only marks, mark=*, mark size=2.5pt, blue!75!black]
     coordinates {(0.0311,0.7332) (0.0468,0.6349)};
@@ -60,10 +52,13 @@
     coordinates {(0.1619,0.7883)};
 \addplot[only marks, mark=triangle*, mark size=3pt, teal!75!black]
     coordinates {(0.0283,0.7758)};
-\node[font=\tiny, anchor=south west] at (axis cs:0.0311,0.7332) {Context};
-\node[font=\tiny, anchor=north west] at (axis cs:0.0468,0.6349) {Audio};
-\node[font=\tiny, anchor=south east] at (axis cs:0.1619,0.7883) {Equal fusion};
-\node[font=\tiny, anchor=north west] at (axis cs:0.0283,0.7758) {Fold-fitted};
-\end{axis}
+\node[font=\sffamily\footnotesize, anchor=south west, xshift=3pt, yshift=2pt]
+    at (axis cs:0.0311,0.7332) {Context};
+\node[font=\sffamily\footnotesize, anchor=south west, xshift=3pt, yshift=2pt]
+    at (axis cs:0.0468,0.6349) {Audio};
+\node[font=\sffamily\footnotesize, anchor=south east, xshift=-3pt, yshift=2pt]
+    at (axis cs:0.1619,0.7883) {Equal fusion};
+\node[font=\sffamily\footnotesize, anchor=south west, xshift=3pt, yshift=2pt]
+    at (axis cs:0.0283,0.7758) {Fold-fitted};
+\end{groupplot}
 \end{tikzpicture}
-\end{minipage}
