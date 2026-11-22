@@ -1,0 +1,74 @@
+{
+  "schema_version": "affectlab-model-provenance-v1",
+  "created_at": "2026-11-22T16:52:52.049317+00:00",
+  "git_commit": "ff1d2e8b5e8f071668b25b089b4640073513045d",
+  "configuration": {
+    "path": "configs/iemocap_final_multimodal.json",
+    "sha256": "d1a29a886293d5ed7398afc3208b4e866ef50d78b03b5792c5c66fb4693e0914"
+  },
+  "environment": {
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "torch": "2.13.0",
+    "transformers": "5.15.0",
+    "pymongo": "4.17.0",
+    "openai": "2.52.0"
+  },
+  "text_model": {
+    "directory_name": "text",
+    "files": [
+      {
+        "path": "config.json",
+        "bytes": 1132,
+        "sha256": "d1ff13b2783556a884c2b83e459c4262e301c9f1d6718520ab85b808d39b977e"
+      },
+      {
+        "path": "model.safetensors",
+        "bytes": 567604704,
+        "sha256": "a89b6635494d90ebac233904e2a1cb2e352f421c0148c4da61dcbb7a9abafdd0"
+      },
+      {
+        "path": "tokenizer.json",
+        "bytes": 8339876,
+        "sha256": "e9ddd853a4a31023721c993458663f2019e3154a05dacf0d2b3c217e53d9bdc8"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 538,
+        "sha256": "0dbe41323167ba5f2e1e876ccd05068318dd2378b922bdfd924a389dba3bcc7a"
+      },
+      {
+        "path": "training_args.bin",
+        "bytes": 5201,
+        "sha256": "2c50db76e5a0f5ab9905d78b20a3139add0ce3c2bb08c09d72a09e353047e3c1"
+      }
+    ],
+    "aggregate_sha256": "7a233faab5be54cbfa79a0279e3c3a77bf856a356ae48202ff259d720b51d5ce"
+  },
+  "audio_model": {
+    "directory_name": "audio",
+    "files": [
+      {
+        "path": "config.json",
+        "bytes": 2548,
+        "sha256": "c93c5be3e3ebf0975f4bda01693444a3752de53b7f2736d23e10e494200fed3b"
+      },
+      {
+        "path": "model.safetensors",
+        "bytes": 378304368,
+        "sha256": "7928dab1eedc21744e72f0035fa3f5a64d9a336d91883c03f75b1f66728109ae"
+      },
+      {
+        "path": "preprocessor_config.json",
+        "bytes": 215,
+        "sha256": "8cdfd65ff4115423185a1512bdae100e2e0cd744f5b322417429944aaafd0827"
+      },
+      {
+        "path": "training_args.bin",
+        "bytes": 5201,
+        "sha256": "3e209a22b3fa5098faae9a9e63a2333a9219386c65bdabfcde5f76d0a707590b"
+      }
+    ],
+    "aggregate_sha256": "502d8c6282315efdb80568944850ee66a15b9fe4a3a0ed318cd1bdb433d16c16"
+  }
+}

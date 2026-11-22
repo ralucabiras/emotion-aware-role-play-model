@@ -6,7 +6,7 @@
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {4.1}{\ignorespaces Separate evaluation and application-packaging paths.}}{17}{figure.4.1}%
 \contentsline {figure}{\numberline {4.2}{\ignorespaces Conversation request with safety precedence and a shared commit step.}}{20}{figure.4.2}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Ordered checks for bounded affect-aware pacing.}}{22}{figure.4.3}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Ordered checks for bounded affect-aware pacing.}}{21}{figure.4.3}%
 \contentsline {figure}{\numberline {4.4}{\ignorespaces Representative role-play workspace with transcript, scenario state, message composer, and optional voice interaction.}}{23}{figure.4.4}%
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {5.1}{\ignorespaces Four-class held-out results. Panel (a) compares macro F1; Panel (b) shows the calibration cost of equal fusion and the effect of validation-derived fitting.}}{30}{figure.5.1}%

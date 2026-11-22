@@ -4,13 +4,13 @@
 
 The Colab notebooks in `ml/notebooks` cover preprocessing, context text training, audio training, calibration, fusion, and final full-data packaging. Use only the authorized private IEMOCAP archive. Dataset rules are frozen in `docs/dataset-registry.md`; parameters are frozen in `configs/iemocap_final_multimodal.json`. Run folds by IEMOCAP session, fit every calibration/fusion parameter on validation predictions, and reserve the held-out session for evaluation.
 
-After downloading final model directories, capture hashes and environment metadata:
+The [model-file manifest captured on 22 November 2026](generated/model-provenance-v1.json) identifies the available final text and audio files. After downloading another copy of those model directories, capture a separate manifest for comparison:
 
 ```powershell
-.venv\Scripts\python.exe scripts\capture_model_provenance.py --text-model "D:\models\text" --audio-model "D:\models\audio" --output "docs\evidence-package\private-model-provenance.json"
+.venv\Scripts\python.exe scripts\capture_model_provenance.py --text-model "D:\models\text" --audio-model "D:\models\audio" --output ".local\model-provenance.json"
 ```
 
-Do not commit that generated private manifest if paths or metadata reveal restricted storage details; archive it with the dissertation evidence instead.
+Compare each model's relative file list, byte counts, individual hashes, aggregate hash, and the configuration digest with the archived manifest. Capture timestamps, revisions, and local environments can differ between captures. Preserve the archived manifest as the baseline. Keep any new manifest containing restricted paths or metadata in the private dissertation evidence rather than committing it. The archived manifest records relative model filenames and capture metadata only; the original training environment is documented separately in [results and provenance](results-and-provenance.md#exact-artifact-provenance).
 
 ## Offline demonstration
 

@@ -4,6 +4,7 @@
 This appendix preserves secondary results useful for reproducibility but unnecessary for the main argument in Chapter~\ref{chap5}. Pooled metrics are computed after concatenating the five non-overlapping held-out sessions; fold means are unweighted descriptive summaries and therefore need not equal the pooled values.
 
 \section{Reproduction Provenance}
+\label{sec:model-package-provenance}
 
 Table~\ref{tab:model-reproduction-provenance} fixes the exact configuration behind the principal four-class results and the final private inference package. The evaluation models and the later full-data package have different evidential roles: only the rotating held-out-session models support performance claims.
 
@@ -31,7 +32,7 @@ Evidence archive & Training code/configuration: the preparation commit linked ab
 \end{tabularx}
 \end{table}
 
-IEMOCAP media, row-level predictions, and weights cannot be redistributed, so access to the private evidence archive requires authorisation. At the audit cut-off, the repository revision, configuration digest, environment, and archive locations were recorded, but individual and aggregate hashes for the downloaded final model files had not yet been captured. The supplied provenance script must generate and archive that manifest before any claim of complete independent reproduction.
+IEMOCAP media, row-level predictions, and weights cannot be redistributed, so access to the private evidence archive requires authorisation. On 22 November 2026, hashes for the nine locally available final-model files were recorded in \path{docs/evidence-package/generated/model-provenance-v1.json}. This manifest records file sizes, individual and aggregate SHA-256 digests, the configuration digest, and the capture revision and environment. The latter describe the local capture, not the original training run. These fingerprints identify the available full-data package; they do not retrospectively verify its training history or establish independent reproduction of the held-out experiments.
 
 \section{Four-Class Per-Class Results}
 

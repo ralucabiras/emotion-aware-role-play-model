@@ -1,7 +1,7 @@
 # Dissertation Revision Plan
 
 Created: 2026-11-22  
-Status: Revision in progress; Notes 1, 2, 3, 4, 6, and 7 completed and checked. Note 5 partially addressed; final length review remains open.
+Status: Revision in progress; Notes 1, 2, 3, 4, 6, 7, 8, and 16 completed and checked. Note 5 partially addressed; final length review remains open.
 
 This tracker covers the author's 20 reading notes and the changes proposed in the accompanying review. Use it to record what remains to be revised and checked.
 
@@ -119,10 +119,12 @@ Location: `cap4.tex`, Emotion-Recognition Pipeline, paragraph about the private 
 
 The sentence refers to missing digital fingerprints for the final model files, rather than a reported model failure.
 
-- [ ] Check whether a completed model-file manifest is available.
-- [ ] If the relevant files are available, capture and record their hashes; otherwise retain a precise statement of the remaining provenance limitation.
-- [ ] Replace vague “audit cut-off” wording with a factual account of what was recorded.
-- [ ] Keep the detailed provenance explanation in one appropriate location, coordinated with Note 16.
+- [x] Check whether a completed model-file manifest is available.
+- [x] If the relevant files are available, capture and record their hashes; otherwise retain a precise statement of the remaining provenance limitation.
+- [x] Replace vague “audit cut-off” wording with a factual account of what was recorded.
+- [x] Keep the detailed provenance explanation in one appropriate location, coordinated with Note 16.
+
+Checked result (2026-11-22): no completed model-file manifest was present, but the configured private directories outside the repository contained five text-model files and four audio-model files. Captured all nine in `docs/evidence-package/generated/model-provenance-v1.json` using the existing provenance script. Independently checked every file's byte count and SHA-256 with PowerShell, recomputed both aggregate digests, and confirmed that the configuration digest matches the preparation record. The manifest contains relative filenames and capture metadata, without weights or absolute private paths. Chapter 4 now refers to the single detailed account in Appendix C. That account distinguishes the capture revision and environment from the original training records and states that current fingerprints do not retrospectively verify training history or independently reproduce held-out evaluation. Updated the repository evidence and comparison instructions to match. No remote archive comparison or model training was performed.
 
 Complete when the text accurately describes the available model-file provenance and contains no vague unfinished-task language.
 
@@ -199,9 +201,11 @@ Complete when every remaining appendix item supports the main argument and the a
 
 Location: `appendix_c_supplementary_model_results.tex`, Reproduction Provenance.
 
-- [ ] Coordinate with Note 8 to describe restricted access and model-file provenance accurately.
-- [ ] Replace the instruction to run a supplied script with a factual description of the available records and any remaining limitation.
-- [ ] Remove duplicated provenance explanations while retaining an honest account of completeness.
+- [x] Coordinate with Note 8 to describe restricted access and model-file provenance accurately.
+- [x] Replace the instruction to run a supplied script with a factual description of the available records and any remaining limitation.
+- [x] Remove duplicated provenance explanations while retaining an honest account of completeness.
+
+Checked result (2026-11-22): replaced the second paragraph of C.1 with the date, scope, and location of the completed model-file manifest and its remaining historical-provenance limitation. Retained the restricted-access qualification. The dissertation no longer contains “audit cut-off” wording or an instruction to generate a missing manifest. Chapter 4 gives only a cross-reference; the detailed explanation is in C.1. See Note 8 for the hash verification.
 
 Complete when the paragraph reads as a finished account rather than an internal review instruction.
 
@@ -270,3 +274,4 @@ Complete when repetition is limited to necessary orientation and final conclusio
 | 2026-11-22 | Note 5: Length audit and local reduction; partially addressed | Removed one repeated 64-word overview paragraph from Section 4.1, eliminating Chapter 4's sparse final continuation. Recorded the current page breakdown and the remaining dependencies on appendix reduction, prose consolidation, and readable replacement figures. | Rebuilt successfully: 66 physical pages and 37 chapter-content pages, down from 67 and 38 before this change. Visually checked numbered pages 16–23. No LaTeX errors, undefined citations/references, or overfull boxes; all 35 bibliography entries remain cited. Source hashes confirm that every other thesis source, figure, the bibliography, and REDUCTION_PLAN.md are unchanged; an exact source comparison confirms that all other Chapter 4 text, including pilot passages, is unchanged. Note 5 remains open for the remaining reductions and the final pagination review. |
 | 2026-11-22 | Note 6: Opening of Section 3.2 | Replaced the specification-history opening with the capabilities users need: preparation, private rehearsal, feedback, control over data and optional features, text-only access, and clear interruption and service-failure handling. Introduced the nine requirement groups and FR/NFR identifiers after their purpose, with references to the full requirements and verification evidence. Removed editorial justification from the opening and the later acceptance-criteria explanation. | Rebuilt successfully: 66 physical pages and 37 chapter-content pages, unchanged. Visually checked numbered pages 12-15; the opening fits before the unchanged requirements table, with no sparse continuation page. No LaTeX errors, undefined citations/references, or overfull boxes. Source hashes and exact comparisons confirm that only Section 3.2 prose changed; all requirements, identifiers, citations, pilot material, other thesis sources, and REDUCTION_PLAN.md are unchanged. Other pending notes remain open. |
 | 2026-11-22 | Note 7: Technical figures | Rebuilt Figures 3.1 and 4.1–4.3 with shared styles and native 10-point labels. Separated architecture connections, reduced the pipeline to seven boxes in two paths, reduced the request sequence to three lanes with a shared commit step, and separated pacing outcomes and lower emotion branches. Updated captions, List of Figures entries, and directly related discussion. | Rebuilt successfully: 67 physical pages and 38 chapter-content pages, one more than before because of readable Chapter 4 diagrams. Visually checked all 14 Chapter 3/4 pages and each diagram at 95 dpi; no overlaps, clipping, isolated figure page, or one-word continuation remains. No LaTeX errors, undefined citations/references, or overfull boxes; all 35 bibliography entries remain cited. Source hashes and exact comparisons confirm that pilot material, numerical findings, all other chapter text, other thesis sources, and REDUCTION_PLAN.md are unchanged. Note 5 and other pending notes remain open. |
+| 2026-11-22 | Notes 8 and 16: Model-file provenance | Located the configured private final models outside the repository and captured nine files in `docs/evidence-package/generated/model-provenance-v1.json`, with per-file sizes and SHA-256 hashes, aggregate directory hashes, configuration digest, and capture metadata. Replaced Chapter 4's unfinished wording with a cross-reference to the factual account in Appendix C; updated repository evidence and comparison instructions. | Independently verified all nine file hashes and sizes, both aggregate digests, and the matching preparation configuration digest. Rebuilt successfully: 67 physical pages and 38 chapter-content pages, unchanged; no LaTeX errors, undefined citations/references, or overfull boxes; all 35 bibliography entries remain cited. Visually checked affected Chapter 4 pages 18-24 and Appendix C pages 50-52. Exact source comparisons confirm that tables, numerical results, pilot material, all other thesis sources, and REDUCTION_PLAN.md are unchanged. The manifest identifies the current local files; it does not retrospectively verify training history or independently reproduce held-out evaluation. No model training, inference evaluation, or remote archive comparison was performed. Other pending notes remain open. |

@@ -23,8 +23,8 @@
 \contentsline {section}{\numberline {4.1}Technology and Application Overview}{16}{section.4.1}%
 \contentsline {section}{\numberline {4.2}Emotion-Recognition Pipeline}{16}{section.4.2}%
 \contentsline {section}{\numberline {4.3}Backend and Request Processing}{18}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Role-Play and Affect-Adaptation Engine}{20}{section.4.4}%
-\contentsline {section}{\numberline {4.5}Feedback and Frontend Workflow}{21}{section.4.5}%
+\contentsline {section}{\numberline {4.4}Role-Play and Affect-Adaptation Engine}{19}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Feedback and Frontend Workflow}{22}{section.4.5}%
 \contentsline {section}{\numberline {4.6}Security, Persistence, and Deployment}{23}{section.4.6}%
 \contentsline {chapter}{\numberline {5}Evaluation and Results}{25}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Evaluation Methodology}{25}{section.5.1}%
@@ -61,7 +61,7 @@
 \contentsline {chapter}{\numberline {C}Supplementary Model Results}{50}{appendix.C}%
 \contentsline {section}{\numberline {C.1}Reproduction Provenance}{50}{section.C.1}%
 \contentsline {section}{\numberline {C.2}Four-Class Per-Class Results}{50}{section.C.2}%
-\contentsline {section}{\numberline {C.3}Exploratory Six-Class Experiment}{50}{section.C.3}%
+\contentsline {section}{\numberline {C.3}Exploratory Six-Class Experiment}{52}{section.C.3}%
 \contentsline {section}{\numberline {C.4}Operational Packaging Diagnostic}{54}{section.C.4}%
 \contentsline {chapter}{\numberline {D}Application Verification Details}{55}{appendix.D}%
 \contentsline {section}{\numberline {D.1}Requirement Traceability}{55}{section.D.1}%

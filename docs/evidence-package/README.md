@@ -29,6 +29,7 @@ Safety checks precede model generation. Raw audio is processed in memory and is 
 - [Model card](model-card.md): text, audio, and calibrated late-fusion artifacts.
 - [System card](system-card.md): intended use, prohibited use, privacy, safety, and limitations.
 - [Canonical results and provenance](results-and-provenance.md): the only compact headline table to use in slides.
+- [Final model-file manifest](generated/model-provenance-v1.json): individual and aggregate SHA-256 hashes for nine locally available private model files, captured on 22 November 2026.
 - [Reproduction and demonstration](reproduction-and-demo.md): training references, evidence capture, offline demo, and presentation runbook.
 - `generated/performance-v1.json`: source-hashed local HTTP latency evidence for the deterministic core workflow.
 - `synthetic-demo.json`: fictional, redistribution-safe demonstration wording.

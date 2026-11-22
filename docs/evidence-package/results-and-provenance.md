@@ -44,4 +44,13 @@ Run `.\.venv\Scripts\python.exe scripts\evaluate_performance.py` from the reposi
 - Final text artifact: DeBERTa-v3-small, 7 epochs, 5,531 examples.
 - Final audio artifact: Wav2Vec2-base, 10 epochs, 5,531 examples; 16 kHz; 20-second cap; 16/5,531 files truncated.
 
-Model-file hashes cannot be truthfully recorded until the private final directories are downloaded beside the application. Run `scripts/capture_model_provenance.py` immediately after download and retain its JSON with the dissertation archive. That manifest is the immutable source for individual file and aggregate model hashes.
+On 22 November 2026, `scripts/capture_model_provenance.py` captured all nine files in the configured local final-model directories: five text files and four audio files. The completed [model-file manifest](generated/model-provenance-v1.json) records each relative filename, byte count, and SHA-256 digest, plus one aggregate digest per directory. No weights or model-file contents are included in the manifest.
+
+| Model directory | Files | Aggregate SHA-256 |
+| --- | ---: | --- |
+| Text | 5 | `7a233faab5be54cbfa79a0279e3c3a77bf856a356ae48202ff259d720b51d5ce` |
+| Audio | 4 | `502d8c6282315efdb80568944850ee66a15b9fe4a3a0ed318cd1bdb433d16c16` |
+
+Each aggregate is the SHA-256 of the UTF-8 string formed by joining the sorted file entries as `<file SHA-256><two spaces><relative POSIX filename>` with newline separators and no trailing newline. Individual weight-file hashes are also recorded in the manifest.
+
+The configuration digest matches the preparation digest above. The manifest's `git_commit` and `environment` describe the local hash capture, separately from the preparation commit and training environment recorded above. These fingerprints identify the files available on the capture date; no comparison with historical training-time hashes or the remote archive was performed. Capturing them does not establish independent reproduction of training or held-out evaluation.
