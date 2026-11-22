@@ -33,12 +33,7 @@ The separation of development roles is especially important for calibration. A t
 \subsection{Measures and Statistical Comparison}
 \label{subsec:evaluation-measures}
 
-Accuracy, macro F1, and weighted F1 are reported for classification. Macro F1 is primary because it weights the four classes equally despite unequal support. Probability quality is evaluated separately through expected calibration error (ECE), negative log-likelihood (NLL), and multiclass Brier score. ECE summarises the gap between confidence and accuracy within bins, but it is bin-dependent and incomplete; NLL and Brier score therefore provide complementary proper scoring rules \cite{guo2017calibration,kull2019dirichlet}. Temperature scaling is fitted to validation logits only:
-\begin{equation}
-    \hat{\mathbf{p}}=\operatorname{softmax}\!\left(\frac{\mathbf{z}}{T}\right), \qquad T>0.
-    \label{eq:evaluation-temperature}
-\end{equation}
-A scalar temperature changes probability concentration without changing the predicted class.
+Accuracy, macro F1, and weighted F1 are reported for classification. Macro F1 is primary because it weights the four classes equally despite unequal support. Probability quality is evaluated separately through expected calibration error (ECE), negative log-likelihood (NLL), and multiclass Brier score. ECE summarises the gap between confidence and accuracy within bins, but it is bin-dependent and incomplete; NLL and Brier score therefore provide complementary proper scoring rules \cite{guo2017calibration,kull2019dirichlet}. Temperature scaling divides a classifier's logits by one positive scalar before softmax converts them to probabilities. The temperature is selected to minimise NLL on validation logits and labels only, then applied unchanged to the held-out test logits. This changes probability concentration without changing the classifier's predicted class.
 
 Because utterances from one conversation are dependent, comparisons use a paired percentile bootstrap over the 151 complete dialogues. In each of 10,000 replicates, dialogues are sampled with replacement and the same sampled clusters are applied to both systems before recomputing each aggregate metric. The 2.5th and 97.5th percentiles form the 95\% interval; the procedure uses seed 20260808. These intervals describe resampling uncertainty among the observed dialogues, not demographic, cultural, linguistic, device, or deployment generalisation.
 

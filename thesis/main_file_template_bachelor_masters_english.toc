@@ -24,7 +24,7 @@
 \contentsline {section}{\numberline {4.2}Emotion-Recognition Pipeline}{17}{section.4.2}%
 \contentsline {section}{\numberline {4.3}Backend and Request Processing}{18}{section.4.3}%
 \contentsline {section}{\numberline {4.4}Role-Play and Affect-Adaptation Engine}{20}{section.4.4}%
-\contentsline {section}{\numberline {4.5}Feedback and Frontend Workflow}{21}{section.4.5}%
+\contentsline {section}{\numberline {4.5}Feedback and Frontend Workflow}{22}{section.4.5}%
 \contentsline {section}{\numberline {4.6}Security, Persistence, and Deployment}{23}{section.4.6}%
 \contentsline {chapter}{\numberline {5}Evaluation and Results}{25}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Evaluation Methodology}{25}{section.5.1}%

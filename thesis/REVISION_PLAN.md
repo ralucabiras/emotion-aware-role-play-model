@@ -1,7 +1,7 @@
 # Dissertation Revision Plan
 
 Created: 2026-11-22  
-Status: Revision in progress; Notes 1, 2, and 3 completed and checked.
+Status: Revision in progress; Notes 1, 2, 3, and 4 completed and checked.
 
 This tracker covers the author's 20 reading notes and the changes proposed in the accompanying review. Use it to record what remains to be revised and checked.
 
@@ -55,11 +55,11 @@ Complete when the opening makes the need for the application understandable befo
 
 Locations: `cap2.tex`, `cap4.tex`, and `cap5.tex`; reviewed pages 8, 19, and 29.
 
-- [ ] Replace the displayed causal-context notation in Chapter 2 with a clear explanation of using the current and preceding turns, without future turns.
-- [ ] Remove the duplicate displayed fusion equation from the literature discussion.
-- [ ] Retain one fusion equation in the implementation chapter and define its terms plainly.
-- [ ] Explain temperature scaling in prose or inline notation instead of a separate displayed equation, preserving how validation data determine the temperature.
-- [ ] Remove obsolete equation references and check the surrounding explanations.
+- [x] Replace the displayed causal-context notation in Chapter 2 with a clear explanation of using the current and preceding turns, without future turns.
+- [x] Remove the duplicate displayed fusion equation from the literature discussion.
+- [x] Retain one fusion equation in the implementation chapter and define its terms plainly.
+- [x] Explain temperature scaling in prose or inline notation instead of a separate displayed equation, preserving how validation data determine the temperature.
+- [x] Remove obsolete equation references and check the surrounding explanations.
 
 Complete when each retained formula adds necessary precision and no formula repeats another explanation without purpose.
 
@@ -248,3 +248,4 @@ Complete when repetition is limited to necessary orientation and final conclusio
 | 2026-11-22 | Note 1: Abstract | Rewrote the abstract around the problem, user workflow, implementation, evaluation, and main findings. Retained the context and fusion macro-F1 results and explained the calibration trade-off in prose; removed test-count inventories, precise local latency, and unfinished model-hash detail. Preserved the three pilot sentences word for word. | Rebuilt the 76-page PDF with no LaTeX errors, undefined citations/references, or overfull boxes. Visually checked that the abstract and keywords fit on one readable page. Verified the retained results against Chapter 5 and confirmed that all source outside the abstract, all other thesis sources, and `REDUCTION_PLAN.md` are unchanged. Remaining notes are pending. |
 | 2026-11-22 | Note 2: Empty pages | Checked Section 5 of the faculty's archived 2025–2026 and current 2026–2027 English guides: new-page chapter openings are specified, with no right-hand-opening requirement. Enabled `openany`, replaced explicit double-page clears, made internal class transitions use single-page clears, and removed obsolete blank-verso header suppression. | Rebuilt the PDF successfully: 67 physical pages instead of 76, with all nine bodyless pages removed and no empty or header-only pages remaining in the text scan or rendered page overviews. Chapters 1–6 still contain 38 content pages. No LaTeX errors, undefined citations/references, or overfull boxes. Source hashes confirm that all chapter, appendix, figure, and bibliography sources and `REDUCTION_PLAN.md` are unchanged; the abstract is unchanged as well, preserving all pilot material. Other pending notes remain open. |
 | 2026-11-22 | Note 3: Context and Problem | Rewrote the opening of Section 1.1 around anticipated confrontation, anxiety, avoidance, and difficulty finding words. Explained private, repeatable rehearsal and reflection before introducing language models and technical control; stated explicitly that AffectLab does not diagnose or treat anxiety. | Rebuilt the 67-page PDF with no LaTeX errors, undefined citations/references, or overfull boxes. Visually checked the revised opening and following page; Section 1.1 fits on one page and Section 1.2 starts on the next. Source hashes confirm that Chapter 1 after Section 1.1, all other thesis sources, and REDUCTION_PLAN.md are unchanged, preserving all pilot material. Other pending notes remain open. |
+| 2026-11-22 | Note 4: Equations | Replaced Chapter 2's causal-context notation with prose about the current and preceding turns, excluding future turns and annotated neighbouring labels. Replaced its duplicate fusion formula with a weighted-average explanation. Retained the implementation fusion equation and defined all distributions, the weight range, and equal weighting. Explained temperature scaling in prose, including validation-only NLL fitting and unchanged application to held-out test logits; removed the obsolete temperature-equation label. | Rebuilt the 67-page PDF with no LaTeX errors, undefined citations/references, or overfull boxes. Visually checked the affected pages and their continuations (numbered pages 8–9, 18–19, and 27–28). Confirmed that only one displayed equation remains, with no obsolete equation references, and checked the temperature-fitting account against the implementation. Citation commands are unchanged. Source comparisons confirm that all Chapter 5 results and pilot material, all other thesis sources, the bibliography, and REDUCTION_PLAN.md are unchanged. Other pending notes remain open. |

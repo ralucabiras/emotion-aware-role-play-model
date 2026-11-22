@@ -35,14 +35,14 @@ The acoustic classifier fine-tunes \texttt{facebook/wav2vec2-base} on raw wavefo
 
 Both classifiers are selected by validation macro F1 rather than test performance. Text fine-tuning uses cross-entropy, a small learning rate, warm-up, weight decay, and early stopping; speech fine-tuning adds gradient accumulation and checkpointing to fit the raw-waveform model within available memory. Each fold records its seed, session assignment, label order, training history, environment, validation calibration, and row-level test distributions. The fusion program verifies these identifiers and reconstructs the saved single-modality metrics before combining probabilities, preventing a result from being produced from mismatched rows or class orders.
 
-Decision-level late fusion keeps the modalities independently trainable and inspectable \cite{baltrusaitis2019multimodal}. For text logits $z_t$ and audio logits $z_a$, validation-fitted temperatures first produce $p_t=\operatorname{softmax}(z_t/T_t)$ and $p_a=\operatorname{softmax}(z_a/T_a)$. The distributions are then combined as
+Decision-level late fusion keeps the modalities independently trainable and inspectable \cite{baltrusaitis2019multimodal}. Each classifier's raw class scores (logits) are first divided by a positive temperature fitted on validation data and converted to probabilities with softmax. The calibrated text and audio distributions are then combined as
 
 \begin{equation}
  p_m = w p_t + (1-w)p_a,
  \label{eq:implementation-late-fusion}
 \end{equation}
 
-with a predeclared $w=0.5$ for the principal research comparison. A separate deployment path chooses $w$ and a final temperature from validation-role predictions only. Temperature scaling changes probability concentration without changing the largest logit \cite{guo2017calibration}; classification and calibration are consequently evaluated as separate properties. The packaged global parameters are operational settings rather than independent performance evidence because their pooled fitting procedure reuses utterance labels across rotating fold roles.
+Here, $p_t$ and $p_a$ are the text and audio probabilities in the same class order, and $p_m$ is the combined distribution. The text weight $w$ lies between zero and one; the audio weight is $1-w$. A predeclared $w=0.5$ gives both modalities equal weight for the principal research comparison. A separate deployment path chooses $w$ and a final temperature from validation-role predictions only. Temperature scaling changes probability concentration without changing the predicted class of the distribution being scaled \cite{guo2017calibration}; classification and calibration are consequently evaluated as separate properties. The packaged global parameters are operational settings rather than independent performance evidence because their pooled fitting procedure reuses utterance labels across rotating fold roles.
 \label{subsec:multimodal-late-fusion}
 \label{subsec:confidence-calibration-uncertainty}
 
