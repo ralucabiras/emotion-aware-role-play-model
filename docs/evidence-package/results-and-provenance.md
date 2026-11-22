@@ -2,6 +2,8 @@
 
 Use this held-out-performance table for the dissertation presentation. Do not substitute training-sample smoke-test accuracy or the label-reused global packaging analysis reported separately below.
 
+[Supplementary model settings and results](supplementary-model-results.md) preserves the full settings, per-class and per-session tables, and exploratory six-class detail supporting thesis Appendix C.
+
 | System | Accuracy | Macro F1 | Weighted F1 | ECE | NLL | Multiclass Brier | Evaluation provenance |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | Utterance-only text | 0.6624 | 0.6651 | 0.6640 | — | — | — | Five session-held-out IEMOCAP folds; no canonical calibrated probabilities reported |
