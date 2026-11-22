@@ -1,7 +1,7 @@
 # Dissertation Revision Plan
 
 Created: 2026-11-22  
-Status: Revision in progress; Note 1 completed and checked.
+Status: Revision in progress; Notes 1 and 2 completed and checked.
 
 This tracker covers the author's 20 reading notes and the changes proposed in the accompanying review. Use it to record what remains to be revised and checked.
 
@@ -29,11 +29,15 @@ Complete when the abstract gives a readable account of the work rather than a co
 
 Location: main document class, chapter openings, and explicit page-clearing commands.
 
-Confirmed bodyless pages: VIII, X, XII, 16, 26, 38, 42, 48, and 60. These come from right-hand chapter openings in the `book` class and explicit `\cleardoublepage` commands; several retain running headers.
+Confirmed bodyless pages in the reviewed PDF: VIII, X, XII, 16, 26, 38, 42, 48, and 60. These came from right-hand chapter openings in the `book` class and explicit `\cleardoublepage` commands; several retained running headers.
 
-- [ ] Check the applicable thesis layout requirements before changing chapter-opening behaviour.
-- [ ] Where permitted, remove unnecessary blank versos by addressing both class options and explicit page-clearing commands.
-- [ ] Inspect the rebuilt PDF for remaining accidental blank pages and headers on retained blank pages.
+- [x] Check the applicable thesis layout requirements before changing chapter-opening behaviour.
+- [x] Where permitted, remove unnecessary blank versos by addressing both class options and explicit page-clearing commands.
+- [x] Inspect the rebuilt PDF for remaining accidental blank pages and headers on retained blank pages.
+
+Layout check (2026-11-22): Section 5 of both the [2025–2026 English guide](https://drive.google.com/file/d/1PijhYd6nSlfeQuIFSW16uulRf3joTObi/view) and the [2026–2027 English guide](https://drive.google.com/file/d/1w9IxWH3NiI_ndve3EGLT7xehv2HlSuWk/view), linked from the [faculty's master-completion page](https://info.uvt.ro/finalizarea-studiilor-universitare-master/), requires chapters to begin on a new page; neither specifies right-hand openings or blank versos. Retained new-page openings, existing margins, typography, and two-sided running headers. Selected `openany`, replaced explicit double-page clears with `\clearpage`, and made the class's internal double-page clears use `\clearpage` as well, including the transition to the main matter. Removed the obsolete empty-verso header suppression.
+
+Checked result: 67 physical pages, down from 76. All nine bodyless pages are removed. Text extraction across all 67 pages and visual inspection of rendered page overviews found no remaining empty or header-only pages. Chapters 1–6 contain 38 pages of content, unchanged; the reduction is entirely pagination. No blank pages were retained.
 
 Complete when blank pages are either removed or retained for a documented formatting requirement.
 
@@ -242,3 +246,4 @@ Complete when repetition is limited to necessary orientation and final conclusio
 | --- | --- | --- | --- |
 | 2026-11-22 | Planning only | Created this tracker from the author's 20 notes; excluded pilot work. | No dissertation edits made. Bibliography verification from the review is recorded under Note 14. |
 | 2026-11-22 | Note 1: Abstract | Rewrote the abstract around the problem, user workflow, implementation, evaluation, and main findings. Retained the context and fusion macro-F1 results and explained the calibration trade-off in prose; removed test-count inventories, precise local latency, and unfinished model-hash detail. Preserved the three pilot sentences word for word. | Rebuilt the 76-page PDF with no LaTeX errors, undefined citations/references, or overfull boxes. Visually checked that the abstract and keywords fit on one readable page. Verified the retained results against Chapter 5 and confirmed that all source outside the abstract, all other thesis sources, and `REDUCTION_PLAN.md` are unchanged. Remaining notes are pending. |
+| 2026-11-22 | Note 2: Empty pages | Checked Section 5 of the faculty's archived 2025–2026 and current 2026–2027 English guides: new-page chapter openings are specified, with no right-hand-opening requirement. Enabled `openany`, replaced explicit double-page clears, made internal class transitions use single-page clears, and removed obsolete blank-verso header suppression. | Rebuilt the PDF successfully: 67 physical pages instead of 76, with all nine bodyless pages removed and no empty or header-only pages remaining in the text scan or rendered page overviews. Chapters 1–6 still contain 38 content pages. No LaTeX errors, undefined citations/references, or overfull boxes. Source hashes confirm that all chapter, appendix, figure, and bibliography sources and `REDUCTION_PLAN.md` are unchanged; the abstract is unchanged as well, preserving all pilot material. Other pending notes remain open. |
