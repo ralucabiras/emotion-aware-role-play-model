@@ -1,7 +1,7 @@
 # Dissertation Revision Plan
 
 Created: 2026-11-22  
-Status: Revision in progress; Notes 1, 2, 3, and 4 completed and checked.
+Status: Revision in progress; Notes 1, 2, 3, and 4 completed and checked. Note 5 partially addressed; final length review remains open.
 
 This tracker covers the author's 20 reading notes and the changes proposed in the accompanying review. Use it to record what remains to be revised and checked.
 
@@ -69,9 +69,23 @@ Reviewed baseline: 76 physical pages, including nine bodyless pages. Chapters 1�
 
 - [ ] Reduce length through the removals, consolidation, and layout changes in this tracker, without changing pilot material.
 - [ ] Remove avoidable sparse continuation pages and excessive float whitespace.
-- [ ] Record the resulting physical page count and numbered-chapter content count after rebuilding.
+- [x] Record the resulting physical page count and numbered-chapter content count after rebuilding.
 
 Working direction: approximately 30–32 chapter-content pages and roughly 50–55 physical pages overall, if achievable while preserving the pilot, required formatting, and readable figures. These are editorial targets, not reasons to shrink text or crowd content.
+
+Checked progress (2026-11-22): rebuilt the PDF after removing one redundant 64-word overview paragraph from Section 4.1. Its points about deterministic control, optional models, and fallback behaviour remain explained in the preceding overview and the relevant implementation sections. This eliminates Chapter 4's short final continuation, formerly numbered page 24 (the corresponding sparse continuation in the reviewed baseline was page 25), without changing pilot material, typography, margins, or figure sizes.
+
+| Part | Current pages |
+| --- | --- |
+| Front matter | 9 |
+| Chapters 1–6 | 37 content pages: 4 + 6 + 5 + 8 + 11 + 3 |
+| Bibliography | 4 |
+| Appendices A–D | 16: 1 + 6 + 5 + 4 |
+| **Physical total** | **66** |
+
+Chapters 1–6 now occupy numbered pages 1–37, with no bodyless pages. The physical total is down from the reviewed 76-page baseline by ten pages: nine blank pages removed under Note 2 and one continuation page removed here. Visually checked all eight rebuilt Chapter 4 pages (numbered 16–23); the chapter ends on a full page, and its floats leave no excessive whitespace. The existing diagram-label and screenshot-readability issues remain assigned to Notes 7 and 9.
+
+Remaining work: the current build is still 5–7 chapter-content pages and 11–16 physical pages above the working direction. Appendix C still occupies five pages, including a sparse packaging-diagnostic page (numbered 53); reduce it under Notes 15 and 16. Appendix D still occupies four pages and ends with an isolated latency table (numbered 57); consolidate it under Note 17. Main-text consolidation under Notes 19 and 20, together with the shorter passages in Notes 6, 10, and 12, remains the route to further chapter reduction. Recheck the budget after the figure and screenshot revisions under Notes 7, 9, 11, and 18, since readable replacements may need more space. Leave the first two actions open until those revisions and the final pagination review are complete; refresh the recorded counts at that point.
 
 ### Note 6 Opening of Section 3.2
 
@@ -249,3 +263,4 @@ Complete when repetition is limited to necessary orientation and final conclusio
 | 2026-11-22 | Note 2: Empty pages | Checked Section 5 of the faculty's archived 2025–2026 and current 2026–2027 English guides: new-page chapter openings are specified, with no right-hand-opening requirement. Enabled `openany`, replaced explicit double-page clears, made internal class transitions use single-page clears, and removed obsolete blank-verso header suppression. | Rebuilt the PDF successfully: 67 physical pages instead of 76, with all nine bodyless pages removed and no empty or header-only pages remaining in the text scan or rendered page overviews. Chapters 1–6 still contain 38 content pages. No LaTeX errors, undefined citations/references, or overfull boxes. Source hashes confirm that all chapter, appendix, figure, and bibliography sources and `REDUCTION_PLAN.md` are unchanged; the abstract is unchanged as well, preserving all pilot material. Other pending notes remain open. |
 | 2026-11-22 | Note 3: Context and Problem | Rewrote the opening of Section 1.1 around anticipated confrontation, anxiety, avoidance, and difficulty finding words. Explained private, repeatable rehearsal and reflection before introducing language models and technical control; stated explicitly that AffectLab does not diagnose or treat anxiety. | Rebuilt the 67-page PDF with no LaTeX errors, undefined citations/references, or overfull boxes. Visually checked the revised opening and following page; Section 1.1 fits on one page and Section 1.2 starts on the next. Source hashes confirm that Chapter 1 after Section 1.1, all other thesis sources, and REDUCTION_PLAN.md are unchanged, preserving all pilot material. Other pending notes remain open. |
 | 2026-11-22 | Note 4: Equations | Replaced Chapter 2's causal-context notation with prose about the current and preceding turns, excluding future turns and annotated neighbouring labels. Replaced its duplicate fusion formula with a weighted-average explanation. Retained the implementation fusion equation and defined all distributions, the weight range, and equal weighting. Explained temperature scaling in prose, including validation-only NLL fitting and unchanged application to held-out test logits; removed the obsolete temperature-equation label. | Rebuilt the 67-page PDF with no LaTeX errors, undefined citations/references, or overfull boxes. Visually checked the affected pages and their continuations (numbered pages 8–9, 18–19, and 27–28). Confirmed that only one displayed equation remains, with no obsolete equation references, and checked the temperature-fitting account against the implementation. Citation commands are unchanged. Source comparisons confirm that all Chapter 5 results and pilot material, all other thesis sources, the bibliography, and REDUCTION_PLAN.md are unchanged. Other pending notes remain open. |
+| 2026-11-22 | Note 5: Length audit and local reduction; partially addressed | Removed one repeated 64-word overview paragraph from Section 4.1, eliminating Chapter 4's sparse final continuation. Recorded the current page breakdown and the remaining dependencies on appendix reduction, prose consolidation, and readable replacement figures. | Rebuilt successfully: 66 physical pages and 37 chapter-content pages, down from 67 and 38 before this change. Visually checked numbered pages 16–23. No LaTeX errors, undefined citations/references, or overfull boxes; all 35 bibliography entries remain cited. Source hashes confirm that every other thesis source, figure, the bibliography, and REDUCTION_PLAN.md are unchanged; an exact source comparison confirms that all other Chapter 4 text, including pilot passages, is unchanged. Note 5 remains open for the remaining reductions and the final pagination review. |

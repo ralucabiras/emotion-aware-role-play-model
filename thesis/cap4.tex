@@ -11,8 +11,6 @@ This separation is also reflected in deployment. The browser submits typed reque
 
 Typed boundaries carry the distinctions through the application. A conversation turn can retain the emotion distribution available at that instant, the selected support or character action, the response source, and the pacing decision, while a role-play decision additionally retains its policy version and state snapshots. Absence is represented explicitly rather than as a zero-valued observation. This permits later replay and evaluation to distinguish deterministic, provider-backed, model-assisted, and failed paths without reconstructing them from a transcript.
 
-The implementation is text-first and failure-tolerant. Dialogue progression, evidence collection, crisis interruption, feedback, replay, and session management do not require a graphics processor or external provider. Probabilistic outputs pass through a bounded pacing policy. A language model may phrase a response or feedback item, but it cannot choose an action, declare success, create evidence, or override safety. These authority boundaries organise the mechanisms below.
-
 \section{Emotion-Recognition Pipeline}
 \label{sec:emotion-recognition-pipeline}
 

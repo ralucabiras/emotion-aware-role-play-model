@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 12:31
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 12:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -23,20 +23,25 @@ File: bk12.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
 \abovecaptionskip=\skip49
 \belowcaptionskip=\skip50
 \bibindent=\dimen148
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
 Package: amsmath 2025/07/09 v2.17z AMS math features
 \@mathmargin=\skip51
+
 For additional information on amsmath, use the `?' option.
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext.sty
 Package: amstext 2024/11/17 v2.01 AMS text
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks17
 \ex@=\dimen149
-)) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 \pmbraise@=\dimen150
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
 \inf@bad=\count284
@@ -86,7 +91,8 @@ LaTeX Info: Redefining \Relbar on input line 970.
 \mathdisplay@stack=\toks21
 LaTeX Info: Redefining \[ on input line 2950.
 LaTeX Info: Redefining \] on input line 2951.
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amscls\amsthm.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amscls\amsthm.sty
 Package: amsthm 2020/05/29 v2.20.6
 \thm@style=\toks22
 \thm@bodyfont=\toks23
@@ -97,8 +103,10 @@ Package: amsthm 2020/05/29 v2.20.6
 \thm@postskip=\skip55
 \thm@headsep=\skip56
 \dth@everypar=\toks27
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \symAMSa=\mathgroup4
@@ -109,11 +117,14 @@ LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 )) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.st
 y
 Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
 Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
 \KV@toks@=\toks28
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
 Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
 Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
 )
@@ -130,8 +141,8 @@ File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
 \Gin@req@width=\dimen159
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tikz.
-sty (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.
 sty
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.sty
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfrcs.st
 y
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil
@@ -145,8 +156,8 @@ y
 \pgfutil@abb=\box55
 )
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrcs.
-code.tex (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revi
-sion.tex)
+code.tex
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revision.tex)
 Package: pgfrcs 2025-08-29 v3.1.11a (3.1.11a)
 ))
 Package: pgf 2025-08-29 v3.1.11a (3.1.11a)
@@ -212,8 +223,10 @@ File: pgfsyssoftpath.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
 sprotocol.code.tex
 File: pgfsysprotocol.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
 Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
@@ -395,8 +408,8 @@ y
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfkeys.s
 ty
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
-.code.tex)) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pg
-fmath.sty
+.code.tex))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath.sty
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code
 .tex))
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgffor.
@@ -520,8 +533,8 @@ File: tikzlibraryshapes.symbols.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\
 pgflibraryshapes.symbols.code.tex
 File: pgflibraryshapes.symbols.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgfplots\pgfplots.st
-y
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/pgfplots\pgfplots.sty
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.rev
 ision.tex)
 Package: pgfplots 2021/05/15 v1.18.1 Data Visualization (1.18.1)
@@ -653,10 +666,13 @@ rarypgfplots.groupplots.code.tex
 \pgfplots@group@current@plot=\count324
 \pgfplots@group@current@row=\count325
 \pgfplots@group@current@column=\count326
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
 Package: geometry 2026/03/07 v6.0 Page Geometry
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
 Package: iftex 2024/12/12 v1.0g TeX engine tests
 ))
@@ -672,6 +688,7 @@ Package: iftex 2024/12/12 v1.0g TeX engine tests
 \Gm@layouthoffset=\dimen290
 \Gm@layoutvoffset=\dimen291
 \Gm@dimlist=\toks48
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
 \lst@mode=\count330
@@ -686,14 +703,17 @@ Package: iftex 2024/12/12 v1.0g TeX engine tests
 \lst@newlines=\count334
 \lst@lineno=\count335
 \lst@maxwidth=\dimen295
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty
 File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
 File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
 \c@lstnumber=\count336
 \lst@skipnumbers=\count337
 \lst@framebox=\box90
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
 File: listings.cfg 2025/11/14 1.11b listings configuration
 ))
 Package: listings 2025/11/14 1.11b (Carsten Heinz)
@@ -705,6 +725,7 @@ Package: listings 2025/11/14 1.11b (Carsten Heinz)
     so I'm assuming it got fixed.
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/colortbl\colortbl.sty
 Package: colortbl 2026/05/01 v1.0l Color table columns (DPC)
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty
 Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
 \col@sep=\dimen296
@@ -718,13 +739,15 @@ Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
 \everycr=\toks51
 \minrowclearance=\skip59
 \rownum=\count338
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/multirow\multirow.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/multirow\multirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 \multirow@colwidth=\skip60
 \multirow@cntb=\count339
 \multirow@dima=\skip61
 \bigstrutjot=\dimen298
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.sty
 Package: babel 2025/12/11 v25.17 The multilingual framework for LuaLaTeX, pdfLa
 TeX and XeLaTeX
 \babel@savecnt=\count340
@@ -744,12 +767,14 @@ LaTeX Encoding Info:    Ignoring declaration for text command \SS (encoding ?)
 on input line 2101.
 \U@D=\dimen299
 \l@unhyphenated=\language79
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/babel\txtbabel.def)
 \bbl@readstream=\read3
 \bbl@dirlevel=\count341
 Package babel Info: Configuration files are deprecated, as
 (babel)             they can break document portability.
 (babel)             Reported on input line 4196.
+
 *************************************
 * Local config file bblopts.cfg used
 *
@@ -771,15 +796,16 @@ Package babel Info: Hyphen rules for 'australian' set to \l@ukenglish
 (babel)             (\language73). Reported on input line 105.
 Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
 (babel)             (\language73). Reported on input line 108.
-)) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/paralist\paralist.st
-y
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/paralist\paralist.sty
 Package: paralist 2017/01/22 v2.7 Extended list environments
 \pltopsep=\skip62
 \plpartopsep=\skip63
 \plitemsep=\skip64
 \plparsep=\skip65
 \pl@lab=\toks52
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty
 Package: tabularx 2023/12/11 v2.12a `tabularx' package (DPC)
 \TX@col@width=\dimen300
 \TX@old@table=\dimen301
@@ -796,12 +822,13 @@ Package: pdflscape 2022-10-27 v0.13 Display of landscape pages in PDF
 etadata.sty
 Package: pdflscape-nometadata 2022-10-28 v0.13 Display of landscape pages in PD
 F (HO)
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/graphics\lscape.sty
 Package: lscape 2020/05/28 v3.02 Landscape Pages (DPC)
 )
 Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
-)) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyphenat\hyphenat.st
-y
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyphenat\hyphenat.sty
 Package: hyphenat 2009/09/02 v2.3c hyphenation utilities
 \langwohyphens=\language80
 LaTeX Info: Redefining \_ on input line 43.
@@ -810,14 +837,15 @@ LaTeX Info: Redefining \_ on input line 43.
 y
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
 nment
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
+ (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count343
 \float@exts=\toks54
 \float@box=\box93
 \@float@everytoks=\toks55
 \@floatcapt=\box94
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
 Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
 )
 \@float@every@algorithm=\toks56
@@ -830,6 +858,7 @@ Package: algpseudocode
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algorithmi
 cx.sty
 Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
+
 Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
 \c@ALG@line=\count345
 \c@ALG@rem=\count346
@@ -864,6 +893,7 @@ Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
 ty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty
 Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
 )
@@ -879,10 +909,13 @@ Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
-)) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty
+))
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
 Package: nameref 2025-06-21 v2.57 Cross-referencing by name of section
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 )
@@ -894,7 +927,8 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
 \c@section@level=\count354
-) (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
+)
+(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
 Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count355
 )
@@ -906,7 +940,7 @@ Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
 \@linkdim=\dimen306
 \Hy@linkcounter=\count356
 \Hy@pagecounter=\count357
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
+ (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
 File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
@@ -914,7 +948,7 @@ Now handling font encoding PD1 ...
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
 \Hy@SavedSpaceFactor=\count358
-(C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
+ (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
 File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
@@ -927,12 +961,14 @@ Package hyperref Info: Backreferencing OFF on input line 4215.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4462.
 \c@Hy@tempcnt=\count359
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4801.
 \XeTeXLinkMargin=\dimen307
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 
@@ -956,6 +992,7 @@ Package hyperref Info: PDF/A mode OFF on input line 6108.
 \c@Hfootnote=\count363
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
 File: hpdftex.def 2025-07-12 v7.01o Hyperref driver for pdfTeX
 \Fld@listcount=\count364
@@ -1069,8 +1106,8 @@ s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
 \c@lstlisting=\count377
 Package hyperref Info: Link coloring OFF on input line 38.
-(main_file_template_bachelor_masters_english.out) (main_file_template_bachelor_
-masters_english.out)
+(main_file_template_bachelor_masters_english.out)
+(main_file_template_bachelor_masters_english.out)
 \@outlinefile=\write4
 \openout4 = `main_file_template_bachelor_masters_english.out'.
 
@@ -1081,14 +1118,17 @@ Package pdftex.def Info: FI.png  used on input line 47.
 (pdftex.def)             Requested size: 100.0pt x 50.10338pt.
 LaTeX Font Info:    Trying to load font information for U+msa on input line 68.
 
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 68.
 
+
 (C:\Users\raluc\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) [1
+)
+[1
 
 
 {C:/Users/raluc/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./FI.png>] [
@@ -1098,18 +1138,20 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 \tf@toc=\write5
 \openout5 = `main_file_template_bachelor_masters_english.toc'.
 
-[6] (main_file_template_bachelor_masters_english.lof)
+ [6]
+(main_file_template_bachelor_masters_english.lof)
 \tf@lof=\write6
 \openout6 = `main_file_template_bachelor_masters_english.lof'.
 
-[7
+ [7
 
 
-] (main_file_template_bachelor_masters_english.lot)
+]
+(main_file_template_bachelor_masters_english.lot)
 \tf@lot=\write7
 \openout7 = `main_file_template_bachelor_masters_english.lot'.
 
-[8
+ [8
 
 
 ] [9
@@ -1123,7 +1165,8 @@ Chapter 1.
 ]
 Underfull \vbox (badness 3168) has occurred while \output is active []
 
-[2] [3]) (cap2.tex [4]
+ [2]
+[3]) (cap2.tex [4]
 Chapter 2.
 [5
 
@@ -1174,29 +1217,24 @@ Underfull \hbox (badness 1783) in paragraph at lines 58--58
 
 [13] [14]) (cap4.tex [15]
 Chapter 4.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
 [16
 
-] (figures/emotion_pipeline.tex) [17] [18] (figures/request_sequence.tex) [19] 
-[20] (figures/affect_policy.tex)
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-[21]
+] (figures/emotion_pipeline.tex) [17] [18] (figures/request_sequence.tex)
+[19] [20] (figures/affect_policy.tex) [21]
 <figures/app-roleplay.png, id=620, 696.80325pt x 558.888pt>
 File: figures/app-roleplay.png Graphic file (type png)
 <use figures/app-roleplay.png>
-Package pdftex.def Info: figures/app-roleplay.png  used on input line 135.
+Package pdftex.def Info: figures/app-roleplay.png  used on input line 133.
 (pdftex.def)             Requested size: 192.13715pt x 154.10828pt.
-[22] [23 <./figures/app-roleplay.png>]) (cap5.tex [24]
+ [22 <./figures/app-roleplay.png>])
+(cap5.tex [23]
 Chapter 5.
-[25
+[24
 
-] [26] [27] [28] [29] (figures/model_results.tex
+] [25] [26] [27] [28] (figures/model_results.tex
 Package pgfplots info on input line 26: Using 'lua backend=false' for axis: x c
 oord trafo unsupported.
-) [30]
+) [29]
 Underfull \hbox (badness 1248) in paragraph at lines 162--162
 []|\OT1/cmr/m/n/10 In-process, sin-gle client; ex-cludes net-work,
  []
@@ -1204,11 +1242,12 @@ Underfull \hbox (badness 1248) in paragraph at lines 162--162
 
 Underfull \vbox (badness 5403) has occurred while \output is active []
 
-[31] [32] [33] [34]) (cap6.tex [35]
+ [30]
+[31] [32] [33]) (cap6.tex [34]
 Chapter 6.
-[36
+[35
 
-] [37]) [38] (main_file_template_bachelor_masters_english.bbl [39
+] [36]) [37] (main_file_template_bachelor_masters_english.bbl [38
 
 
 ]
@@ -1217,20 +1256,20 @@ Underfull \hbox (badness 1577) in paragraph at lines 99--107
 i
  []
 
-[40]
+[39]
 Underfull \hbox (badness 4582) in paragraph at lines 135--141
 []\OT1/cmr/m/n/12 Meelis Kull, Miquel Perello-Nieto, Markus K^^?angsepp, Telmo
  []
 
-[41]) (appendix_a_ai_usage.tex [42]
+[40]) (appendix_a_ai_usage.tex [41]
 Appendix A.
-) (appendix_b_requirements.tex [43
+) (appendix_b_requirements.tex [42
 
 ]
 Appendix B.
-[44
+[43
 
-] [45] [46] [47] [48]) (appendix_c_supplementary_model_results.tex [49]
+] [44] [45] [46] [47]) (appendix_c_supplementary_model_results.tex [48]
 Appendix C.
 
 Underfull \hbox (badness 10000) in paragraph at lines 31--31
@@ -1287,9 +1326,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 31--31
 uca-[]biras / runs/$ \OT1/cmr/m/n/8 and $\OT1/cmtt/m/n/8 gs :
  []
 
-[50
+[49
 
-] [51] [52] [53]) (appendix_d_verification_details.tex [54
+] [50] [51] [52]) (appendix_d_verification_details.tex [53
 
 ]
 Appendix D.
@@ -1366,9 +1405,10 @@ Underfull \hbox (badness 1342) in paragraph at lines 78--78
 
 Underfull \vbox (badness 2617) has occurred while \output is active []
 
-[55
+ [54
 
-] [56]
+]
+[55]
 Underfull \hbox (badness 1231) in paragraph at lines 104--104
 []|\OT1/cmr/m/n/10.95 Authenticated sce-nario cat-a-
  []
@@ -1378,7 +1418,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 104--104
 []|\OT1/cmr/m/n/10.95 Deterministic con-ver-sa-tion
  []
 
-) [57] [58] (main_file_template_bachelor_masters_english.aux)
+) [56] [57] (main_file_template_bachelor_masters_english.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -1388,8 +1428,8 @@ out' has not changed.
 (rerunfilecheck)             Checksum: 942AB77D6616C8B06AAE401E35716EC6;12675.
  ) 
 Here is how much of TeX's memory you used:
- 38343 strings out of 467871
- 889697 string characters out of 5418375
+ 38342 strings out of 467871
+ 889690 string characters out of 5418375
  1425015 words of memory out of 5000000
  66356 multiletter control sequences out of 15000+600000
  642745 words of font info for 97 fonts, out of 8000000 for 9000
@@ -1420,10 +1460,10 @@ fb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm
 /cmti12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
 sfonts/cm/cmtt12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
 public/amsfonts/cm/cmtt8.pfb>
-Output written on main_file_template_bachelor_masters_english.pdf (67 pages, 78
-4912 bytes).
+Output written on main_file_template_bachelor_masters_english.pdf (66 pages, 78
+3690 bytes).
 PDF statistics:
- 971 PDF objects out of 1000 (max. 8388607)
- 213 named destinations out of 1000 (max. 500000)
+ 966 PDF objects out of 1000 (max. 8388607)
+ 212 named destinations out of 1000 (max. 500000)
  511 words of extra memory for PDF output out of 10000 (max. 10000000)
 
