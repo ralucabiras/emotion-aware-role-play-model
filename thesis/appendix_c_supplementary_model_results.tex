@@ -41,21 +41,11 @@ Figure~\ref{fig:four-class-f1} compares pooled class F1 after concatenating the 
 
 Context's largest class gain was for sadness. Neutral remained the weakest class for both fusion variants, so their aggregate gains do not imply uniformly strong recognition.
 
-\begin{table}[htbp]
+\begin{figure}[htbp]
 \centering
-\caption{Macro F1 by held-out session.}
-\label{tab:session-fold-variation}
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{|l|r|r|r|r|r|}
-\hline
-\textbf{Configuration} & \textbf{S1} & \textbf{S2} & \textbf{S3} & \textbf{S4} & \textbf{S5} \\ \hline
-Utterance-only text & 0.6376 & 0.7125 & 0.6443 & 0.6575 & 0.6625 \\ \hline
-Three-turn context & 0.6918 & 0.7556 & 0.7235 & 0.7310 & 0.7505 \\ \hline
-Audio only & 0.6450 & 0.6974 & 0.5870 & 0.6017 & 0.6224 \\ \hline
-Equal-weight fusion & 0.7517 & 0.8108 & 0.7708 & 0.8090 & 0.7922 \\ \hline
-Validation-fitted fusion & 0.7294 & 0.8070 & 0.7542 & 0.7932 & 0.7852 \\ \hline
-\end{tabular}
-\end{table}
+\input{figures/session_fold_results}
+\caption[Macro F1 by held-out session.]{Macro F1 by held-out session. Marker shape and colour identify configurations; vertical offsets separate markers within each session. Exact scores remain in the linked repository evidence package.}
+\label{fig:session-fold-variation}
+\end{figure}
 
-Table~\ref{tab:session-fold-variation} shows that context exceeded utterance-only text, and equal fusion ranked highest, in every session. Audio varied most. These five actor dyads show observed fold variation, not population-level speaker variability; unweighted fold means need not equal pooled scores.
+Figure~\ref{fig:session-fold-variation} shows that context exceeded utterance-only text, and equal fusion ranked highest, in every session. Audio varied most. These five actor dyads show observed fold variation, not population-level speaker variability; unweighted fold means need not equal pooled scores.

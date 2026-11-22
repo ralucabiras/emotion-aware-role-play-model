@@ -29,7 +29,7 @@ IEMOCAP media, row-level predictions, and weights cannot be redistributed, so ac
 
 ## Four-class supporting results
 
-Pooled class metrics are computed after concatenating the five non-overlapping held-out sessions. Fold means are unweighted descriptive summaries and therefore need not equal the pooled values. The dissertation retains the class F1 values in one heatmap and the five session scores in a compact table; the full precision, recall, support, and fold summaries follow.
+Pooled class metrics are computed after concatenating the five non-overlapping held-out sessions. Fold means are unweighted descriptive summaries and therefore need not equal the pooled values. The dissertation retains the class F1 values in one heatmap and compares the five session scores in a point plot; the exact session values and full precision, recall, support, and fold summaries follow.
 
 ### Per-class results for the four-class text configurations.
 

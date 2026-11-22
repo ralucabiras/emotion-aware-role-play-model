@@ -122,13 +122,13 @@ Replay is a read-only projection of the recorded exchanges, state transitions, g
 
 Measurement boundaries prevent later reflection from entering rehearsal feedback. Missing legacy decisions or model output are displayed as gaps rather than regenerated. A branch validates source ownership, version, policy compatibility, and the selected pre-turn snapshot, then stores its lineage and copied-turn boundary. Action-card suggestions reuse only eligible participant turns inside the measurement window; safety-interrupted content and copied branch context are excluded, and every field remains editable before saving.
 
-The React interface makes this lifecycle available as a sequence of practice views. Figure~\ref{fig:app-roleplay}(a) shows the dashboard controls for starting a reflection or role-play and continuing a saved session. A new role-play leads to scenario and difficulty selection before rehearsal; a saved session restores the existing conversation. Recent activity identifies each session by title, turn count, and, for rehearsals, difficulty, with separate rename and delete controls.
+Figure~\ref{fig:app-roleplay} follows entry from the dashboard into rehearsal. A new role-play leads to scenario and difficulty selection; continuing a saved session restores the existing conversation.
 \label{subsec:frontend-navigation}
 
-During rehearsal, the participant reads the character's reply and enters a response in the message composer. Figure~\ref{fig:app-roleplay}(b) shows the workload scenario's objective, current stage, turn count, and first exchange. The participant can retry the last turn, pause, or choose \emph{Finish \& review}; the pacing and optional voice controls below the transcript provide further control over the exchange.
+During rehearsal, the participant responds through the message composer. Below the transcript crop in Figure~\ref{fig:app-roleplay}(b), pacing and optional voice controls provide further control over the exchange.
 \label{subsec:frontend-roleplay-workspace}
 
-After finishing, the feedback view in Figure~\ref{fig:app-feedback} distinguishes the completion reason from the language features observed. In this example, the participant ended the attempt manually: request and supporting detail were observed in turn~1, while the remaining features are marked \emph{Not yet observed}. Strengths, next-attempt suggestions, and turn-linked evidence make the basis of the feedback visible. The participant can then revisit the conversation through replay or branching and save a personal takeaway or action card for later practice.
+Figure~\ref{fig:app-feedback} shows feedback after manual completion: request and supporting detail were observed in turn~1, while the remaining features are marked \emph{Not yet observed}. Replay, branching, and saved takeaways or action cards support further practice.
 \label{subsec:frontend-feedback-interfaces}
 
 The browser includes the displayed session version and a fresh request identifier, clears a draft only after confirmation, and offers reload after a conflict while preserving unsent text. Semantic controls, visible focus, live status regions, reduced-motion rules, and responsive layouts support keyboard, desktop, and mobile use.

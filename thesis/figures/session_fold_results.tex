@@ -1,0 +1,41 @@
+% Independent sessions are categorical; offsets separate markers, not observations.
+\begin{tikzpicture}
+\begin{axis}[
+    width=7.7cm, height=3.5cm, scale only axis,
+    xmin=0.55, xmax=0.85, xtick={0.55,0.60,0.65,0.70,0.75,0.80,0.85},
+    ymin=0.5, ymax=5.5, y dir=reverse,
+    ytick={1,2,3,4,5}, yticklabels={S1,S2,S3,S4,S5},
+    xlabel={Macro F1},
+    tick label style={font=\sffamily\footnotesize},
+    label style={font=\sffamily\footnotesize},
+    xticklabel style={/pgf/number format/fixed,
+        /pgf/number format/precision=2, /pgf/number format/zerofill},
+    xmajorgrids, grid style={draw=black!12},
+    axis line style={draw=black!50}, tick style={draw=black!50},
+    only marks, mark size=2.2pt,
+    legend style={at={(1.04,0.5)}, anchor=west, draw=none,
+        font=\sffamily\footnotesize, row sep=5pt},
+    legend cell align=left
+]
+\addplot[gray!80!black, mark=x] coordinates {
+    (0.6376,0.76) (0.7125,1.76) (0.6443,2.76) (0.6575,3.76) (0.6625,4.76)
+};
+\addlegendentry{Utterance-only text}
+\addplot[blue!75!black, mark=*] coordinates {
+    (0.6918,0.88) (0.7556,1.88) (0.7235,2.88) (0.7310,3.88) (0.7505,4.88)
+};
+\addlegendentry{Three-turn context}
+\addplot[red!65!black, mark=diamond*] coordinates {
+    (0.6450,1) (0.6974,2) (0.5870,3) (0.6017,4) (0.6224,5)
+};
+\addlegendentry{Audio only}
+\addplot[orange!85!black, mark=square*] coordinates {
+    (0.7517,1.12) (0.8108,2.12) (0.7708,3.12) (0.8090,4.12) (0.7922,5.12)
+};
+\addlegendentry{Equal-weight fusion}
+\addplot[teal!75!black, mark=triangle*, mark size=2.6pt] coordinates {
+    (0.7294,1.24) (0.8070,2.24) (0.7542,3.24) (0.7932,4.24) (0.7852,5.24)
+};
+\addlegendentry{Validation-fitted fusion}
+\end{axis}
+\end{tikzpicture}

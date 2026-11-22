@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 20:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 20:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1306,10 +1306,10 @@ Appendix B.
 Appendix C.
 [53
 
-] (figures/supplementary_class_f1.tex)) [54
+] (figures/supplementary_class_f1.tex) (figures/session_fold_results.tex))
+[54
 
-]
-(main_file_template_bachelor_masters_english.aux)
+] (main_file_template_bachelor_masters_english.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -1319,13 +1319,13 @@ out' has not changed.
 (rerunfilecheck)             Checksum: 6DE1A01E321C86640BBF9B39BF2AA8CF;11353.
  ) 
 Here is how much of TeX's memory you used:
- 38224 strings out of 467871
- 889060 string characters out of 5418375
- 1416591 words of memory out of 5000000
- 66239 multiletter control sequences out of 15000+600000
+ 38273 strings out of 467871
+ 890270 string characters out of 5418375
+ 1416935 words of memory out of 5000000
+ 66285 multiletter control sequences out of 15000+600000
  642450 words of font info for 96 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,13n,104p,1279b,2677s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,19n,104p,1279b,2677s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmbx10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmbx12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/p
@@ -1349,9 +1349,9 @@ luc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:
 /Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt1
 2.pfb>
 Output written on main_file_template_bachelor_masters_english.pdf (63 pages, 91
-0302 bytes).
+1525 bytes).
 PDF statistics:
- 896 PDF objects out of 1000 (max. 8388607)
+ 897 PDF objects out of 1000 (max. 8388607)
  197 named destinations out of 1000 (max. 500000)
  509 words of extra memory for PDF output out of 10000 (max. 10000000)
 

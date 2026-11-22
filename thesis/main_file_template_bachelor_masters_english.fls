@@ -580,6 +580,11 @@ INPUT .\figures\supplementary_class_f1.tex
 INPUT .\figures\supplementary_class_f1.tex
 INPUT .\figures\supplementary_class_f1.tex
 INPUT figures\supplementary_class_f1.tex
+INPUT .\figures\session_fold_results.tex
+INPUT .\figures\session_fold_results.tex
+INPUT .\figures\session_fold_results.tex
+INPUT .\figures\session_fold_results.tex
+INPUT figures\session_fold_results.tex
 INPUT main_file_template_bachelor_masters_english.aux
 INPUT .\main_file_template_bachelor_masters_english.out
 INPUT .\main_file_template_bachelor_masters_english.out
