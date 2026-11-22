@@ -6,7 +6,7 @@
 
 AffectLab is a text-first application for rehearsing difficult interpersonal conversations. Its architecture combines deterministic application logic, trained affect-recognition models, optional generative services, and a browser interface, but it is not an end-to-end conversational model. The central design principle is separation of authority: probabilistic components may provide affective evidence or flexible wording, whereas explicit policies retain control of safety, dialogue progression, completion, and feedback evidence. This division makes consequential decisions inspectable and allows the core rehearsal to continue when a model or provider is unavailable.
 
-Figure~\ref{fig:system-architecture} separates authoritative safety and dialogue control from optional model contributions. The interaction layer supports scenario selection, text and optional voice input, conversation display, and reflection. The application layer authenticates the request, validates ownership, coordinates the active session, and persists its state. Safety and dialogue policies are authoritative; affect inference supplies bounded evidence to the dialogue policy but cannot replace either authority. Response realisation converts a selected action into text using a constrained generator or its deterministic template. Feedback and reflection operate on recorded policy evidence rather than on unverified generated claims.
+Figure~\ref{fig:system-architecture} shows these dependencies. The application coordinates an account-owned session; safety and dialogue policies select its actions; response realisation supplies wording; and feedback uses recorded policy evidence. Dashed connections distinguish optional model contributions from authoritative decisions.
 
 \begin{figure}[htbp]
 \centering
@@ -19,9 +19,9 @@ The architecture is deliberately text-first. Every conversational turn contains 
 
 The three enhanced scenarios---workload negotiation, personal boundary-setting, and expression of a relationship need---share a structural contract. Each defines its objective, stages, difficulty-dependent resistance, observable communication features, response actions, and possible outcomes. A deterministic policy evaluates the current message against that contract and records both the selected action and its evidence. The response-realisation layer receives the action only after this decision; consequently, generated wording cannot redefine success, remove intended resistance, alter the evidence record, or override a safety interruption.
 
-Persistence stores the textual turns and enough decision metadata to reconstruct the interaction: state transitions, detected features, selected actions, reason codes, affect-policy decisions, component versions, and generation or fallback provenance. Completed sessions can then support evidence-linked feedback, replay, retry, branching, comparison, personal takeaways, and action cards. Research records form a separate, minimised projection rather than a copy of the participant-facing conversation.
+Persistence retains textual turns, state transitions, evidence, decisions, versions, and response provenance so that feedback and alternative continuations remain traceable. Research records form a separate, minimised projection of the session.
 
-Component boundaries are expressed through narrow contracts rather than shared access to model or provider internals. Inference returns probabilities and provenance; the affect policy returns a permitted adaptation decision; the dialogue policy returns state, evidence, and an action; and response realisation returns wording plus its source. Explicit unavailable and rejected states are part of these contracts. This makes failure behaviour testable, prevents an optional component from silently acquiring authority, and permits models, persistence implementations, or external providers to be replaced without rewriting the scenario policies.
+Component contracts return probabilities and provenance, permitted adaptation, dialogue state and evidence, or wording and its source. Explicit unavailable and rejected states make failure behaviour testable and allow an optional model or provider to be replaced without changing scenario authority.
 
 These boundaries align the architecture with the research questions. Contextual text, speech, fusion, and calibration support RQ1 and RQ2; the separation of affect evidence from dialogue and safety authority addresses RQ3; and the integrated, recoverable application provides the object evaluated for RQ4. Model accuracy, policy conformance, application quality, and pilot feedback therefore remain distinct forms of evidence.
 
@@ -30,7 +30,7 @@ These boundaries align the architecture with the research questions. Contextual 
 
 Users need to prepare difficult conversations, rehearse privately, and review feedback. They need control over their data and optional features, text-only access, and clear handling of interruptions or unavailable services. Table~\ref{tab:grouped-requirements} groups these capabilities and quality constraints into nine areas. Functional (FR1--FR29) and non-functional (NFR1--NFR14) identifiers link each area to the full requirements in Appendix~\ref{app:complete-requirements} and verification evidence in Section~\ref{sec:requirement-traceability}.
 
-\begin{table}[H]
+\begin{table}[!t]
 \centering
 \caption{Grouped functional and non-functional requirements.}
 \label{tab:grouped-requirements}
@@ -51,9 +51,9 @@ Operational quality & NFR9--NFR10 & Bounded failures and recovery, measurable re
 \end{tabularx}
 \end{table}
 
-The groups also distinguish core from optional capability. Authentication, text interaction, scenario policy, safety handling, deterministic response templates, evidence-based feedback, and session management form the core. Voice capture, transcription, trained multimodal inference, generative wording, and research participation are optional. A valid implementation may expose an optional feature only when its configuration and failure path preserve the core requirements.
+The core comprises authenticated text rehearsal, scenario and safety policies, deterministic responses, feedback, and session management. Voice, trained inference, generative wording, and research participation are optional and must preserve that core when unavailable.
 
-Each requirement identifier denotes a separately testable obligation; its group identifies the common architectural boundary through which it is implemented. Chapter~\ref{chap5} therefore traces identifiers to evidence rather than treating a group as a single pass/fail claim. This is particularly important for optional features: successful text fallback does not prove trained-inference quality, and successful provider generation does not replace verification of the underlying deterministic action.
+Each identifier remains a separately testable obligation. Chapter~\ref{chap5} evaluates the exercised paths; the groups do not imply that every requirement passed in every configuration.
 
 \section{Dialogue, Affect Adaptation, and Safety Boundaries}
 \label{sec:dialogue-affect-safety-boundaries}
@@ -68,7 +68,7 @@ In parallel, the scenario policy identifies observable features such as a specif
 
 Outside active role-play, deterministic lexical rules may select a bounded support strategy. Labels such as intent, cause, readiness, resistance, or cognitive pattern denote which authored rule fired, not validated psychological constructs. They remain contestable, have no authority over the rehearsal or research workflow, and are evaluated only for rule conformance.
 
-The same authority order governs retries and concurrent requests. A turn is accepted only against the expected session state; a stale update cannot overwrite a newer transition. Retry and branch operations copy declared context but create distinct continuation records, so later feedback can separate inherited turns from new evidence. These constraints make replay reproducible and prevent a delayed provider response from retroactively changing a dialogue decision that has already been persisted.
+Turns are accepted only against the expected session state, preventing stale updates from overwriting newer decisions. Branches retain shared context separately from new evidence; Section~\ref{sec:feedback-reflection} explains the resulting measurement boundary.
 
 \section{Ethics, Privacy, and Design Limitations}
 \label{sec:ethical-considerations-limitations}

@@ -7,9 +7,7 @@
 
 AffectLab is implemented as a modular web application whose trained models advise, but do not control, the rehearsal workflow. A React and TypeScript client presents preparation, role-play, feedback, and reflection views. A Python and FastAPI backend owns authentication, dialogue state, safety decisions, feedback evidence, and persistence in MongoDB. Contextual text and speech classifiers can add calibrated affect estimates, while optional provider services can transcribe audio or realise an authorised response in natural language. Each optional component is behind a narrow interface, so the text-based deterministic workflow remains available when model artefacts, credentials, or network services are absent.
 
-This separation is also reflected in deployment. The browser submits typed requests and replaces its local view with the version committed by the backend; it does not calculate authoritative transitions or scores. Backend routes validate transport objects, application services implement policy, and a repository interface supplies either MongoDB persistence or an in-memory substitute for isolated demonstrations. Private datasets, model weights, credentials, and transient audio remain outside version-controlled application code. Dependency sets separate the core web service from the larger local-inference runtime, and containers package the compiled client, API, and database without embedding private artefacts.
-
-Typed boundaries carry the distinctions through the application. A conversation turn can retain the emotion distribution available at that instant, the selected support or character action, the response source, and the pacing decision, while a role-play decision additionally retains its policy version and state snapshots. Absence is represented explicitly rather than as a zero-valued observation. This permits later replay and evaluation to distinguish deterministic, provider-backed, model-assisted, and failed paths without reconstructing them from a transcript.
+The browser displays the backend's committed state rather than calculating transitions or scores. A repository interface supplies MongoDB persistence or an in-memory substitute for isolated checks; private data, weights, and credentials remain outside version-controlled code. Routine account, dependency, and container configuration is documented in the repository \href{https://github.com/ralucabiras/emotion-aware-role-play-model/blob/main/README.md}{setup guide} and \href{https://github.com/ralucabiras/emotion-aware-role-play-model/blob/main/docs/architecture.md}{architecture notes}.
 
 \section{Emotion-Recognition Pipeline}
 \label{sec:emotion-recognition-pipeline}
@@ -53,17 +51,17 @@ The private inference package contains the two models, their tokenizer or featur
 \section{Backend and Request Processing}
 \label{sec:backend-application}
 
-The FastAPI backend is the authoritative coordination layer. API routes and Pydantic schemas constrain inputs and outputs, application services coordinate authentication, conversation, model, and provider functions, and repositories encapsulate mutable state. This layering keeps transport logic separate from dialogue policy and permits deterministic or trained implementations to satisfy the same interfaces. Session documents retain ordered turns, role-play snapshots, evidence, policy decisions, feedback, model metadata, version, and expiry time; response schemas expose only what each interface requires.
+FastAPI routes and Pydantic schemas validate requests, application services coordinate policy execution, and repositories commit session state. Stored turns, snapshots, evidence, decisions, versions, and model provenance preserve the basis of each response; unavailable model evidence remains explicit.
 \label{subsec:backend-service-architecture}
 \label{subsec:backend-domain-models}
 
-Authentication and routine account operations use the same service boundary but are not part of the research contribution. Passwords and verification or recovery tokens are stored only as adaptive hashes or digests. Short-lived access tokens authorise API requests, while rotated refresh tokens use HTTP-only cookies. More importantly for the rehearsal data, every session lookup includes both the session and authenticated owner identifiers. Each write also supplies an expected monotonically increasing version and a request identifier; stale or duplicate submissions return a conflict rather than silently overwriting a committed turn. MongoDB provides durable storage and expiry indexes, while the in-memory repository implements the same contract for controlled local use.
+Every session lookup includes the authenticated owner identifier. Writes require an expected version and request identifier, so stale or duplicate conversation submissions cannot overwrite a committed turn. MongoDB provides durable storage and expiry indexes; the memory repository implements the same contract for isolated checks.
 \label{subsec:backend-authentication}
 \label{subsec:backend-session-persistence}
 
-Request schemas enforce message, title, reflection, and encoded-audio limits before service execution. Enhanced exchanges must pair their expected version with a unique request identifier, and received probability vectors are accepted only when all values are finite, bounded, normalised, and consistent with the declared leading label. The backend derives agreement and confidence bands again instead of trusting client-authored summaries. These checks keep a malformed enhancement from contaminating the authoritative session even when ordinary text processing can continue.
+Input limits apply before service execution. Received probability vectors must be finite, bounded, normalised, and consistent with their leading label; the backend recomputes agreement and confidence bands rather than trusting client summaries. Malformed enhancements therefore cannot supply authoritative evidence.
 
-Figure~\ref{fig:request-sequence} shows the processing order for a conversation exchange, grouping internal backend steps in one lane. After validation, authentication, ownership, duplication, and version checks, a local crisis-language detector runs before affect inference or response generation. A safety match interrupts the rehearsal through fixed wording and skips optional processing. Otherwise, eligible requests may obtain a multimodal estimate; failure is recorded as unavailability and does not abort the message. The service then appends the user turn, advances the deterministic controller, records evidence, applies any permitted pacing action, realises the authorised reply, and persists the complete transition atomically. The response contains the committed version and server-owned state so the browser does not need to infer what succeeded.
+Figure~\ref{fig:request-sequence} shows the exchange after request checks. A local crisis-language match skips optional processing and returns a fixed interruption. Otherwise, the backend obtains any eligible estimate, records unavailability on failure, advances the controller, applies permitted pacing, and realises the selected action. Both paths atomically commit the transition and return its version and server-owned state.
 \label{subsec:backend-conversation-processing}
 \label{subsec:safety-precedence}
 
@@ -74,7 +72,7 @@ Figure~\ref{fig:request-sequence} shows the processing order for a conversation 
 \label{fig:request-sequence}
 \end{figure}
 
-Provider-backed response realisation follows the same authority rule. It receives the selected support strategy or role-play action and must return a typed, short response consistent with that action. Empty, refused, malformed, unsafe, or contradictory output is discarded in favour of deterministic wording. A small rule-based analyser can expose tentative lexical intent, possible patterns, and authored support priorities outside active role-play, but these values are rule matches rather than learned probabilities or validated psychological measurements. During role-play, neither these heuristics nor provider output may advance the scenario, create evidence, or determine success.
+Outside active role-play, lexical rules can select a support strategy and expose tentative intent or pattern matches. These are authored rules, not learned probabilities or validated psychological measurements, and have no authority over rehearsal progression or success. During role-play, response validation enforces the selected controller action as described in Section~\ref{sec:roleplay-adaptation}.
 \label{subsec:backend-fallbacks}
 \label{subsec:cognitive-support-routing}
 
@@ -120,7 +118,7 @@ Replay is a read-only projection of the recorded exchanges, state transitions, g
 \label{subsec:rewind-branching}
 \label{subsec:takeaways-action-cards}
 
-Measurement boundaries prevent later reflection from entering rehearsal feedback. Missing legacy decisions or model output are displayed as gaps rather than regenerated. A branch validates source ownership, version, policy compatibility, and the selected pre-turn snapshot, then stores its lineage and copied-turn boundary. Action-card suggestions reuse only eligible participant turns inside the measurement window; safety-interrupted content and copied branch context are excluded, and every field remains editable before saving.
+Rehearsal feedback and action-card suggestions exclude later reflection; suggestions also exclude copied branch context and safety-interrupted content. Every suggested field remains editable. Missing legacy decisions or model outputs remain visible gaps. Exact snapshot, lineage, and compatibility checks are documented in the repository's \href{https://github.com/ralucabiras/emotion-aware-role-play-model/blob/main/docs/conversation-replay.md}{replay} and \href{https://github.com/ralucabiras/emotion-aware-role-play-model/blob/main/docs/branch-and-compare.md}{branching contracts}.
 
 Figure~\ref{fig:app-roleplay} follows entry from the dashboard into rehearsal. A new role-play leads to scenario and difficulty selection; continuing a saved session restores the existing conversation.
 \label{subsec:frontend-navigation}
@@ -131,7 +129,7 @@ During rehearsal, the participant responds through the message composer. Below t
 Figure~\ref{fig:app-feedback} shows feedback after manual completion: request and supporting detail were observed in turn~1, while the remaining features are marked \emph{Not yet observed}. Replay, branching, and saved takeaways or action cards support further practice.
 \label{subsec:frontend-feedback-interfaces}
 
-The browser includes the displayed session version and a fresh request identifier, clears a draft only after confirmation, and offers reload after a conflict while preserving unsent text. Semantic controls, visible focus, live status regions, reduced-motion rules, and responsive layouts support keyboard, desktop, and mobile use.
+The browser clears a draft only after confirmation and preserves unsent text on conflict. Keyboard, status-announcement, reduced-motion, and responsive-layout checks are reported in Section~\ref{subsec:automated-system-results}.
 \label{subsec:frontend-testing}
 
 \begin{figure}[htbp]
@@ -174,4 +172,4 @@ The integrated deployment uses a compiled frontend, FastAPI service, and MongoDB
 \label{sec:implementation-verification}
 \label{subsec:performance-testing}
 
-Verification evidence is reported once in Chapter~\ref{chap5}. Unit, service, browser, and full-stack checks exercise the compiled client and real database while external providers and trained inference remain disabled; performance therefore describes only that controlled local path. Reproduction additionally requires the source revision, locked dependencies, versioned configurations, and private artefact hashes.
+Chapter~\ref{chap5} reports verification and its configuration limits; Appendix~\ref{sec:model-package-provenance} records model reproduction provenance.
