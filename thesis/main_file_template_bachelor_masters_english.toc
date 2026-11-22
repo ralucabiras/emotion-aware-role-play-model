@@ -4,61 +4,61 @@
 \contentsline {chapter}{List of Abbreviations}{ix}{section*.9}%
 \contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Context and Problem}{1}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Aim and Objectives}{2}{section.1.2}%
+\contentsline {section}{\numberline {1.2}Aim and Objectives}{1}{section.1.2}%
 \contentsline {section}{\numberline {1.3}Research Questions}{2}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Approach and Contributions}{3}{section.1.4}%
-\contentsline {section}{\numberline {1.5}Scope and Dissertation Structure}{4}{section.1.5}%
-\contentsline {chapter}{\numberline {2}State of the Art}{5}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Communication Rehearsal, Role-Play, and Feedback}{5}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Deterministic and Generative Conversational Agents}{6}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Contextual Text and Speech Emotion Recognition}{7}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Multimodal Fusion, Calibration, and Uncertainty}{8}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Research Gap and Design Implications for AffectLab}{9}{section.2.5}%
-\contentsline {chapter}{\numberline {3}Proposed System Architecture}{11}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Architecture and Design Principles}{11}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Grouped System Requirements}{12}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Dialogue, Affect Adaptation, and Safety Boundaries}{13}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Ethics, Privacy, and Design Limitations}{14}{section.3.4}%
-\contentsline {chapter}{\numberline {4}Implementation}{16}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Technology and Application Overview}{16}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Emotion-Recognition Pipeline}{16}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Backend and Request Processing}{18}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Role-Play and Affect-Adaptation Engine}{19}{section.4.4}%
-\contentsline {section}{\numberline {4.5}Feedback and Frontend Workflow}{21}{section.4.5}%
-\contentsline {section}{\numberline {4.6}Security, Persistence, and Deployment}{25}{section.4.6}%
-\contentsline {chapter}{\numberline {5}Evaluation and Results}{26}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Evaluation Methodology}{26}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Evidence Scope and Decision Rules}{26}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Benchmark Task and Speaker-Independent Protocol}{27}{subsection.5.1.2}%
-\contentsline {subsection}{\numberline {5.1.3}Measures and Statistical Comparison}{28}{subsection.5.1.3}%
-\contentsline {section}{\numberline {5.2}Contextual Text Results}{28}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Speech, Fusion, and Calibration Results}{29}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Audio and Predeclared Fusion}{29}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Classification--Calibration Trade-off}{30}{subsection.5.3.2}%
-\contentsline {section}{\numberline {5.4}Application Verification}{32}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}Bounded Policy Behaviour}{32}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}Integrated Quality and Local Responsiveness}{33}{subsection.5.4.2}%
-\contentsline {section}{\numberline {5.5}Supplementary Pilot Results}{34}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Threats to Validity}{35}{section.5.6}%
-\contentsline {paragraph}{Model and statistical validity.}{35}{section*.10}%
-\contentsline {paragraph}{Construct and external validity.}{35}{section*.11}%
-\contentsline {paragraph}{Application and deployment validity.}{35}{section*.12}%
-\contentsline {paragraph}{Pilot validity.}{36}{section*.13}%
-\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{37}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Conclusions for the Research Questions}{37}{section.6.1}%
-\contentsline {paragraph}{RQ1: conversational context.}{37}{section*.14}%
-\contentsline {paragraph}{RQ2: multimodal complementarity and calibration.}{37}{section*.15}%
-\contentsline {paragraph}{RQ3: bounded use of affective evidence.}{37}{section*.16}%
-\contentsline {paragraph}{RQ4: integrated application quality.}{38}{section*.17}%
-\contentsline {section}{\numberline {6.2}Contributions and Material Limitations}{38}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Prioritised Future Work}{39}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Final Conclusion}{39}{section.6.4}%
-\contentsline {chapter}{Bibliography}{40}{section*.18}%
-\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{44}{appendix.A}%
-\contentsline {chapter}{\numberline {B}Complete System Requirements}{45}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Functional Requirements}{45}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Non-Functional Requirements}{48}{section.B.2}%
-\contentsline {section}{\numberline {B.3}Requirement Traceability}{51}{section.B.3}%
-\contentsline {chapter}{\numberline {C}Supplementary Model Results}{52}{appendix.C}%
-\contentsline {section}{\numberline {C.1}Reproduction Provenance}{52}{section.C.1}%
-\contentsline {section}{\numberline {C.2}Selected Four-Class Results}{53}{section.C.2}%
+\contentsline {section}{\numberline {1.4}Approach and Contributions}{2}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Scope and Dissertation Structure}{3}{section.1.5}%
+\contentsline {chapter}{\numberline {2}State of the Art}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Communication Rehearsal, Role-Play, and Feedback}{4}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Deterministic and Generative Conversational Agents}{5}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Contextual Text and Speech Emotion Recognition}{6}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Multimodal Fusion, Calibration, and Uncertainty}{7}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Research Gap and Design Implications for AffectLab}{8}{section.2.5}%
+\contentsline {chapter}{\numberline {3}Proposed System Architecture}{9}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Architecture and Design Principles}{9}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Grouped System Requirements}{10}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Dialogue, Affect Adaptation, and Safety Boundaries}{10}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Ethics, Privacy, and Design Limitations}{11}{section.3.4}%
+\contentsline {chapter}{\numberline {4}Implementation}{13}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Technology and Application Overview}{13}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Emotion-Recognition Pipeline}{13}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Backend and Request Processing}{15}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Role-Play and Affect-Adaptation Engine}{15}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Feedback and Frontend Workflow}{18}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Security, Persistence, and Deployment}{21}{section.4.6}%
+\contentsline {chapter}{\numberline {5}Evaluation and Results}{22}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Evaluation Methodology}{22}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Evidence Scope and Decision Rules}{22}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Benchmark Task and Speaker-Independent Protocol}{23}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Measures and Statistical Comparison}{23}{subsection.5.1.3}%
+\contentsline {section}{\numberline {5.2}Contextual Text Results}{24}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Speech, Fusion, and Calibration Results}{25}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Audio and Predeclared Fusion}{25}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Classification--Calibration Trade-off}{26}{subsection.5.3.2}%
+\contentsline {section}{\numberline {5.4}Application Verification}{27}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Bounded Policy Behaviour}{27}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Integrated Quality and Local Responsiveness}{28}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Supplementary Pilot Results}{29}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Threats to Validity}{30}{section.5.6}%
+\contentsline {paragraph}{Model and statistical validity.}{30}{section*.10}%
+\contentsline {paragraph}{Construct and external validity.}{30}{section*.11}%
+\contentsline {paragraph}{Application and deployment validity.}{31}{section*.12}%
+\contentsline {paragraph}{Pilot validity.}{31}{section*.13}%
+\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{32}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Conclusions for the Research Questions}{32}{section.6.1}%
+\contentsline {paragraph}{RQ1: conversational context.}{32}{section*.14}%
+\contentsline {paragraph}{RQ2: multimodal complementarity and calibration.}{32}{section*.15}%
+\contentsline {paragraph}{RQ3: bounded use of affective evidence.}{32}{section*.16}%
+\contentsline {paragraph}{RQ4: integrated application quality.}{32}{section*.17}%
+\contentsline {section}{\numberline {6.2}Contributions and Material Limitations}{33}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Prioritised Future Work}{33}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Final Conclusion}{33}{section.6.4}%
+\contentsline {chapter}{Bibliography}{34}{section*.18}%
+\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{38}{appendix.A}%
+\contentsline {chapter}{\numberline {B}Complete System Requirements}{39}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Functional Requirements}{39}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Non-Functional Requirements}{42}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Requirement Traceability}{45}{section.B.3}%
+\contentsline {chapter}{\numberline {C}Supplementary Model Results}{46}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Reproduction Provenance}{46}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Selected Four-Class Results}{47}{section.C.2}%

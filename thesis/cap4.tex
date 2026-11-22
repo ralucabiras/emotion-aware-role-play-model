@@ -5,7 +5,7 @@
 \label{sec:implementation-overview}
 \label{sec:technology-stack}
 
-AffectLab is implemented as a modular web application whose trained models advise, but do not control, the rehearsal workflow. A React and TypeScript client presents preparation, role-play, feedback, and reflection views. A Python and FastAPI backend owns authentication, dialogue state, safety decisions, feedback evidence, and persistence in MongoDB. Contextual text and speech classifiers can add calibrated affect estimates, while optional provider services can transcribe audio or realise an authorised response in natural language. Each optional component is behind a narrow interface, so the text-based deterministic workflow remains available when model artefacts, credentials, or network services are absent.
+A React and TypeScript client presents preparation, rehearsal, feedback, and reflection views. A Python and FastAPI backend implements the authority boundaries in Section~\ref{sec:system-overview}, with MongoDB persistence and interfaces to optional trained models, transcription, and generative wording.
 
 The browser displays the backend's committed state rather than calculating transitions or scores. A repository interface supplies MongoDB persistence or an in-memory substitute for isolated checks; private data, weights, and credentials remain outside version-controlled code. Routine account, dependency, and container configuration is documented in the repository \href{https://github.com/ralucabiras/emotion-aware-role-play-model/blob/main/README.md}{setup guide} and \href{https://github.com/ralucabiras/emotion-aware-role-play-model/blob/main/docs/architecture.md}{architecture notes}.
 
@@ -14,7 +14,7 @@ The browser displays the backend's committed state rather than calculating trans
 
 The model pipeline converts a private IEMOCAP release into separate text and speech classifiers and then packages compatible full-data artefacts for optional application inference. Preprocessing joins annotations, transcripts, and sentence-level waveforms by utterance identifier, rejects duplicates or missing inputs, and records source and manifest digests. The principal task maps anger, happiness plus excitement, neutrality, and sadness to a fixed four-class order, producing 5,531 matched text--audio utterances. Licensed media and row-level derived data are kept outside the repository. An exploratory six-class mapping is retained only as a secondary research configuration and is not used by the deployed multimodal service.
 
-Figure~\ref{fig:emotion-pipeline} separates held-out evaluation from application packaging into two paths from the same matched data. Five speaker-independent folds are constructed from complete IEMOCAP sessions: one session is held out for testing, one for validation, and three for training. Because each actor occurs in one session, preprocessing can verify that speakers do not cross split boundaries. These folds provide the evidence reported in Chapter~\ref{chap5}. Only after the experimental configuration is frozen are final text and audio models trained on all eligible examples for application use; their training outputs are not treated as a new held-out result.
+Figure~\ref{fig:emotion-pipeline} separates held-out evaluation from full-data application packaging. Preprocessing verifies speaker separation in the five session folds; Section~\ref{subsec:evaluation-benchmark-splits} specifies their roles and matched conditions. Final models are trained on all eligible examples only after the experimental configuration is frozen, yielding application artefacts without an additional held-out estimate.
 
 \begin{figure}[htbp]
 \centering
@@ -38,11 +38,11 @@ Decision-level late fusion keeps the modalities independently trainable and insp
  \label{eq:implementation-late-fusion}
 \end{equation}
 
-Here, $p_t$ and $p_a$ are the text and audio probabilities in the same class order, and $p_m$ is the combined distribution. The text weight $w$ lies between zero and one; the audio weight is $1-w$. A predeclared $w=0.5$ gives both modalities equal weight for the principal research comparison. A separate deployment path chooses $w$ and a final temperature from validation-role predictions only. Temperature scaling changes probability concentration without changing the predicted class of the distribution being scaled \cite{guo2017calibration}; classification and calibration are consequently evaluated as separate properties. The packaged global parameters are operational settings rather than independent performance evidence because their pooled fitting procedure reuses utterance labels across rotating fold roles.
+Here, $p_t$ and $p_a$ are the text and audio probabilities in the same class order, and $p_m$ is the combined distribution. The text weight $w$ lies between zero and one; the audio weight is $1-w$. Predeclared $w=0.5$ gives equal weighting. A separate packaging path fits $w$ and a final temperature from validation-role predictions. Temperature scaling preserves the top class of the distribution being scaled \cite{guo2017calibration}; Section~\ref{subsec:evaluation-measures} defines fitting and evaluation, and Section~\ref{subsec:fusion-calibration-results} distinguishes independent fold results from label-reused global diagnostics.
 \label{subsec:multimodal-late-fusion}
 \label{subsec:confidence-calibration-uncertainty}
 
-At inference, the backend returns complete calibrated distributions, selected labels, confidence, modality agreement, and separate queue and execution times. Confidence below 0.55 is presented as low, from 0.55 to below 0.75 as moderate, and at least 0.75 as high. These are operational display and policy thresholds, not psychological boundaries. Missing audio, disagreement, invalid distributions, or unavailable models remain explicit; they are never converted into a stronger estimate. Calibration can also deteriorate under shifts in speaker, language, device, and interaction style \cite{ovadia2019shift}, so the application treats the distributions as uncertain evidence rather than descriptions of internal state.
+At inference, the backend returns calibrated distributions, labels, confidence, agreement, and separate queue and execution times. Confidence below 0.55 is displayed as low, from 0.55 to below 0.75 as moderate, and at least 0.75 as high. These operational bands do not establish reliability under distribution shift \cite{ovadia2019shift}. Missing audio, disagreement, invalid distributions, and unavailable models remain explicit inputs to the pacing policy in Section~\ref{subsec:affect-pacing}.
 
 The private inference package contains the two models, their tokenizer or feature extractor, the fixed label order, input limits, and the complete calibration chain. File-level provenance for the available package is recorded in Appendix~\ref{sec:model-package-provenance}. Models load lazily and run behind an asynchronous lock to bound memory contention. Multimodal inference is disabled by default and failure returns the exchange to the deterministic text path.
 \label{subsec:model-artefacts-provenance}
@@ -72,7 +72,7 @@ Figure~\ref{fig:request-sequence} shows the exchange after request checks. A loc
 \label{fig:request-sequence}
 \end{figure}
 
-Outside active role-play, lexical rules can select a support strategy and expose tentative intent or pattern matches. These are authored rules, not learned probabilities or validated psychological measurements, and have no authority over rehearsal progression or success. During role-play, response validation enforces the selected controller action as described in Section~\ref{sec:roleplay-adaptation}.
+Outside role-play, lexical support routing implements the limited contract in Section~\ref{sec:dialogue-affect-safety-boundaries}. During rehearsal, response validation enforces the controller action as described below.
 \label{subsec:backend-fallbacks}
 \label{subsec:cognitive-support-routing}
 
@@ -146,7 +146,9 @@ The browser clears a draft only after confirmation and preserves unsent text on 
 \label{fig:app-feedback}
 \end{figure}
 
-Voice input is opt-in for each exchange. The browser requests microphone access only after an explicit action, records at most 20 seconds, converts the signal to mono 16~kHz PCM WAV, and keeps it in component memory. A transcription result enters the composer for review rather than becoming a turn automatically. The reviewed text and optional audio are then sent together so prediction, pacing, and stored wording refer to one exchange. The backend validates the audio and processes it in memory; raw recordings are not placed in sessions or research exports.
+% Flush the walkthrough figures before the remaining frontend prose.
+\clearpage
+Voice input is opt-in for each exchange. After explicit microphone activation, the browser records at most 20 seconds, converts it to mono 16~kHz PCM WAV, and holds it in memory. Transcription enters the composer for review. The reviewed text and optional audio are submitted together, keeping prediction, pacing, and wording aligned. The backend validates and processes audio in memory; recordings enter neither sessions nor research exports.
 \label{subsec:frontend-voice}
 \label{subsec:audio-conversation-data}
 
@@ -156,8 +158,6 @@ The interface distinguishes the trained multimodal distribution from a separate 
 Optional research support is limited to a versioned pilot workflow: explicit consent and eligibility, three ordered required tasks, immediate questionnaires, pseudonymous progress records, and a text-free export. Required tasks deliberately bypass multimodal inference and affect-aware pacing. The workflow therefore supports collection for the baseline deterministic rehearsal only; its implementation does not make the pilot evidence about adaptation. This distinction is carried into the evaluation in Chapter~\ref{chap5}.
 \label{sec:research-workflow-implementation}
 
-% Keep the two walkthrough figures with the frontend section.
-\clearpage
 \section{Security, Persistence, and Deployment}
 \label{sec:security-privacy-data-protection}
 \label{sec:deployment-configuration}
@@ -171,5 +171,3 @@ The integrated deployment uses a compiled frontend, FastAPI service, and MongoDB
 
 \label{sec:implementation-verification}
 \label{subsec:performance-testing}
-
-Chapter~\ref{chap5} reports verification and its configuration limits; Appendix~\ref{sec:model-package-provenance} records model reproduction provenance.

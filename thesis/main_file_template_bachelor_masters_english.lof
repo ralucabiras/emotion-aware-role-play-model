@@ -2,18 +2,18 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Component dependencies and decision authority in AffectLab.}}{11}{figure.3.1}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Component dependencies and decision authority in AffectLab.}}{9}{figure.3.1}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Separate evaluation and application-packaging paths.}}{17}{figure.4.1}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Conversation request with safety precedence and a shared commit step.}}{19}{figure.4.2}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Ordered checks for bounded affect-aware pacing.}}{21}{figure.4.3}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Entering practice and conducting a rehearsal.}}{23}{figure.4.4}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Reviewing feedback after a rehearsal.}}{24}{figure.4.5}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Separate evaluation and application-packaging paths.}}{14}{figure.4.1}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Conversation request with safety precedence and a shared commit step.}}{16}{figure.4.2}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Ordered checks for bounded affect-aware pacing.}}{17}{figure.4.3}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Entering practice and conducting a rehearsal.}}{19}{figure.4.4}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Reviewing feedback after a rehearsal.}}{20}{figure.4.5}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Four-class held-out results. Panel (a) compares macro F1; Panel (b) shows the calibration cost of equal fusion and the effect of validation-derived fitting.}}{31}{figure.5.1}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Four-class held-out results. Panel (a) compares macro F1; Panel (b) shows the calibration cost of equal fusion and the effect of validation-derived fitting.}}{26}{figure.5.1}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {C.1}{\ignorespaces Four-class F1 by model configuration.}}{53}{figure.C.1}%
-\contentsline {figure}{\numberline {C.2}{\ignorespaces Macro F1 by held-out session.}}{53}{figure.C.2}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {C.1}{\ignorespaces Four-class F1 by model configuration.}}{47}{figure.C.1}%
+\contentsline {figure}{\numberline {C.2}{\ignorespaces Macro F1 by held-out session.}}{47}{figure.C.2}%

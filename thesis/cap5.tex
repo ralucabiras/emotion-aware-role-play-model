@@ -15,7 +15,7 @@ Each research question has a distinct evaluation unit. For RQ1, the unit is an I
 
 The comparisons were chosen before interpreting the final pooled results. Utterance-only text is the RQ1 reference, and three-turn contextual text is the RQ2 reference. Predeclared equal fusion is the primary classification treatment; validation-fitted fusion answers the different question of whether operational probability quality can be recovered. The pilot is not promoted to a fifth evaluation level because its required tasks did not enter the multimodal path. It instead provides descriptive evidence about workflow completion and participant ratings for the deterministic baseline.
 
-Evidence is reported at the narrowest defensible level. A passed test denotes observed conformance, not proof of correctness for all inputs. A bootstrap interval concerns the sampled dialogue clusters, not unseen populations. A zero-violation accessibility scan concerns automated rules and rendered states, not conformance certification. Similarly, a local latency distribution is a regression measurement rather than a production service-level result. These decision rules are applied consistently in the results and threats-to-validity sections.
+Evidence is reported at the narrowest defensible level: observed test conformance, resampling uncertainty among sampled dialogues, and local regression performance. Section~\ref{sec:evaluation-limitations} consolidates the limits on generalisation and deployment claims.
 
 \subsection{Benchmark Task and Speaker-Independent Protocol}
 \label{subsec:evaluation-benchmark-splits}
@@ -42,7 +42,7 @@ Pooling the five non-overlapping test sessions produces one prediction for every
 \section{Contextual Text Results}
 \label{sec:context-text-results}
 
-Table~\ref{tab:context-text-results} gives the primary RQ1 comparison. Three-turn causal context improved accuracy from 0.6624 to 0.7304, macro F1 from 0.6651 to 0.7332, and weighted F1 from 0.6640 to 0.7300. The macro-F1 gain was 0.0681, with a dialogue-bootstrap 95\% interval of 0.0504--0.0857; all three aggregate intervals excluded zero.
+Table~\ref{tab:context-text-results} gives the primary RQ1 comparison. Three-turn context improved all aggregate measures, with a macro-F1 gain of 0.0681 and all paired intervals excluding zero.
 
 \begin{table}[htbp]
 \centering
@@ -66,7 +66,7 @@ The comparison also isolates only the combined effect of the contextual input re
 
 An exploratory six-class task also improved from 0.5490 to 0.6222 macro F1, but only 40 of its 7,420 examples were mapped anxiety cases. Its per-class and fold tables remain in the repository evidence package. It is secondary evidence and does not support a deployed anxiety-recognition claim.
 
-Within this protocol, RQ1 is therefore answered positively: causal dialogue history improved aggregate text classification while architecture, data splits, and training settings were held constant. The experiment does not reveal whether the gain comes from additional lexical material, speaker markers, or discourse history, and it cannot show that a predicted category represents a user's internal emotional state.
+Within this protocol, RQ1 is answered positively: causal history improved aggregate text classification under matched conditions, with the mechanism remaining unresolved.
 
 \section{Speech, Fusion, and Calibration Results}
 \label{sec:multimodal-results}
@@ -74,9 +74,9 @@ Within this protocol, RQ1 is therefore answered positively: causal dialogue hist
 \subsection{Audio and Predeclared Fusion}
 \label{subsec:equal-fusion-results}
 
-The wav2vec~2.0 audio baseline obtained accuracy 0.6279, macro F1 0.6349, weighted F1 0.6229, and calibrated ECE 0.0468. It was weaker than contextual text overall but stronger for anger recall, suggesting that the branches contained complementary predictive information. This does not mean that the acoustic representation isolated prosody: it may also encode phonetic, lexical, speaker, and recording characteristics.
+The audio baseline was weaker than contextual text overall (Table~\ref{tab:calibration-tradeoff}) but stronger for anger recall, suggesting complementary information. Its representation may encode phonetic, lexical, speaker, and recording characteristics as well as prosody.
 
-The principal fusion configuration averages the validation-calibrated text and audio posterior distributions with fixed weights of 0.5. Table~\ref{tab:equal-fusion-results} shows improvements over contextual text on every aggregate classification measure. Macro F1 increased by 0.0551, with a paired 95\% interval of 0.0407--0.0713; all 10,000 dialogue-bootstrap replicates favoured fusion for accuracy, macro F1, and weighted F1. Because the rule was predeclared rather than selected from fused test performance, it provides the headline RQ2 classification evidence.
+Table~\ref{tab:equal-fusion-results} gives the predeclared equal-weight comparison. Every aggregate classification measure improved, and all 10,000 dialogue-bootstrap replicates favoured fusion. The rule was fixed before interpreting fused test performance, making this the headline RQ2 classification evidence.
 
 \begin{table}[htbp]
 \centering
@@ -92,9 +92,9 @@ Weighted F1 & 0.7300 & 0.7815 & +0.0514 & [0.0366, 0.0671] \\ \hline
 \end{tabular}
 \end{table}
 
-The class-F1 heatmap in Figure~\ref{fig:four-class-f1} shows gains across all four classes under equal fusion, with neutral remaining the hardest class. Inspection of matched errors showed why fusion is not uniformly corrective: a strong audio error could overturn a correct text decision, and agreement between two wrong branches could reinforce a shared error. These cases are explanatory examples rather than prevalence estimates.
+The class-F1 heatmap in Figure~\ref{fig:four-class-f1} shows gains across all four classes under equal fusion, with neutral remaining the hardest class.
 
-Matched predictions illustrate both directions. For one anger utterance, contextual text selected neutral while audio selected anger, and fusion recovered the annotated class. For a neutral utterance, text was correct but audio favoured anger strongly enough that fusion narrowly selected anger. In another neutral case, both modalities predicted anger and averaging reinforced the shared error. Late fusion can therefore exploit complementary mistakes but cannot correct correlated ones, and a fixed average can allow an overconfident branch to dominate a better counterpart.
+Matched predictions explain both corrective and harmful effects. Fusion recovered an anger utterance misclassified by text, but an audio error overturned a correct neutral text prediction elsewhere. In another neutral case, both branches predicted anger. These examples illustrate complementary and correlated errors, without estimating their prevalence.
 
 The session-level plot in Figure~\ref{fig:session-fold-variation} shows that the aggregate gains were not confined to one held-out session. Context exceeded utterance-only text, and equal fusion ranked highest, in all five. Audio varied most, with fold scores from 0.5870 to 0.6974 and a descriptive standard deviation of 0.0386; contextual text and equal fusion each had a standard deviation of about 0.0227. These five dyads reveal sensitivity within the corpus but are too few to estimate population speaker variability.
 
@@ -103,7 +103,7 @@ The session-level plot in Figure~\ref{fig:session-fold-variation} shows that the
 
 Equal averaging achieved the strongest classification but ECE rose to 0.1619. Separately calibrated modalities therefore did not remain calibrated after their probabilities were averaged. This matters operationally because AffectLab consumes confidence when selecting whether to preserve baseline pacing, offer a choice, or permit a bounded acknowledgement.
 
-Fold-specific validation fitting selected text weights between 0.54 and 0.63 and fitted a final temperature. As Table~\ref{tab:calibration-tradeoff} shows, this reduced ECE to 0.0283 while retaining accuracy 0.7717 and macro F1 0.7758. Its NLL and Brier score were also the lowest among the independently evaluated configurations. The approximately one-point macro-F1 reduction relative to equal fusion is consequently an explicit trade-off, not an inconsistency between results.
+Fold-specific validation fitting selected text weights between 0.54 and 0.63 and a final temperature. It recovered strong calibration and the lowest proper scores while sacrificing approximately one macro-F1 point relative to equal fusion (Table~\ref{tab:calibration-tradeoff}).
 
 \begin{table}[htbp]
 \centering
@@ -121,9 +121,7 @@ Validation-fitted fusion & 0.7717 & 0.7758 & 0.7707 & 0.0283 & 0.6050 & 0.3273 \
 \end{tabular}
 \end{table}
 
-Figure~\ref{fig:model-results} places the main classification and calibration results on common scales. The proper scores qualify an ECE-only interpretation: equal fusion was under-confident, yet its NLL and Brier score improved over both unimodal branches. Validation-fitted fusion then improved all three probability-quality measures. Classification quality and probability quality must therefore remain separate claims.
-
-The apparently counter-intuitive equal-fusion result follows from the metrics measuring different properties. ECE compares average confidence with empirical accuracy inside bins, whereas NLL and Brier score use the complete predicted distribution. Equal fusion often placed useful probability mass on the correct class while remaining systematically under-confident in its populated mid-confidence bins. Validation-derived weighting and temperature scaling brought maximum confidence closer to observed accuracy without preserving every classification decision. For an application whose policy consumes confidence, the better-calibrated configuration is therefore preferable even though the fixed average has the highest F1.
+Figure~\ref{fig:model-results} shows the trade-off on common scales. Equal fusion's higher ECE coexisted with better NLL and Brier scores than either unimodal branch: it assigned useful probability to the correct class while remaining under-confident in populated middle bins. Validation fitting brought maximum confidence closer to observed accuracy without preserving every classification decision. The better-calibrated variant is therefore preferable for a confidence-dependent policy, despite equal fusion's higher F1.
 
 \begin{figure}[htbp]
 \centering
@@ -178,13 +176,13 @@ The persistence and replay checks in Section~\ref{sec:requirement-traceability} 
 \subsection{Integrated Quality and Local Responsiveness}
 \label{subsec:automated-system-results}
 
-The default backend suite passed 245 tests. Thirteen additional MongoDB integration tests were not run because the required test database connection was not configured. The executed backend tests used controlled inputs and a memory repository. Ruff, the production frontend build, and frontend linting passed. A focused browser run expanded 38 logical cases across desktop Chromium and a Pixel~7 profile, producing 76 passes. Twenty axe-core scans covered ten interface states in both profiles and detected no violations under the selected automated WCAG~2.0/2.1 A/AA rule tags. This is evidence about the exercised DOM states, not accessibility certification.
+Table~\ref{tab:application-verification} records executed and unexecuted checks. The backend suite used controlled inputs and a memory repository; the required database connection for the 13 MongoDB integration tests was not configured. Browser cases ran in desktop Chromium and a Pixel~7 profile. Axe-core scanned rendered states under selected automated WCAG~2.0/2.1 A/AA tags, providing narrower evidence than certification or testing with assistive-technology users.
 
 Browser cases exercised the rehearsal and reflection workflow, voice-text review, pacing provenance, and failure recovery, including keyboard, focus, status, and unsent-input checks. The two viewports do not sample wider browser, device, zoom, or assistive-technology variation.
 
 Two separate full-stack journeys verified selected database-backed workflows using the compiled frontend, an actual FastAPI process, and disposable MongoDB~8.0.1. These journeys did not execute the 13 skipped integration tests. They covered account access, consent and study flow, required-task persistence, researcher export, enhanced dialogue, failure recovery, replay, branching, comparison, and action-card persistence. State remained correct across two backend restarts. Trained inference, transcription, and generation providers were disabled, so the journeys establish integration and recovery for the deterministic configuration rather than live-provider behaviour.
 
-The local regression benchmark exercised FastAPI's in-process HTTP boundary with authentication, validation, services, serialisation, and the memory repository. All five predeclared budgets passed. The deterministic conversation turn had median 4.659~ms and nearest-rank P95 5.836~ms over 100 sequential samples. These numbers characterise locally controlled application overhead only; they exclude network transit, MongoDB, trained inference, provider latency, and concurrent clients.
+The local regression benchmark exercised FastAPI's in-process HTTP boundary with authentication, validation, services, serialisation, and the memory repository. Conversation timings in Table~\ref{tab:application-verification} use 100 sequential samples and nearest-rank P95. They measure application overhead; deployment-sensitive components are excluded as listed in the table.
 
 Together, the authored, automated, browser, persistence, recovery, and timing evidence answers RQ4 for the tested offline deterministic core: the exercised paths showed conformance with the requirements mapped to those checks. This evidence does not establish conformance for unexercised paths or production conditions. Trained inference, live providers, real microphones, production infrastructure, concurrent load, penetration testing, and participatory accessibility require separate staged validation before controlled deployment.
 
@@ -219,7 +217,7 @@ Completion was distributed across 14 workload, 13 boundary, and 12 relationship 
 \paragraph{Model and statistical validity.}
 IEMOCAP contains ten actors in acted or improvised English dialogue. Session-held-out folds prevent identity leakage for the tested speaker, but five dyads cannot represent demographic, cultural, linguistic, device, microphone, disability, or deployment diversity. Dialogue bootstrapping respects within-conversation dependence among the 151 observed dialogues but cannot create missing populations. One primary training seed leaves optimisation variance incompletely characterised, and small numerical variation can arise across GPU executions. Source, configuration, prediction, and metric records support reproducibility; the final-file fingerprints in Appendix~\ref{sec:model-package-provenance} identify the available package without retrospectively verifying its training history.
 
-The final full-data packages have no independent test set, and their pooled packaging diagnostics reuse labels across validation and reporting roles. They must not replace the held-out fold evidence. ECE depends on binning and may deteriorate under distribution shift; even favourable IEMOCAP calibration does not validate confidence in a deployment population. The 0.55 and 0.75 policy bands are operational presentation settings rather than psychological boundaries.
+Full-data package diagnostics remain separate from held-out evidence (Section~\ref{subsec:fusion-calibration-results}). Bin-dependent ECE and the operational confidence bands in Section~\ref{subsec:confidence-calibration-uncertainty} do not validate confidence in a deployment population.
 
 \paragraph{Construct and external validity.}
 IEMOCAP labels are annotations of expressive categories, not direct observations of internal emotion. Merging excitement with happiness and mapping rare fear cases to exploratory anxiety simplify already contested constructs. Scores must not be interpreted as diagnosis, emotional truth, or equitable performance. The six-class anxiety result is especially fragile because it contains only 40 mapped examples.
@@ -232,4 +230,4 @@ Engineering tests use controlled distributions, synthetic accounts, deterministi
 \paragraph{Pilot validity.}
 The pilot is small, single-arm, uncontrolled, incomplete in places, and based on study-specific ordinal measures. Most importantly, required tasks bypassed the multimodal and affect-aware path, so the pilot supplies no human evidence for the dissertation's adaptation mechanism. Immediate confidence change may reflect repetition, demand characteristics, or selection effects and cannot establish sustained learning or real-world transfer. The pilot is therefore retained only as contextual evidence that some participants completed and positively rated the baseline workflow.
 
-In summary, the evaluation supports four bounded conclusions: causal context improved four-class text classification on session-held-out IEMOCAP; audio added complementary benchmark information but introduced a calibration trade-off under equal fusion; deterministic policies implemented the declared uncertainty, preference, fallback, and safety precedence; and the integrated offline core passed its scoped verification. Chapter~\ref{chap6} draws the final research conclusions without extending them beyond these boundaries.
+Chapter~\ref{chap6} draws together the answers to RQ1--RQ4 within these evidence boundaries.

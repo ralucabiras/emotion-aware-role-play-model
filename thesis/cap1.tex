@@ -10,15 +10,15 @@ Private, repeatable rehearsal offers a space to try different wording before a r
 
 Dependable rehearsal also creates technical challenges. Language models can add conversational variety, but may leave their assigned role, vary the intended difficulty, or produce feedback unsupported by the user's words. Scenario progression, outcomes, assessment, and safety therefore require explicit control.
 
-A second challenge concerns affect. Meaning can depend on preceding dialogue and on acoustic delivery as well as the current transcript, which motivates contextual and multimodal emotion recognition. Yet a benchmark label is not a direct measurement of a person's internal state. Predictions can be wrong, overconfident, or inconsistent across text and audio, particularly outside the data on which the models were evaluated. An application must therefore decide not only how to infer affective information, but when that information is sufficiently reliable and appropriate to influence an interaction.
+A second challenge concerns affect: preceding dialogue and acoustic delivery can change how a transcript is interpreted. Contextual and multimodal models may help, but their predictions can be wrong, overconfident, or inconsistent. The application must decide when this uncertain evidence is appropriate to use.
 
-This dissertation addresses the integration problem created by these requirements: how to combine contextual text and speech models with flexible role-play while keeping dialogue outcomes, feedback, safety, privacy, and failure handling predictable. AffectLab treats affect predictions as bounded evidence for modest and reversible pacing choices, not as authoritative psychological judgements. Deterministic policies remain responsible for scenario state, observable communication features, and safety precedence, while optional generative services may realise an already constrained response. Model performance, application conformance, and supporting user feedback are evaluated separately so that evidence from one level is not used to justify claims at another.
+This dissertation addresses that integration problem: combining contextual text and speech models with flexible role-play while keeping outcomes, feedback, safety, privacy, and failure handling predictable. AffectLab confines affect predictions to reversible pacing choices under explicit policies. Model performance, application conformance, and supporting user feedback are evaluated separately.
 
 \section{Aim and Objectives}
 \label{sec:dissertation-aim}
 \label{sec:dissertation-objectives}
 
-The aim of this dissertation is to design, implement, and evaluate AffectLab, an emotion-aware system for rehearsing difficult interpersonal conversations. The system combines structured role-play, contextual text and audio-based affect recognition, uncertainty-aware adaptation, and evidence-grounded feedback while preserving transparency, user control, privacy, safety, and deterministic fallback behaviour.
+The aim is to design, implement, and evaluate AffectLab as a structured rehearsal system that combines contextual text and speech recognition with bounded adaptation and evidence-linked feedback.
 
 The objectives are:
 
@@ -49,28 +49,18 @@ The dissertation is guided by four research questions:
 \label{sec:proposed-approach}
 \label{sec:contributions}
 
-AffectLab uses a layered architecture that separates affect inference, dialogue control, response realisation, feedback, and safety. The experimental pipeline compares an utterance-only text classifier with a model that adds preceding causal dialogue turns. A separate speech model provides acoustic evidence, and late fusion combines the modality distributions. Classification metrics establish predictive performance, while calibration measures assess whether confidence is suitable for operational thresholds. Speaker-independent session folds and paired dialogue-level comparisons keep the principal model comparisons aligned.
-
-Within the application, a deterministic controller represents each scenario as stages, character behaviour, completion conditions, and unresolved outcomes. It selects the next conversational action from observable evidence rather than allowing a language model to decide whether the user has succeeded. An optional generative service may phrase that action more naturally, but validation and deterministic templates preserve the recorded decision when generation is unavailable or unsuitable.
-
-Multimodal estimates enter the interaction through a restricted affect policy. Confidence, agreement between modalities, inference availability, eligibility, and an explicit user preference determine whether the system preserves baseline behaviour, offers a pacing choice, or permits a brief acknowledgement. Safety interruption takes precedence and does not depend on the emotion classifier. This separation also prevents affect predictions from determining scenario success, feedback scores, or participation decisions.
-
-Feedback is derived from inspectable language features associated with each scenario, such as a clear request, maintained boundary, non-blaming statement, acknowledgement, or practical next step. The relevant conversational turns remain available as evidence. Replay, retry, branching, comparison, personal takeaways, and action cards support reflection on alternative responses rather than reducing practice to a single score.
+AffectLab combines matched speaker-independent model experiments with an implemented rehearsal application. The experiments compare utterance-only text, causal conversational context, speech, and late fusion, assessing classification and calibration separately. The application separates model evidence from scenario decisions and links feedback to recorded turns. Chapters~\ref{chap:proposed-system-architecture} and~\ref{chap:implementation} explain the control boundaries and mechanisms, including replay and branching for comparing alternative responses.
 
 Evaluation follows the same separation of responsibilities. The model study addresses context, modality complementarity, and calibration. Authored policy cases and automated checks address dialogue transitions, fallbacks, persistence, recovery, accessibility, responsive behaviour, and the complete application workflow. Local timing measurements characterise only the tested deterministic path. A small pilot supplies supplementary feedback on the baseline rehearsal workflow; because its required tasks did not exercise multimodal adaptation, it is not evidence that adaptation benefits users.
 
-The dissertation makes five principal contributions:
+The dissertation makes three connected contributions:
 
 \begin{enumerate}[itemsep=0.2em, topsep=0.4em, parsep=0pt]
-    \item \textbf{A controlled evaluation of causal conversational context and multimodal complementarity.} Utterance-only text, contextual text, speech, and fused configurations are compared on matched speaker-independent data, with dialogue-level uncertainty estimates.
+    \item \textbf{Empirical: context, multimodal complementarity, and calibration.} Matched speaker-independent comparisons and dialogue-level uncertainty estimates establish the effects of causal context and text--audio fusion, while distinguishing classification performance from operational confidence.
 
-    \item \textbf{An explicit separation between classification performance and operational confidence.} Predeclared fusion and validation-fitted calibration expose the trade-off between the strongest classifier and the probability estimates used by an interactive policy.
+    \item \textbf{Architectural: bounded affect-aware rehearsal and reflection.} Deterministic dialogue and safety policies constrain uncertain predictions and optional generation. Outcomes and feedback link to observable turns, while replay and branching support comparison from shared context.
 
-    \item \textbf{A bounded architecture for affect-aware role-play.} Deterministic dialogue and safety logic remain authoritative, while uncertain affect estimates and optional generation are limited to inspectable, reversible actions with defined fallbacks.
-
-    \item \textbf{Evidence-grounded rehearsal and reflection.} Scenario-specific outcomes and feedback are connected to observable turns, and replay and branching allow alternative responses to be compared from the same conversational context.
-
-    \item \textbf{A layered verification framework for an integrated application.} Model evaluation, policy conformance, application verification, local performance, and supplementary user feedback are kept distinct, making the scope of each resulting claim explicit.
+    \item \textbf{Methodological: layered verification of an integrated application.} Model evaluation, policy conformance, application verification, local performance, and supplementary user feedback remain distinct, making the scope of each claim explicit.
 \end{enumerate}
 
 Together, these contributions concern the responsible integration of affective models into an implemented communication-practice system. They do not imply that AffectLab identifies a user's true emotion or that completing a rehearsal improves a real relationship.
@@ -81,8 +71,6 @@ Together, these contributions concern the responsible integration of affective m
 
 Six built-in application scenarios support adults rehearsing ordinary difficult conversations; workload, boundary, and relationship practice use the enhanced staged policies evaluated here. Text interaction is primary and voice input is optional. The affective component is limited to supervised categorical recognition from text and audio; it excludes video, physiological signals, multilingual inference, diagnosis, therapy, autonomous crisis assessment, and consequential decisions about another person. Emotion estimates are uncertain application inputs, not findings about an individual's internal state.
 
-The empirical model claims are limited to the defined IEMOCAP protocol. Its ten actors, controlled English-language interactions, annotation process, and categorical labels do not establish generalisation across cultures, accents, devices, populations, or spontaneous application use \cite{busso2008iemocap}. Deterministic language rules are reproducible but cannot recognise every appropriate paraphrase and are not validated measures of general communication ability or psychological constructs. Optional providers introduce additional privacy and reliability boundaries, so the text-based fallback remains part of the intended system rather than an exceptional mode.
+Model claims concern the defined IEMOCAP protocol \cite{busso2008iemocap}; application claims concern observed behaviour under documented test conditions. Section~\ref{sec:evaluation-limitations} sets out the statistical, construct, and deployment limitations.
 
 Application evaluation establishes behaviour only for the tested cases and configurations. It does not replace independent security review, target-environment load and recovery testing, live-provider evaluation, participatory accessibility work, or validation of trained inference under deployment conditions. The small, uncontrolled pilot concerns the non-adaptive baseline workflow and cannot establish causal benefit, sustained skill development, or transfer to real conversations. AffectLab is therefore presented as an implementation-complete, deployment-oriented research application whose wider use remains conditional on further technical, ethical, and human evaluation.
-
-Chapters 2--6 cover the literature, architecture, implementation, evaluation, and conclusions, respectively.
