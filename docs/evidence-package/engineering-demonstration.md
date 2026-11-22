@@ -193,6 +193,47 @@ real API; the uncertainty view uses explicitly synthetic saved prediction fixtur
 ![Synthetic uncertainty fixture; not measured emotion or model performance](generated/synthetic-uncertainty.png)
 
 
+## Supplementary verification sources
+
+The thesis reports the verification outcomes and scope in Chapter 5. Its compact
+requirement-to-evidence mapping is in Appendix B. Detailed cases and timings can
+be inspected here without repeating the thesis's aggregate test counts:
+
+- [Authored engineering record](generated/engineering-v1.json): ordered dialogue
+  inputs, expected and observed stages, feature-extraction annotations, and
+  affect-pacing decisions. The trajectory summary appears above.
+- [Cognitive-rule and strategy tests](../../backend/tests/test_text_intelligence.py)
+  and [service-composition tests](../../backend/tests/test_services.py): the
+  selected support-routing cases below.
+- [Backend suites](../../backend/tests) and [browser suites](../../frontend/e2e):
+  API, ownership, safety, preferences, preparation, feedback, recovery, replay,
+  branching, research controls, and automated accessibility checks.
+- [Full-stack smoke record](generated/smoke-v1.json): database-backed workflows
+  and backend restarts with providers and trained inference disabled.
+- [HTTP performance record](generated/performance-v1.json): each operation's
+  sample count, median, nearest-rank P95, predeclared regression budget, and
+  outcome. This in-process HTTP benchmark is distinct from the service-level
+  timings in `engineering-v1.json`; it excludes network transit, MongoDB,
+  providers, trained inference, and concurrent clients. Read-only endpoints use
+  200 post-warm-up samples and state-changing operations use 100. Budgets are
+  regression tripwires rather than production service-level objectives.
+
+| Selected cognitive or routing condition | Verified rule behaviour | Not established |
+| --- | --- | --- |
+| Failure prediction combined with a request for advice | Pattern match; practical-help intent takes precedence; clause after “because” is copied as possible context | Psychological distortion, true cause, or actual preference for advice |
+| Explicit pushback vocabulary | Resistance value exceeds the routing threshold | Psychological resistance, its degree, persistence, or cause |
+| Practical-help question with default lexical affect | Practical suggestion has the highest strategy score | Helpfulness, timing, or superiority to alternatives |
+| Crisis flag with high arousal | Safety escalation overrides ordinary strategy scores | Detector sensitivity/specificity or response adequacy |
+| Two emotional-support messages | Analyser, selector, and offline template compose emotion-specific responses | Affect accuracy, therapeutic value, preference, or absence of harm |
+
+These selected positive paths and a precedence condition establish rule
+conformance. They do not systematically cover pattern combinations, ties,
+negation, quotation, malformed clauses, dialects, or correction of wrong
+inferences. The requirement mapping identifies supporting checks rather than
+certifying complete requirement satisfaction. In particular, maintainability has
+not been measured longitudinally, and no independent privacy or reproduction
+audit is implied.
+
 ## Validation record ? 28 September 2026
 
 - Backend: 253 tests passed with `TEST_MONGODB_URI=mongodb://localhost:27017`.

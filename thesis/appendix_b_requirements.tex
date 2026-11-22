@@ -1,7 +1,7 @@
 \chapter{Complete System Requirements}
 \label{app:complete-requirements}
 
-This appendix preserves the atomic requirements consolidated into the nine architectural groups in Chapter~\ref{chap:proposed-system-architecture}. The identifiers are also used by the verification traceability matrix in Appendix~\ref{app:verification-details}.
+This appendix preserves the atomic requirements consolidated into the nine architectural groups in Chapter~\ref{chap:proposed-system-architecture}. Section~\ref{sec:requirement-traceability} maps these identifiers to the verification evidence.
 
 \section{Functional Requirements}
 
@@ -139,3 +139,35 @@ This appendix preserves the atomic requirements consolidated into the nine archi
     \item[\textbf{NFR14. Appropriate presentation of uncertainty}]
     Affect outputs shall be presented as model estimates rather than verified facts. Low-confidence, conflicting, or unavailable results shall be distinguishable from supported predictions and shall not be converted into stronger psychological claims.
 \end{description}
+
+\clearpage
+\section{Requirement Traceability}
+\label{sec:requirement-traceability}
+
+Table~\ref{tab:requirements-traceability} connects the requirements to the checks reported in Section~\ref{sec:engineering-evaluation}. Results and scope limitations are explained there. The repository \href{https://github.com/ralucabiras/emotion-aware-role-play-model/blob/main/docs/evidence-package/engineering-demonstration.md}{engineering evidence} links the authored fixtures, test suites, and saved records; individual HTTP timings and budgets are in \href{https://github.com/ralucabiras/emotion-aware-role-play-model/blob/main/docs/evidence-package/generated/performance-v1.json}{the performance record}.
+
+\begin{table}[htbp]
+\centering
+\caption{Requirement groups and supporting verification evidence.}
+\label{tab:requirements-traceability}
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.22\textwidth}|>{\raggedright\arraybackslash}p{0.28\textwidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Requirement IDs} & \textbf{Capability} & \textbf{Supporting checks} \\ \hline
+FR1, FR26; NFR5, NFR13 & Ownership, persistence, deletion & API, security, stale-write, deletion, and recovery tests \\ \hline
+FR2, FR3, FR25; NFR3 & Onboarding, preferences, reflection & API and browser onboarding, preference, takeaway, and recovery journeys \\ \hline
+FR4--FR8, FR15, FR19 & Preparation and dialogue lifecycle & Unit, API, desktop/mobile, authored-trajectory, and smoke tests \\ \hline
+FR9, FR11--FR13; NFR2, NFR4 & Voice, context, fusion, fallback & Context, multimodal, transcription, transient-audio, missing-service, and browser tests \\ \hline
+FR10; NFR1 & Safety precedence & Crisis paraphrase, false-positive, precedence, API, and conversation tests \\ \hline
+FR29 & General support routing & Authored rule, extraction, pushback, strategy-selection, and precedence cases \\ \hline
+FR14; NFR14 & Bounded pacing and uncertainty & Authored pacing cases; preference, disagreement, failure, and replay tests \\ \hline
+FR16--FR18, FR20--FR21; NFR6, NFR8 & Evidence, wording, feedback & Determinism, evidence-linking, generation, fallback, feedback, and concurrency tests \\ \hline
+FR22--FR24 & Replay, branching, comparison & Backend, browser, stale-state, restart, and full-stack smoke tests \\ \hline
+FR27--FR28; NFR7 & Research controls and export & Protocol, eligibility, withdrawal, export-exclusion, provenance, and smoke tests \\ \hline
+NFR9 & Responsiveness and recovery & Recovery journeys, health checks, restart, and local performance record \\ \hline
+NFR10 & Accessible, responsive interface & axe-core, keyboard, and desktop/mobile browser checks \\ \hline
+NFR11--NFR12 & Modularity and testability & Interface inspection, provider substitution, and component-boundary suites \\ \hline
+\end{tabularx}
+\end{table}

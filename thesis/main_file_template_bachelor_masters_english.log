@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 20:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 20:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1111,7 +1111,7 @@ Package hyperref Info: Link coloring OFF on input line 38.
 \@outlinefile=\write4
 \openout4 = `main_file_template_bachelor_masters_english.out'.
 
-<FI.png, id=242, 578.8827pt x 290.0436pt>
+<FI.png, id=226, 578.8827pt x 290.0436pt>
 File: FI.png Graphic file (type png)
 <use FI.png>
 Package pdftex.def Info: FI.png  used on input line 47.
@@ -1223,7 +1223,7 @@ Chapter 4.
 [17] [18] (figures/request_sequence.tex (figures/technical_diagram_styles.tex))
 [19] [20] (figures/affect_policy.tex (figures/technical_diagram_styles.tex))
 [21] [22] (figures/app_practice_walkthrough.tex
-<figures/app-dashboard.png, id=607, 692.5875pt x 551.05875pt>
+<figures/app-dashboard.png, id=581, 692.5875pt x 551.05875pt>
 File: figures/app-dashboard.png Graphic file (type png)
 <use figures/app-dashboard.png>
 Package pdftex.def Info: figures/app-dashboard.png  used on input line 8.
@@ -1232,14 +1232,14 @@ File: figures/app-dashboard.png Graphic file (type png)
 <use figures/app-dashboard.png>
 Package pdftex.def Info: figures/app-dashboard.png  used on input line 11.
 (pdftex.def)             Requested size: 424.06033pt x 179.05792pt.
-<figures/app-roleplay.png, id=610, 696.80325pt x 558.888pt>
+<figures/app-roleplay.png, id=584, 696.80325pt x 558.888pt>
 File: figures/app-roleplay.png Graphic file (type png)
 <use figures/app-roleplay.png>
 Package pdftex.def Info: figures/app-roleplay.png  used on input line 16.
 (pdftex.def)             Requested size: 424.06033pt x 272.9356pt.
 )
 (figures/app_feedback_walkthrough.tex
-<figures/app-feedback.png, id=612, 305.34074pt x 520.94624pt>
+<figures/app-feedback.png, id=586, 305.34074pt x 520.94624pt>
 File: figures/app-feedback.png Graphic file (type png)
 <use figures/app-feedback.png>
 Package pdftex.def Info: figures/app-feedback.png  used on input line 8.
@@ -1270,7 +1270,7 @@ Underfull \hbox (badness 1248) in paragraph at lines 162--162
  []
 
 
-Underfull \vbox (badness 4181) has occurred while \output is active []
+Underfull \vbox (badness 3679) has occurred while \output is active []
 
  [33]
 [34] [35] [36]) (cap6.tex [37]
@@ -1299,115 +1299,30 @@ Appendix A.
 Appendix B.
 [46
 
-] [47] [48] [49] [50]) (appendix_c_supplementary_model_results.tex [51]
-Appendix C.
+] [47] [48] [49] [50] [51]) (appendix_c_supplementary_model_results.tex
 [52
 
-] (figures/supplementary_class_f1.tex)) (appendix_d_verification_details.tex [5
-3
+]
+Appendix C.
+[53
+
+] (figures/supplementary_class_f1.tex)) [54
 
 ]
-Appendix D.
-
-Underfull \hbox (badness 1210) in paragraph at lines 33--33
-[]|\OT1/cmr/m/n/8 No in-de-pen-dent pen-e-tra-
- []
-
-
-Underfull \hbox (badness 3849) in paragraph at lines 33--33
-\OT1/cmr/m/n/8 tion or deployed-backup
- []
-
-
-Underfull \hbox (badness 1769) in paragraph at lines 33--33
-[]|\OT1/cmr/m/n/8 Three en-hanced sce-nario
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-[]|\OT1/cmr/m/n/8 Limited live-device,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-\OT1/cmr/m/n/8 provider, and private-
- []
-
-
-Underfull \hbox (badness 2285) in paragraph at lines 33--33
-[]|\OT1/cmr/m/n/8 Lexical de-tec-tion can-not
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-[]|\OT1/cmr/m/n/8 No con-struct, clin-i-cal,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-[]|\OT1/cmr/m/n/8 Controlled prob-a-bil-i-ties;
- []
-
-
-Underfull \hbox (badness 4429) in paragraph at lines 33--33
-\OT1/cmr/m/n/8 load or provider-latency
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-[]|\OT1/cmr/m/n/8 No eval-u-a-tion with
- []
-
-
-Underfull \hbox (badness 3623) in paragraph at lines 71--71
-[]|\OT1/cmr/m/n/10 Psychological dis-tor-tion, true
- []
-
-
-Underfull \hbox (badness 7759) in paragraph at lines 71--71
-[]|\OT1/cmr/m/n/10 Detector sen-si-tiv-ity/specificity
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 71--71
-[]|\OT1/cmr/m/n/10 Affect ac-cu-racy, ther-a-peu-tic
- []
-
-
-Underfull \hbox (badness 1342) in paragraph at lines 78--78
-[]\OT1/cmr/bx/n/17.28 Automated, Full-Stack, and Ac-ces-si-bil-ity
- []
-
-
-Underfull \vbox (badness 2617) has occurred while \output is active []
-
- [54
-
-]
-[55]
-Underfull \hbox (badness 1231) in paragraph at lines 104--104
-[]|\OT1/cmr/m/n/10.95 Authenticated sce-nario cat-a-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 104--104
-[]|\OT1/cmr/m/n/10.95 Deterministic con-ver-sa-tion
- []
-
-) [56] [57] (main_file_template_bachelor_masters_english.aux)
+(main_file_template_bachelor_masters_english.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main_file_template_bachelor_masters_english.
 out' has not changed.
-(rerunfilecheck)             Checksum: F465723A0C420BA28233F768622E8832;12226.
+(rerunfilecheck)             Checksum: 6DE1A01E321C86640BBF9B39BF2AA8CF;11353.
  ) 
 Here is how much of TeX's memory you used:
- 38249 strings out of 467871
- 889675 string characters out of 5418375
- 1425806 words of memory out of 5000000
- 66251 multiletter control sequences out of 15000+600000
+ 38224 strings out of 467871
+ 889060 string characters out of 5418375
+ 1416591 words of memory out of 5000000
+ 66239 multiletter control sequences out of 15000+600000
  642450 words of font info for 96 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,13n,104p,1279b,2677s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1433,10 +1348,10 @@ ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/ra
 luc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:
 /Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt1
 2.pfb>
-Output written on main_file_template_bachelor_masters_english.pdf (66 pages, 93
-1560 bytes).
+Output written on main_file_template_bachelor_masters_english.pdf (63 pages, 91
+0302 bytes).
 PDF statistics:
- 937 PDF objects out of 1000 (max. 8388607)
- 207 named destinations out of 1000 (max. 500000)
- 541 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 896 PDF objects out of 1000 (max. 8388607)
+ 197 named destinations out of 1000 (max. 500000)
+ 509 words of extra memory for PDF output out of 10000 (max. 10000000)
 
