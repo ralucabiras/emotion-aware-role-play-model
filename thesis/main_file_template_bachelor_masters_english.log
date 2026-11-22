@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  1 NOV 2026 12:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 11:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1439,7 +1439,7 @@ Here is how much of TeX's memory you used:
  66358 multiletter control sequences out of 15000+600000
  643676 words of font info for 100 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,13n,104p,2166b,2456s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,13n,104p,1168b,2456s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmbx10.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmbx12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/p
@@ -1467,7 +1467,7 @@ sfonts/cm/cmti12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
 public/amsfonts/cm/cmtt12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fon
 ts/type1/public/amsfonts/cm/cmtt8.pfb>
 Output written on main_file_template_bachelor_masters_english.pdf (76 pages, 80
-3074 bytes).
+3182 bytes).
 PDF statistics:
  1020 PDF objects out of 1200 (max. 8388607)
  223 named destinations out of 1000 (max. 500000)
