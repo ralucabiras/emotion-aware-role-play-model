@@ -122,17 +122,30 @@ Replay is a read-only projection of the recorded exchanges, state transitions, g
 
 Measurement boundaries prevent later reflection from entering rehearsal feedback. Missing legacy decisions or model output are displayed as gaps rather than regenerated. A branch validates source ownership, version, policy compatibility, and the selected pre-turn snapshot, then stores its lineage and copied-turn boundary. Action-card suggestions reuse only eligible participant turns inside the measurement window; safety-interrupted content and copied branch context are excluded, and every field remains editable before saving.
 
-The React interface follows the same lifecycle: preparation, active rehearsal, feedback, replay or branching, and an action card. The representative role-play view in Figure~\ref{fig:app-roleplay} combines the transcript and composer with scenario progress and optional voice controls. The browser includes the displayed session version and a fresh request identifier, clears a draft only after confirmation, and offers reload after a conflict while preserving unsent text. Semantic controls, visible focus, live status regions, reduced-motion rules, and responsive layouts support keyboard, desktop, and mobile use.
+The React interface makes this lifecycle available as a sequence of practice views. Figure~\ref{fig:app-roleplay}(a) shows the dashboard controls for starting a reflection or role-play and continuing a saved session. A new role-play leads to scenario and difficulty selection before rehearsal; a saved session restores the existing conversation. Recent activity identifies each session by title, turn count, and, for rehearsals, difficulty, with separate rename and delete controls.
 \label{subsec:frontend-navigation}
+
+During rehearsal, the participant reads the character's reply and enters a response in the message composer. Figure~\ref{fig:app-roleplay}(b) shows the workload scenario's objective, current stage, turn count, and first exchange. The participant can retry the last turn, pause, or choose \emph{Finish \& review}; the pacing and optional voice controls below the transcript provide further control over the exchange.
 \label{subsec:frontend-roleplay-workspace}
+
+After finishing, the feedback view in Figure~\ref{fig:app-feedback} distinguishes the completion reason from the language features observed. In this example, the participant ended the attempt manually: request and supporting detail were observed in turn~1, while the remaining features are marked \emph{Not yet observed}. Strengths, next-attempt suggestions, and turn-linked evidence make the basis of the feedback visible. The participant can then revisit the conversation through replay or branching and save a personal takeaway or action card for later practice.
 \label{subsec:frontend-feedback-interfaces}
+
+The browser includes the displayed session version and a fresh request identifier, clears a draft only after confirmation, and offers reload after a conflict while preserving unsent text. Semantic controls, visible focus, live status regions, reduced-motion rules, and responsive layouts support keyboard, desktop, and mobile use.
 \label{subsec:frontend-testing}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.94\textwidth,height=0.22\textheight,keepaspectratio]{figures/app-roleplay.png}
-\caption{Representative role-play workspace with transcript, scenario state, message composer, and optional voice interaction.}
+\input{figures/app_practice_walkthrough}
+\caption[Entering practice and conducting a rehearsal.]{Entering practice and conducting a rehearsal. (a) Dashboard crops show the start controls and recent sessions. (b) The rehearsal crop shows the scenario, progress, participant response, and retry, pause, and review controls.}
 \label{fig:app-roleplay}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\input{figures/app_feedback_walkthrough}
+\caption[Reviewing feedback after a rehearsal.]{Cropped views of the same feedback screen. (a) The completion reason and feature checks distinguish observed language from personal competence. (b) Strengths, suggestions, and source-turn evidence support the next attempt. The intervening comparison area is omitted for readability.}
+\label{fig:app-feedback}
 \end{figure}
 
 Voice input is opt-in for each exchange. The browser requests microphone access only after an explicit action, records at most 20 seconds, converts the signal to mono 16~kHz PCM WAV, and keeps it in component memory. A transcription result enters the composer for review rather than becoming a turn automatically. The reviewed text and optional audio are then sent together so prediction, pacing, and stored wording refer to one exchange. The backend validates the audio and processes it in memory; raw recordings are not placed in sessions or research exports.
@@ -145,6 +158,8 @@ The interface distinguishes the trained multimodal distribution from a separate 
 Optional research support is limited to a versioned pilot workflow: explicit consent and eligibility, three ordered required tasks, immediate questionnaires, pseudonymous progress records, and a text-free export. Required tasks deliberately bypass multimodal inference and affect-aware pacing. The workflow therefore supports collection for the baseline deterministic rehearsal only; its implementation does not make the pilot evidence about adaptation. This distinction is carried into the evaluation in Chapter~\ref{chap5}.
 \label{sec:research-workflow-implementation}
 
+% Keep the two walkthrough figures with the frontend section.
+\clearpage
 \section{Security, Persistence, and Deployment}
 \label{sec:security-privacy-data-protection}
 \label{sec:deployment-configuration}

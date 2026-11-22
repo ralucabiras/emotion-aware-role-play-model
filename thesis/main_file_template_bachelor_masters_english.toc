@@ -25,46 +25,46 @@
 \contentsline {section}{\numberline {4.3}Backend and Request Processing}{18}{section.4.3}%
 \contentsline {section}{\numberline {4.4}Role-Play and Affect-Adaptation Engine}{19}{section.4.4}%
 \contentsline {section}{\numberline {4.5}Feedback and Frontend Workflow}{22}{section.4.5}%
-\contentsline {section}{\numberline {4.6}Security, Persistence, and Deployment}{23}{section.4.6}%
-\contentsline {chapter}{\numberline {5}Evaluation and Results}{25}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Evaluation Methodology}{25}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Evidence Scope and Decision Rules}{25}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Benchmark Task and Speaker-Independent Protocol}{26}{subsection.5.1.2}%
-\contentsline {subsection}{\numberline {5.1.3}Measures and Statistical Comparison}{27}{subsection.5.1.3}%
-\contentsline {section}{\numberline {5.2}Contextual Text Results}{27}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Speech, Fusion, and Calibration Results}{28}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Audio and Predeclared Fusion}{28}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Classification--Calibration Trade-off}{29}{subsection.5.3.2}%
-\contentsline {section}{\numberline {5.4}Application Verification}{31}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}Bounded Policy Behaviour}{32}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}Integrated Quality and Local Responsiveness}{32}{subsection.5.4.2}%
-\contentsline {section}{\numberline {5.5}Supplementary Pilot Results}{33}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Threats to Validity}{34}{section.5.6}%
-\contentsline {paragraph}{Model and statistical validity.}{34}{section*.10}%
-\contentsline {paragraph}{Construct and external validity.}{34}{section*.11}%
-\contentsline {paragraph}{Application and deployment validity.}{35}{section*.12}%
-\contentsline {paragraph}{Pilot validity.}{35}{section*.13}%
-\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{36}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Conclusions for the Research Questions}{36}{section.6.1}%
-\contentsline {paragraph}{RQ1: conversational context.}{36}{section*.14}%
-\contentsline {paragraph}{RQ2: multimodal complementarity and calibration.}{36}{section*.15}%
-\contentsline {paragraph}{RQ3: bounded use of affective evidence.}{36}{section*.16}%
-\contentsline {paragraph}{RQ4: integrated application quality.}{37}{section*.17}%
-\contentsline {section}{\numberline {6.2}Contributions and Material Limitations}{37}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Prioritised Future Work}{38}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Final Conclusion}{38}{section.6.4}%
-\contentsline {chapter}{Bibliography}{39}{section*.18}%
-\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{43}{appendix.A}%
-\contentsline {chapter}{\numberline {B}Complete System Requirements}{44}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Functional Requirements}{44}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Non-Functional Requirements}{47}{section.B.2}%
-\contentsline {chapter}{\numberline {C}Supplementary Model Results}{50}{appendix.C}%
-\contentsline {section}{\numberline {C.1}Reproduction Provenance}{50}{section.C.1}%
-\contentsline {section}{\numberline {C.2}Four-Class Per-Class Results}{50}{section.C.2}%
-\contentsline {section}{\numberline {C.3}Exploratory Six-Class Experiment}{52}{section.C.3}%
-\contentsline {section}{\numberline {C.4}Operational Packaging Diagnostic}{54}{section.C.4}%
-\contentsline {chapter}{\numberline {D}Application Verification Details}{55}{appendix.D}%
-\contentsline {section}{\numberline {D.1}Requirement Traceability}{55}{section.D.1}%
-\contentsline {section}{\numberline {D.2}Authored Policy Cases}{55}{section.D.2}%
-\contentsline {section}{\numberline {D.3}Automated, Full-Stack, and Accessibility Evidence}{57}{section.D.3}%
-\contentsline {section}{\numberline {D.4}Local Performance Detail}{57}{section.D.4}%
+\contentsline {section}{\numberline {4.6}Security, Persistence, and Deployment}{26}{section.4.6}%
+\contentsline {chapter}{\numberline {5}Evaluation and Results}{27}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Evaluation Methodology}{27}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Evidence Scope and Decision Rules}{27}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Benchmark Task and Speaker-Independent Protocol}{28}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Measures and Statistical Comparison}{29}{subsection.5.1.3}%
+\contentsline {section}{\numberline {5.2}Contextual Text Results}{29}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Speech, Fusion, and Calibration Results}{30}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Audio and Predeclared Fusion}{30}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Classification--Calibration Trade-off}{31}{subsection.5.3.2}%
+\contentsline {section}{\numberline {5.4}Application Verification}{33}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Bounded Policy Behaviour}{34}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Integrated Quality and Local Responsiveness}{34}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Supplementary Pilot Results}{35}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Threats to Validity}{36}{section.5.6}%
+\contentsline {paragraph}{Model and statistical validity.}{36}{section*.10}%
+\contentsline {paragraph}{Construct and external validity.}{36}{section*.11}%
+\contentsline {paragraph}{Application and deployment validity.}{37}{section*.12}%
+\contentsline {paragraph}{Pilot validity.}{37}{section*.13}%
+\contentsline {chapter}{\numberline {6}Conclusions and Future Work}{38}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Conclusions for the Research Questions}{38}{section.6.1}%
+\contentsline {paragraph}{RQ1: conversational context.}{38}{section*.14}%
+\contentsline {paragraph}{RQ2: multimodal complementarity and calibration.}{38}{section*.15}%
+\contentsline {paragraph}{RQ3: bounded use of affective evidence.}{38}{section*.16}%
+\contentsline {paragraph}{RQ4: integrated application quality.}{39}{section*.17}%
+\contentsline {section}{\numberline {6.2}Contributions and Material Limitations}{39}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Prioritised Future Work}{40}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Final Conclusion}{40}{section.6.4}%
+\contentsline {chapter}{Bibliography}{41}{section*.18}%
+\contentsline {chapter}{\numberline {A}Generative AI Tools Usage}{45}{appendix.A}%
+\contentsline {chapter}{\numberline {B}Complete System Requirements}{46}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Functional Requirements}{46}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Non-Functional Requirements}{49}{section.B.2}%
+\contentsline {chapter}{\numberline {C}Supplementary Model Results}{52}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Reproduction Provenance}{52}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Four-Class Per-Class Results}{52}{section.C.2}%
+\contentsline {section}{\numberline {C.3}Exploratory Six-Class Experiment}{54}{section.C.3}%
+\contentsline {section}{\numberline {C.4}Operational Packaging Diagnostic}{56}{section.C.4}%
+\contentsline {chapter}{\numberline {D}Application Verification Details}{57}{appendix.D}%
+\contentsline {section}{\numberline {D.1}Requirement Traceability}{57}{section.D.1}%
+\contentsline {section}{\numberline {D.2}Authored Policy Cases}{57}{section.D.2}%
+\contentsline {section}{\numberline {D.3}Automated, Full-Stack, and Accessibility Evidence}{59}{section.D.3}%
+\contentsline {section}{\numberline {D.4}Local Performance Detail}{59}{section.D.4}%

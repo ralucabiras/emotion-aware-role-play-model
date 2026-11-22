@@ -5,24 +5,24 @@
 \contentsline {table}{\numberline {3.1}{\ignorespaces Grouped functional and non-functional requirements.}}{13}{table.3.1}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Four-class contextual-text results on five held-out IEMOCAP sessions.}}{27}{table.5.1}%
-\contentsline {table}{\numberline {5.2}{\ignorespaces Predeclared equal-weight fusion compared with contextual text.}}{29}{table.5.2}%
-\contentsline {table}{\numberline {5.3}{\ignorespaces Classification and probability quality for independently evaluated fold configurations.}}{30}{table.5.3}%
-\contentsline {table}{\numberline {5.4}{\ignorespaces Aggregate application-verification evidence.}}{31}{table.5.4}%
-\contentsline {table}{\numberline {5.5}{\ignorespaces Supplementary pilot results for the non-adaptive required workflow. Ratings use seven-point scales.}}{34}{table.5.5}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Four-class contextual-text results on five held-out IEMOCAP sessions.}}{29}{table.5.1}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Predeclared equal-weight fusion compared with contextual text.}}{31}{table.5.2}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Classification and probability quality for independently evaluated fold configurations.}}{32}{table.5.3}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Aggregate application-verification evidence.}}{33}{table.5.4}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Supplementary pilot results for the non-adaptive required workflow. Ratings use seven-point scales.}}{36}{table.5.5}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {C.1}{\ignorespaces Compact provenance for the principal IEMOCAP experiments and packaging run.}}{51}{table.C.1}%
-\contentsline {table}{\numberline {C.2}{\ignorespaces Per-class results for the four-class text configurations.}}{51}{table.C.2}%
-\contentsline {table}{\numberline {C.3}{\ignorespaces Per-class results for the audio and fusion configurations.}}{52}{table.C.3}%
-\contentsline {table}{\numberline {C.4}{\ignorespaces Macro F1 by held-out IEMOCAP session.}}{52}{table.C.4}%
-\contentsline {table}{\numberline {C.5}{\ignorespaces Exploratory six-class contextual-text comparison.}}{52}{table.C.5}%
-\contentsline {table}{\numberline {C.6}{\ignorespaces Fold variation for the exploratory six-class comparison.}}{53}{table.C.6}%
-\contentsline {table}{\numberline {C.7}{\ignorespaces Per-class results for the exploratory six-class task.}}{53}{table.C.7}%
+\contentsline {table}{\numberline {C.1}{\ignorespaces Compact provenance for the principal IEMOCAP experiments and packaging run.}}{53}{table.C.1}%
+\contentsline {table}{\numberline {C.2}{\ignorespaces Per-class results for the four-class text configurations.}}{53}{table.C.2}%
+\contentsline {table}{\numberline {C.3}{\ignorespaces Per-class results for the audio and fusion configurations.}}{54}{table.C.3}%
+\contentsline {table}{\numberline {C.4}{\ignorespaces Macro F1 by held-out IEMOCAP session.}}{54}{table.C.4}%
+\contentsline {table}{\numberline {C.5}{\ignorespaces Exploratory six-class contextual-text comparison.}}{54}{table.C.5}%
+\contentsline {table}{\numberline {C.6}{\ignorespaces Fold variation for the exploratory six-class comparison.}}{55}{table.C.6}%
+\contentsline {table}{\numberline {C.7}{\ignorespaces Per-class results for the exploratory six-class task.}}{55}{table.C.7}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {D.1}{\ignorespaces Grouped requirement-to-evidence traceability matrix.}}{56}{table.D.1}%
-\contentsline {table}{\numberline {D.2}{\ignorespaces Enhanced-dialogue trajectory results.}}{56}{table.D.2}%
-\contentsline {table}{\numberline {D.3}{\ignorespaces Implemented cognitive-heuristic and support-routing checks.}}{57}{table.D.3}%
-\contentsline {table}{\numberline {D.4}{\ignorespaces Local single-client application latency.}}{58}{table.D.4}%
+\contentsline {table}{\numberline {D.1}{\ignorespaces Grouped requirement-to-evidence traceability matrix.}}{58}{table.D.1}%
+\contentsline {table}{\numberline {D.2}{\ignorespaces Enhanced-dialogue trajectory results.}}{58}{table.D.2}%
+\contentsline {table}{\numberline {D.3}{\ignorespaces Implemented cognitive-heuristic and support-routing checks.}}{59}{table.D.3}%
+\contentsline {table}{\numberline {D.4}{\ignorespaces Local single-client application latency.}}{60}{table.D.4}%
