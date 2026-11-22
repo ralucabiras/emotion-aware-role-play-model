@@ -1,7 +1,7 @@
 # Dissertation Revision Plan
 
 Created: 2026-11-22  
-Status: Revision in progress; Notes 1, 2, 3, and 4 completed and checked. Note 5 partially addressed; final length review remains open.
+Status: Revision in progress; Notes 1, 2, 3, 4, and 6 completed and checked. Note 5 partially addressed; final length review remains open.
 
 This tracker covers the author's 20 reading notes and the changes proposed in the accompanying review. Use it to record what remains to be revised and checked.
 
@@ -91,9 +91,9 @@ Remaining work: the current build is still 5–7 chapter-content pages and 11–
 
 Location: `cap3.tex`, Grouped System Requirements.
 
-- [ ] Replace the opening about the original specification and its consolidation with an explanation of the capabilities users need.
-- [ ] Introduce the requirement groups and identifiers after their purpose is clear.
-- [ ] Remove editorial justification such as “This grouping is sufficient for the design argument.”
+- [x] Replace the opening about the original specification and its consolidation with an explanation of the capabilities users need.
+- [x] Introduce the requirement groups and identifiers after their purpose is clear.
+- [x] Remove editorial justification such as “This grouping is sufficient for the design argument.”
 
 Complete when the opening explains system requirements rather than the history of editing the dissertation.
 
@@ -264,3 +264,4 @@ Complete when repetition is limited to necessary orientation and final conclusio
 | 2026-11-22 | Note 3: Context and Problem | Rewrote the opening of Section 1.1 around anticipated confrontation, anxiety, avoidance, and difficulty finding words. Explained private, repeatable rehearsal and reflection before introducing language models and technical control; stated explicitly that AffectLab does not diagnose or treat anxiety. | Rebuilt the 67-page PDF with no LaTeX errors, undefined citations/references, or overfull boxes. Visually checked the revised opening and following page; Section 1.1 fits on one page and Section 1.2 starts on the next. Source hashes confirm that Chapter 1 after Section 1.1, all other thesis sources, and REDUCTION_PLAN.md are unchanged, preserving all pilot material. Other pending notes remain open. |
 | 2026-11-22 | Note 4: Equations | Replaced Chapter 2's causal-context notation with prose about the current and preceding turns, excluding future turns and annotated neighbouring labels. Replaced its duplicate fusion formula with a weighted-average explanation. Retained the implementation fusion equation and defined all distributions, the weight range, and equal weighting. Explained temperature scaling in prose, including validation-only NLL fitting and unchanged application to held-out test logits; removed the obsolete temperature-equation label. | Rebuilt the 67-page PDF with no LaTeX errors, undefined citations/references, or overfull boxes. Visually checked the affected pages and their continuations (numbered pages 8–9, 18–19, and 27–28). Confirmed that only one displayed equation remains, with no obsolete equation references, and checked the temperature-fitting account against the implementation. Citation commands are unchanged. Source comparisons confirm that all Chapter 5 results and pilot material, all other thesis sources, the bibliography, and REDUCTION_PLAN.md are unchanged. Other pending notes remain open. |
 | 2026-11-22 | Note 5: Length audit and local reduction; partially addressed | Removed one repeated 64-word overview paragraph from Section 4.1, eliminating Chapter 4's sparse final continuation. Recorded the current page breakdown and the remaining dependencies on appendix reduction, prose consolidation, and readable replacement figures. | Rebuilt successfully: 66 physical pages and 37 chapter-content pages, down from 67 and 38 before this change. Visually checked numbered pages 16–23. No LaTeX errors, undefined citations/references, or overfull boxes; all 35 bibliography entries remain cited. Source hashes confirm that every other thesis source, figure, the bibliography, and REDUCTION_PLAN.md are unchanged; an exact source comparison confirms that all other Chapter 4 text, including pilot passages, is unchanged. Note 5 remains open for the remaining reductions and the final pagination review. |
+| 2026-11-22 | Note 6: Opening of Section 3.2 | Replaced the specification-history opening with the capabilities users need: preparation, private rehearsal, feedback, control over data and optional features, text-only access, and clear interruption and service-failure handling. Introduced the nine requirement groups and FR/NFR identifiers after their purpose, with references to the full requirements and verification evidence. Removed editorial justification from the opening and the later acceptance-criteria explanation. | Rebuilt successfully: 66 physical pages and 37 chapter-content pages, unchanged. Visually checked numbered pages 12-15; the opening fits before the unchanged requirements table, with no sparse continuation page. No LaTeX errors, undefined citations/references, or overfull boxes. Source hashes and exact comparisons confirm that only Section 3.2 prose changed; all requirements, identifiers, citations, pilot material, other thesis sources, and REDUCTION_PLAN.md are unchanged. Other pending notes remain open. |

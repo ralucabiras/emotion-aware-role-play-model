@@ -1,6 +1,7 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 12:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.22)  22 NOV 2026 12:47
 entering extended mode
  restricted \write18 enabled.
+ file:line:error style messages enabled.
  %&-line parsing enabled.
 **./main_file_template_bachelor_masters_english.tex
 (main_file_template_bachelor_masters_english.tex
@@ -1221,7 +1222,7 @@ Chapter 4.
 
 ] (figures/emotion_pipeline.tex) [17] [18] (figures/request_sequence.tex)
 [19] [20] (figures/affect_policy.tex) [21]
-<figures/app-roleplay.png, id=620, 696.80325pt x 558.888pt>
+<figures/app-roleplay.png, id=621, 696.80325pt x 558.888pt>
 File: figures/app-roleplay.png Graphic file (type png)
 <use figures/app-roleplay.png>
 Package pdftex.def Info: figures/app-roleplay.png  used on input line 133.
@@ -1461,9 +1462,9 @@ fb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm
 sfonts/cm/cmtt12.pfb><C:/Users/raluc/AppData/Local/Programs/MiKTeX/fonts/type1/
 public/amsfonts/cm/cmtt8.pfb>
 Output written on main_file_template_bachelor_masters_english.pdf (66 pages, 78
-3690 bytes).
+3811 bytes).
 PDF statistics:
- 966 PDF objects out of 1000 (max. 8388607)
+ 967 PDF objects out of 1000 (max. 8388607)
  212 named destinations out of 1000 (max. 500000)
  511 words of extra memory for PDF output out of 10000 (max. 10000000)
 

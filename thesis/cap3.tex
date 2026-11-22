@@ -28,7 +28,7 @@ These boundaries align the architecture with the research questions. Contextual 
 \section{Grouped System Requirements}
 \label{sec:system-requirements-scope}
 
-The original specification contains 29 functional requirements (FR1--FR29) and 14 non-functional requirements (NFR1--NFR14). Table~\ref{tab:grouped-requirements} consolidates them into nine architectural groups while retaining every identifier used by the implementation and the traceability analysis in Appendix~\ref{app:verification-details}. This grouping is sufficient for the design argument; Appendix~B preserves the complete atomic wording as reproducibility material.
+Users need to prepare difficult conversations, rehearse privately, and review feedback. They need control over their data and optional features, text-only access, and clear handling of interruptions or unavailable services. Table~\ref{tab:grouped-requirements} groups these capabilities and quality constraints into nine areas. Functional (FR1--FR29) and non-functional (NFR1--NFR14) identifiers link each area to the full requirements in Appendix~\ref{app:complete-requirements} and verification evidence in Appendix~\ref{app:verification-details}.
 
 \begin{table}[H]
 \centering
@@ -53,7 +53,7 @@ Operational quality & NFR9--NFR10 & Bounded failures and recovery, measurable re
 
 The groups also distinguish core from optional capability. Authentication, text interaction, scenario policy, safety handling, deterministic response templates, evidence-based feedback, and session management form the core. Voice capture, transcription, trained multimodal inference, generative wording, and research participation are optional. A valid implementation may expose an optional feature only when its configuration and failure path preserve the core requirements.
 
-Consolidation does not weaken the atomic acceptance criteria. Each identifier still denotes a separately testable obligation, while a group states the common architectural boundary through which those obligations are implemented. Chapter~\ref{chap5} therefore traces identifiers to evidence rather than treating a group as a single pass/fail claim. This is particularly important for optional features: successful text fallback does not prove trained-inference quality, and successful provider generation does not replace verification of the underlying deterministic action.
+Each requirement identifier denotes a separately testable obligation; its group identifies the common architectural boundary through which it is implemented. Chapter~\ref{chap5} therefore traces identifiers to evidence rather than treating a group as a single pass/fail claim. This is particularly important for optional features: successful text fallback does not prove trained-inference quality, and successful provider generation does not replace verification of the underlying deterministic action.
 
 \section{Dialogue, Affect Adaptation, and Safety Boundaries}
 \label{sec:dialogue-affect-safety-boundaries}
